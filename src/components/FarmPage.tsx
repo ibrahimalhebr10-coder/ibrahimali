@@ -955,8 +955,68 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
 
               {/* الشريط المختصر - دائماً ظاهر */}
               <div className="border-t border-gray-200 bg-white">
-                <div className="p-3">
-                  {/* زر الحجز */}
+                {/* الملخص المنظم - دائماً ظاهر */}
+                {!isBottomSheetExpanded && (
+                  <div className="px-4 pt-3 pb-2 space-y-2">
+                    {/* الصف الأول: عدد الأشجار والإجمالي */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                          <TreePine className="w-4 h-4 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="text-xs text-gray-500">عدد الأشجار</p>
+                          <p className="text-sm font-bold text-gray-900">{totalTrees} شجرة</p>
+                        </div>
+                      </div>
+
+                      {selectedContract && (
+                        <div className="text-left">
+                          <p className="text-xs text-gray-500">إجمالي الحجز</p>
+                          <p className={`text-lg font-black text-green-600 transition-all duration-300 ${
+                            priceUpdateAnimation ? 'scale-110' : 'scale-100'
+                          }`}>
+                            {totalCost.toLocaleString()} <span className="text-sm">ر.س</span>
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* الصف الثاني: رسوم الصيانة */}
+                    {selectedContract && farm?.treeTypes?.[0]?.varieties?.[0]?.maintenance_fee && farm.treeTypes[0].varieties[0].maintenance_fee > 0 && (
+                      <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-2.5 border border-amber-200">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Shield className="w-4 h-4 text-amber-600" />
+                            <div>
+                              <p className="text-xs text-gray-600">رسوم الصيانة السنوية</p>
+                              <p className="text-xs font-bold text-amber-700">
+                                {maintenanceFee.toLocaleString()} ر.س/سنة
+                              </p>
+                            </div>
+                          </div>
+                          {farm.firstYearMaintenanceFree && (
+                            <div className="bg-green-100 px-2 py-1 rounded-md">
+                              <p className="text-xs font-bold text-green-700">السنة 1 مجاناً</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* زر عرض التفاصيل */}
+                    <button
+                      onClick={() => setIsBottomSheetExpanded(true)}
+                      className="w-full py-1.5 text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1 transition-colors"
+                    >
+                      <span>عرض التفاصيل الكاملة</span>
+                      <Sparkles className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+
+                {/* زر الحجز */}
+                <div className="p-3 pt-2">
                   {selectedContract ? (
                     <button
                       onClick={handleSaveReservation}
@@ -971,7 +1031,7 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                       ) : (
                         <>
                           <CheckCircle2 className="w-5 h-5" />
-                          <span>أكمل حجز أشجار مزرعتك 🌱</span>
+                          <span>أكمل حجز أشجار مزرعتك</span>
                         </>
                       )}
                     </button>
@@ -990,34 +1050,6 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                     </button>
                   )}
                 </div>
-
-                {/* شريط الملخص السريع */}
-                {!isBottomSheetExpanded && (
-                  <button
-                    onClick={() => setIsBottomSheetExpanded(true)}
-                    className="w-full border-t border-gray-200 bg-gray-50 hover:bg-gray-100 transition-colors py-2.5 flex items-center justify-center gap-2 text-sm"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center gap-1.5">
-                        <TreePine className="w-4 h-4 text-green-600" />
-                        <span className="font-bold text-gray-900">{totalTrees}</span>
-                      </div>
-                      {selectedContract && (
-                        <>
-                          <div className="w-px h-4 bg-gray-300" />
-                          <div className="flex items-center gap-1.5">
-                            <span className={`text-xs font-medium transition-all duration-300 ${
-                              priceUpdateAnimation ? 'text-green-600 scale-110' : 'text-gray-600'
-                            }`}>
-                              {totalCost.toLocaleString()} ريال
-                            </span>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                    <Sparkles className="w-4 h-4 text-gray-400" />
-                  </button>
-                )}
               </div>
             </div>
           </div>
