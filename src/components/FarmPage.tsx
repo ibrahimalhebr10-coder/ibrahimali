@@ -350,133 +350,134 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                   const colors = getContractColors();
 
                   return (
-                    <div key={contract.id} className="flex-shrink-0 snap-center w-36 lg:w-40">
-                      <div className="relative pt-4 pb-1">
-                        {/* Badge "الأكثر شعبية" - فوق البطاقة تماماً بدون تداخل */}
+                    <div key={contract.id} className="flex-shrink-0 snap-center w-32 lg:w-36">
+                      <div className="relative pt-3">
+                        {/* Badge "الأكثر شعبية" - فوق البطاقة تماماً */}
                         {isRecommended && (
-                          <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 z-20">
-                            <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-3 py-1 rounded-full text-[9px] lg:text-[10px] font-bold shadow-xl flex items-center gap-1 border-2 border-amber-300">
-                              <Sparkles className="w-3 h-3" />
+                          <div className="absolute -top-1 left-1/2 -translate-x-1/2 z-20">
+                            <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2 py-0.5 rounded-full text-[9px] font-bold shadow-xl flex items-center gap-1 border border-amber-300">
+                              <Sparkles className="w-2.5 h-2.5" />
                               <span>الأكثر شعبية</span>
                             </div>
                           </div>
                         )}
 
-                        {/* البطاقة الرئيسية */}
+                        {/* البطاقة المربعة */}
                         <button
                           onClick={() => setSelectedContract(contract)}
-                          className="w-full rounded-2xl flex flex-col bg-white transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-lg relative overflow-hidden"
+                          className="w-full aspect-square rounded-xl lg:rounded-2xl flex flex-col items-center justify-center bg-white transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-lg relative overflow-hidden p-3 lg:p-4"
                           style={{
                             boxShadow: isSelected
-                              ? `0 8px 24px ${colors.shadow}, 0 16px 48px ${colors.shadow}`
-                              : `0 4px 12px ${colors.shadow}`,
-                            border: `3px solid ${colors.border}`,
+                              ? `0 4px 16px ${colors.shadow}, 0 8px 32px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.05)`
+                              : `0 2px 8px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.5)`,
+                            background: colors.iconGradient,
+                            border: `2px solid ${colors.border}`,
                             backdropFilter: 'blur(12px)',
                             WebkitBackdropFilter: 'blur(12px)'
                           }}
                         >
-                          {/* علامة الاختيار - في الزاوية فقط */}
+                          {/* علامة الاختيار - في الزاوية */}
                           {isSelected && (
-                            <div className="absolute top-2 right-2 z-10">
-                              <div className="w-6 h-6 lg:w-7 lg:h-7 bg-white rounded-full flex items-center justify-center shadow-xl border-2 border-green-500">
-                                <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-green-600" />
+                            <div className="absolute top-1.5 right-1.5 z-10">
+                              <div className="w-5 h-5 lg:w-6 lg:h-6 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-green-500">
+                                <CheckCircle2 className="w-3.5 h-3.5 lg:w-4 lg:h-4 text-green-600" />
                               </div>
                             </div>
                           )}
 
-                          {/* قسم العنوان */}
-                          <div
-                            className="px-3 py-2 rounded-t-2xl text-center"
-                            style={{
-                              background: colors.iconGradient
-                            }}
-                          >
-                            <div className="flex items-center justify-center gap-1.5 mb-1">
-                              <Award className={`w-3.5 h-3.5 ${
+                          {/* محتوى البطاقة - مرتب بدون تداخلات */}
+                          <div className="flex flex-col items-center justify-center gap-1.5 lg:gap-2 w-full">
+                            {/* عنوان صغير في الأعلى */}
+                            <div className="flex items-center gap-1">
+                              <Award className={`w-2.5 h-2.5 lg:w-3 lg:h-3 ${
                                 isSelected || isRecommended ? 'text-white' : 'text-green-700'
                               }`} />
-                              <p className={`text-[10px] lg:text-[11px] font-bold ${
-                                isSelected || isRecommended ? 'text-white' : 'text-green-900'
+                              <p className={`text-[8px] lg:text-[9px] font-bold ${
+                                isSelected || isRecommended ? 'text-white/90' : 'text-gray-600'
                               }`}>
                                 عقد انتفاع
                               </p>
                             </div>
-                            <div className={`w-12 h-0.5 rounded-full mx-auto ${
-                              isSelected || isRecommended ? 'bg-white/40' : 'bg-green-300'
-                            }`} />
-                          </div>
 
-                          {/* قسم المحتوى */}
-                          <div className="px-4 py-4 bg-gradient-to-b from-white to-gray-50">
                             {/* مدة العقد */}
-                            <div className="text-center mb-3">
-                              <p className="text-[10px] font-medium text-gray-600 mb-1">مدة العقد</p>
-                              <p className="text-5xl lg:text-6xl font-black text-green-700 leading-none">
+                            <div className="text-center">
+                              <p className={`text-3xl lg:text-4xl font-black leading-none ${
+                                isSelected || isRecommended ? 'text-white drop-shadow-lg' : 'text-green-700'
+                              }`}>
                                 {contract.duration_years}
                               </p>
-                              <p className="text-[11px] font-bold text-gray-600 mt-1">
+                              <p className={`text-[9px] lg:text-[10px] font-bold mt-0.5 ${
+                                isSelected || isRecommended ? 'text-white/90' : 'text-gray-600'
+                              }`}>
                                 {contract.duration_years === 1 ? 'سنة' : 'سنوات'}
                               </p>
                             </div>
 
-                            {/* السنوات المجانية */}
+                            {/* السنوات المجانية - إذا وجدت */}
                             {contract.bonus_years > 0 && (
                               <>
-                                <div className="flex items-center justify-center gap-2 mb-3">
-                                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
-                                  <Plus className="w-3.5 h-3.5 text-emerald-600" />
-                                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
-                                </div>
+                                <div className={`w-10 h-px rounded-full ${
+                                  isSelected || isRecommended ? 'bg-white/30' : 'bg-gray-300'
+                                }`} />
 
-                                <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl p-3 shadow-lg border-2 border-emerald-300 mb-3">
-                                  <div className="flex items-center justify-center gap-1.5 mb-1">
-                                    <Gift className="w-3.5 h-3.5 text-white" />
-                                    <p className="text-[10px] font-bold text-white">هدية مجانية</p>
+                                <div className={`px-2 py-1 rounded-lg shadow-md border ${
+                                  isSelected
+                                    ? 'bg-white/20 border-white/40 backdrop-blur-sm'
+                                    : isRecommended
+                                      ? 'bg-white/20 border-white/40 backdrop-blur-sm'
+                                      : 'bg-gradient-to-br from-emerald-500 to-green-600 border-emerald-400'
+                                }`}>
+                                  <div className="flex items-center justify-center gap-1">
+                                    <Gift className={`w-2.5 h-2.5 ${
+                                      isSelected || isRecommended ? 'text-white' : 'text-white'
+                                    }`} />
+                                    <p className={`text-[8px] lg:text-[9px] font-bold ${
+                                      isSelected || isRecommended ? 'text-white' : 'text-white'
+                                    }`}>
+                                      +{contract.bonus_years} مجاناً
+                                    </p>
                                   </div>
-                                  <p className="text-center text-2xl lg:text-3xl font-black text-white leading-none">
-                                    {contract.bonus_years}
-                                  </p>
-                                  <p className="text-center text-[11px] font-bold text-white/90 mt-1">
-                                    {contract.bonus_years === 1 ? 'سنة إضافية' : 'سنوات إضافية'}
-                                  </p>
                                 </div>
                               </>
                             )}
 
-                            {/* الإجمالي */}
-                            <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl p-3 border-2 border-gray-300">
-                              <p className="text-[10px] font-medium text-gray-600 text-center mb-1">الإجمالي الكلي</p>
-                              <p className="text-3xl lg:text-4xl font-black text-gray-800 text-center leading-none">
+                            {/* خط فاصل */}
+                            {contract.bonus_years > 0 && (
+                              <div className={`w-10 h-px rounded-full ${
+                                isSelected || isRecommended ? 'bg-white/30' : 'bg-gray-300'
+                              }`} />
+                            )}
+
+                            {/* إجمالي السنوات */}
+                            <div className="text-center">
+                              <p className={`text-[8px] lg:text-[9px] font-medium ${
+                                isSelected || isRecommended ? 'text-white/70' : 'text-gray-500'
+                              }`}>
+                                الإجمالي
+                              </p>
+                              <p className={`text-xl lg:text-2xl font-black leading-none ${
+                                isSelected || isRecommended ? 'text-white' : 'text-gray-700'
+                              }`}>
                                 {totalYears}
                               </p>
-                              <p className="text-[11px] font-bold text-gray-600 text-center mt-1">
+                              <p className={`text-[9px] lg:text-[10px] font-bold mt-0.5 ${
+                                isSelected || isRecommended ? 'text-white/90' : 'text-gray-600'
+                              }`}>
                                 {totalYears === 1 ? 'سنة' : 'سنوات'}
                               </p>
                             </div>
                           </div>
-
-                          {/* قسم السعر */}
-                          <div
-                            className="px-3 py-3 rounded-b-2xl text-center border-t-2"
-                            style={{
-                              background: isSelected
-                                ? 'linear-gradient(to bottom, #dcfce7, #bbf7d0)'
-                                : isRecommended
-                                  ? 'linear-gradient(to bottom, #fef3c7, #fde68a)'
-                                  : 'linear-gradient(to bottom, #f9fafb, #f3f4f6)',
-                              borderTopColor: isSelected ? '#86efac' : isRecommended ? '#fcd34d' : '#e5e7eb'
-                            }}
-                          >
-                            <p className={`text-base lg:text-lg font-black leading-none ${
-                              isSelected ? 'text-green-700' : isRecommended ? 'text-amber-700' : 'text-gray-800'
-                            }`}>
-                              {contract.investor_price} ریال
-                            </p>
-                            <p className="text-[9px] lg:text-[10px] font-medium text-gray-600 mt-1">
-                              للشجرة الواحدة
-                            </p>
-                          </div>
                         </button>
+
+                        {/* السعر أسفل البطاقة */}
+                        <div className="mt-1.5 text-center">
+                          <p className={`text-sm lg:text-base font-black leading-tight ${
+                            isSelected ? 'text-green-700' : isRecommended ? 'text-amber-700' : 'text-gray-700'
+                          }`}>
+                            {contract.investor_price} ريال
+                          </p>
+                          <p className="text-[9px] lg:text-[10px] text-gray-500">للشجرة الواحدة</p>
+                        </div>
                       </div>
                     </div>
                   );
