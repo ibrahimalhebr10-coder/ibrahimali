@@ -363,7 +363,7 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
 
                         <button
                           onClick={() => setSelectedContract(contract)}
-                          className="w-full aspect-square rounded-xl lg:rounded-2xl flex flex-col items-center justify-center bg-white transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-lg relative overflow-hidden p-3 lg:p-4"
+                          className="w-full aspect-square rounded-xl lg:rounded-2xl flex flex-col items-center justify-center bg-white transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-lg relative overflow-hidden p-4 lg:p-5"
                           style={{
                             boxShadow: isSelected
                               ? `0 4px 16px ${colors.shadow}, 0 8px 32px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.05)`
@@ -374,50 +374,85 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                             WebkitBackdropFilter: 'blur(12px)'
                           }}
                         >
+                          {/* Badge "عقد انتفاع" في الزاوية العليا اليسرى */}
+                          <div className="absolute top-2 left-2">
+                            <div className={`px-2 py-1 rounded-lg text-[9px] lg:text-[10px] font-bold shadow-md flex items-center gap-1 ${
+                              isSelected
+                                ? 'bg-white text-green-700 border border-green-200'
+                                : isRecommended
+                                  ? 'bg-white text-amber-700 border border-amber-200'
+                                  : 'bg-gray-800 text-white'
+                            }`}>
+                              <Award className="w-2.5 h-2.5" />
+                              <span>عقد انتفاع</span>
+                            </div>
+                          </div>
+
                           {/* علامة الاختيار */}
                           {isSelected && (
-                            <div className="absolute top-1.5 right-1.5">
-                              <div className="w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-lg">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                            <div className="absolute top-2 right-2">
+                              <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-green-500">
+                                <CheckCircle2 className="w-4 h-4 text-green-600" />
                               </div>
                             </div>
                           )}
 
                           {/* المحتوى المركزي - عدد السنوات في الأعلى */}
-                          <div className="flex flex-col items-center justify-center gap-1.5 lg:gap-2">
+                          <div className="flex flex-col items-center justify-center gap-2 lg:gap-2.5">
                             {/* عدد السنوات الرئيسي */}
                             <div className="text-center">
-                              <p className={`text-5xl lg:text-6xl font-black leading-none ${
+                              <p className={`text-4xl lg:text-5xl font-black leading-none mb-1 ${
                                 isSelected || isRecommended ? 'text-white drop-shadow-lg' : 'text-green-700'
                               }`}>
                                 {contract.duration_years}
                               </p>
-                              <p className={`text-[9px] lg:text-[10px] font-bold mt-0.5 ${
+                              <p className={`text-[10px] lg:text-[11px] font-bold ${
                                 isSelected || isRecommended ? 'text-white/90' : 'text-gray-600'
                               }`}>
                                 {contract.duration_years === 1 ? 'سنة' : 'سنوات'}
                               </p>
                             </div>
 
-                            {/* السنوات المجانية في المنتصف أسفل السنوات */}
+                            {/* السنوات المجانية - بارزة وواضحة */}
                             {contract.bonus_years > 0 && (
-                              <div className={`px-2.5 py-1 rounded-lg text-[10px] lg:text-[11px] font-bold shadow-md flex items-center gap-1 ${
-                                isSelected
-                                  ? 'bg-white text-green-600'
-                                  : isRecommended
-                                    ? 'bg-white text-amber-600'
-                                    : 'bg-emerald-500 text-white'
-                              }`}>
-                                <Gift className="w-3 h-3" />
-                                <span>+{contract.bonus_years} مجاناً</span>
+                              <div className="w-full">
+                                <div className={`px-3 py-2 rounded-xl text-[11px] lg:text-xs font-black shadow-lg border-2 ${
+                                  isSelected
+                                    ? 'bg-white text-emerald-600 border-emerald-300'
+                                    : isRecommended
+                                      ? 'bg-white text-amber-600 border-amber-300'
+                                      : 'bg-gradient-to-r from-emerald-500 to-green-500 text-white border-emerald-400'
+                                }`}>
+                                  <div className="flex items-center justify-center gap-1.5 mb-0.5">
+                                    <Gift className="w-3.5 h-3.5" />
+                                    <span>سنوات مجانية</span>
+                                  </div>
+                                  <div className="text-center text-base lg:text-lg font-black">
+                                    +{contract.bonus_years} {contract.bonus_years === 1 ? 'سنة' : 'سنوات'}
+                                  </div>
+                                </div>
                               </div>
                             )}
 
+                            {/* خط فاصل */}
+                            {contract.bonus_years > 0 && (
+                              <div className={`w-12 h-0.5 rounded-full ${
+                                isSelected || isRecommended ? 'bg-white/40' : 'bg-gray-300'
+                              }`} />
+                            )}
+
                             {/* إجمالي السنوات */}
-                            <div className={`text-[9px] lg:text-[10px] font-semibold ${
-                              isSelected || isRecommended ? 'text-white/80' : 'text-gray-500'
-                            }`}>
-                              = {totalYears} {totalYears === 1 ? 'سنة' : 'سنوات'} إجمالي
+                            <div className="text-center">
+                              <p className={`text-[9px] lg:text-[10px] font-medium mb-0.5 ${
+                                isSelected || isRecommended ? 'text-white/70' : 'text-gray-500'
+                              }`}>
+                                إجمالي المدة
+                              </p>
+                              <p className={`text-xl lg:text-2xl font-black ${
+                                isSelected || isRecommended ? 'text-white' : 'text-gray-700'
+                              }`}>
+                                {totalYears} {totalYears === 1 ? 'سنة' : 'سنوات'}
+                              </p>
                             </div>
                           </div>
                         </button>
