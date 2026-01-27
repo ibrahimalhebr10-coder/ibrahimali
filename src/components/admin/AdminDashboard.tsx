@@ -6,6 +6,7 @@ import Breadcrumb from './Breadcrumb';
 import AdminNavigation, { AdminPage } from './AdminNavigation';
 import FarmManagement from './FarmManagement';
 import VideoIntroManagement from './VideoIntroManagement';
+import ReservationsManagement from './ReservationsManagement';
 import AdminRouteGuard from './AdminRouteGuard';
 import { adminService, DashboardStats, FarmStats } from '../../services/adminService';
 import { useAdmin } from '../../contexts/AdminContext';
@@ -132,14 +133,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
     }
 
     if (currentPage === 'reservations') {
-      return (
-        <div className="p-6">
-          <div className="max-w-7xl mx-auto text-center py-20">
-            <h2 className="text-2xl font-bold text-white mb-4">إدارة الحجوزات</h2>
-            <p className="text-gray-400">قريباً: إدارة كاملة للحجوزات</p>
-          </div>
-        </div>
-      );
+      return <ReservationsManagement onBack={() => setCurrentPage('dashboard')} />;
     }
 
     if (currentPage === 'finance') {
