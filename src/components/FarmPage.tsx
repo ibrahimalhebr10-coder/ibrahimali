@@ -628,7 +628,7 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                 return (
                   <div key={variety.id} className="relative">
                     <div
-                      className={`relative bg-white rounded-xl p-3 transition-all duration-300 ${
+                      className={`relative bg-white rounded-xl p-4 transition-all duration-300 ${
                         isSelected ? 'shadow-lg' : 'shadow-md hover:shadow-lg'
                       }`}
                       style={{
@@ -646,15 +646,15 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                         </div>
                       )}
 
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md flex-shrink-0">
-                          <TreePine className="w-4 h-4 text-white" />
+                      <div className="flex items-start gap-3">
+                        <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md flex-shrink-0">
+                          <TreePine className="w-5 h-5 text-white" />
                         </div>
 
-                        <div className="flex-1 min-w-0">
-                          <h4 className="text-xs font-bold text-gray-900 whitespace-nowrap truncate">{variety.name}</h4>
-                          <div className="flex items-center gap-1 text-[9px] text-gray-600 whitespace-nowrap">
-                            <span>{type.name}</span>
+                        <div className="flex-1 min-w-0 space-y-1.5">
+                          <h4 className="text-sm font-bold text-gray-900 leading-tight">{variety.name}</h4>
+                          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-600">
+                            <span className="font-medium">{type.name}</span>
                             <span>•</span>
                             <span className="text-green-600 font-semibold">{variety.available} متاح</span>
                             {variety.maintenance_fee && (
@@ -664,29 +664,29 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                               </>
                             )}
                           </div>
-                        </div>
 
-                        <div
-                          className={`rounded-lg px-2 py-1 flex-shrink-0 ${
-                            selectedContract ? 'bg-green-50' : 'bg-gray-50'
-                          }`}
-                          style={{
-                            border: selectedContract ? '1.5px solid #10b981' : '1px solid #e5e7eb'
-                          }}
-                        >
-                          {selectedContract ? (
-                            <p className="text-sm font-black text-green-700 tabular-nums">{selectedContract.investor_price}</p>
-                          ) : (
-                            <p className="text-[10px] font-bold text-gray-500">اختر عقد</p>
-                          )}
-                        </div>
+                          <div className="flex items-center gap-2 pt-1">
+                            <div
+                              className={`rounded-lg px-3 py-1.5 ${
+                                selectedContract ? 'bg-green-50' : 'bg-gray-50'
+                              }`}
+                              style={{
+                                border: selectedContract ? '1.5px solid #10b981' : '1px solid #e5e7eb'
+                              }}
+                            >
+                              {selectedContract ? (
+                                <p className="text-sm font-black text-green-700 tabular-nums">{selectedContract.investor_price}</p>
+                              ) : (
+                                <p className="text-xs font-bold text-gray-500">اختر عقد</p>
+                              )}
+                            </div>
 
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                          <button
-                            onClick={() => handleTreeQuantityChange(variety, type.name, -1)}
-                            disabled={quantity === 0}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
-                            style={{
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => handleTreeQuantityChange(variety, type.name, -1)}
+                                disabled={quantity === 0}
+                                className="w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+                                style={{
                               background: 'linear-gradient(145deg, #fef2f2, #fee2e2)',
                               boxShadow: quantity > 0 ? '0 2px 4px rgba(239, 68, 68, 0.2)' : '0 1px 2px rgba(0,0,0,0.05)',
                               border: '1px solid rgba(239, 68, 68, 0.2)'
@@ -710,18 +710,20 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                             </p>
                           </div>
 
-                          <button
-                            onClick={() => handleTreeQuantityChange(variety, type.name, 1)}
-                            disabled={quantity >= variety.available}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
-                            style={{
-                              background: 'linear-gradient(145deg, #10b981, #059669)',
-                              boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)',
-                              border: '1px solid rgba(5, 150, 105, 0.5)'
-                            }}
-                          >
-                            <Plus className="w-3.5 h-3.5 text-white" />
-                          </button>
+                              <button
+                                onClick={() => handleTreeQuantityChange(variety, type.name, 1)}
+                                disabled={quantity >= variety.available}
+                                className="w-9 h-9 rounded-lg flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed"
+                                style={{
+                                  background: 'linear-gradient(145deg, #10b981, #059669)',
+                                  boxShadow: '0 2px 4px rgba(16, 185, 129, 0.3)',
+                                  border: '1px solid rgba(5, 150, 105, 0.5)'
+                                }}
+                              >
+                                <Plus className="w-3.5 h-3.5 text-white" />
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
