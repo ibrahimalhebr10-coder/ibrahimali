@@ -135,6 +135,21 @@ export default function PendingReservations({ isOpen, onClose }: PendingReservat
             </div>
           ) : (
             <div className="space-y-4">
+              {/* رسالة الترحيب */}
+              <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-2xl p-5 mb-6">
+                <div className="flex items-start gap-3">
+                  <span className="text-3xl">🌱</span>
+                  <div>
+                    <h3 className="text-base font-bold text-gray-900 mb-1">
+                      هذه بداية رحلتك الزراعية
+                    </h3>
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      سنوافيك بكل جديد يخص مزرعتك.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {reservations.map((reservation) => (
                 <div
                   key={reservation.id}

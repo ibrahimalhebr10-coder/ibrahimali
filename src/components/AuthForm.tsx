@@ -185,6 +185,22 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
               </p>
             </div>
 
+            {/* رسائل الطمأنة */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-200 space-y-2">
+              <div className="flex items-start gap-2">
+                <span className="text-green-600 text-lg flex-shrink-0">🔒</span>
+                <p className="text-xs text-gray-700 leading-relaxed">
+                  <span className="font-bold">لن نفقد أي من اختياراتك</span>
+                </p>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-green-600 text-lg flex-shrink-0">🌱</span>
+                <p className="text-xs text-gray-700 leading-relaxed">
+                  <span className="font-bold">سيتم نقل الحجز مباشرة إلى حسابك</span>
+                </p>
+              </div>
+            </div>
+
             <button
               type="submit"
               disabled={loading}

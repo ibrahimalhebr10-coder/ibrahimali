@@ -31,6 +31,8 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
   const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
   const [priceUpdateAnimation, setPriceUpdateAnimation] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showPreAuthConfirmation, setShowPreAuthConfirmation] = useState(false);
+  const [showSuccessScreen, setShowSuccessScreen] = useState(false);
   const [pendingReservation, setPendingReservation] = useState<boolean>(false);
   const videoRef = useRef<HTMLDivElement>(null);
   const contractsScrollRef = useRef<HTMLDivElement>(null);
@@ -102,7 +104,7 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
 
     if (!user) {
       setPendingReservation(true);
-      setShowAuthModal(true);
+      setShowPreAuthConfirmation(true);
       return;
     }
 
@@ -150,7 +152,12 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
     setShowAuthModal(false);
     if (pendingReservation) {
       setPendingReservation(false);
+      setShowSuccessScreen(true);
       await saveReservationToDatabase();
+      setTimeout(() => {
+        setShowSuccessScreen(false);
+        onNavigateToReservations();
+      }, 2500);
     }
   };
 
@@ -834,7 +841,7 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                       ) : (
                         <>
                           <CheckCircle2 className="w-5 h-5" />
-                          <span>تأكيد الحجز • {totalCost.toLocaleString()} ريال</span>
+                          <span>أكمل حجز أشجار مزرعتك 🌱</span>
                         </>
                       )}
                     </button>
@@ -904,6 +911,97 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
               autoPlay
               className="w-full h-full"
             />
+          </div>
+        </div>
+      )}
+
+      {/* PRE-AUTH CONFIRMATION SCREEN - شاشة التمهيد قبل التسجيل */}
+      {showPreAuthConfirmation && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500"></div>
+
+            <div className="p-8">
+              <div className="text-center mb-6">
+                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-xl">
+                  <CheckCircle2 className="w-10 h-10 text-white" />
+                </div>
+
+                <h2 className="text-2xl font-black text-gray-900 mb-2">🎉 أحسنت الاختيار!</h2>
+
+                <div className="bg-green-50 rounded-xl p-4 mb-4 border-2 border-green-200">
+                  <p className="text-base font-bold text-gray-900 mb-2">
+                    تم تجهيز حجز أشجار مزرعتك بنجاح
+                  </p>
+                  <p className="text-sm text-gray-700">
+                    وجميع اختياراتك محفوظة.
+                  </p>
+                </div>
+
+                <div className="bg-amber-50 rounded-xl p-3 mb-4 border border-amber-200">
+                  <p className="text-xs text-amber-900 font-semibold">
+                    هذا حجز مؤقت إلى أن يتم ربطه بحسابك.
+                  </p>
+                </div>
+
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  باقي خطوة بسيطة عشان ننقل<br />
+                  <span className="font-bold text-green-700">أشجار مزرعتك</span> إلى حسابك وتقدر تتابعها متى ما حبيت 🌿
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <button
+                  onClick={() => {
+                    setShowPreAuthConfirmation(false);
+                    setShowAuthModal(true);
+                  }}
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02]"
+                >
+                  إنشاء حساب ونقل الحجز إلى حسابي
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowPreAuthConfirmation(false);
+                    setPendingReservation(false);
+                  }}
+                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-300"
+                >
+                  الرجوع لتعديل الاختيارات
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* SUCCESS SCREEN - شاشة النجاح بعد التسجيل */}
+      {showSuccessScreen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500 animate-pulse"></div>
+
+            <div className="p-8 text-center">
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-xl animate-bounce">
+                <CheckCircle2 className="w-12 h-12 text-white" />
+              </div>
+
+              <h2 className="text-3xl font-black text-gray-900 mb-2">🌿 مبروك!</h2>
+
+              <div className="bg-green-50 rounded-xl p-4 mb-4 border-2 border-green-200">
+                <p className="text-base font-bold text-gray-900 mb-2">
+                  تم نقل حجز أشجار مزرعتك إلى حسابك بنجاح.
+                </p>
+                <p className="text-sm text-gray-700">
+                  حجزك الآن محفوظ باسمك<br />
+                  وسيتم مراجعته من قبل الإدارة.
+                </p>
+              </div>
+
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600 mx-auto mb-2"></div>
+              <p className="text-xs text-gray-500">جاري التحويل إلى حجوزاتي...</p>
+            </div>
           </div>
         </div>
       )}
