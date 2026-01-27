@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Clock, TreePine, Calendar, FileText, AlertCircle } from 'lucide-react';
+import { Clock, TreePine, Calendar, FileText, AlertCircle, DollarSign, CheckCircle2, CreditCard, XCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -52,30 +52,35 @@ export default function MyReservations() {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; className: string }> = {
+    const statusConfig: Record<string, { label: string; className: string; icon: any }> = {
       pending: {
         label: 'قيد المراجعة',
-        className: 'bg-amber-100 text-amber-800 border-amber-300'
+        className: 'bg-amber-100 text-amber-800 border-amber-300',
+        icon: Clock
       },
-      confirmed: {
-        label: 'مؤكد',
-        className: 'bg-green-100 text-green-800 border-green-300'
+      waiting_for_payment: {
+        label: 'بانتظار السداد',
+        className: 'bg-blue-100 text-blue-800 border-blue-300',
+        icon: DollarSign
       },
-      completed: {
-        label: 'مكتمل',
-        className: 'bg-blue-100 text-blue-800 border-blue-300'
+      paid: {
+        label: 'مدفوع',
+        className: 'bg-green-100 text-green-800 border-green-300',
+        icon: CheckCircle2
       },
       cancelled: {
         label: 'ملغي',
-        className: 'bg-red-100 text-red-800 border-red-300'
+        className: 'bg-red-100 text-red-800 border-red-300',
+        icon: XCircle
       }
     };
 
     const config = statusConfig[status] || statusConfig.pending;
+    const Icon = config.icon;
 
     return (
       <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold border-2 ${config.className}`}>
-        <Clock className="w-3 h-3" />
+        <Icon className="w-3 h-3" />
         {config.label}
       </span>
     );
@@ -159,7 +164,75 @@ export default function MyReservations() {
                       <div className="flex-1">
                         <p className="text-sm text-amber-900 font-semibold">حجزك قيد المراجعة</p>
                         <p className="text-xs text-amber-800 mt-1">
-                          سيتم التواصل معك قريباً لإتمام عملية السداد وتأكيد الحجز
+                          يتم الآن مراجعة حجزك من قبل الإدارة. سيتم إخطارك عند اعتماد الحجز وإتاحة خيارات الدفع.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {reservation.status === 'waiting_for_payment' && (
+                    <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-300 rounded-xl p-4 mb-4">
+                      <div className="flex items-start gap-3 mb-4">
+                        <CheckCircle2 className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-base text-blue-900 font-bold">تم اعتماد حجزك!</p>
+                          <p className="text-sm text-blue-800 mt-1">
+                            يمكنك الآن إتمام عملية السداد بقيمة <span className="font-bold">{reservation.total_price.toLocaleString()} ريال سعودي</span>
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <p className="text-sm font-bold text-gray-700 mb-3">اختر وسيلة الدفع:</p>
+
+                        <button className="w-full flex items-center justify-between px-4 py-3 bg-white border-2 border-blue-300 rounded-xl hover:bg-blue-50 transition-all group">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
+                              <CreditCard className="w-5 h-5 text-white" />
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-bold text-gray-900">مدى</p>
+                              <p className="text-xs text-gray-600">الدفع عبر بطاقة مدى</p>
+                            </div>
+                          </div>
+                          <span className="text-blue-600 font-bold group-hover:translate-x-1 transition-transform">←</span>
+                        </button>
+
+                        <button className="w-full flex items-center justify-between px-4 py-3 bg-white border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all group opacity-60 cursor-not-allowed">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                              <DollarSign className="w-5 h-5 text-white" />
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-bold text-gray-900">تابي / تمارا</p>
+                              <p className="text-xs text-gray-600">الدفع بالتقسيط</p>
+                            </div>
+                          </div>
+                          <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-bold">قريباً</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {reservation.status === 'paid' && (
+                    <div className="bg-green-50 border-2 border-green-200 rounded-xl p-3 mb-4 flex items-start gap-2">
+                      <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm text-green-900 font-semibold">تم استلام الدفع بنجاح</p>
+                        <p className="text-xs text-green-800 mt-1">
+                          شكراً لك! تم تأكيد استثمارك وسيتم التواصل معك قريباً بالتفاصيل.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {reservation.status === 'cancelled' && (
+                    <div className="bg-red-50 border-2 border-red-200 rounded-xl p-3 mb-4 flex items-start gap-2">
+                      <XCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm text-red-900 font-semibold">تم إلغاء الحجز</p>
+                        <p className="text-xs text-red-800 mt-1">
+                          تم إلغاء هذا الحجز. يمكنك إنشاء حجز جديد في أي وقت.
                         </p>
                       </div>
                     </div>

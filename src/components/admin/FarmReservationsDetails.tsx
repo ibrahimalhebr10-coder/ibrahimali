@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, CheckCircle2, XCircle, Clock, TreePine, User, Calendar, AlertCircle, Loader2, Check, X } from 'lucide-react';
+import { ArrowRight, CheckCircle2, XCircle, Clock, TreePine, User, Calendar, AlertCircle, Loader2, Check, X, DollarSign } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { notificationService } from '../../services/notificationService';
 import Breadcrumb from './Breadcrumb';
 
 interface Reservation {
@@ -34,7 +35,7 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedReservations, setSelectedReservations] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState<'pending' | 'approved' | 'cancelled'>('pending');
+  const [activeTab, setActiveTab] = useState<'pending' | 'waiting_for_payment' | 'paid' | 'cancelled'>('pending');
 
   useEffect(() => {
     loadReservations();
@@ -92,7 +93,7 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
     if (reservationIds.length === 0) return;
 
     const confirmed = window.confirm(
-      `هل أنت متأكد من تعميد ${reservationIds.length} حجز؟\nسيتم تغيير حالة الحجوزات من "قيد المراجعة" إلى "معتمد".`
+      `هل أنت متأكد من تعميد ${reservationIds.length} حجز؟\n\nعند التعميد:\n- سيتم تفعيل خيارات الدفع للمستثمرين\n- سيتم إرسال إشعار لكل مستثمر\n- يمكن للمستثمرين إتمام السداد فوراً`
     );
 
     if (!confirmed) return;
@@ -100,18 +101,35 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
     try {
       setProcessing(true);
 
-      const { error: updateError } = await supabase
+      const { data: approvedReservations, error: updateError } = await supabase
         .from('reservations')
-        .update({ status: 'approved' })
-        .in('id', reservationIds);
+        .update({ status: 'waiting_for_payment' })
+        .in('id', reservationIds)
+        .select('id, user_id, farm_name, contract_name, total_price');
 
       if (updateError) throw updateError;
+
+      if (approvedReservations) {
+        for (const reservation of approvedReservations) {
+          try {
+            await notificationService.createNotification({
+              user_id: reservation.user_id,
+              title: 'تم اعتماد حجزك',
+              message: `تم اعتماد حجزك في ${reservation.farm_name} - ${reservation.contract_name}. يمكنك الآن إتمام السداد بقيمة ${reservation.total_price.toLocaleString()} ريال سعودي.`,
+              type: 'payment_ready',
+              read: false
+            });
+          } catch (notifError) {
+            console.error('Error sending notification:', notifError);
+          }
+        }
+      }
 
       await loadReservations();
       setSelectedReservations(new Set());
       onUpdate();
 
-      alert(`تم تعميد ${reservationIds.length} حجز بنجاح!`);
+      alert(`تم تعميد ${reservationIds.length} حجز بنجاح!\nتم إرسال إشعارات للمستثمرين.`);
     } catch (err) {
       console.error('Error approving reservations:', err);
       alert('حدث خطأ أثناء تعميد الحجوزات');
@@ -176,7 +194,8 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
   const filteredReservations = reservations.filter((r) => r.status === activeTab);
 
   const pendingCount = reservations.filter((r) => r.status === 'pending').length;
-  const approvedCount = reservations.filter((r) => r.status === 'approved').length;
+  const waitingForPaymentCount = reservations.filter((r) => r.status === 'waiting_for_payment').length;
+  const paidCount = reservations.filter((r) => r.status === 'paid').length;
   const cancelledCount = reservations.filter((r) => r.status === 'cancelled').length;
 
   const getStatusBadge = (status: string) => {
@@ -186,8 +205,13 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
         icon: Clock,
         className: 'bg-amber-100 text-amber-800 border-amber-300'
       },
-      approved: {
-        label: 'معتمد',
+      waiting_for_payment: {
+        label: 'بانتظار السداد',
+        icon: DollarSign,
+        className: 'bg-blue-100 text-blue-800 border-blue-300'
+      },
+      paid: {
+        label: 'مدفوع',
         icon: CheckCircle2,
         className: 'bg-green-100 text-green-800 border-green-300'
       },
@@ -232,7 +256,7 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
         <div className="mt-4">
           <h1 className="text-3xl font-black text-gray-900">حجوزات {farmName}</h1>
           <p className="text-gray-600 mt-1">
-            {reservations.length} حجز • {pendingCount} قيد المراجعة • {approvedCount} معتمد
+            {reservations.length} حجز • {pendingCount} قيد المراجعة • {waitingForPaymentCount} بانتظار السداد • {paidCount} مدفوع
           </p>
         </div>
 
@@ -303,14 +327,24 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
               قيد المراجعة ({pendingCount})
             </button>
             <button
-              onClick={() => setActiveTab('approved')}
+              onClick={() => setActiveTab('waiting_for_payment')}
               className={`flex-1 px-6 py-4 font-bold transition-all ${
-                activeTab === 'approved'
+                activeTab === 'waiting_for_payment'
+                  ? 'bg-blue-50 text-blue-800 border-b-4 border-blue-500'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              بانتظار السداد ({waitingForPaymentCount})
+            </button>
+            <button
+              onClick={() => setActiveTab('paid')}
+              className={`flex-1 px-6 py-4 font-bold transition-all ${
+                activeTab === 'paid'
                   ? 'bg-green-50 text-green-800 border-b-4 border-green-500'
                   : 'text-gray-600 hover:bg-gray-50'
               }`}
             >
-              معتمد ({approvedCount})
+              مدفوع ({paidCount})
             </button>
             <button
               onClick={() => setActiveTab('cancelled')}
@@ -344,7 +378,12 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
               <AlertCircle className="w-10 h-10 text-gray-400" />
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">لا توجد حجوزات</h3>
-            <p className="text-gray-600">لا توجد حجوزات بحالة "{activeTab === 'pending' ? 'قيد المراجعة' : activeTab === 'approved' ? 'معتمد' : 'ملغي'}"</p>
+            <p className="text-gray-600">
+              لا توجد حجوزات بحالة "
+              {activeTab === 'pending' ? 'قيد المراجعة' :
+               activeTab === 'waiting_for_payment' ? 'بانتظار السداد' :
+               activeTab === 'paid' ? 'مدفوع' : 'ملغي'}"
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">

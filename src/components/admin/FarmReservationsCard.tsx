@@ -7,7 +7,8 @@ interface FarmReservationsCardProps {
   totalInvestors: number;
   totalAmount: number;
   pendingCount: number;
-  approvedCount: number;
+  waitingForPaymentCount: number;
+  paidCount: number;
   onViewDetails: (farmId: number) => void;
 }
 
@@ -18,10 +19,11 @@ export default function FarmReservationsCard({
   totalInvestors,
   totalAmount,
   pendingCount,
-  approvedCount,
+  waitingForPaymentCount,
+  paidCount,
   onViewDetails
 }: FarmReservationsCardProps) {
-  const totalReservations = pendingCount + approvedCount;
+  const totalReservations = pendingCount + waitingForPaymentCount + paidCount;
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border-2 border-green-100 overflow-hidden hover:shadow-xl transition-all">
@@ -89,17 +91,23 @@ export default function FarmReservationsCard({
             <TrendingUp className="w-5 h-5 text-green-600" />
             <span className="text-sm font-bold text-gray-700">الحالة:</span>
           </div>
-          <div className="flex items-center gap-3">
-            {approvedCount > 0 && (
-              <div className="flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full border border-green-300">
-                <div className="w-2 h-2 rounded-full bg-green-600"></div>
-                <span className="text-sm font-bold text-green-800">{approvedCount} معتمد</span>
-              </div>
-            )}
+          <div className="flex items-center gap-3 flex-wrap">
             {pendingCount > 0 && (
               <div className="flex items-center gap-2 bg-amber-100 px-3 py-1 rounded-full border border-amber-300">
                 <div className="w-2 h-2 rounded-full bg-amber-600"></div>
                 <span className="text-sm font-bold text-amber-800">{pendingCount} قيد المراجعة</span>
+              </div>
+            )}
+            {waitingForPaymentCount > 0 && (
+              <div className="flex items-center gap-2 bg-blue-100 px-3 py-1 rounded-full border border-blue-300">
+                <div className="w-2 h-2 rounded-full bg-blue-600"></div>
+                <span className="text-sm font-bold text-blue-800">{waitingForPaymentCount} بانتظار السداد</span>
+              </div>
+            )}
+            {paidCount > 0 && (
+              <div className="flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full border border-green-300">
+                <div className="w-2 h-2 rounded-full bg-green-600"></div>
+                <span className="text-sm font-bold text-green-800">{paidCount} مدفوع</span>
               </div>
             )}
           </div>

@@ -12,7 +12,8 @@ interface FarmReservationsStats {
   totalInvestors: number;
   totalAmount: number;
   pendingCount: number;
-  approvedCount: number;
+  waitingForPaymentCount: number;
+  paidCount: number;
 }
 
 interface ReservationsManagementProps {
@@ -59,7 +60,8 @@ export default function ReservationsManagement({ onBack }: ReservationsManagemen
             totalInvestors: 0,
             totalAmount: 0,
             pendingCount: 0,
-            approvedCount: 0,
+            waitingForPaymentCount: 0,
+            paidCount: 0,
           });
         }
 
@@ -69,8 +71,10 @@ export default function ReservationsManagement({ onBack }: ReservationsManagemen
 
         if (reservation.status === 'pending') {
           stats.pendingCount += 1;
-        } else if (reservation.status === 'approved') {
-          stats.approvedCount += 1;
+        } else if (reservation.status === 'waiting_for_payment') {
+          stats.waitingForPaymentCount += 1;
+        } else if (reservation.status === 'paid') {
+          stats.paidCount += 1;
         }
       });
 
