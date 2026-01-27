@@ -5,6 +5,7 @@ import AdminFarmCard from './AdminFarmCard';
 import Breadcrumb from './Breadcrumb';
 import AdminNavigation, { AdminPage } from './AdminNavigation';
 import FarmManagement from './FarmManagement';
+import VideoIntroManagement from './VideoIntroManagement';
 import AdminRouteGuard from './AdminRouteGuard';
 import { adminService, DashboardStats, FarmStats } from '../../services/adminService';
 import { useAdmin } from '../../contexts/AdminContext';
@@ -75,6 +76,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
       reservations: 'إدارة الحجوزات',
       finance: 'الإدارة المالية',
       harvest: 'إدارة محصولي',
+      video: 'الفيديو التعريفي',
       settings: 'إعدادات النظام'
     };
     return labels[page];
@@ -123,6 +125,10 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
     if (currentPage === 'farms') {
       console.log('Rendering FarmManagement with selectedFarmId:', selectedFarmId);
       return <FarmManagement key={selectedFarmId || 'all'} initialFarmId={selectedFarmId} />;
+    }
+
+    if (currentPage === 'video') {
+      return <VideoIntroManagement />;
     }
 
     if (currentPage === 'reservations') {

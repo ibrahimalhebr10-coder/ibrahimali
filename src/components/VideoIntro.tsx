@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { X, Play, Volume2, VolumeX, Leaf } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Play, Volume2, VolumeX, Leaf, AlertCircle } from 'lucide-react';
+import { videoIntroService, type VideoIntro as VideoIntroData } from '../services/videoIntroService';
 
 interface VideoIntroProps {
   isOpen: boolean;
@@ -45,15 +46,34 @@ export default function VideoIntro({ isOpen, onClose, onStartFarm }: VideoIntroP
   const [isMuted, setIsMuted] = useState(true);
   const [showCTA, setShowCTA] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [videoData, setVideoData] = useState<VideoIntroData | null>(null);
+  const [loadingVideo, setLoadingVideo] = useState(true);
+  const [videoError, setVideoError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      loadVideo();
+    } else {
       setCurrentScene(0);
       setIsPlaying(false);
       setShowCTA(false);
       setProgress(0);
+      setVideoError(false);
     }
   }, [isOpen]);
+
+  async function loadVideo() {
+    setLoadingVideo(true);
+    setVideoError(false);
+    const data = await videoIntroService.getActiveVideo();
+    setVideoData(data);
+    setLoadingVideo(false);
+    if (!data) {
+      setVideoError(true);
+    }
+  }
 
   useEffect(() => {
     if (!isPlaying || showCTA) return;
@@ -86,45 +106,99 @@ export default function VideoIntro({ isOpen, onClose, onStartFarm }: VideoIntroP
   const handlePlay = () => {
     setIsPlaying(true);
     setShowCTA(false);
+
+    if (videoData?.video_type === 'upload' && videoRef.current) {
+      videoRef.current.play();
+    }
   };
 
   const handleStartFarm = () => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
     onClose();
     onStartFarm();
+  };
+
+  const handleVideoEnd = () => {
+    setShowCTA(true);
+    setIsPlaying(false);
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+    }
   };
 
   if (!isOpen) return null;
 
   const scene = scenes[currentScene];
+  const hasVideo = videoData && !videoError;
+  const embedUrl = videoData && (videoData.video_type === 'youtube' || videoData.video_type === 'tiktok')
+    ? videoIntroService.getEmbedUrl(videoData.video_type, videoData.video_url)
+    : null;
 
   return (
     <div className="fixed inset-0 z-[100] bg-black animate-fade-in" dir="rtl">
-      {scenes.map((s, idx) => (
-        <div
-          key={s.id}
-          className="absolute inset-0 transition-opacity duration-1000"
-          style={{
-            opacity: idx === currentScene ? 1 : 0,
-            zIndex: idx === currentScene ? 1 : 0
-          }}
-        >
-          <img
-            src={s.image}
-            alt=""
-            className="w-full h-full object-cover"
-            style={{
-              transform: isPlaying ? 'scale(1.1)' : 'scale(1)',
-              transition: `transform ${s.duration}ms ease-out`
-            }}
-          />
+      {hasVideo && videoData ? (
+        <div className="absolute inset-0">
+          {videoData.video_type === 'upload' && (
+            <video
+              ref={videoRef}
+              src={videoData.video_url}
+              className="w-full h-full object-cover"
+              muted={isMuted}
+              playsInline
+              onEnded={handleVideoEnd}
+            />
+          )}
+          {(videoData.video_type === 'youtube' || videoData.video_type === 'tiktok') && embedUrl && (
+            <iframe
+              ref={iframeRef}
+              src={isPlaying ? embedUrl : ''}
+              className="w-full h-full"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          )}
           <div
-            className="absolute inset-0"
+            className="absolute inset-0 pointer-events-none"
             style={{
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.7) 100%)'
+              background: isPlaying ? 'transparent' : 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.7) 100%)'
             }}
           />
         </div>
-      ))}
+      ) : (
+        scenes.map((s, idx) => (
+          <div
+            key={s.id}
+            className="absolute inset-0 transition-opacity duration-1000"
+            style={{
+              opacity: idx === currentScene ? 1 : 0,
+              zIndex: idx === currentScene ? 1 : 0
+            }}
+          >
+            <img
+              src={s.image}
+              alt=""
+              className="w-full h-full object-cover"
+              style={{
+                transform: isPlaying ? 'scale(1.1)' : 'scale(1)',
+                transition: `transform ${s.duration}ms ease-out`
+              }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background: 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0.7) 100%)'
+              }}
+            />
+          </div>
+        ))
+      )}
 
       <div className="absolute top-0 left-0 right-0 z-10 p-4 flex items-center justify-between">
         <button
@@ -177,20 +251,52 @@ export default function VideoIntro({ isOpen, onClose, onStartFarm }: VideoIntroP
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6">
         {!isPlaying && !showCTA && (
           <div className="text-center animate-fade-in">
-            <button
-              onClick={handlePlay}
-              className="w-24 h-24 rounded-full flex items-center justify-center mb-8 transition-transform active:scale-95"
-              style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%)',
-                backdropFilter: 'blur(10px)',
-                border: '3px solid rgba(255,255,255,0.5)',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
-              }}
-            >
-              <Play className="w-12 h-12 text-white mr-[-4px]" fill="white" />
-            </button>
-            <h2 className="text-2xl font-bold text-white mb-2">تعرّف على جود</h2>
-            <p className="text-white/80">اضغط لمشاهدة العرض التعريفي</p>
+            {loadingVideo ? (
+              <div className="mb-8">
+                <div className="w-24 h-24 rounded-full mx-auto flex items-center justify-center mb-4"
+                  style={{
+                    background: 'rgba(255,255,255,0.2)',
+                    backdropFilter: 'blur(10px)'
+                  }}
+                >
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+                </div>
+                <p className="text-white/80">جاري تحميل الفيديو...</p>
+              </div>
+            ) : videoError ? (
+              <div className="mb-8">
+                <div className="w-24 h-24 rounded-full mx-auto flex items-center justify-center mb-4"
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.2)',
+                    backdropFilter: 'blur(10px)',
+                    border: '3px solid rgba(239, 68, 68, 0.5)'
+                  }}
+                >
+                  <AlertCircle className="w-12 h-12 text-red-400" />
+                </div>
+                <h2 className="text-2xl font-bold text-white mb-2">لم يتم إضافة فيديو تعريفي</h2>
+                <p className="text-white/80">سيتم عرض الشرائح الافتراضية</p>
+              </div>
+            ) : (
+              <button
+                onClick={handlePlay}
+                className="w-24 h-24 rounded-full flex items-center justify-center mb-8 mx-auto transition-transform active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 100%)',
+                  backdropFilter: 'blur(10px)',
+                  border: '3px solid rgba(255,255,255,0.5)',
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                }}
+              >
+                <Play className="w-12 h-12 text-white mr-[-4px]" fill="white" />
+              </button>
+            )}
+            <h2 className="text-2xl font-bold text-white mb-2">
+              {hasVideo && videoData ? videoData.title : 'تعرّف على جود'}
+            </h2>
+            <p className="text-white/80">
+              {hasVideo && videoData ? videoData.description || 'اضغط لمشاهدة العرض التعريفي' : 'اضغط لمشاهدة العرض التعريفي'}
+            </p>
           </div>
         )}
 
@@ -260,10 +366,10 @@ export default function VideoIntro({ isOpen, onClose, onStartFarm }: VideoIntroP
         )}
       </div>
 
-      {isPlaying && (
+      {isPlaying && hasVideo && videoData?.video_type === 'upload' && (
         <div className="absolute bottom-8 left-0 right-0 z-10 flex justify-center">
           <button
-            onClick={() => setIsMuted(!isMuted)}
+            onClick={toggleMute}
             className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-95"
             style={{
               background: 'rgba(255,255,255,0.2)',

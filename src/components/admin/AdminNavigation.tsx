@@ -1,6 +1,6 @@
-import { Home, Sprout, Calendar, DollarSign, Package, Settings, BarChart3 } from 'lucide-react';
+import { Home, Sprout, Calendar, DollarSign, Package, Settings, BarChart3, Video } from 'lucide-react';
 
-export type AdminPage = 'dashboard' | 'farms' | 'reservations' | 'finance' | 'harvest' | 'settings';
+export type AdminPage = 'dashboard' | 'farms' | 'reservations' | 'finance' | 'harvest' | 'settings' | 'video';
 
 interface AdminNavigationProps {
   currentPage: AdminPage;
@@ -45,6 +45,12 @@ const navItems: NavItem[] = [
     label: 'إدارة محصولي',
     icon: Package,
     allowedRoles: ['super_admin', 'farm_manager']
+  },
+  {
+    id: 'video',
+    label: 'الفيديو التعريفي',
+    icon: Video,
+    allowedRoles: ['super_admin']
   },
   {
     id: 'settings',
