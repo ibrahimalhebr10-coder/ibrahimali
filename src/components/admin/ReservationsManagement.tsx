@@ -12,8 +12,7 @@ interface FarmReservationsStats {
   totalInvestors: number;
   totalAmount: number;
   pendingCount: number;
-  waitingForPaymentCount: number;
-  paidCount: number;
+  cancelledCount: number;
 }
 
 interface ReservationsManagementProps {
@@ -37,7 +36,8 @@ export default function ReservationsManagement({ onBack }: ReservationsManagemen
 
       const { data: reservations, error: reservationsError } = await supabase
         .from('reservations')
-        .select('farm_id, farm_name, total_trees, total_price, user_id, status');
+        .select('farm_id, farm_name, total_trees, total_price, user_id, status')
+        .in('status', ['pending', 'cancelled']);
 
       if (reservationsError) throw reservationsError;
 
@@ -60,8 +60,7 @@ export default function ReservationsManagement({ onBack }: ReservationsManagemen
             totalInvestors: 0,
             totalAmount: 0,
             pendingCount: 0,
-            waitingForPaymentCount: 0,
-            paidCount: 0,
+            cancelledCount: 0,
           });
         }
 
@@ -71,10 +70,8 @@ export default function ReservationsManagement({ onBack }: ReservationsManagemen
 
         if (reservation.status === 'pending') {
           stats.pendingCount += 1;
-        } else if (reservation.status === 'waiting_for_payment') {
-          stats.waitingForPaymentCount += 1;
-        } else if (reservation.status === 'paid') {
-          stats.paidCount += 1;
+        } else if (reservation.status === 'cancelled') {
+          stats.cancelledCount += 1;
         }
       });
 
@@ -166,7 +163,7 @@ export default function ReservationsManagement({ onBack }: ReservationsManagemen
                 <div>
                   <p className="text-sm font-semibold text-gray-600">إجمالي الإحصائيات</p>
                   <p className="text-2xl font-black text-green-700 mt-1">
-                    {farmsStats.length} مزرعة • {farmsStats.reduce((sum, f) => sum + f.pendingCount + f.approvedCount, 0)} حجز
+                    {farmsStats.length} مزرعة • {farmsStats.reduce((sum, f) => sum + f.pendingCount + f.cancelledCount, 0)} حجز
                   </p>
                 </div>
                 <div className="text-left">

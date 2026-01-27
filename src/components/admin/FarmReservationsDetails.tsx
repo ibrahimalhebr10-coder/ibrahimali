@@ -35,7 +35,7 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedReservations, setSelectedReservations] = useState<Set<string>>(new Set());
-  const [activeTab, setActiveTab] = useState<'pending' | 'waiting_for_payment' | 'paid' | 'cancelled'>('pending');
+  const [activeTab, setActiveTab] = useState<'pending' | 'cancelled'>('pending');
 
   useEffect(() => {
     loadReservations();
@@ -50,6 +50,7 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
         .from('reservations')
         .select('*')
         .eq('farm_id', farmId)
+        .in('status', ['pending', 'cancelled'])
         .order('created_at', { ascending: false });
 
       if (reservationsError) throw reservationsError;
@@ -194,8 +195,6 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
   const filteredReservations = reservations.filter((r) => r.status === activeTab);
 
   const pendingCount = reservations.filter((r) => r.status === 'pending').length;
-  const waitingForPaymentCount = reservations.filter((r) => r.status === 'waiting_for_payment').length;
-  const paidCount = reservations.filter((r) => r.status === 'paid').length;
   const cancelledCount = reservations.filter((r) => r.status === 'cancelled').length;
 
   const getStatusBadge = (status: string) => {
@@ -256,7 +255,7 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
         <div className="mt-4">
           <h1 className="text-3xl font-black text-gray-900">حجوزات {farmName}</h1>
           <p className="text-gray-600 mt-1">
-            {reservations.length} حجز • {pendingCount} قيد المراجعة • {waitingForPaymentCount} بانتظار السداد • {paidCount} مدفوع
+            {reservations.length} حجز • {pendingCount} قيد المراجعة • {cancelledCount} ملغي
           </p>
         </div>
 
@@ -327,26 +326,6 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
               قيد المراجعة ({pendingCount})
             </button>
             <button
-              onClick={() => setActiveTab('waiting_for_payment')}
-              className={`flex-1 px-6 py-4 font-bold transition-all ${
-                activeTab === 'waiting_for_payment'
-                  ? 'bg-blue-50 text-blue-800 border-b-4 border-blue-500'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              بانتظار السداد ({waitingForPaymentCount})
-            </button>
-            <button
-              onClick={() => setActiveTab('paid')}
-              className={`flex-1 px-6 py-4 font-bold transition-all ${
-                activeTab === 'paid'
-                  ? 'bg-green-50 text-green-800 border-b-4 border-green-500'
-                  : 'text-gray-600 hover:bg-gray-50'
-              }`}
-            >
-              مدفوع ({paidCount})
-            </button>
-            <button
               onClick={() => setActiveTab('cancelled')}
               className={`flex-1 px-6 py-4 font-bold transition-all ${
                 activeTab === 'cancelled'
@@ -379,10 +358,7 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
             </div>
             <h3 className="text-xl font-bold text-gray-900 mb-2">لا توجد حجوزات</h3>
             <p className="text-gray-600">
-              لا توجد حجوزات بحالة "
-              {activeTab === 'pending' ? 'قيد المراجعة' :
-               activeTab === 'waiting_for_payment' ? 'بانتظار السداد' :
-               activeTab === 'paid' ? 'مدفوع' : 'ملغي'}"
+              لا توجد حجوزات بحالة "{activeTab === 'pending' ? 'قيد المراجعة' : 'ملغي'}"
             </p>
           </div>
         ) : (

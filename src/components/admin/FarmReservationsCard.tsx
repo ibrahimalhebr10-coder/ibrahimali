@@ -7,8 +7,7 @@ interface FarmReservationsCardProps {
   totalInvestors: number;
   totalAmount: number;
   pendingCount: number;
-  waitingForPaymentCount: number;
-  paidCount: number;
+  cancelledCount: number;
   onViewDetails: (farmId: number) => void;
 }
 
@@ -19,11 +18,10 @@ export default function FarmReservationsCard({
   totalInvestors,
   totalAmount,
   pendingCount,
-  waitingForPaymentCount,
-  paidCount,
+  cancelledCount,
   onViewDetails
 }: FarmReservationsCardProps) {
-  const totalReservations = pendingCount + waitingForPaymentCount + paidCount;
+  const totalReservations = pendingCount + cancelledCount;
 
   return (
     <div className="bg-white rounded-2xl shadow-lg border-2 border-green-100 overflow-hidden hover:shadow-xl transition-all">
@@ -98,16 +96,10 @@ export default function FarmReservationsCard({
                 <span className="text-sm font-bold text-amber-800">{pendingCount} قيد المراجعة</span>
               </div>
             )}
-            {waitingForPaymentCount > 0 && (
-              <div className="flex items-center gap-2 bg-blue-100 px-3 py-1 rounded-full border border-blue-300">
-                <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                <span className="text-sm font-bold text-blue-800">{waitingForPaymentCount} بانتظار السداد</span>
-              </div>
-            )}
-            {paidCount > 0 && (
-              <div className="flex items-center gap-2 bg-green-100 px-3 py-1 rounded-full border border-green-300">
-                <div className="w-2 h-2 rounded-full bg-green-600"></div>
-                <span className="text-sm font-bold text-green-800">{paidCount} مدفوع</span>
+            {cancelledCount > 0 && (
+              <div className="flex items-center gap-2 bg-red-100 px-3 py-1 rounded-full border border-red-300">
+                <div className="w-2 h-2 rounded-full bg-red-600"></div>
+                <span className="text-sm font-bold text-red-800">{cancelledCount} ملغي</span>
               </div>
             )}
           </div>
