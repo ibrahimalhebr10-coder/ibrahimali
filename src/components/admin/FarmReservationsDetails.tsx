@@ -102,15 +102,51 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
     try {
       setProcessing(true);
 
+      const { data: reservationsToApprove, error: fetchError } = await supabase
+        .from('reservations')
+        .select('id, user_id, farm_id, farm_name, contract_name, total_price, payment_method')
+        .in('id', reservationIds);
+
+      if (fetchError) throw fetchError;
+      if (!reservationsToApprove || reservationsToApprove.length === 0) {
+        throw new Error('لم يتم العثور على الحجوزات');
+      }
+
       const { data: approvedReservations, error: updateError } = await supabase
         .from('reservations')
         .update({ status: 'waiting_for_payment' })
         .in('id', reservationIds)
-        .select('id, user_id, farm_name, contract_name, total_price');
+        .select('id, user_id, farm_id, farm_name, contract_name, total_price, payment_method');
 
       if (updateError) throw updateError;
 
       if (approvedReservations) {
+        const paymentPromises = approvedReservations.map(async (reservation) => {
+          const { error: paymentError } = await supabase
+            .from('payments')
+            .insert({
+              reservation_id: reservation.id,
+              user_id: reservation.user_id,
+              farm_id: reservation.farm_id,
+              farm_name: reservation.farm_name,
+              amount: reservation.total_price,
+              payment_method: reservation.payment_method || 'mada',
+              payment_status: 'waiting_for_payment',
+              gateway_response: {},
+              metadata: {
+                contract_name: reservation.contract_name,
+                approved_at: new Date().toISOString()
+              }
+            });
+
+          if (paymentError) {
+            console.error(`Error creating payment for reservation ${reservation.id}:`, paymentError);
+            throw paymentError;
+          }
+        });
+
+        await Promise.all(paymentPromises);
+
         for (const reservation of approvedReservations) {
           try {
             await notificationService.createNotification({
@@ -130,10 +166,10 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
       setSelectedReservations(new Set());
       onUpdate();
 
-      alert(`تم تعميد ${reservationIds.length} حجز بنجاح!\nتم إرسال إشعارات للمستثمرين.`);
+      alert(`تم تعميد ${reservationIds.length} حجز بنجاح!\nتم إنشاء ${reservationIds.length} عملية دفع في القسم المالي.\nتم إرسال إشعارات للمستثمرين.`);
     } catch (err) {
       console.error('Error approving reservations:', err);
-      alert('حدث خطأ أثناء تعميد الحجوزات');
+      alert('حدث خطأ أثناء تعميد الحجوزات: ' + (err instanceof Error ? err.message : 'خطأ غير معروف'));
     } finally {
       setProcessing(false);
     }
