@@ -216,10 +216,10 @@ function App() {
       shadow: 'rgba(245, 215, 150, 0.28)'
     },
     apple: {
-      iconGradient: 'linear-gradient(145deg, rgba(255, 248, 250, 0.95) 0%, rgba(255, 240, 245, 0.88) 50%, rgba(255, 245, 248, 0.92) 100%)',
-      cardGradient: 'linear-gradient(135deg, rgba(255, 245, 248, 0.72) 0%, rgba(255, 238, 243, 0.65) 50%, rgba(255, 242, 246, 0.70) 100%)',
-      border: 'rgba(255, 220, 235, 0.45)',
-      shadow: 'rgba(255, 200, 225, 0.28)'
+      iconGradient: 'linear-gradient(145deg, rgba(220, 255, 235, 0.92) 0%, rgba(230, 255, 240, 0.88) 50%, rgba(225, 255, 238, 0.90) 100%)',
+      cardGradient: 'linear-gradient(135deg, rgba(225, 255, 238, 0.75) 0%, rgba(230, 255, 242, 0.68) 50%, rgba(228, 255, 240, 0.72) 100%)',
+      border: 'rgba(144, 238, 144, 0.50)',
+      shadow: 'rgba(144, 238, 144, 0.35)'
     },
     grape: {
       iconGradient: 'linear-gradient(145deg, rgba(255, 248, 240, 0.95) 0%, rgba(255, 238, 220, 0.88) 50%, rgba(255, 245, 233, 0.92) 100%)',
