@@ -604,7 +604,7 @@ function App() {
                         <div key={farm.id} className="w-full flex-shrink-0 px-0.5">
                           <button
                             onClick={() => handleFarmClick(farm.id)}
-                            className="w-full rounded-lg overflow-hidden transition-all duration-300 active:scale-[0.97] hover:shadow-xl text-right group backdrop-blur-xl relative"
+                            className="w-full rounded-xl overflow-hidden transition-all duration-300 active:scale-[0.97] hover:shadow-xl text-right group backdrop-blur-xl relative"
                             style={{
                               background: activeColors.cardGradient,
                               boxShadow: `0 8px 24px ${activeColors.shadow}, 0 4px 12px ${activeColors.shadow}, inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.03)`,
@@ -613,7 +613,7 @@ function App() {
                               WebkitBackdropFilter: 'blur(20px)'
                             }}
                           >
-                            <div className="relative w-full h-[69px] overflow-hidden">
+                            <div className="relative w-full h-[76px] overflow-hidden">
                               <img
                                 src={farm.image}
                                 alt={farm.name}
@@ -622,38 +622,38 @@ function App() {
                               <div
                                 className="absolute inset-0"
                                 style={{
-                                  background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%)'
+                                  background: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 100%)'
                                 }}
                               />
-                              <div className="absolute top-1 right-1 bg-white/95 backdrop-blur-sm rounded-md px-1.5 py-0.5 shadow-lg">
-                                <span className="text-[8px] font-black text-darkgreen">{farm.name}</span>
+                              <div className="absolute top-1.5 right-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-1 shadow-lg">
+                                <span className="text-[9px] font-black text-darkgreen">{farm.name}</span>
                               </div>
-                              <div className="absolute top-1 left-1 bg-gradient-to-r from-green-50 to-emerald-50 backdrop-blur-sm rounded-full px-1.5 py-0.5 flex items-center gap-0.5 shadow-md border border-green-200">
-                                <TrendingUp className="w-2 h-2 text-green-600" strokeWidth={2.5} />
-                                <span className="text-[8px] font-black text-green-700">{farm.returnRate}</span>
+                              <div className="absolute top-1.5 left-1.5 bg-gradient-to-r from-green-50 to-emerald-50 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 shadow-lg border border-green-200">
+                                <TrendingUp className="w-2.5 h-2.5 text-green-600" strokeWidth={2.5} />
+                                <span className="text-[9px] font-black text-green-700">{farm.returnRate}</span>
                               </div>
                             </div>
-                        <div className="p-2 space-y-1">
-                          <div className="flex items-center justify-center gap-1 py-1 px-2 rounded-md bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border border-amber-200">
-                            <Sparkles className="w-2 h-2 text-amber-500" strokeWidth={2.5} fill="currentColor" />
-                            <span className="text-[8px] font-black text-amber-800">احجز شجرتك</span>
+                        <div className="p-2.5 space-y-1.5">
+                          <div className="flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border border-amber-200 shadow-sm">
+                            <Sparkles className="w-2.5 h-2.5 text-amber-500" strokeWidth={2.5} fill="currentColor" />
+                            <span className="text-[9px] font-black text-amber-800">احجز شجرتك الآن</span>
                           </div>
 
-                          <div className="flex items-center justify-between gap-1 text-[7px]">
-                            <div className="flex items-center gap-0.5 bg-green-50 rounded px-1.5 py-0.5 border border-green-200">
-                              <CheckCircle2 className="w-2 h-2 text-green-600" strokeWidth={2.5} />
-                              <span className="font-black text-green-700">{farm.availableTrees}</span>
+                          <div className="flex items-center justify-between gap-1.5 text-[8px]">
+                            <div className="flex items-center gap-1 bg-green-50 rounded-lg px-2 py-1 border border-green-200 shadow-sm flex-1">
+                              <CheckCircle2 className="w-2.5 h-2.5 text-green-600" strokeWidth={2.5} />
+                              <span className="font-black text-green-700 text-[9px]">{farm.availableTrees}</span>
                               <span className="font-bold text-green-600">متاح</span>
                             </div>
-                            <div className="flex items-center gap-0.5 bg-amber-50 rounded px-1.5 py-0.5 border border-amber-200">
-                              <Clock className="w-2 h-2 text-amber-600" strokeWidth={2.5} />
-                              <span className="font-black text-amber-700">{farm.reservedTrees}</span>
+                            <div className="flex items-center gap-1 bg-amber-50 rounded-lg px-2 py-1 border border-amber-200 shadow-sm flex-1">
+                              <Clock className="w-2.5 h-2.5 text-amber-600" strokeWidth={2.5} />
+                              <span className="font-black text-amber-700 text-[9px]">{farm.reservedTrees}</span>
                               <span className="font-bold text-amber-600">محجوز</span>
                             </div>
                           </div>
 
-                          <div className="space-y-0.5">
-                            <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                          <div className="space-y-1">
+                            <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden shadow-inner">
                               <div
                                 className="h-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 transition-all duration-700"
                                 style={{
@@ -663,12 +663,12 @@ function App() {
                                 }}
                               />
                             </div>
-                            <p className="text-[7px] font-black text-amber-700 text-center">
-                              {reservationPercentage.toFixed(0)}% محجوز
+                            <p className="text-[8px] font-black text-amber-700 text-center">
+                              نسبة الحجز: {reservationPercentage.toFixed(0)}%
                             </p>
                           </div>
 
-                          <p className="text-[7px] leading-tight line-clamp-2 font-bold text-darkgreen/80">
+                          <p className="text-[8px] leading-relaxed line-clamp-2 font-bold text-darkgreen/80 pt-0.5">
                             {farm.description}
                           </p>
                         </div>
@@ -732,7 +732,7 @@ function App() {
                 <button
                   key={farm.id}
                   onClick={() => handleFarmClick(farm.id)}
-                  className="w-full rounded-lg overflow-hidden transition-all duration-300 active:scale-[0.97] hover:shadow-xl text-right group backdrop-blur-xl relative"
+                  className="w-full rounded-xl overflow-hidden transition-all duration-300 active:scale-[0.97] hover:shadow-xl text-right group backdrop-blur-xl relative"
                   style={{
                     background: activeColors.cardGradient,
                     boxShadow: `0 8px 24px ${activeColors.shadow}, 0 4px 12px ${activeColors.shadow}, inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.03)`,
@@ -741,7 +741,7 @@ function App() {
                     WebkitBackdropFilter: 'blur(20px)'
                   }}
                 >
-                  <div className="relative w-full h-[69px] overflow-hidden">
+                  <div className="relative w-full h-[76px] overflow-hidden">
                     <img
                       src={farm.image}
                       alt={farm.name}
@@ -750,38 +750,38 @@ function App() {
                     <div
                       className="absolute inset-0"
                       style={{
-                        background: 'linear-gradient(180deg, rgba(0,0,0,0.3) 0%, transparent 100%)'
+                        background: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 100%)'
                       }}
                     />
-                    <div className="absolute top-1 right-1 bg-white/95 backdrop-blur-sm rounded-md px-1.5 py-0.5 shadow-lg">
-                      <span className="text-[8px] font-black text-darkgreen">{farm.name}</span>
+                    <div className="absolute top-1.5 right-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-1 shadow-lg">
+                      <span className="text-[9px] font-black text-darkgreen">{farm.name}</span>
                     </div>
-                    <div className="absolute top-1 left-1 bg-gradient-to-r from-green-50 to-emerald-50 backdrop-blur-sm rounded-full px-1.5 py-0.5 flex items-center gap-0.5 shadow-md border border-green-200">
-                      <TrendingUp className="w-2 h-2 text-green-600" strokeWidth={2.5} />
-                      <span className="text-[8px] font-black text-green-700">{farm.returnRate}</span>
+                    <div className="absolute top-1.5 left-1.5 bg-gradient-to-r from-green-50 to-emerald-50 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 shadow-lg border border-green-200">
+                      <TrendingUp className="w-2.5 h-2.5 text-green-600" strokeWidth={2.5} />
+                      <span className="text-[9px] font-black text-green-700">{farm.returnRate}</span>
                     </div>
                   </div>
-                  <div className="p-2 space-y-1">
-                    <div className="flex items-center justify-center gap-1 py-1 px-2 rounded-md bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border border-amber-200">
-                      <Sparkles className="w-2 h-2 text-amber-500" strokeWidth={2.5} fill="currentColor" />
-                      <span className="text-[8px] font-black text-amber-800">احجز شجرتك</span>
+                  <div className="p-2.5 space-y-1.5">
+                    <div className="flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border border-amber-200 shadow-sm">
+                      <Sparkles className="w-2.5 h-2.5 text-amber-500" strokeWidth={2.5} fill="currentColor" />
+                      <span className="text-[9px] font-black text-amber-800">احجز شجرتك الآن</span>
                     </div>
 
-                    <div className="flex items-center justify-between gap-1 text-[7px]">
-                      <div className="flex items-center gap-0.5 bg-green-50 rounded px-1.5 py-0.5 border border-green-200">
-                        <CheckCircle2 className="w-2 h-2 text-green-600" strokeWidth={2.5} />
-                        <span className="font-black text-green-700">{farm.availableTrees}</span>
+                    <div className="flex items-center justify-between gap-1.5 text-[8px]">
+                      <div className="flex items-center gap-1 bg-green-50 rounded-lg px-2 py-1 border border-green-200 shadow-sm flex-1">
+                        <CheckCircle2 className="w-2.5 h-2.5 text-green-600" strokeWidth={2.5} />
+                        <span className="font-black text-green-700 text-[9px]">{farm.availableTrees}</span>
                         <span className="font-bold text-green-600">متاح</span>
                       </div>
-                      <div className="flex items-center gap-0.5 bg-amber-50 rounded px-1.5 py-0.5 border border-amber-200">
-                        <Clock className="w-2 h-2 text-amber-600" strokeWidth={2.5} />
-                        <span className="font-black text-amber-700">{farm.reservedTrees}</span>
+                      <div className="flex items-center gap-1 bg-amber-50 rounded-lg px-2 py-1 border border-amber-200 shadow-sm flex-1">
+                        <Clock className="w-2.5 h-2.5 text-amber-600" strokeWidth={2.5} />
+                        <span className="font-black text-amber-700 text-[9px]">{farm.reservedTrees}</span>
                         <span className="font-bold text-amber-600">محجوز</span>
                       </div>
                     </div>
 
-                    <div className="space-y-0.5">
-                      <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                    <div className="space-y-1">
+                      <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden shadow-inner">
                         <div
                           className="h-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 transition-all duration-700"
                           style={{
@@ -791,12 +791,12 @@ function App() {
                           }}
                         />
                       </div>
-                      <p className="text-[7px] font-black text-amber-700 text-center">
-                        {reservationPercentage.toFixed(0)}% محجوز
+                      <p className="text-[8px] font-black text-amber-700 text-center">
+                        نسبة الحجز: {reservationPercentage.toFixed(0)}%
                       </p>
                     </div>
 
-                    <p className="text-[7px] leading-tight line-clamp-2 font-bold text-darkgreen/80">
+                    <p className="text-[8px] leading-relaxed line-clamp-2 font-bold text-darkgreen/80 pt-0.5">
                       {farm.description}
                     </p>
                   </div>
