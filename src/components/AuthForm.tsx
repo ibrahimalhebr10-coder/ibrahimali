@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, Lock, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { Smartphone, Lock, X, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AuthFormProps {
@@ -11,7 +11,7 @@ interface AuthFormProps {
 export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) {
   const { signUp, signIn } = useAuth();
   const [mode, setMode] = useState<'signin' | 'signup'>('signup');
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,14 +19,44 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
 
   if (!isOpen) return null;
 
+  const normalizePhoneNumber = (phoneInput: string): string => {
+    let cleaned = phoneInput.replace(/\D/g, '');
+
+    if (cleaned.startsWith('00966')) {
+      cleaned = cleaned.substring(5);
+    } else if (cleaned.startsWith('966')) {
+      cleaned = cleaned.substring(3);
+    } else if (cleaned.startsWith('0')) {
+      cleaned = cleaned.substring(1);
+    }
+
+    return cleaned;
+  };
+
+  const validateSaudiPhone = (phoneInput: string): boolean => {
+    const normalized = normalizePhoneNumber(phoneInput);
+    return /^5[0-9]{8}$/.test(normalized);
+  };
+
+  const phoneToEmail = (phoneInput: string): string => {
+    const normalized = normalizePhoneNumber(phoneInput);
+    return `966${normalized}@phone.local`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
     setLoading(true);
 
-    if (!email || !password) {
-      setError('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+    if (!phone || !password) {
+      setError('يرجى إدخال رقم الجوال وكلمة المرور');
+      setLoading(false);
+      return;
+    }
+
+    if (!validateSaudiPhone(phone)) {
+      setError('رقم الجوال غير صحيح. يجب أن يبدأ بـ 05 ويتكون من 10 أرقام');
       setLoading(false);
       return;
     }
@@ -37,13 +67,15 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
       return;
     }
 
+    const email = phoneToEmail(phone);
+
     try {
       if (mode === 'signup') {
         const { error: signUpError } = await signUp(email, password);
 
         if (signUpError) {
           if (signUpError.message.includes('already registered')) {
-            setError('هذا البريد الإلكتروني مسجل مسبقاً. جرب تسجيل الدخول.');
+            setError('رقم الجوال هذا مسجل مسبقاً. جرب تسجيل الدخول.');
           } else {
             setError(signUpError.message);
           }
@@ -72,7 +104,7 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
 
         if (signInError) {
           if (signInError.message.includes('Invalid login credentials')) {
-            setError('البريد الإلكتروني أو كلمة المرور غير صحيحة');
+            setError('رقم الجوال أو كلمة المرور غير صحيحة');
           } else {
             setError(signInError.message);
           }
@@ -118,15 +150,15 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
                 boxShadow: '0 8px 16px rgba(58,161,126,0.3)'
               }}
             >
-              <Mail className="w-10 h-10 text-white" />
+              <Smartphone className="w-10 h-10 text-white" />
             </div>
             <h2 className="text-3xl font-bold text-darkgreen mb-2">
               {mode === 'signup' ? 'إنشاء حساب جديد' : 'تسجيل الدخول'}
             </h2>
             <p className="text-sm text-gray-600">
               {mode === 'signup'
-                ? 'أنشئ حسابك للبدء في الاستثمار الزراعي'
-                : 'سجل دخولك للوصول إلى حسابك'}
+                ? 'سجل برقم جوالك وابدأ رحلتك الزراعية'
+                : 'سجل دخولك برقم جوالك'}
             </p>
           </div>
 
@@ -147,21 +179,25 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-bold text-darkgreen mb-2">
-                البريد الإلكتروني
+                رقم الجوال
               </label>
               <div className="relative">
-                <Mail className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Smartphone className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="example@email.com"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="05XXXXXXXX"
                   disabled={loading}
                   className="w-full pr-12 pl-4 py-4 rounded-xl border-2 border-gray-200 focus:border-darkgreen focus:outline-none transition-colors text-right disabled:bg-gray-50"
                   dir="ltr"
                   style={{ textAlign: 'left' }}
+                  maxLength={10}
                 />
               </div>
+              <p className="text-xs text-gray-500 mt-2">
+                أدخل رقم جوالك السعودي (مثال: 0512345678)
+              </p>
             </div>
 
             <div>
