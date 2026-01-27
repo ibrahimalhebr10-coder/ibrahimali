@@ -142,8 +142,8 @@ export default function FarmCalculatorConfirmation({
                   </div>
 
                   {calculatorData.trees.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-start gap-3">
-                      <span style={{ color: '#5D4E37' }} className="flex-1 leading-relaxed break-words">
+                    <div key={idx} className="flex justify-between items-center gap-3 overflow-x-auto">
+                      <span style={{ color: '#5D4E37' }} className="whitespace-nowrap">
                         {item.treeType.name} {item.treeType.subtitle}
                       </span>
                       <span className="font-bold flex-shrink-0" style={{ color: '#2F5233' }}>
