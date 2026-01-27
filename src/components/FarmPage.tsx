@@ -803,146 +803,159 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
           >
             {/* المحتوى */}
             <div className="bg-white shadow-2xl">
-              {/* الحالة الموسعة - التفاصيل الكاملة */}
+              {/* الحالة الموسعة - التفاصيل الكاملة محسّنة بصرياً */}
               {isBottomSheetExpanded && (
                 <div className="overflow-y-auto" style={{ maxHeight: 'calc(85vh - 80px)' }}>
-                  <div className="p-5 pb-6 space-y-4">
+                  <div className="p-4 pb-5 space-y-3">
                     {/* رأس التفاصيل */}
-                    <div className="flex items-center justify-between border-b border-gray-200 pb-3">
-                      <h3 className="text-lg font-bold text-gray-900">ملخص الحجز</h3>
+                    <div className="flex items-center justify-between border-b-2 border-green-100 pb-2.5">
+                      <h3 className="text-base font-black bg-gradient-to-l from-green-600 to-green-500 bg-clip-text text-transparent">ملخص الحجز الكامل</h3>
                       <button
                         onClick={() => setIsBottomSheetExpanded(false)}
-                        className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+                        className="w-7 h-7 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
                       >
-                        <X className="w-4 h-4 text-gray-600" />
+                        <X className="w-3.5 h-3.5 text-gray-600" />
                       </button>
                     </div>
 
-                    {/* تفاصيل الأشجار */}
-                    <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200">
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-green-600 flex items-center justify-center">
-                          <TreePine className="w-5 h-5 text-white" />
+                    {/* تفاصيل الأشجار - محسّنة */}
+                    <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-green-50 rounded-lg p-3 border border-green-200 shadow-sm">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md">
+                            <TreePine className="w-4.5 h-4.5 text-white" />
+                          </div>
+                          <div className="leading-tight">
+                            <p className="text-[10px] font-semibold text-green-700 uppercase tracking-wide">الأشجار المختارة</p>
+                            <p className="text-2xl font-black bg-gradient-to-l from-green-700 to-green-600 bg-clip-text text-transparent">{totalTrees}</p>
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <p className="text-xs font-semibold text-green-800 mb-1">عدد الأشجار المختارة</p>
-                          <p className="text-2xl font-black text-green-700">{totalTrees} شجرة</p>
+                        <div className="text-left">
+                          <p className="text-xs text-gray-500 font-medium">شجرة</p>
                         </div>
                       </div>
                     </div>
 
-                    {/* تفاصيل العقد */}
+                    {/* تفاصيل العقد - محسّنة */}
                     {selectedContract ? (
-                      <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-200">
-                        <div className="flex items-start gap-3 mb-3">
-                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
-                            <Award className="w-5 h-5 text-white" />
+                      <div className="bg-gradient-to-br from-blue-50 via-cyan-50 to-blue-50 rounded-lg p-3 border border-blue-200 shadow-sm">
+                        <div className="flex items-center gap-2.5 mb-2.5">
+                          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md">
+                            <Award className="w-4.5 h-4.5 text-white" />
                           </div>
                           <div className="flex-1">
-                            <p className="text-xs font-semibold text-blue-800 mb-1">العقد المختار</p>
-                            <p className="text-base font-black text-gray-900">{selectedContract.contract_name}</p>
+                            <p className="text-[10px] font-semibold text-blue-700 uppercase tracking-wide">العقد المختار</p>
+                            <p className="text-sm font-black text-gray-900 mt-0.5">{selectedContract.contract_name}</p>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-2 text-sm">
-                          <div className="bg-white/70 rounded-lg p-2.5 border border-blue-200">
-                            <p className="text-xs text-gray-600 mb-0.5">مدة العقد</p>
-                            <p className="font-bold text-gray-900">{selectedContract.duration_years} {selectedContract.duration_years === 1 ? 'سنة' : 'سنوات'}</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="bg-white/80 rounded-md p-2 border border-blue-100">
+                            <p className="text-[9px] text-gray-500 font-medium uppercase tracking-wide">المدة</p>
+                            <p className="text-base font-black text-blue-600 mt-0.5">{selectedContract.duration_years} <span className="text-xs font-bold">سنة</span></p>
                           </div>
                           {selectedContract.bonus_years > 0 ? (
-                            <div className="bg-emerald-50 rounded-lg p-2.5 border border-emerald-300">
-                              <p className="text-xs text-emerald-700 mb-0.5">سنوات إضافية</p>
-                              <p className="font-bold text-emerald-600">+{selectedContract.bonus_years} {selectedContract.bonus_years === 1 ? 'سنة' : 'سنوات'}</p>
+                            <div className="bg-gradient-to-br from-emerald-100 to-green-100 rounded-md p-2 border border-emerald-200">
+                              <p className="text-[9px] text-emerald-700 font-semibold uppercase tracking-wide">إضافية</p>
+                              <p className="text-base font-black text-emerald-600 mt-0.5">+{selectedContract.bonus_years} <span className="text-xs font-bold">سنة</span></p>
                             </div>
                           ) : (
-                            <div className="bg-white/70 rounded-lg p-2.5 border border-blue-200">
-                              <p className="text-xs text-gray-600 mb-0.5">نوع العقد</p>
-                              <p className="font-bold text-gray-900">سنوي</p>
+                            <div className="bg-white/80 rounded-md p-2 border border-blue-100">
+                              <p className="text-[9px] text-gray-500 font-medium uppercase tracking-wide">النوع</p>
+                              <p className="text-xs font-bold text-gray-700 mt-0.5">سنوي</p>
                             </div>
                           )}
                         </div>
 
                         {selectedContract.bonus_years > 0 && (
-                          <div className="mt-2 bg-gradient-to-r from-emerald-100 to-green-100 border-2 border-emerald-300 rounded-lg p-2.5">
-                            <p className="text-xs text-emerald-900 font-semibold text-center leading-relaxed">
-                              🎁 يشمل {selectedContract.bonus_years} {selectedContract.bonus_years === 1 ? 'سنة' : 'سنوات'} إضافية مجاناً
+                          <div className="mt-2 bg-gradient-to-r from-green-500 to-emerald-500 rounded-md p-2">
+                            <p className="text-[10px] text-white font-bold text-center leading-tight flex items-center justify-center gap-1">
+                              <Gift className="w-3 h-3" />
+                              هدية {selectedContract.bonus_years} {selectedContract.bonus_years === 1 ? 'سنة' : 'سنوات'} إضافية
                             </p>
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-4 border-2 border-amber-300">
-                        <div className="flex items-center gap-2 mb-2">
-                          <AlertCircle className="w-5 h-5 text-amber-600" />
-                          <p className="text-sm font-bold text-gray-900">اختر العقد</p>
+                      <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-lg p-3 border border-amber-200">
+                        <div className="flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4 text-amber-600" />
+                          <div>
+                            <p className="text-xs font-bold text-gray-900">اختر العقد</p>
+                            <p className="text-[10px] text-gray-600 mt-0.5">يرجى اختيار أحد العقود</p>
+                          </div>
                         </div>
-                        <p className="text-xs text-gray-600">يرجى اختيار أحد العقود لإكمال الحجز</p>
                       </div>
                     )}
 
-                    {/* السعر الإجمالي */}
-                    <div className={`bg-gradient-to-r from-green-600 via-green-500 to-green-600 rounded-xl p-5 shadow-xl transition-transform duration-300 ${
-                      priceUpdateAnimation ? 'scale-105' : 'scale-100'
+                    {/* السعر الإجمالي - محسّن جداً */}
+                    <div className={`bg-gradient-to-br from-green-600 via-green-500 to-emerald-600 rounded-xl p-4 shadow-xl shadow-green-200 transition-all duration-300 ${
+                      priceUpdateAnimation ? 'scale-105 shadow-2xl' : 'scale-100'
                     }`}>
                       <div className="text-center">
-                        <p className="text-xs font-semibold text-white/90 mb-1">إجمالي تكلفة الحجز</p>
-                        <p className={`text-5xl font-black text-white mb-1 transition-all duration-300 ${
+                        <p className="text-[10px] font-bold text-white/80 uppercase tracking-widest mb-1">الإجمالي</p>
+                        <div className={`transition-all duration-300 ${
                           priceUpdateAnimation ? 'scale-110' : 'scale-100'
                         }`}>
-                          {selectedContract ? totalCost.toLocaleString() : '---'}
-                        </p>
-                        <p className="text-sm font-semibold text-white/90">ريال سعودي</p>
+                          <p className="text-4xl font-black text-white leading-none">
+                            {selectedContract ? totalCost.toLocaleString() : '---'}
+                          </p>
+                          <p className="text-xs font-bold text-white/90 mt-1 tracking-wider">ريال سعودي</p>
+                        </div>
 
                         {selectedContract && (
-                          <div className="mt-4 bg-white/20 backdrop-blur-sm rounded-lg p-2.5 border border-white/30">
-                            <p className="text-xs text-white/95 font-medium">
-                              {totalTrees} شجرة × {selectedContract.investor_price.toLocaleString()} ريال
+                          <div className="mt-3 bg-white/20 backdrop-blur-sm rounded-lg p-2 border border-white/30">
+                            <p className="text-[10px] text-white/95 font-semibold">
+                              {totalTrees} شجرة × {selectedContract.investor_price.toLocaleString()} ر.س
                             </p>
                           </div>
                         )}
                       </div>
                     </div>
 
-                    {/* رسوم الصيانة السنوية */}
+                    {/* رسوم الصيانة - محسّنة ومضغوطة */}
                     {farm?.treeTypes?.[0]?.varieties?.[0]?.maintenance_fee && farm.treeTypes[0].varieties[0].maintenance_fee > 0 && (
-                      <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-4 border-2 border-amber-300">
-                        <div className="flex items-start gap-3">
-                          <div className="flex-shrink-0 w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center">
-                            <Shield className="w-5 h-5 text-white" />
+                      <div className="bg-gradient-to-br from-amber-50 via-orange-50 to-amber-50 rounded-lg p-3 border border-amber-200 shadow-sm">
+                        <div className="flex items-start gap-2.5">
+                          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-500 to-orange-500 flex items-center justify-center shadow-md flex-shrink-0">
+                            <Shield className="w-4.5 h-4.5 text-white" />
                           </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-bold text-gray-900 mb-2">رسوم التشغيل والصيانة السنوية</p>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs font-black text-gray-900 mb-2">رسوم الصيانة السنوية</p>
 
                             {farm.firstYearMaintenanceFree ? (
-                              <div className="space-y-2">
-                                <div className="bg-green-100 border-2 border-green-300 rounded-lg p-2.5">
-                                  <p className="text-xs font-bold text-green-800 text-center">
-                                    ✨ السنة الأولى مجاناً
+                              <div className="space-y-1.5">
+                                <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-md p-1.5">
+                                  <p className="text-[10px] font-bold text-white text-center leading-tight flex items-center justify-center gap-1">
+                                    <Sparkles className="w-2.5 h-2.5" />
+                                    السنة الأولى مجاناً
                                   </p>
                                 </div>
-                                <div className="bg-white/70 rounded-lg p-2.5 border border-amber-200">
-                                  <p className="text-xs text-gray-700 leading-relaxed">
-                                    <span className="font-bold text-amber-700">{maintenanceFee.toLocaleString()} ريال سنوياً</span> ابتداءً من السنة الثانية
+                                <div className="bg-white/80 rounded-md p-2 border border-amber-100">
+                                  <p className="text-xs leading-tight">
+                                    <span className="font-black text-amber-700 text-sm">{maintenanceFee.toLocaleString()}</span>
+                                    <span className="text-[10px] text-gray-600 font-medium"> ر.س/سنة</span>
                                   </p>
-                                  <p className="text-xs text-gray-600 mt-1">
-                                    ({farm.treeTypes[0].varieties[0].maintenance_fee.toLocaleString()} ريال لكل شجرة)
+                                  <p className="text-[9px] text-gray-500 mt-0.5">
+                                    من السنة الثانية • {farm.treeTypes[0].varieties[0].maintenance_fee.toLocaleString()} ر.س للشجرة
                                   </p>
                                 </div>
                               </div>
                             ) : (
-                              <div className="bg-white/70 rounded-lg p-2.5 border border-amber-200">
-                                <p className="text-xs text-gray-700 leading-relaxed">
-                                  <span className="font-bold text-amber-700">{maintenanceFee.toLocaleString()} ريال سنوياً</span>
+                              <div className="bg-white/80 rounded-md p-2 border border-amber-100">
+                                <p className="text-xs leading-tight">
+                                  <span className="font-black text-amber-700 text-sm">{maintenanceFee.toLocaleString()}</span>
+                                  <span className="text-[10px] text-gray-600 font-medium"> ر.س/سنة</span>
                                 </p>
-                                <p className="text-xs text-gray-600 mt-1">
-                                  ({farm.treeTypes[0].varieties[0].maintenance_fee.toLocaleString()} ريال لكل شجرة)
+                                <p className="text-[9px] text-gray-500 mt-0.5">
+                                  {farm.treeTypes[0].varieties[0].maintenance_fee.toLocaleString()} ر.س للشجرة
                                 </p>
                               </div>
                             )}
 
-                            <div className="mt-2 bg-amber-100/50 rounded-lg p-2 border border-amber-200">
-                              <p className="text-xs text-amber-900 leading-relaxed">
-                                💡 هذه الرسوم مستقلة ولا تدخل ضمن تكلفة الحجز
+                            <div className="mt-1.5 bg-amber-100/60 rounded-md p-1.5 border border-amber-200">
+                              <p className="text-[9px] text-amber-900 leading-tight font-medium text-center">
+                                رسوم منفصلة • لا تشمل تكلفة الحجز
                               </p>
                             </div>
                           </div>
@@ -953,85 +966,95 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                 </div>
               )}
 
-              {/* الشريط المختصر - دائماً ظاهر */}
-              <div className="border-t border-gray-200 bg-white">
-                {/* الملخص المنظم - دائماً ظاهر */}
+              {/* الشريط المختصر - تصميم مضغوط ومبتكر */}
+              <div className="border-t border-gray-200 bg-gradient-to-br from-white via-green-50/30 to-white">
                 {!isBottomSheetExpanded && (
-                  <div className="px-4 pt-3 pb-2 space-y-2">
-                    {/* الصف الأول: عدد الأشجار والإجمالي */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                          <TreePine className="w-4 h-4 text-green-600" />
+                  <div className="px-3 pt-2.5 pb-2">
+                    {/* ملخص سريع مضغوط جداً في سطر واحد */}
+                    <div className="flex items-center justify-between mb-2">
+                      {/* عدد الأشجار - مضغوط */}
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-sm">
+                          <TreePine className="w-3.5 h-3.5 text-white" />
                         </div>
-                        <div>
-                          <p className="text-xs text-gray-500">عدد الأشجار</p>
-                          <p className="text-sm font-bold text-gray-900">{totalTrees} شجرة</p>
+                        <div className="leading-none">
+                          <p className="text-[10px] text-gray-400 font-medium">الأشجار</p>
+                          <p className="text-sm font-black text-gray-900 mt-0.5">{totalTrees}</p>
                         </div>
                       </div>
 
+                      {/* الإجمالي - بارز وجذاب */}
                       {selectedContract && (
-                        <div className="text-left">
-                          <p className="text-xs text-gray-500">إجمالي الحجز</p>
-                          <p className={`text-lg font-black text-green-600 transition-all duration-300 ${
-                            priceUpdateAnimation ? 'scale-110' : 'scale-100'
-                          }`}>
-                            {totalCost.toLocaleString()} <span className="text-sm">ر.س</span>
-                          </p>
+                        <div className="flex items-center gap-2">
+                          {/* رسوم الصيانة - مدمجة بشكل صغير */}
+                          {farm?.treeTypes?.[0]?.varieties?.[0]?.maintenance_fee && farm.treeTypes[0].varieties[0].maintenance_fee > 0 && (
+                            <div className="text-left">
+                              <p className="text-[9px] text-amber-600 font-semibold flex items-center gap-0.5">
+                                <Shield className="w-2.5 h-2.5" />
+                                صيانة
+                              </p>
+                              <p className="text-[11px] font-bold text-amber-700 leading-none mt-0.5">
+                                {maintenanceFee.toLocaleString()}
+                                {farm.firstYearMaintenanceFree && (
+                                  <span className="text-[8px] text-green-600 mr-0.5">★</span>
+                                )}
+                              </p>
+                            </div>
+                          )}
+
+                          <div className="w-px h-8 bg-gray-200" />
+
+                          {/* السعر الإجمالي */}
+                          <div className="text-left">
+                            <p className="text-[10px] text-gray-400 font-medium">الإجمالي</p>
+                            <p className={`text-xl font-black bg-gradient-to-l from-green-600 to-green-500 bg-clip-text text-transparent leading-none mt-0.5 transition-all duration-300 ${
+                              priceUpdateAnimation ? 'scale-110' : 'scale-100'
+                            }`}>
+                              {totalCost.toLocaleString()}
+                              <span className="text-xs mr-0.5">ر.س</span>
+                            </p>
+                          </div>
                         </div>
                       )}
                     </div>
 
-                    {/* الصف الثاني: رسوم الصيانة */}
-                    {selectedContract && farm?.treeTypes?.[0]?.varieties?.[0]?.maintenance_fee && farm.treeTypes[0].varieties[0].maintenance_fee > 0 && (
-                      <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg p-2.5 border border-amber-200">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <Shield className="w-4 h-4 text-amber-600" />
-                            <div>
-                              <p className="text-xs text-gray-600">رسوم الصيانة السنوية</p>
-                              <p className="text-xs font-bold text-amber-700">
-                                {maintenanceFee.toLocaleString()} ر.س/سنة
-                              </p>
-                            </div>
-                          </div>
-                          {farm.firstYearMaintenanceFree && (
-                            <div className="bg-green-100 px-2 py-1 rounded-md">
-                              <p className="text-xs font-bold text-green-700">السنة 1 مجاناً</p>
-                            </div>
-                          )}
-                        </div>
+                    {/* ملاحظة السنة المجانية - مضغوطة جداً */}
+                    {selectedContract && farm?.firstYearMaintenanceFree && farm?.treeTypes?.[0]?.varieties?.[0]?.maintenance_fee && farm.treeTypes[0].varieties[0].maintenance_fee > 0 && (
+                      <div className="bg-gradient-to-r from-green-100 via-emerald-50 to-green-100 rounded-md px-2 py-1 mb-2">
+                        <p className="text-[10px] text-green-700 font-bold text-center leading-tight">
+                          ★ السنة الأولى بدون رسوم صيانة
+                        </p>
                       </div>
                     )}
 
-                    {/* زر عرض التفاصيل */}
+                    {/* زر التفاصيل - صغير جداً */}
                     <button
                       onClick={() => setIsBottomSheetExpanded(true)}
-                      className="w-full py-1.5 text-xs text-gray-500 hover:text-gray-700 flex items-center justify-center gap-1 transition-colors"
+                      className="w-full py-1 text-[10px] text-gray-400 hover:text-gray-600 flex items-center justify-center gap-1 transition-colors border-t border-gray-100"
                     >
-                      <span>عرض التفاصيل الكاملة</span>
-                      <Sparkles className="w-3 h-3" />
+                      <Sparkles className="w-2.5 h-2.5" />
+                      <span>تفاصيل أكثر</span>
                     </button>
                   </div>
                 )}
 
-                {/* زر الحجز */}
-                <div className="p-3 pt-2">
+                {/* زر الحجز - محسّن بصرياً */}
+                <div className="px-3 pb-3 pt-0">
                   {selectedContract ? (
                     <button
                       onClick={handleSaveReservation}
                       disabled={saving}
-                      className="w-full bg-gradient-to-r from-green-600 via-green-500 to-green-600 hover:from-green-700 hover:via-green-600 hover:to-green-700 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                      className="w-full bg-gradient-to-r from-green-600 via-green-500 to-emerald-600 hover:from-green-700 hover:via-green-600 hover:to-emerald-700 text-white font-black py-3 px-4 rounded-xl shadow-lg shadow-green-200 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2 text-sm tracking-wide"
                     >
                       {saving ? (
                         <>
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                          <span>جاري الحفظ...</span>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <span className="font-bold">جاري الحفظ</span>
                         </>
                       ) : (
                         <>
                           <CheckCircle2 className="w-5 h-5" />
-                          <span>أكمل حجز أشجار مزرعتك</span>
+                          <span>إتمام الحجز الآن</span>
                         </>
                       )}
                     </button>
@@ -1043,10 +1066,10 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                           contractSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }
                       }}
-                      className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02] flex items-center justify-center gap-2"
+                      className="w-full bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 hover:from-amber-600 hover:via-orange-600 hover:to-amber-700 text-white font-black py-3 px-4 rounded-xl shadow-lg shadow-orange-200 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl flex items-center justify-center gap-2 text-sm tracking-wide"
                     >
                       <AlertCircle className="w-5 h-5" />
-                      <span>اختر العقد لإكمال الحجز</span>
+                      <span>اختر العقد أولاً</span>
                     </button>
                   )}
                 </div>
