@@ -3,6 +3,7 @@ import { X, MapPin, Play, Map, Plus, Minus, TreePine, CheckCircle2, AlertCircle,
 import { useAuth } from '../contexts/AuthContext';
 import { farmService, type FarmProject, type TreeVariety, type FarmContract } from '../services/farmService';
 import { reservationService } from '../services/reservationService';
+import { supabase } from '../lib/supabase';
 import AuthForm from './AuthForm';
 
 interface FarmPageProps {
@@ -91,6 +92,45 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
     });
   };
 
+  const savePendingReservationToStorage = () => {
+    if (!selectedContract || !farm) return;
+
+    const totalTrees = Object.values(treeSelections).reduce((sum, sel) => sum + sel.quantity, 0);
+    const totalCost = totalTrees * selectedContract.investor_price;
+
+    const cart: Record<string, any> = {};
+    Object.entries(treeSelections).forEach(([varietyId, selection]) => {
+      cart[varietyId] = {
+        varietyName: selection.variety.name,
+        typeName: selection.typeName,
+        quantity: selection.quantity,
+        price: selectedContract.investor_price
+      };
+    });
+
+    const treeDetails = Object.values(treeSelections).map(sel => ({
+      varietyName: sel.variety.name,
+      typeName: sel.typeName,
+      quantity: sel.quantity,
+      pricePerTree: selectedContract.investor_price
+    }));
+
+    const reservationData = {
+      farmId: farm.id,
+      farmName: farm.name,
+      cart,
+      totalTrees,
+      totalPrice: totalCost,
+      contractId: selectedContract.id,
+      contractName: `عقد ${selectedContract.duration_years} ${selectedContract.duration_years === 1 ? 'سنة' : 'سنوات'}`,
+      durationYears: selectedContract.duration_years,
+      bonusYears: selectedContract.bonus_years,
+      treeDetails
+    };
+
+    localStorage.setItem('pendingReservation', JSON.stringify(reservationData));
+  };
+
   const handleSaveReservation = async () => {
     if (Object.keys(treeSelections).length === 0) {
       alert('الرجاء اختيار الأشجار أولاً');
@@ -103,6 +143,7 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
     }
 
     if (!user) {
+      savePendingReservationToStorage();
       setPendingReservation(true);
       setShowPreAuthConfirmation(true);
       return;
@@ -112,7 +153,7 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
   };
 
   const saveReservationToDatabase = async () => {
-    if (!user || !selectedContract) return;
+    if (!user || !selectedContract || !farm) return;
 
     try {
       setSaving(true);
@@ -120,22 +161,41 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
       const totalTrees = Object.values(treeSelections).reduce((sum, sel) => sum + sel.quantity, 0);
       const totalCost = totalTrees * selectedContract.investor_price;
 
-      const mainVariety = Object.values(treeSelections)[0].variety;
-
-      const result = await reservationService.createReservation({
-        userId: user.id,
-        farmId,
-        varietyId: mainVariety.id,
-        treeCount: totalTrees,
-        totalCost,
-        contractId: selectedContract.id,
-        contractYears: selectedContract.duration_years,
-        bonusYears: selectedContract.bonus_years,
-        totalYears: selectedContract.duration_years + selectedContract.bonus_years,
-        monthlyPayment: 0
+      const cart: Record<string, any> = {};
+      Object.entries(treeSelections).forEach(([varietyId, selection]) => {
+        cart[varietyId] = {
+          varietyName: selection.variety.name,
+          typeName: selection.typeName,
+          quantity: selection.quantity,
+          price: selectedContract.investor_price
+        };
       });
 
+      const treeDetails = Object.values(treeSelections).map(sel => ({
+        varietyName: sel.variety.name,
+        typeName: sel.typeName,
+        quantity: sel.quantity,
+        pricePerTree: selectedContract.investor_price
+      }));
+
+      const result = await reservationService.createReservation(
+        user.id,
+        {
+          farmId: farm.id,
+          farmName: farm.name,
+          cart,
+          totalTrees,
+          totalPrice: totalCost,
+          contractId: selectedContract.id,
+          contractName: `عقد ${selectedContract.duration_years} ${selectedContract.duration_years === 1 ? 'سنة' : 'سنوات'}`,
+          durationYears: selectedContract.duration_years,
+          bonusYears: selectedContract.bonus_years,
+          treeDetails
+        }
+      );
+
       if (result) {
+        localStorage.removeItem('pendingReservation');
         onNavigateToReservations();
       } else {
         alert('حدث خطأ أثناء حفظ الحجز. الرجاء المحاولة مرة أخرى.');
@@ -150,14 +210,45 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
 
   const handleAuthSuccess = async () => {
     setShowAuthModal(false);
-    if (pendingReservation) {
+
+    const storedReservation = localStorage.getItem('pendingReservation');
+
+    if (pendingReservation && storedReservation) {
       setPendingReservation(false);
       setShowSuccessScreen(true);
-      await saveReservationToDatabase();
-      setTimeout(() => {
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      try {
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+
+        if (!currentUser) {
+          alert('حدث خطأ في جلب معلومات المستخدم. الرجاء المحاولة مرة أخرى.');
+          setShowSuccessScreen(false);
+          return;
+        }
+
+        const reservationData = JSON.parse(storedReservation);
+        const result = await reservationService.createReservation(
+          currentUser.id,
+          reservationData
+        );
+
+        if (result) {
+          localStorage.removeItem('pendingReservation');
+          setTimeout(() => {
+            setShowSuccessScreen(false);
+            onNavigateToReservations();
+          }, 2500);
+        } else {
+          alert('حدث خطأ أثناء حفظ الحجز. الرجاء المحاولة مرة أخرى.');
+          setShowSuccessScreen(false);
+        }
+      } catch (error) {
+        console.error('Error saving reservation after auth:', error);
+        alert('حدث خطأ أثناء حفظ الحجز. الرجاء المحاولة مرة أخرى.');
         setShowSuccessScreen(false);
-        onNavigateToReservations();
-      }, 2500);
+      }
     }
   };
 
