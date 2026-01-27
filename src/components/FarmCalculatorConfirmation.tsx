@@ -142,11 +142,11 @@ export default function FarmCalculatorConfirmation({
                   </div>
 
                   {calculatorData.trees.map((item, idx) => (
-                    <div key={idx} className="flex justify-between items-center">
-                      <span style={{ color: '#5D4E37' }}>
+                    <div key={idx} className="flex justify-between items-start gap-3">
+                      <span style={{ color: '#5D4E37' }} className="flex-1 leading-relaxed break-words">
                         {item.treeType.name} {item.treeType.subtitle}
                       </span>
-                      <span className="font-bold" style={{ color: '#2F5233' }}>
+                      <span className="font-bold flex-shrink-0" style={{ color: '#2F5233' }}>
                         {item.quantity} شجرة
                       </span>
                     </div>

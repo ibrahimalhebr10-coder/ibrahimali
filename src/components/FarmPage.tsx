@@ -394,7 +394,7 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                   </div>
                   <div className="text-right flex-1 min-w-0">
                     <p className="text-sm font-black leading-tight">عرض الموقع على الخريطة</p>
-                    <p className="text-[10px] text-white/90 mt-0.5 font-medium truncate">اكتشف الموقع الجغرافي الدقيق</p>
+                    <p className="text-[10px] text-white/90 mt-0.5 font-medium leading-relaxed break-words">اكتشف الموقع الجغرافي الدقيق</p>
                   </div>
                 </div>
               </button>
@@ -652,15 +652,15 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          <h4 className="text-sm font-bold text-gray-900 truncate">{variety.name}</h4>
-                          <div className="flex items-center gap-1.5 text-[10px] text-gray-600">
-                            <span>{type.name}</span>
+                          <h4 className="text-sm font-bold text-gray-900 leading-tight break-words">{variety.name}</h4>
+                          <div className="flex items-center gap-1.5 text-[10px] text-gray-600 flex-wrap">
+                            <span className="whitespace-nowrap">{type.name}</span>
                             <span>•</span>
-                            <span className="text-green-600 font-semibold">{variety.available} متاح</span>
+                            <span className="text-green-600 font-semibold whitespace-nowrap">{variety.available} متاح</span>
                             {variety.maintenance_fee && (
                               <>
                                 <span>•</span>
-                                <span className="text-amber-600 font-semibold">{variety.maintenance_fee} ر.س/سنة</span>
+                                <span className="text-amber-600 font-semibold whitespace-nowrap">{variety.maintenance_fee} ر.س/سنة</span>
                               </>
                             )}
                           </div>
