@@ -409,11 +409,11 @@ export default function FarmCalculator({ onClose, onComplete }: FarmCalculatorPr
                   {calculations.selectedTreesData.map(({ treeType, quantity }) => (
                     <div
                       key={treeType.id}
-                      className="flex justify-between items-center gap-3 px-3 py-2 rounded-lg overflow-x-auto"
+                      className="flex justify-between items-center gap-2 px-3 py-2 rounded-lg"
                       style={{ background: 'rgba(74,93,82,0.05)' }}
                     >
-                      <span className="text-sm text-[#6B7B6E] whitespace-nowrap">{treeType.name} {treeType.subtitle}</span>
-                      <span className="font-bold text-[#2F3E36] flex-shrink-0">{quantity} شجرة</span>
+                      <span className="text-sm text-[#6B7B6E] whitespace-nowrap truncate min-w-0 flex-1">{treeType.name} {treeType.subtitle}</span>
+                      <span className="font-bold text-[#2F3E36] flex-shrink-0 whitespace-nowrap">{quantity} شجرة</span>
                     </div>
                   ))}
                   <div

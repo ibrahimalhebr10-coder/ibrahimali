@@ -651,16 +651,16 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                           <TreePine className="w-4 h-4 text-white" />
                         </div>
 
-                        <div className="flex-1 overflow-hidden">
-                          <h4 className="text-sm font-bold text-gray-900 whitespace-nowrap overflow-x-auto scrollbar-thin pb-0.5">{variety.name}</h4>
-                          <div className="flex items-center gap-1.5 text-[10px] text-gray-600 overflow-x-auto scrollbar-thin pb-0.5">
-                            <span className="whitespace-nowrap">{type.name}</span>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-xs font-bold text-gray-900 whitespace-nowrap truncate">{variety.name}</h4>
+                          <div className="flex items-center gap-1 text-[9px] text-gray-600 whitespace-nowrap">
+                            <span>{type.name}</span>
                             <span>•</span>
-                            <span className="text-green-600 font-semibold whitespace-nowrap">{variety.available} متاح</span>
+                            <span className="text-green-600 font-semibold">{variety.available} متاح</span>
                             {variety.maintenance_fee && (
                               <>
                                 <span>•</span>
-                                <span className="text-amber-600 font-semibold whitespace-nowrap">{variety.maintenance_fee} ر.س/سنة</span>
+                                <span className="text-amber-600 font-semibold">{variety.maintenance_fee} ر.س/سنة</span>
                               </>
                             )}
                           </div>
