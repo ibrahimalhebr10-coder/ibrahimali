@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Clock, TreePine, Calendar, FileText, AlertCircle, DollarSign, CheckCircle2, CreditCard, XCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { paymentService } from '../services/paymentService';
 
 interface Reservation {
   id: string;
@@ -26,6 +27,7 @@ export default function MyReservations() {
   const { user } = useAuth();
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [processingPayment, setProcessingPayment] = useState<string | null>(null);
 
   useEffect(() => {
     loadReservations();
@@ -48,6 +50,37 @@ export default function MyReservations() {
       console.error('Error loading reservations:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePayment = async (reservation: Reservation, method: 'mada' | 'tabby' | 'tamara') => {
+    if (!user) return;
+
+    try {
+      setProcessingPayment(reservation.id);
+
+      const payment = await paymentService.createPayment({
+        reservation_id: reservation.id,
+        user_id: user.id,
+        farm_id: reservation.farm_id,
+        farm_name: reservation.farm_name,
+        amount: reservation.total_price,
+        payment_method: method,
+        metadata: {
+          contract_name: reservation.contract_name,
+          total_trees: reservation.total_trees,
+          duration_years: reservation.duration_years
+        }
+      });
+
+      alert(`تم إنشاء عملية الدفع بنجاح!\n\nفي النسخة الكاملة:\n- سيتم توجيهك لبوابة الدفع ${method === 'mada' ? 'مدى' : method === 'tabby' ? 'تابي' : 'تمارا'}\n- بعد إتمام الدفع سيتم تحديث حالة الحجز تلقائياً\n\nرقم المعاملة: ${payment.id}`);
+
+      await loadReservations();
+    } catch (error) {
+      console.error('Error creating payment:', error);
+      alert('حدث خطأ أثناء إنشاء عملية الدفع. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setProcessingPayment(null);
     }
   };
 
@@ -185,7 +218,11 @@ export default function MyReservations() {
                       <div className="space-y-2">
                         <p className="text-sm font-bold text-gray-700 mb-3">اختر وسيلة الدفع:</p>
 
-                        <button className="w-full flex items-center justify-between px-4 py-3 bg-white border-2 border-blue-300 rounded-xl hover:bg-blue-50 transition-all group">
+                        <button
+                          onClick={() => handlePayment(reservation, 'mada')}
+                          disabled={processingPayment === reservation.id}
+                          className="w-full flex items-center justify-between px-4 py-3 bg-white border-2 border-blue-300 rounded-xl hover:bg-blue-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                               <CreditCard className="w-5 h-5 text-white" />
@@ -195,10 +232,15 @@ export default function MyReservations() {
                               <p className="text-xs text-gray-600">الدفع عبر بطاقة مدى</p>
                             </div>
                           </div>
-                          <span className="text-blue-600 font-bold group-hover:translate-x-1 transition-transform">←</span>
+                          <span className="text-blue-600 font-bold group-hover:translate-x-1 transition-transform">
+                            {processingPayment === reservation.id ? '...' : '←'}
+                          </span>
                         </button>
 
-                        <button className="w-full flex items-center justify-between px-4 py-3 bg-white border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all group opacity-60 cursor-not-allowed">
+                        <button
+                          disabled
+                          className="w-full flex items-center justify-between px-4 py-3 bg-white border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all group opacity-60 cursor-not-allowed"
+                        >
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
                               <DollarSign className="w-5 h-5 text-white" />
