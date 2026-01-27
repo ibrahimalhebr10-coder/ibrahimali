@@ -199,5 +199,55 @@ export const paymentService = {
 
     if (error) throw error;
     return data as Payment[];
+  },
+
+  async confirmPayment(paymentId: string, transactionId: string) {
+    const payment = await this.getPaymentById(paymentId);
+    if (!payment) {
+      throw new Error('Payment not found');
+    }
+
+    if (payment.payment_status === 'paid') {
+      throw new Error('Payment already confirmed');
+    }
+
+    const updatedPayment = await this.updatePaymentStatus(
+      paymentId,
+      'paid',
+      transactionId,
+      { confirmed_at: new Date().toISOString() }
+    );
+
+    const { error: reservationError } = await supabase
+      .from('reservations')
+      .update({ status: 'paid' })
+      .eq('id', payment.reservation_id);
+
+    if (reservationError) {
+      console.error('Error updating reservation status:', reservationError);
+      throw new Error('Failed to update reservation status');
+    }
+
+    return updatedPayment;
+  },
+
+  async markPaymentAsFailed(paymentId: string, reason?: string) {
+    const payment = await this.getPaymentById(paymentId);
+    if (!payment) {
+      throw new Error('Payment not found');
+    }
+
+    if (payment.payment_status === 'paid') {
+      throw new Error('Cannot mark paid payment as failed');
+    }
+
+    const updatedPayment = await this.updatePaymentStatus(
+      paymentId,
+      'failed',
+      undefined,
+      { failed_at: new Date().toISOString(), failure_reason: reason || 'Unknown' }
+    );
+
+    return updatedPayment;
   }
 };

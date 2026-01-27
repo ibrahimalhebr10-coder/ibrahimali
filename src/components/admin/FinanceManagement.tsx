@@ -17,6 +17,7 @@ export default function FinanceManagement({ onBack }: FinanceManagementProps) {
   const [activeTab, setActiveTab] = useState<'all' | 'waiting_for_payment' | 'paid' | 'failed'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [usersMap, setUsersMap] = useState<Map<string, string>>(new Map());
+  const [processingPaymentId, setProcessingPaymentId] = useState<string | null>(null);
 
   useEffect(() => {
     loadFinanceData();
@@ -72,6 +73,53 @@ export default function FinanceManagement({ onBack }: FinanceManagementProps) {
       setError('حدث خطأ أثناء البحث');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleConfirmPayment = async (paymentId: string) => {
+    const transactionId = prompt('أدخل رقم المعاملة (Transaction ID):');
+
+    if (!transactionId || !transactionId.trim()) {
+      alert('يجب إدخال رقم المعاملة');
+      return;
+    }
+
+    try {
+      setProcessingPaymentId(paymentId);
+
+      await paymentService.confirmPayment(paymentId, transactionId.trim());
+
+      alert('تم تأكيد الدفع بنجاح!\n\n✅ تم تحديث حالة الدفع إلى "مدفوع"\n✅ تم تحديث حالة الحجز إلى "مدفوع"\n\nالحجز الآن مدفوع وجاهز للتشغيل لاحقاً.');
+
+      await loadFinanceData();
+    } catch (err) {
+      console.error('Error confirming payment:', err);
+      alert('حدث خطأ أثناء تأكيد الدفع: ' + (err instanceof Error ? err.message : 'خطأ غير معروف'));
+    } finally {
+      setProcessingPaymentId(null);
+    }
+  };
+
+  const handleMarkAsFailed = async (paymentId: string) => {
+    const reason = prompt('أدخل سبب فشل الدفع (اختياري):');
+
+    if (!confirm('هل أنت متأكد من تحديد هذا الدفع كفاشل؟')) {
+      return;
+    }
+
+    try {
+      setProcessingPaymentId(paymentId);
+
+      await paymentService.markPaymentAsFailed(paymentId, reason || undefined);
+
+      alert('تم تحديد الدفع كفاشل.\n\nيمكن للمستثمر محاولة الدفع مرة أخرى.');
+
+      await loadFinanceData();
+    } catch (err) {
+      console.error('Error marking payment as failed:', err);
+      alert('حدث خطأ: ' + (err instanceof Error ? err.message : 'خطأ غير معروف'));
+    } finally {
+      setProcessingPaymentId(null);
     }
   };
 
@@ -252,6 +300,9 @@ export default function FinanceManagement({ onBack }: FinanceManagementProps) {
                 key={payment.id}
                 payment={payment}
                 userEmail={usersMap.get(payment.user_id)}
+                onConfirmPayment={handleConfirmPayment}
+                onMarkAsFailed={handleMarkAsFailed}
+                isProcessing={processingPaymentId === payment.id}
               />
             ))}
           </div>

@@ -4,9 +4,12 @@ import type { Payment } from '../../services/paymentService';
 interface PaymentCardProps {
   payment: Payment;
   userEmail?: string;
+  onConfirmPayment?: (paymentId: string) => void;
+  onMarkAsFailed?: (paymentId: string) => void;
+  isProcessing?: boolean;
 }
 
-export default function PaymentCard({ payment, userEmail }: PaymentCardProps) {
+export default function PaymentCard({ payment, userEmail, onConfirmPayment, onMarkAsFailed, isProcessing }: PaymentCardProps) {
   const getStatusConfig = (status: Payment['payment_status']) => {
     const configs = {
       waiting_for_payment: {
@@ -125,7 +128,7 @@ export default function PaymentCard({ payment, userEmail }: PaymentCardProps) {
         )}
 
         <div className="pt-4 border-t border-gray-200">
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-2 gap-4 text-sm mb-4">
             <div className="flex items-center gap-2">
               <User className="w-4 h-4 text-gray-400" />
               <span className="text-gray-600">{userEmail || 'المستثمر'}</span>
@@ -135,6 +138,27 @@ export default function PaymentCard({ payment, userEmail }: PaymentCardProps) {
               <span className="text-gray-600">{formatDate(payment.created_at)}</span>
             </div>
           </div>
+
+          {payment.payment_status === 'waiting_for_payment' && onConfirmPayment && onMarkAsFailed && (
+            <div className="flex gap-2">
+              <button
+                onClick={() => onConfirmPayment(payment.id)}
+                disabled={isProcessing}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>{isProcessing ? 'جاري المعالجة...' : 'تأكيد الدفع'}</span>
+              </button>
+              <button
+                onClick={() => onMarkAsFailed(payment.id)}
+                disabled={isProcessing}
+                className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white font-bold rounded-xl hover:from-red-600 hover:to-red-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <XCircle className="w-4 h-4" />
+                <span>{isProcessing ? 'جاري المعالجة...' : 'فشل الدفع'}</span>
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
