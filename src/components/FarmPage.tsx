@@ -350,122 +350,133 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                   const colors = getContractColors();
 
                   return (
-                    <div key={contract.id} className="flex-shrink-0 snap-center w-32 lg:w-36">
-                      <div className="relative">
+                    <div key={contract.id} className="flex-shrink-0 snap-center w-36 lg:w-40">
+                      <div className="relative pt-4 pb-1">
+                        {/* Badge "الأكثر شعبية" - فوق البطاقة تماماً بدون تداخل */}
                         {isRecommended && (
-                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 z-10">
-                            <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-2.5 py-0.5 rounded-full text-[9px] font-bold shadow-lg flex items-center gap-1">
-                              <Sparkles className="w-2.5 h-2.5" />
+                          <div className="absolute -top-0.5 left-1/2 -translate-x-1/2 z-20">
+                            <div className="bg-gradient-to-r from-amber-500 to-amber-600 text-white px-3 py-1 rounded-full text-[9px] lg:text-[10px] font-bold shadow-xl flex items-center gap-1 border-2 border-amber-300">
+                              <Sparkles className="w-3 h-3" />
                               <span>الأكثر شعبية</span>
                             </div>
                           </div>
                         )}
 
+                        {/* البطاقة الرئيسية */}
                         <button
                           onClick={() => setSelectedContract(contract)}
-                          className="w-full aspect-square rounded-xl lg:rounded-2xl flex flex-col items-center justify-center bg-white transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-lg relative overflow-hidden p-4 lg:p-5"
+                          className="w-full rounded-2xl flex flex-col bg-white transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-lg relative overflow-hidden"
                           style={{
                             boxShadow: isSelected
-                              ? `0 4px 16px ${colors.shadow}, 0 8px 32px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.05)`
-                              : `0 2px 8px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.5)`,
-                            background: colors.iconGradient,
-                            border: `2px solid ${colors.border}`,
+                              ? `0 8px 24px ${colors.shadow}, 0 16px 48px ${colors.shadow}`
+                              : `0 4px 12px ${colors.shadow}`,
+                            border: `3px solid ${colors.border}`,
                             backdropFilter: 'blur(12px)',
                             WebkitBackdropFilter: 'blur(12px)'
                           }}
                         >
-                          {/* Badge "عقد انتفاع" في الزاوية العليا اليسرى */}
-                          <div className="absolute top-2 left-2">
-                            <div className={`px-2 py-1 rounded-lg text-[9px] lg:text-[10px] font-bold shadow-md flex items-center gap-1 ${
-                              isSelected
-                                ? 'bg-white text-green-700 border border-green-200'
-                                : isRecommended
-                                  ? 'bg-white text-amber-700 border border-amber-200'
-                                  : 'bg-gray-800 text-white'
-                            }`}>
-                              <Award className="w-2.5 h-2.5" />
-                              <span>عقد انتفاع</span>
-                            </div>
-                          </div>
-
-                          {/* علامة الاختيار */}
+                          {/* علامة الاختيار - في الزاوية فقط */}
                           {isSelected && (
-                            <div className="absolute top-2 right-2">
-                              <div className="w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-lg border-2 border-green-500">
-                                <CheckCircle2 className="w-4 h-4 text-green-600" />
+                            <div className="absolute top-2 right-2 z-10">
+                              <div className="w-6 h-6 lg:w-7 lg:h-7 bg-white rounded-full flex items-center justify-center shadow-xl border-2 border-green-500">
+                                <CheckCircle2 className="w-4 h-4 lg:w-5 lg:h-5 text-green-600" />
                               </div>
                             </div>
                           )}
 
-                          {/* المحتوى المركزي - عدد السنوات في الأعلى */}
-                          <div className="flex flex-col items-center justify-center gap-2 lg:gap-2.5">
-                            {/* عدد السنوات الرئيسي */}
-                            <div className="text-center">
-                              <p className={`text-4xl lg:text-5xl font-black leading-none mb-1 ${
-                                isSelected || isRecommended ? 'text-white drop-shadow-lg' : 'text-green-700'
+                          {/* قسم العنوان */}
+                          <div
+                            className="px-3 py-2 rounded-t-2xl text-center"
+                            style={{
+                              background: colors.iconGradient
+                            }}
+                          >
+                            <div className="flex items-center justify-center gap-1.5 mb-1">
+                              <Award className={`w-3.5 h-3.5 ${
+                                isSelected || isRecommended ? 'text-white' : 'text-green-700'
+                              }`} />
+                              <p className={`text-[10px] lg:text-[11px] font-bold ${
+                                isSelected || isRecommended ? 'text-white' : 'text-green-900'
                               }`}>
+                                عقد انتفاع
+                              </p>
+                            </div>
+                            <div className={`w-12 h-0.5 rounded-full mx-auto ${
+                              isSelected || isRecommended ? 'bg-white/40' : 'bg-green-300'
+                            }`} />
+                          </div>
+
+                          {/* قسم المحتوى */}
+                          <div className="px-4 py-4 bg-gradient-to-b from-white to-gray-50">
+                            {/* مدة العقد */}
+                            <div className="text-center mb-3">
+                              <p className="text-[10px] font-medium text-gray-600 mb-1">مدة العقد</p>
+                              <p className="text-5xl lg:text-6xl font-black text-green-700 leading-none">
                                 {contract.duration_years}
                               </p>
-                              <p className={`text-[10px] lg:text-[11px] font-bold ${
-                                isSelected || isRecommended ? 'text-white/90' : 'text-gray-600'
-                              }`}>
+                              <p className="text-[11px] font-bold text-gray-600 mt-1">
                                 {contract.duration_years === 1 ? 'سنة' : 'سنوات'}
                               </p>
                             </div>
 
-                            {/* السنوات المجانية - بارزة وواضحة */}
+                            {/* السنوات المجانية */}
                             {contract.bonus_years > 0 && (
-                              <div className="w-full">
-                                <div className={`px-3 py-2 rounded-xl text-[11px] lg:text-xs font-black shadow-lg border-2 ${
-                                  isSelected
-                                    ? 'bg-white text-emerald-600 border-emerald-300'
-                                    : isRecommended
-                                      ? 'bg-white text-amber-600 border-amber-300'
-                                      : 'bg-gradient-to-r from-emerald-500 to-green-500 text-white border-emerald-400'
-                                }`}>
-                                  <div className="flex items-center justify-center gap-1.5 mb-0.5">
-                                    <Gift className="w-3.5 h-3.5" />
-                                    <span>سنوات مجانية</span>
-                                  </div>
-                                  <div className="text-center text-base lg:text-lg font-black">
-                                    +{contract.bonus_years} {contract.bonus_years === 1 ? 'سنة' : 'سنوات'}
-                                  </div>
+                              <>
+                                <div className="flex items-center justify-center gap-2 mb-3">
+                                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+                                  <Plus className="w-3.5 h-3.5 text-emerald-600" />
+                                  <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
                                 </div>
-                              </div>
+
+                                <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-xl p-3 shadow-lg border-2 border-emerald-300 mb-3">
+                                  <div className="flex items-center justify-center gap-1.5 mb-1">
+                                    <Gift className="w-3.5 h-3.5 text-white" />
+                                    <p className="text-[10px] font-bold text-white">هدية مجانية</p>
+                                  </div>
+                                  <p className="text-center text-2xl lg:text-3xl font-black text-white leading-none">
+                                    {contract.bonus_years}
+                                  </p>
+                                  <p className="text-center text-[11px] font-bold text-white/90 mt-1">
+                                    {contract.bonus_years === 1 ? 'سنة إضافية' : 'سنوات إضافية'}
+                                  </p>
+                                </div>
+                              </>
                             )}
 
-                            {/* خط فاصل */}
-                            {contract.bonus_years > 0 && (
-                              <div className={`w-12 h-0.5 rounded-full ${
-                                isSelected || isRecommended ? 'bg-white/40' : 'bg-gray-300'
-                              }`} />
-                            )}
-
-                            {/* إجمالي السنوات */}
-                            <div className="text-center">
-                              <p className={`text-[9px] lg:text-[10px] font-medium mb-0.5 ${
-                                isSelected || isRecommended ? 'text-white/70' : 'text-gray-500'
-                              }`}>
-                                إجمالي المدة
+                            {/* الإجمالي */}
+                            <div className="bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl p-3 border-2 border-gray-300">
+                              <p className="text-[10px] font-medium text-gray-600 text-center mb-1">الإجمالي الكلي</p>
+                              <p className="text-3xl lg:text-4xl font-black text-gray-800 text-center leading-none">
+                                {totalYears}
                               </p>
-                              <p className={`text-xl lg:text-2xl font-black ${
-                                isSelected || isRecommended ? 'text-white' : 'text-gray-700'
-                              }`}>
-                                {totalYears} {totalYears === 1 ? 'سنة' : 'سنوات'}
+                              <p className="text-[11px] font-bold text-gray-600 text-center mt-1">
+                                {totalYears === 1 ? 'سنة' : 'سنوات'}
                               </p>
                             </div>
                           </div>
-                        </button>
 
-                        {/* السعر أسفل البطاقة */}
-                        <div className="mt-2 text-center">
-                          <p className={`text-sm lg:text-base font-black leading-tight ${
-                            isSelected ? 'text-green-700' : isRecommended ? 'text-amber-700' : 'text-gray-700'
-                          }`}>
-                            {contract.investor_price} ريال
-                          </p>
-                          <p className="text-[9px] lg:text-[10px] text-gray-500">للشجرة الواحدة</p>
-                        </div>
+                          {/* قسم السعر */}
+                          <div
+                            className="px-3 py-3 rounded-b-2xl text-center border-t-2"
+                            style={{
+                              background: isSelected
+                                ? 'linear-gradient(to bottom, #dcfce7, #bbf7d0)'
+                                : isRecommended
+                                  ? 'linear-gradient(to bottom, #fef3c7, #fde68a)'
+                                  : 'linear-gradient(to bottom, #f9fafb, #f3f4f6)',
+                              borderTopColor: isSelected ? '#86efac' : isRecommended ? '#fcd34d' : '#e5e7eb'
+                            }}
+                          >
+                            <p className={`text-base lg:text-lg font-black leading-none ${
+                              isSelected ? 'text-green-700' : isRecommended ? 'text-amber-700' : 'text-gray-800'
+                            }`}>
+                              {contract.investor_price} ریال
+                            </p>
+                            <p className="text-[9px] lg:text-[10px] font-medium text-gray-600 mt-1">
+                              للشجرة الواحدة
+                            </p>
+                          </div>
+                        </button>
                       </div>
                     </div>
                   );
