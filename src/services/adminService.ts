@@ -424,8 +424,10 @@ class AdminService {
     location: string;
     area_size?: string;
     image: string;
+    hero_image?: string;
     marketing_text?: string;
     video_url?: string;
+    video_title?: string;
     map_url?: string;
     total_trees: number;
     tree_types: any[];
@@ -455,8 +457,10 @@ class AdminService {
           name_en: farmData.name,
           description_ar: farmData.description,
           image_url: farmData.image,
+          hero_image_url: farmData.hero_image,
           marketing_text: farmData.marketing_text,
           video_url: farmData.video_url,
+          video_title: farmData.video_title || 'شاهد جولة المزرعة',
           map_url: farmData.map_url || '#',
           location: farmData.location,
           area_size: farmData.area_size,
@@ -517,8 +521,10 @@ class AdminService {
     location?: string;
     area_size?: string;
     image?: string;
+    hero_image?: string;
     marketing_text?: string;
     video_url?: string;
+    video_title?: string;
     map_url?: string;
     total_trees?: number;
     tree_types?: any[];
@@ -538,8 +544,10 @@ class AdminService {
       if (farmData.location) updateData.location = farmData.location;
       if (farmData.area_size !== undefined) updateData.area_size = farmData.area_size;
       if (farmData.image) updateData.image_url = farmData.image;
+      if (farmData.hero_image !== undefined) updateData.hero_image_url = farmData.hero_image;
       if (farmData.marketing_text !== undefined) updateData.marketing_text = farmData.marketing_text;
       if (farmData.video_url !== undefined) updateData.video_url = farmData.video_url;
+      if (farmData.video_title !== undefined) updateData.video_title = farmData.video_title;
       if (farmData.map_url !== undefined) updateData.map_url = farmData.map_url;
       if (farmData.total_trees !== undefined) updateData.total_trees = farmData.total_trees;
       if (farmData.order_index !== undefined) updateData.order_index = farmData.order_index;

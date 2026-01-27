@@ -39,9 +39,11 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
     area_size: '',
     status: 'active' as 'active' | 'upcoming' | 'closed',
     image: '',
+    hero_image: '',
     marketing_text: '',
     total_trees: 0,
     video_url: '',
+    video_title: 'شاهد جولة المزرعة',
     map_url: '',
     order_index: 0,
     description: '',
@@ -50,8 +52,10 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
   const [treeTypes, setTreeTypes] = useState<TreeTypeData[]>([]);
   const [contracts, setContracts] = useState<ContractData[]>([]);
   const [uploadingVideo, setUploadingVideo] = useState(false);
+  const [uploadingHeroImage, setUploadingHeroImage] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const videoFileInputRef = useRef<HTMLInputElement>(null);
+  const heroImageInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (farmId) {
@@ -70,9 +74,11 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
         area_size: farm.area_size || '',
         status: farm.status || 'active',
         image: farm.image || '',
+        hero_image: farm.hero_image || '',
         marketing_text: farm.marketing_text || '',
         total_trees: farm.total_trees || 0,
         video_url: farm.video_url || '',
+        video_title: farm.video_title || 'شاهد جولة المزرعة',
         map_url: farm.map_url || '',
         order_index: farm.order_index || 0,
         description: farm.description || '',
@@ -198,6 +204,52 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
       alert('حدث خطأ أثناء رفع الفيديو');
     } finally {
       setUploadingVideo(false);
+    }
+  }
+
+  async function handleHeroImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('يرجى اختيار ملف صورة');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('حجم الصورة يجب أن يكون أقل من 5 ميجابايت');
+      return;
+    }
+
+    setUploadingHeroImage(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `farm-hero-${Date.now()}.${fileExt}`;
+      const filePath = `farms/${fileName}`;
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('farm-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('farm-images')
+        .getPublicUrl(filePath);
+
+      if (publicUrl) {
+        setFormData({ ...formData, hero_image: publicUrl });
+      }
+    } catch (error) {
+      console.error('Error uploading hero image:', error);
+      alert('حدث خطأ أثناء رفع الصورة');
+    } finally {
+      setUploadingHeroImage(false);
     }
   }
 
@@ -560,6 +612,104 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
                 >
                   {treeTypeSummary}
                 </div>
+              </div>
+            </div>
+
+            <div
+              className="rounded-2xl p-6 space-y-5"
+              style={{
+                background: 'linear-gradient(145deg, rgba(139, 195, 74, 0.08), rgba(76, 175, 80, 0.05))',
+                border: '2px solid rgba(139, 195, 74, 0.2)'
+              }}
+            >
+              <h2 className="text-xl font-bold text-white mb-4 pb-3 border-b border-green-400/20 flex items-center gap-2">
+                <span className="text-2xl">🖼️</span>
+                صفحة المزرعة
+              </h2>
+
+              <div>
+                <label className="block text-sm font-semibold text-white/80 mb-2">
+                  صورة أعلى صفحة المزرعة
+                  <span className="text-xs text-white/60 block mt-1">هذه الصورة ستظهر مصغرة في أعلى صفحة المزرعة</span>
+                </label>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <input
+                      ref={heroImageInputRef}
+                      type="file"
+                      onChange={handleHeroImageUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => heroImageInputRef.current?.click()}
+                      disabled={uploadingHeroImage}
+                      className="w-full px-4 py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2"
+                      style={{
+                        background: uploadingHeroImage ? 'rgba(158, 158, 158, 0.2)' : 'rgba(139, 195, 74, 0.2)',
+                        border: '2px solid rgba(139, 195, 74, 0.5)',
+                        color: '#8BC34A'
+                      }}
+                    >
+                      {uploadingHeroImage ? (
+                        <>
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-500"></div>
+                          <span>جاري الرفع...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-5 h-5" />
+                          <span>رفع صورة Hero</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+
+                  <div>
+                    <input
+                      type="url"
+                      value={formData.hero_image}
+                      onChange={(e) => setFormData({ ...formData, hero_image: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl text-right"
+                      style={{
+                        background: 'rgba(255, 255, 255, 0.05)',
+                        border: '2px solid rgba(255, 255, 255, 0.1)',
+                        color: 'white'
+                      }}
+                      placeholder="أو أدخل رابط URL للصورة"
+                    />
+                  </div>
+                </div>
+
+                {formData.hero_image && (
+                  <div className="mt-3">
+                    <img
+                      src={formData.hero_image}
+                      alt="Hero Preview"
+                      className="w-full h-32 object-cover rounded-lg border-2 border-green-400/30"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-white/80 mb-2">
+                  عنوان زر الفيديو
+                  <span className="text-xs text-white/60 block mt-1">النص الذي سيظهر على زر الفيديو تحت الصورة</span>
+                </label>
+                <input
+                  type="text"
+                  value={formData.video_title}
+                  onChange={(e) => setFormData({ ...formData, video_title: e.target.value })}
+                  className="w-full px-4 py-3 rounded-xl text-right"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '2px solid rgba(255, 255, 255, 0.1)',
+                    color: 'white'
+                  }}
+                  placeholder="مثال: شاهد جولة المزرعة"
+                />
               </div>
             </div>
 

@@ -339,9 +339,9 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
 
       <div className="max-w-6xl mx-auto px-3 lg:px-4 py-4 lg:py-6 space-y-5 lg:space-y-8 pb-48">
 
-        {/* HERO IMAGE + INTEGRATED VIDEO BUTTON */}
-        <section className="relative group">
-          <div className="relative h-56 lg:h-80 rounded-2xl lg:rounded-3xl overflow-hidden shadow-xl">
+        {/* HERO IMAGE - مصغرة ومحسنة */}
+        <section className="relative">
+          <div className="relative h-40 lg:h-52 rounded-xl lg:rounded-2xl overflow-hidden shadow-md">
             <img
               src={farm?.image || ''}
               alt={farm?.name || 'مزرعة'}
@@ -350,51 +350,55 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
                 e.currentTarget.src = 'https://images.pexels.com/photos/2132250/pexels-photo-2132250.jpeg?auto=compress&cs=tinysrgb&w=1200';
               }}
             />
-
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-
-            <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-              <div className="flex-1">
-                <h3 className="text-xl lg:text-2xl font-bold text-white mb-1 drop-shadow-lg">{farm?.name || 'مزرعة'}</h3>
-                <p className="text-xs lg:text-sm text-white/90 leading-relaxed line-clamp-2 drop-shadow-md">{farm?.description || ''}</p>
-              </div>
-
-              {farm?.video && (
-                <button
-                  onClick={() => setShowVideoModal(true)}
-                  className="group/play ml-4 flex-shrink-0"
-                >
-                  <div className="relative">
-                    <div className="w-14 h-14 lg:w-16 lg:h-16 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-xl transition-all duration-300 group-hover/play:bg-white group-hover/play:scale-110">
-                      <Play className="w-6 h-6 lg:w-7 lg:h-7 text-green-600" fill="currentColor" />
-                    </div>
-                    <div className="absolute inset-0 rounded-full border-2 border-white/40 animate-ping"></div>
-                  </div>
-                </button>
-              )}
-            </div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
           </div>
         </section>
 
-        {/* MAP BUTTON */}
+        {/* VIDEO BUTTON - تصميم مبتكر تحت الصورة */}
+        {farm?.video && (
+          <section className="-mt-3">
+            <div className="max-w-md mx-auto">
+              <button
+                onClick={() => setShowVideoModal(true)}
+                className="w-full group relative bg-gradient-to-r from-green-600 via-emerald-500 to-green-600 hover:from-green-700 hover:via-emerald-600 hover:to-green-700 text-white rounded-xl p-3.5 shadow-lg shadow-green-200 hover:shadow-xl hover:shadow-green-300 transition-all duration-300 hover:scale-[1.02] overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300"></div>
+
+                <div className="relative flex items-center justify-center gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 transition-all duration-300 group-hover:scale-110">
+                    <Play className="w-5 h-5 text-white" fill="currentColor" />
+                  </div>
+                  <div className="flex-1 text-right">
+                    <p className="text-sm font-black leading-tight">{farm?.videoTitle || 'شاهد جولة المزرعة'}</p>
+                    <p className="text-[10px] text-white/90 mt-0.5 font-medium">فيديو تعريفي شامل</p>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </section>
+        )}
+
+        {/* MAP BUTTON - تصميم أصغر ومبتكر */}
         {farm.mapUrl && farm.mapUrl !== '#' && (
           <section>
-            <button
-              onClick={() => window.open(farm.mapUrl, '_blank')}
-              className="w-full group relative bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-2xl p-5 lg:p-6 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] overflow-hidden"
-            >
-              <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300"></div>
+            <div className="max-w-md mx-auto">
+              <button
+                onClick={() => window.open(farm.mapUrl, '_blank')}
+                className="w-full group relative bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl p-3 shadow-md shadow-blue-200 hover:shadow-lg hover:shadow-blue-300 transition-all duration-300 hover:scale-[1.02] overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-300"></div>
 
-              <div className="relative flex items-center justify-center gap-3">
-                <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                  <Map className="w-6 h-6 text-white" />
+                <div className="relative flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30 flex-shrink-0">
+                    <Map className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="text-right flex-1 min-w-0">
+                    <p className="text-sm font-black leading-tight">عرض الموقع على الخريطة</p>
+                    <p className="text-[10px] text-white/90 mt-0.5 font-medium truncate">اكتشف الموقع الجغرافي الدقيق</p>
+                  </div>
                 </div>
-                <div className="text-right flex-1">
-                  <p className="text-lg font-bold mb-0.5">عرض موقع المزرعة</p>
-                  <p className="text-sm text-white/90">اكتشف الموقع الجغرافي على الخريطة</p>
-                </div>
-              </div>
-            </button>
+              </button>
+            </div>
           </section>
         )}
 

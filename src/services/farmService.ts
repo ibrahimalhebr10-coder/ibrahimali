@@ -36,7 +36,9 @@ export interface FarmProject {
   name: string
   description: string
   image: string
+  heroImage?: string
   video?: string
+  videoTitle?: string
   location?: string
   mapUrl: string
   returnRate: string
@@ -442,7 +444,9 @@ export const farmService = {
       name: project.name_ar || project.name_en,
       description: project.description_ar,
       image: project.image_url,
+      heroImage: project.hero_image_url,
       video: project.video_url,
+      videoTitle: project.video_title || 'شاهد جولة المزرعة',
       location: project.location,
       mapUrl: project.map_url || '#',
       returnRate: project.return_rate_display || `${project.annual_return_rate}% سنوياً`,
