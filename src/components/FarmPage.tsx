@@ -3,6 +3,7 @@ import { X, MapPin, Play, Map, Plus, Minus, TreePine, CheckCircle2, AlertCircle,
 import { useAuth } from '../contexts/AuthContext';
 import { farmService, type FarmProject, type TreeVariety, type FarmContract } from '../services/farmService';
 import { reservationService } from '../services/reservationService';
+import AuthForm from './AuthForm';
 
 interface FarmPageProps {
   farmId: string;
@@ -29,6 +30,8 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
   const [saving, setSaving] = useState(false);
   const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
   const [priceUpdateAnimation, setPriceUpdateAnimation] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [pendingReservation, setPendingReservation] = useState<boolean>(false);
   const videoRef = useRef<HTMLDivElement>(null);
   const contractsScrollRef = useRef<HTMLDivElement>(null);
 
@@ -87,11 +90,6 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
   };
 
   const handleSaveReservation = async () => {
-    if (!user) {
-      onOpenAuth();
-      return;
-    }
-
     if (Object.keys(treeSelections).length === 0) {
       alert('الرجاء اختيار الأشجار أولاً');
       return;
@@ -101,6 +99,18 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
       alert('الرجاء اختيار العقد');
       return;
     }
+
+    if (!user) {
+      setPendingReservation(true);
+      setShowAuthModal(true);
+      return;
+    }
+
+    await saveReservationToDatabase();
+  };
+
+  const saveReservationToDatabase = async () => {
+    if (!user || !selectedContract) return;
 
     try {
       setSaving(true);
@@ -133,6 +143,14 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
       alert('حدث خطأ أثناء حفظ الحجز. الرجاء المحاولة مرة أخرى.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAuthSuccess = async () => {
+    setShowAuthModal(false);
+    if (pendingReservation) {
+      setPendingReservation(false);
+      await saveReservationToDatabase();
     }
   };
 
@@ -889,6 +907,16 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
           </div>
         </div>
       )}
+
+      {/* AUTH MODAL - يظهر فوق صفحة المزرعة مباشرة */}
+      <AuthForm
+        isOpen={showAuthModal}
+        onClose={() => {
+          setShowAuthModal(false);
+          setPendingReservation(false);
+        }}
+        onSuccess={handleAuthSuccess}
+      />
     </div>
   );
 }
