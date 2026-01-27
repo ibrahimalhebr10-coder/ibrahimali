@@ -62,13 +62,6 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
       setLoading(true);
       const farmData = await farmService.getFarmProjectById(farmId);
       if (farmData) {
-        console.log('✅ تم تحميل بيانات المزرعة من قاعدة البيانات:', {
-          'اسم المزرعة': farmData.name,
-          'السنة الأولى مجانية': farmData.firstYearMaintenanceFree,
-          'أنواع الأشجار': farmData.treeTypes.length,
-          'رسوم الصيانة': farmData.treeTypes?.[0]?.varieties?.[0]?.maintenance_fee || 'غير محدد',
-          'عدد العقود': farmData.contracts?.length || 0
-        });
         setFarm(farmData);
       } else {
         console.error('Farm not found');
@@ -302,19 +295,6 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
   const maintenanceFee = totalTrees > 0 && farm?.treeTypes?.[0]?.varieties?.[0]?.maintenance_fee
     ? totalTrees * farm.treeTypes[0].varieties[0].maintenance_fee
     : 0;
-
-  useEffect(() => {
-    if (farm && totalTrees > 0) {
-      console.log('🌳 بيانات الحجز الفعلية:', {
-        'اسم المزرعة': farm.name,
-        'عدد الأشجار': totalTrees,
-        'السنة الأولى مجانية': farm.firstYearMaintenanceFree,
-        'رسوم الصيانة لكل شجرة': farm.treeTypes?.[0]?.varieties?.[0]?.maintenance_fee,
-        'إجمالي رسوم الصيانة السنوية': maintenanceFee,
-        'تكلفة الحجز': totalCost
-      });
-    }
-  }, [farm, totalTrees, maintenanceFee, totalCost]);
 
   const scrollContracts = (direction: 'left' | 'right') => {
     if (contractsScrollRef.current) {
