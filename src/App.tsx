@@ -9,7 +9,7 @@ import SmartAssistant from './components/SmartAssistant';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
 import MyHarvest from './components/MyHarvest';
-import PendingReservations from './components/PendingReservations';
+import MyReservations from './components/MyReservations';
 import AdminDashboard from './components/admin/AdminDashboard';
 import AdminLoginGate from './components/admin/AdminLoginGate';
 import Header from './components/Header';
@@ -41,7 +41,7 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
-  const [showPendingReservations, setShowPendingReservations] = useState(false);
+  const [showMyReservations, setShowMyReservations] = useState(false);
 
   useEffect(() => {
     let retryCount = 0;
@@ -355,7 +355,7 @@ function App() {
         onOpenAuth={() => setShowAuthForm(true)}
         onNavigateToReservations={() => {
           handleCloseFarm();
-          setShowPendingReservations(true);
+          setShowMyReservations(true);
         }}
       />
     );
@@ -993,7 +993,7 @@ function App() {
         isOpen={showAccountProfile}
         onClose={() => setShowAccountProfile(false)}
         onOpenAuth={() => setShowAuthForm(true)}
-        onOpenReservations={() => setShowPendingReservations(true)}
+        onOpenReservations={() => setShowMyReservations(true)}
       />
 
       <MyHarvest
@@ -1011,10 +1011,17 @@ function App() {
         }}
       />
 
-      <PendingReservations
-        isOpen={showPendingReservations}
-        onClose={() => setShowPendingReservations(false)}
-      />
+      {showMyReservations && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <MyReservations />
+          <button
+            onClick={() => setShowMyReservations(false)}
+            className="fixed top-4 left-4 z-50 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
+          >
+            <span className="text-gray-700 text-xl">✕</span>
+          </button>
+        </div>
+      )}
 
       {showAdminLogin && (
         <AdminLoginGate

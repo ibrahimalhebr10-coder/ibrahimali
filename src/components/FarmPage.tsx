@@ -4,7 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { farmService, type FarmProject, type TreeVariety, type FarmContract } from '../services/farmService';
 import { reservationService } from '../services/reservationService';
 import { supabase } from '../lib/supabase';
-import AuthForm from './AuthForm';
+import ReservationWelcome from './ReservationWelcome';
+import QuickRegistration from './QuickRegistration';
 
 interface FarmPageProps {
   farmId: string;
@@ -31,8 +32,8 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
   const [saving, setSaving] = useState(false);
   const [isBottomSheetExpanded, setIsBottomSheetExpanded] = useState(false);
   const [priceUpdateAnimation, setPriceUpdateAnimation] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showPreAuthConfirmation, setShowPreAuthConfirmation] = useState(false);
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
+  const [showRegistrationScreen, setShowRegistrationScreen] = useState(false);
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
   const [pendingReservation, setPendingReservation] = useState<boolean>(false);
   const videoRef = useRef<HTMLDivElement>(null);
@@ -145,7 +146,7 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
     if (!user) {
       savePendingReservationToStorage();
       setPendingReservation(true);
-      setShowPreAuthConfirmation(true);
+      setShowWelcomeScreen(true);
       return;
     }
 
@@ -208,8 +209,8 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
     }
   };
 
-  const handleAuthSuccess = async () => {
-    setShowAuthModal(false);
+  const handleRegistrationSuccess = async (userId: string) => {
+    setShowRegistrationScreen(false);
 
     const storedReservation = localStorage.getItem('pendingReservation');
 
@@ -220,17 +221,9 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
       await new Promise(resolve => setTimeout(resolve, 500));
 
       try {
-        const { data: { user: currentUser } } = await supabase.auth.getUser();
-
-        if (!currentUser) {
-          alert('حدث خطأ في جلب معلومات المستخدم. الرجاء المحاولة مرة أخرى.');
-          setShowSuccessScreen(false);
-          return;
-        }
-
         const reservationData = JSON.parse(storedReservation);
         const result = await reservationService.createReservation(
-          currentUser.id,
+          userId,
           reservationData
         );
 
@@ -1106,65 +1099,32 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
         </div>
       )}
 
-      {/* PRE-AUTH CONFIRMATION SCREEN - شاشة التمهيد قبل التسجيل */}
-      {showPreAuthConfirmation && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-green-500 via-emerald-500 to-green-500"></div>
+      {/* WELCOME SCREEN - الشاشة التمهيدية التشجيعية */}
+      {showWelcomeScreen && farm && (
+        <ReservationWelcome
+          farmName={farm.name}
+          totalTrees={Object.values(treeSelections).reduce((sum, sel) => sum + sel.quantity, 0)}
+          totalPrice={Object.values(treeSelections).reduce((sum, sel) => sum + sel.quantity, 0) * (selectedContract?.investor_price || 0)}
+          onContinue={() => {
+            setShowWelcomeScreen(false);
+            setShowRegistrationScreen(true);
+          }}
+          onBack={() => {
+            setShowWelcomeScreen(false);
+            setPendingReservation(false);
+          }}
+        />
+      )}
 
-            <div className="p-8">
-              <div className="text-center mb-6">
-                <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-xl">
-                  <CheckCircle2 className="w-10 h-10 text-white" />
-                </div>
-
-                <h2 className="text-2xl font-black text-gray-900 mb-2">🎉 أحسنت الاختيار!</h2>
-
-                <div className="bg-green-50 rounded-xl p-4 mb-4 border-2 border-green-200">
-                  <p className="text-base font-bold text-gray-900 mb-2">
-                    تم تجهيز حجز أشجار مزرعتك بنجاح
-                  </p>
-                  <p className="text-sm text-gray-700">
-                    وجميع اختياراتك محفوظة.
-                  </p>
-                </div>
-
-                <div className="bg-amber-50 rounded-xl p-3 mb-4 border border-amber-200">
-                  <p className="text-xs text-amber-900 font-semibold">
-                    هذا حجز مؤقت إلى أن يتم ربطه بحسابك.
-                  </p>
-                </div>
-
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  باقي خطوة بسيطة عشان ننقل<br />
-                  <span className="font-bold text-green-700">أشجار مزرعتك</span> إلى حسابك وتقدر تتابعها متى ما حبيت 🌿
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                <button
-                  onClick={() => {
-                    setShowPreAuthConfirmation(false);
-                    setShowAuthModal(true);
-                  }}
-                  className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold py-4 px-6 rounded-xl shadow-lg transition-all duration-300 hover:scale-[1.02]"
-                >
-                  إنشاء حساب ونقل الحجز إلى حسابي
-                </button>
-
-                <button
-                  onClick={() => {
-                    setShowPreAuthConfirmation(false);
-                    setPendingReservation(false);
-                  }}
-                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-xl transition-all duration-300"
-                >
-                  الرجوع لتعديل الاختيارات
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+      {/* REGISTRATION SCREEN - شاشة التسجيل السريع */}
+      {showRegistrationScreen && (
+        <QuickRegistration
+          onSuccess={handleRegistrationSuccess}
+          onBack={() => {
+            setShowRegistrationScreen(false);
+            setShowWelcomeScreen(true);
+          }}
+        />
       )}
 
       {/* SUCCESS SCREEN - شاشة النجاح بعد التسجيل */}
@@ -1196,16 +1156,6 @@ export default function FarmPage({ farmId, onClose, onOpenAuth, onNavigateToRese
           </div>
         </div>
       )}
-
-      {/* AUTH MODAL - يظهر فوق صفحة المزرعة مباشرة */}
-      <AuthForm
-        isOpen={showAuthModal}
-        onClose={() => {
-          setShowAuthModal(false);
-          setPendingReservation(false);
-        }}
-        onSuccess={handleAuthSuccess}
-      />
     </div>
   );
 }
