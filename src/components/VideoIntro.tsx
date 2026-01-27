@@ -200,10 +200,10 @@ export default function VideoIntro({ isOpen, onClose, onStartFarm }: VideoIntroP
         ))
       )}
 
-      <div className="absolute top-0 left-0 right-0 z-10 p-4 flex items-center justify-between">
+      <div className="absolute top-0 left-0 right-0 z-[200] p-4 flex items-center justify-between pointer-events-none">
         <button
           onClick={onClose}
-          className="w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-95"
+          className="w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-95 pointer-events-auto"
           style={{
             background: 'rgba(255,255,255,0.2)',
             backdropFilter: 'blur(10px)'
@@ -248,9 +248,9 @@ export default function VideoIntro({ isOpen, onClose, onStartFarm }: VideoIntroP
         </div>
       )}
 
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6">
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center p-6 pointer-events-none">
         {!isPlaying && !showCTA && (
-          <div className="text-center animate-fade-in">
+          <div className="text-center animate-fade-in pointer-events-auto">
             {loadingVideo ? (
               <div className="mb-8">
                 <div className="w-24 h-24 rounded-full mx-auto flex items-center justify-center mb-4"
@@ -324,7 +324,7 @@ export default function VideoIntro({ isOpen, onClose, onStartFarm }: VideoIntroP
         )}
 
         {showCTA && (
-          <div className="text-center animate-scale-in">
+          <div className="text-center animate-scale-in pointer-events-auto">
             <div
               className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
               style={{
@@ -367,10 +367,10 @@ export default function VideoIntro({ isOpen, onClose, onStartFarm }: VideoIntroP
       </div>
 
       {isPlaying && hasVideo && videoData?.video_type === 'upload' && (
-        <div className="absolute bottom-8 left-0 right-0 z-10 flex justify-center">
+        <div className="absolute bottom-8 left-0 right-0 z-[100] flex justify-center pointer-events-none">
           <button
             onClick={toggleMute}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-95"
+            className="w-12 h-12 rounded-full flex items-center justify-center transition-all active:scale-95 pointer-events-auto"
             style={{
               background: 'rgba(255,255,255,0.2)',
               backdropFilter: 'blur(10px)'
