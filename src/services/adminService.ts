@@ -581,13 +581,47 @@ class AdminService {
       if (error) throw error;
 
       if (farmData.contracts !== undefined) {
-        await supabase
+        const { data: existingContracts } = await supabase
           .from('farm_contracts')
-          .delete()
+          .select('id')
           .eq('farm_id', farmId);
 
-        if (farmData.contracts.length > 0) {
-          const contractsToInsert = farmData.contracts.map((contract: any) => ({
+        const existingIds = new Set(existingContracts?.map(c => c.id) || []);
+        const incomingIds = new Set(
+          farmData.contracts
+            .map((c: any) => c.id)
+            .filter((id: string) => id && !id.startsWith('contract-'))
+        );
+
+        const contractsToDelete = Array.from(existingIds).filter(id => !incomingIds.has(id));
+
+        if (contractsToDelete.length > 0) {
+          const { data: referencedContracts } = await supabase
+            .from('reservations')
+            .select('contract_id')
+            .in('contract_id', contractsToDelete);
+
+          const referencedIds = new Set(referencedContracts?.map(r => r.contract_id) || []);
+          const safeToDelete = contractsToDelete.filter(id => !referencedIds.has(id));
+
+          if (safeToDelete.length > 0) {
+            await supabase
+              .from('farm_contracts')
+              .delete()
+              .in('id', safeToDelete);
+          }
+
+          const toDeactivate = contractsToDelete.filter(id => referencedIds.has(id));
+          if (toDeactivate.length > 0) {
+            await supabase
+              .from('farm_contracts')
+              .update({ is_active: false })
+              .in('id', toDeactivate);
+          }
+        }
+
+        for (const contract of farmData.contracts) {
+          const contractData = {
             farm_id: farmId,
             contract_name: contract.contract_name,
             duration_years: contract.duration_years,
@@ -595,14 +629,25 @@ class AdminService {
             bonus_years: contract.bonus_years || 0,
             is_active: contract.is_active !== false,
             display_order: contract.display_order || 0
-          }));
+          };
 
-          const { error: contractsError } = await supabase
-            .from('farm_contracts')
-            .insert(contractsToInsert);
+          if (contract.id && !contract.id.startsWith('contract-')) {
+            const { error: updateError } = await supabase
+              .from('farm_contracts')
+              .update(contractData)
+              .eq('id', contract.id);
 
-          if (contractsError) {
-            console.error('Error inserting contracts:', contractsError);
+            if (updateError) {
+              console.error('Error updating contract:', updateError);
+            }
+          } else {
+            const { error: insertError } = await supabase
+              .from('farm_contracts')
+              .insert(contractData);
+
+            if (insertError) {
+              console.error('Error inserting contract:', insertError);
+            }
           }
         }
       }
