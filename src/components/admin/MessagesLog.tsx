@@ -1,248 +1,397 @@
 import React, { useState, useEffect } from 'react';
-import { Mail, Eye, Users, Calendar, Search, Filter } from 'lucide-react';
-import { investorMessagingService, InvestorMessageWithDetails } from '../../services/investorMessagingService';
+import { FileText, User, Calendar, Send, Filter, Search, MessageSquare, TrendingUp, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { messagesLogService, MessageLog, MessageLogFilters } from '../../services/messagesLogService';
 
-interface MessageWithStats extends InvestorMessageWithDetails {
-  read_rate: number;
-}
-
-export default function MessagesLog({ onViewMessage }: { onViewMessage: (messageId: string) => void }) {
-  const [messages, setMessages] = useState<MessageWithStats[]>([]);
-  const [filteredMessages, setFilteredMessages] = useState<MessageWithStats[]>([]);
+export default function MessagesLog() {
+  const [messages, setMessages] = useState<MessageLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedMessage, setSelectedMessage] = useState<MessageLog | null>(null);
+  const [filters, setFilters] = useState<MessageLogFilters>({});
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedFarm, setSelectedFarm] = useState<string>('all');
-  const [selectedSender, setSelectedSender] = useState<string>('all');
+  const [stats, setStats] = useState({
+    total: 0,
+    by_type: {} as Record<string, number>,
+    by_channel: {} as Record<string, number>,
+    by_status: {} as Record<string, number>,
+    recent_count: 0
+  });
 
   useEffect(() => {
     loadMessages();
-  }, []);
+    loadStats();
+  }, [filters]);
 
-  useEffect(() => {
-    filterMessages();
-  }, [messages, searchTerm, selectedFarm, selectedSender]);
-
-  async function loadMessages() {
+  const loadMessages = async () => {
     try {
       setLoading(true);
-      const data = await investorMessagingService.getAllMessagesWithStats();
+      const data = await messagesLogService.getAllMessages(filters);
       setMessages(data);
-      setFilteredMessages(data);
     } catch (error) {
-      console.error('Error loading messages:', error);
+      console.error('Error loading messages log:', error);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  function filterMessages() {
-    let filtered = [...messages];
-
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(m =>
-        m.title.toLowerCase().includes(term) ||
-        m.content.toLowerCase().includes(term) ||
-        m.farms?.name_ar?.toLowerCase().includes(term) ||
-        m.admins?.full_name?.toLowerCase().includes(term)
-      );
+  const loadStats = async () => {
+    try {
+      const data = await messagesLogService.getMessageStats();
+      setStats(data);
+    } catch (error) {
+      console.error('Error loading stats:', error);
     }
+  };
 
-    if (selectedFarm !== 'all') {
-      filtered = filtered.filter(m => m.farm_id === selectedFarm);
-    }
-
-    if (selectedSender !== 'all') {
-      filtered = filtered.filter(m => m.sender_id === selectedSender);
-    }
-
-    setFilteredMessages(filtered);
-  }
-
-  const uniqueFarms = Array.from(
-    new Set(messages.map(m => m.farm_id))
-  ).map(farmId => {
-    const message = messages.find(m => m.farm_id === farmId);
-    return {
-      id: farmId,
-      name: message?.farms?.name_ar || 'غير معروف'
-    };
+  const filteredMessages = messages.filter(msg => {
+    if (!searchTerm) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      msg.investor_name?.toLowerCase().includes(search) ||
+      msg.template_name?.toLowerCase().includes(search) ||
+      msg.subject?.toLowerCase().includes(search) ||
+      msg.sent_by_name?.toLowerCase().includes(search) ||
+      msg.farm_name?.toLowerCase().includes(search)
+    );
   });
 
-  const uniqueSenders = Array.from(
-    new Set(messages.map(m => m.sender_id))
-  ).map(senderId => {
-    const message = messages.find(m => m.sender_id === senderId);
-    return {
-      id: senderId,
-      name: message?.admins?.full_name || message?.admins?.email || 'غير معروف'
+  const getMessageTypeLabel = (type: string) => {
+    const types: Record<string, string> = {
+      payment: 'سداد',
+      reservation: 'حجز',
+      general: 'عام',
+      notification: 'إشعار'
     };
-  });
+    return types[type] || type;
+  };
+
+  const getMessageTypeColor = (type: string) => {
+    const colors: Record<string, string> = {
+      payment: 'bg-green-100 text-green-800',
+      reservation: 'bg-blue-100 text-blue-800',
+      general: 'bg-gray-100 text-gray-800',
+      notification: 'bg-yellow-100 text-yellow-800'
+    };
+    return colors[type] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getChannelLabel = (channel: string) => {
+    const channels: Record<string, string> = {
+      website: 'داخل الموقع',
+      whatsapp: 'واتساب',
+      sms: 'رسالة نصية',
+      email: 'بريد إلكتروني'
+    };
+    return channels[channel] || channel;
+  };
+
+  const getChannelColor = (channel: string) => {
+    const colors: Record<string, string> = {
+      website: 'bg-blue-100 text-blue-800',
+      whatsapp: 'bg-green-100 text-green-800',
+      sms: 'bg-purple-100 text-purple-800',
+      email: 'bg-red-100 text-red-800'
+    };
+    return colors[channel] || 'bg-gray-100 text-gray-800';
+  };
+
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'sent':
+        return <CheckCircle className="w-5 h-5 text-green-600" />;
+      case 'failed':
+        return <XCircle className="w-5 h-5 text-red-600" />;
+      case 'pending':
+        return <Clock className="w-5 h-5 text-yellow-600" />;
+      default:
+        return <MessageSquare className="w-5 h-5 text-gray-600" />;
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    const statuses: Record<string, string> = {
+      sent: 'تم الإرسال',
+      failed: 'فشل',
+      pending: 'قيد الإرسال'
+    };
+    return statuses[status] || status;
+  };
+
+  const formatDate = (date: string) => {
+    const d = new Date(date);
+    return new Intl.DateTimeFormat('ar-SA', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(d);
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">جاري تحميل سجل الرسائل...</p>
-        </div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-xl p-6 border border-gray-200">
-        <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">سجل الرسائل</h2>
+          <p className="text-gray-600 mt-1">توثيق كامل لجميع الرسائل المرسلة من النظام</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+          <div className="flex items-center justify-between mb-2">
+            <MessageSquare className="w-8 h-8 text-blue-600" />
+            <span className="text-2xl font-bold text-gray-900">{stats.total}</span>
+          </div>
+          <p className="text-sm text-gray-600">إجمالي الرسائل</p>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+          <div className="flex items-center justify-between mb-2">
+            <TrendingUp className="w-8 h-8 text-green-600" />
+            <span className="text-2xl font-bold text-gray-900">{stats.recent_count}</span>
+          </div>
+          <p className="text-sm text-gray-600">آخر 24 ساعة</p>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+          <div className="flex items-center justify-between mb-2">
+            <CheckCircle className="w-8 h-8 text-green-600" />
+            <span className="text-2xl font-bold text-gray-900">{stats.by_status?.sent || 0}</span>
+          </div>
+          <p className="text-sm text-gray-600">تم الإرسال</p>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+          <div className="flex items-center justify-between mb-2">
+            <XCircle className="w-8 h-8 text-red-600" />
+            <span className="text-2xl font-bold text-gray-900">{stats.by_status?.failed || 0}</span>
+          </div>
+          <p className="text-sm text-gray-600">فشل الإرسال</p>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="w-5 h-5 text-gray-400 absolute right-3 top-1/2 transform -translate-y-1/2" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="بحث في الرسائل..."
-                className="w-full pr-10 pl-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                placeholder="البحث في الرسائل..."
+                className="w-full pr-10 pl-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               />
             </div>
           </div>
 
-          <div className="flex gap-4">
-            <select
-              value={selectedFarm}
-              onChange={(e) => setSelectedFarm(e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            >
-              <option value="all">جميع المزارع</option>
-              {uniqueFarms.map(farm => (
-                <option key={farm.id} value={farm.id}>
-                  {farm.name}
-                </option>
-              ))}
-            </select>
+          <select
+            value={filters.message_type || ''}
+            onChange={(e) => setFilters({ ...filters, message_type: e.target.value || undefined })}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          >
+            <option value="">جميع الأنواع</option>
+            <option value="payment">سداد</option>
+            <option value="reservation">حجز</option>
+            <option value="general">عام</option>
+            <option value="notification">إشعار</option>
+          </select>
 
-            <select
-              value={selectedSender}
-              onChange={(e) => setSelectedSender(e.target.value)}
-              className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-            >
-              <option value="all">جميع المرسلين</option>
-              {uniqueSenders.map(sender => (
-                <option key={sender.id} value={sender.id}>
-                  {sender.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          <select
+            value={filters.channel || ''}
+            onChange={(e) => setFilters({ ...filters, channel: e.target.value || undefined })}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          >
+            <option value="">جميع القنوات</option>
+            <option value="website">داخل الموقع</option>
+            <option value="whatsapp">واتساب</option>
+            <option value="sms">رسالة نصية</option>
+            <option value="email">بريد إلكتروني</option>
+          </select>
+
+          <select
+            value={filters.status || ''}
+            onChange={(e) => setFilters({ ...filters, status: e.target.value || undefined })}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          >
+            <option value="">جميع الحالات</option>
+            <option value="sent">تم الإرسال</option>
+            <option value="failed">فشل</option>
+            <option value="pending">قيد الإرسال</option>
+          </select>
         </div>
 
-        <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
-          <Filter className="w-4 h-4" />
-          <span>
-            عرض {filteredMessages.length} من {messages.length} رسالة
-          </span>
+        <div className="space-y-3">
+          {filteredMessages.length === 0 ? (
+            <div className="text-center py-12">
+              <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد رسائل</h3>
+              <p className="text-gray-600">لم يتم إرسال أي رسائل بعد</p>
+            </div>
+          ) : (
+            filteredMessages.map((message) => (
+              <div
+                key={message.id}
+                className="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors cursor-pointer border border-gray-200"
+                onClick={() => setSelectedMessage(message)}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start gap-3 flex-1">
+                    <div className="mt-1">
+                      {getStatusIcon(message.status)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="font-bold text-gray-900">{message.investor_name}</h3>
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getMessageTypeColor(message.message_type)}`}>
+                          {getMessageTypeLabel(message.message_type)}
+                        </span>
+                        <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${getChannelColor(message.channel)}`}>
+                          {getChannelLabel(message.channel)}
+                        </span>
+                      </div>
+
+                      {message.subject && (
+                        <p className="text-sm text-gray-900 font-medium mb-1">{message.subject}</p>
+                      )}
+
+                      <p className="text-sm text-gray-600 line-clamp-2 mb-2">
+                        {message.content}
+                      </p>
+
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
+                        {message.template_name && (
+                          <span className="flex items-center gap-1">
+                            <FileText className="w-3 h-3" />
+                            {message.template_name}
+                          </span>
+                        )}
+                        {message.sent_by_name && (
+                          <span className="flex items-center gap-1">
+                            <User className="w-3 h-3" />
+                            {message.sent_by_name}
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          {formatDate(message.created_at)}
+                        </span>
+                        {message.farm_name && (
+                          <span className="text-green-600">
+                            {message.farm_name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
-      {filteredMessages.length === 0 ? (
-        <div className="bg-white rounded-xl p-12 text-center border border-gray-200">
-          <div className="bg-gray-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Mail className="w-8 h-8 text-gray-400" />
-          </div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            لا توجد رسائل
-          </h3>
-          <p className="text-gray-600">
-            {searchTerm || selectedFarm !== 'all' || selectedSender !== 'all'
-              ? 'لا توجد نتائج مطابقة للبحث'
-              : 'لم يتم إرسال أي رسائل بعد'}
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filteredMessages.map((message) => (
-            <div
-              key={message.id}
-              className="bg-white rounded-xl p-6 border border-gray-200 hover:border-green-300 hover:shadow-lg transition-all cursor-pointer"
-              onClick={() => onViewMessage(message.id)}
-            >
+      {selectedMessage && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={() => setSelectedMessage(null)}>
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6 border-b border-gray-200">
               <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {message.title}
-                  </h3>
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      <span>
-                        {new Date(message.sent_at).toLocaleDateString('ar-SA', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit'
-                        })}
-                      </span>
-                    </div>
-                    {message.farms && (
-                      <div className="flex items-center gap-2">
-                        <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-xs font-medium">
-                          {message.farms.name_ar}
-                        </span>
-                      </div>
-                    )}
-                    {message.admins && (
-                      <div className="flex items-center gap-2">
-                        <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-medium">
-                          {message.admins.full_name || message.admins.email}
-                        </span>
-                      </div>
-                    )}
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedMessage.investor_name}</h2>
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getMessageTypeColor(selectedMessage.message_type)}`}>
+                      {getMessageTypeLabel(selectedMessage.message_type)}
+                    </span>
+                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${getChannelColor(selectedMessage.channel)}`}>
+                      {getChannelLabel(selectedMessage.channel)}
+                    </span>
+                    <span className="flex items-center gap-1 text-sm">
+                      {getStatusIcon(selectedMessage.status)}
+                      {getStatusLabel(selectedMessage.status)}
+                    </span>
                   </div>
                 </div>
-              </div>
-
-              <p className="text-gray-600 mb-4 line-clamp-2">
-                {message.content}
-              </p>
-
-              <div className="flex items-center gap-6 pt-4 border-t border-gray-200">
-                <div className="flex items-center gap-2">
-                  <div className="bg-purple-100 p-2 rounded-lg">
-                    <Users className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600">المستلمين</p>
-                    <p className="text-sm font-semibold text-gray-900">
-                      {message.recipients_count}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <div className="bg-green-100 p-2 rounded-lg">
-                    <Eye className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600">قرأ</p>
-                    <p className="text-sm font-semibold text-gray-900">
-                      {message.read_count} ({message.read_rate}%)
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mr-auto">
-                  <div className="w-full bg-gray-200 rounded-full h-2" style={{ width: '120px' }}>
-                    <div
-                      className="bg-green-600 h-2 rounded-full transition-all"
-                      style={{ width: `${message.read_rate}%` }}
-                    ></div>
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">معدل القراءة</p>
-                </div>
+                <button
+                  onClick={() => setSelectedMessage(null)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <XCircle className="w-6 h-6" />
+                </button>
               </div>
             </div>
-          ))}
+
+            <div className="p-6 space-y-6">
+              {selectedMessage.subject && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">العنوان</h3>
+                  <p className="text-gray-900 font-medium">{selectedMessage.subject}</p>
+                </div>
+              )}
+
+              <div>
+                <h3 className="text-sm font-medium text-gray-700 mb-2">محتوى الرسالة</h3>
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <p className="text-gray-900 whitespace-pre-wrap">{selectedMessage.content}</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                {selectedMessage.template_name && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">القالب المستخدم</h3>
+                    <p className="text-gray-900">{selectedMessage.template_name}</p>
+                  </div>
+                )}
+
+                {selectedMessage.sent_by_name && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">المرسل</h3>
+                    <p className="text-gray-900">{selectedMessage.sent_by_name}</p>
+                  </div>
+                )}
+
+                {selectedMessage.farm_name && (
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">المزرعة</h3>
+                    <p className="text-gray-900">{selectedMessage.farm_name}</p>
+                  </div>
+                )}
+
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">التاريخ والوقت</h3>
+                  <p className="text-gray-900">{formatDate(selectedMessage.created_at)}</p>
+                </div>
+              </div>
+
+              {selectedMessage.metadata && Object.keys(selectedMessage.metadata).length > 0 && (
+                <div>
+                  <h3 className="text-sm font-medium text-gray-700 mb-2">معلومات إضافية</h3>
+                  <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                    <pre className="text-xs text-gray-700 whitespace-pre-wrap">
+                      {JSON.stringify(selectedMessage.metadata, null, 2)}
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={() => setSelectedMessage(null)}
+                className="w-full px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              >
+                إغلاق
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
