@@ -10,6 +10,7 @@ import ReservationsManagement from './ReservationsManagement';
 import FinanceManagement from './FinanceManagement';
 import PermissionsManagement from './PermissionsManagement';
 import AdminRouteGuard from './AdminRouteGuard';
+import MyHarvest from '../MyHarvest';
 import { adminService, DashboardStats, FarmStats } from '../../services/adminService';
 import { useAdmin } from '../../contexts/AdminContext';
 
@@ -144,14 +145,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
     }
 
     if (currentPage === 'harvest') {
-      return (
-        <div className="p-6">
-          <div className="max-w-7xl mx-auto text-center py-20">
-            <h2 className="text-2xl font-bold text-white mb-4">إدارة محصولي</h2>
-            <p className="text-gray-400">قريباً: إدارة كاملة للمحصول والعمليات الزراعية</p>
-          </div>
-        </div>
-      );
+      return <MyHarvest isOpen={true} onClose={() => {}} inDashboard={true} />;
     }
 
     if (currentPage === 'settings') {

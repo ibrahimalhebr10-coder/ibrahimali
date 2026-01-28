@@ -19,11 +19,12 @@ interface FarmDetailsProps {
   farm: Farm;
   onBack: () => void;
   onClose: () => void;
+  inDashboard?: boolean;
 }
 
 type TabType = 'operations' | 'maintenance' | 'tasks' | 'equipment' | 'finance';
 
-export default function FarmDetails({ farm, onBack, onClose }: FarmDetailsProps) {
+export default function FarmDetails({ farm, onBack, onClose, inDashboard = false }: FarmDetailsProps) {
   const [activeTab, setActiveTab] = useState<TabType>('operations');
 
   const tabs = [
@@ -33,6 +34,57 @@ export default function FarmDetails({ farm, onBack, onClose }: FarmDetailsProps)
     { id: 'equipment' as TabType, name: 'المعدات', icon: Truck },
     { id: 'finance' as TabType, name: 'المالية التشغيلية', icon: DollarSign },
   ];
+
+  if (inDashboard) {
+    return (
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-6 flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/10 hover:bg-white/20 transition-colors"
+          >
+            <ArrowRight className="w-5 h-5 text-white" />
+          </button>
+          <div>
+            <h2 className="text-2xl font-bold text-white">{farm.name_ar}</h2>
+            <p className="text-sm text-white/70">{farm.name_en}</p>
+          </div>
+        </div>
+
+        <div className="bg-white/10 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/20">
+          <div className="bg-white/5 border-b border-white/10 overflow-x-auto">
+            <div className="flex gap-1 px-4 py-3 min-w-max">
+              {tabs.map((tab) => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap ${
+                      activeTab === tab.id
+                        ? 'bg-green-600 text-white shadow-md'
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="text-sm">{tab.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="p-6">
+            {activeTab === 'operations' && <OperationsTab farm={farm} />}
+            {activeTab === 'maintenance' && <MaintenanceTab farm={farm} />}
+            {activeTab === 'tasks' && <TasksTab farm={farm} />}
+            {activeTab === 'equipment' && <EquipmentTab farm={farm} />}
+            {activeTab === 'finance' && <FinanceTab farm={farm} />}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
