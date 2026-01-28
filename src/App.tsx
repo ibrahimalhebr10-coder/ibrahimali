@@ -11,7 +11,7 @@ import AccountProfile from './components/AccountProfile';
 import MyHarvest from './components/MyHarvest';
 import MyReservations from './components/MyReservations';
 import AdminDashboard from './components/admin/AdminDashboard';
-import AdminLoginGate from './components/admin/AdminLoginGate';
+import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
 import Header from './components/Header';
 import AuthForm from './components/AuthForm';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -1024,7 +1024,7 @@ function App() {
       )}
 
       {showAdminLogin && (
-        <AdminLoginGate
+        <SmartAdminLoginGate
           onSuccess={handleAdminLoginSuccess}
           onClose={() => setShowAdminLogin(false)}
         />
