@@ -9,7 +9,9 @@ import SmartAssistant from './components/SmartAssistant';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
 import MyHarvestIntro from './components/MyHarvestIntro';
+import MyHarvestActive from './components/MyHarvestActive';
 import InvestorAccount from './components/InvestorAccount';
+import { checkUserHarvestStatus, type HarvestStatus } from './services/harvestStatusService';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
 import Header from './components/Header';
@@ -44,6 +46,12 @@ function App() {
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
+  const [showMyHarvestActive, setShowMyHarvestActive] = useState(false);
+  const [harvestStatus, setHarvestStatus] = useState<HarvestStatus>({
+    hasActiveHarvest: false,
+    totalTrees: 0,
+    reservationIds: []
+  });
 
   useEffect(() => {
     let retryCount = 0;
@@ -348,6 +356,23 @@ function App() {
       setShowAdminDashboard(false);
     }
   }, [isAdminAuthenticated, isAdminLoading]);
+
+  useEffect(() => {
+    async function loadHarvestStatus() {
+      if (user && !isAdminAuthenticated) {
+        const status = await checkUserHarvestStatus();
+        setHarvestStatus(status);
+      } else {
+        setHarvestStatus({
+          hasActiveHarvest: false,
+          totalTrees: 0,
+          reservationIds: []
+        });
+      }
+    }
+
+    loadHarvestStatus();
+  }, [user, isAdminAuthenticated]);
 
   if (currentView === 'farm' && selectedFarmId) {
     return (
@@ -831,10 +856,12 @@ function App() {
 
           <button
             onClick={() => {
-              if (user) {
-                setShowMyReservations(true);
-              } else {
+              if (!user) {
                 setShowMyHarvest(true);
+              } else if (harvestStatus.hasActiveHarvest) {
+                setShowMyHarvestActive(true);
+              } else {
+                setShowMyReservations(true);
               }
             }}
             className="flex items-center gap-3 px-8 py-3 rounded-2xl transition-all hover:scale-105"
@@ -932,10 +959,12 @@ function App() {
           {/* زر محصولي - الزر الرئيسي المميز */}
           <button
             onClick={() => {
-              if (user) {
-                setShowMyReservations(true);
-              } else {
+              if (!user) {
                 setShowMyHarvest(true);
+              } else if (harvestStatus.hasActiveHarvest) {
+                setShowMyHarvestActive(true);
+              } else {
+                setShowMyReservations(true);
               }
             }}
             className="flex flex-col items-center justify-center gap-1 relative -mt-4"
@@ -1014,6 +1043,11 @@ function App() {
         isOpen={showMyHarvest}
         onClose={() => setShowMyHarvest(false)}
         onOpenAuth={() => setShowAuthForm(true)}
+      />
+
+      <MyHarvestActive
+        isOpen={showMyHarvestActive}
+        onClose={() => setShowMyHarvestActive(false)}
       />
 
       <AuthForm
