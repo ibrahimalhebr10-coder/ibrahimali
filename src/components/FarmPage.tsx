@@ -314,15 +314,15 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
                             {contract.bonus_years > 0 && (
                               <>
                                 <div className={`w-8 sm:w-10 h-px ${isSelected || isRecommended ? 'bg-white/30' : 'bg-gray-300'}`} />
-                                <div className={`px-1.5 sm:px-2 py-1 rounded-md ${
+                                <div className={`px-2 sm:px-2.5 py-1 rounded-lg ${
                                   isSelected || isRecommended
                                     ? 'bg-white/20 border border-white/40'
                                     : 'bg-gradient-to-br from-emerald-500 to-green-600'
                                 }`}>
-                                  <div className="flex items-center gap-0.5 sm:gap-1">
-                                    <Gift className={`w-2.5 h-2.5 sm:w-3 sm:h-3 ${isSelected || isRecommended ? 'text-white' : 'text-white'}`} />
-                                    <span className={`text-[10px] sm:text-xs font-bold ${isSelected || isRecommended ? 'text-white' : 'text-white'}`}>
-                                      +{contract.bonus_years}
+                                  <div className="flex items-center gap-1">
+                                    <Gift className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isSelected || isRecommended ? 'text-white' : 'text-white'}`} />
+                                    <span className={`text-[10px] sm:text-xs font-bold whitespace-nowrap ${isSelected || isRecommended ? 'text-white' : 'text-white'}`}>
+                                      +{contract.bonus_years} {contract.bonus_years === 1 ? 'سنة' : 'سنوات'} مجاناً
                                     </span>
                                   </div>
                                 </div>
@@ -503,7 +503,7 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
                   : 'bg-gray-200 text-gray-400 cursor-not-allowed'
               }`}
             >
-              {totalTrees > 0 ? 'أكمل الحجز' : 'اختر الأشجار للمتابعة'}
+              {totalTrees > 0 ? 'تابع في تأسيس مزرعتك' : 'اختر الأشجار للمتابعة'}
             </button>
           </div>
         </div>
