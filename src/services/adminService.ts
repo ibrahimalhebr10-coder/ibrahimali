@@ -5,7 +5,6 @@ export interface Admin {
   user_id: string;
   email: string;
   full_name: string;
-  phone?: string;
   role: 'super_admin' | 'farm_manager' | 'financial_manager' | 'support';
   role_id?: string;
   permissions: {
@@ -777,7 +776,6 @@ class AdminService {
   async createAdmin(adminData: {
     full_name: string;
     email: string;
-    phone?: string;
     role_id: string;
     password: string;
   }): Promise<boolean> {
@@ -801,7 +799,6 @@ class AdminService {
           user_id: authUser.user.id,
           email: adminData.email,
           full_name: adminData.full_name,
-          phone: adminData.phone,
           role_id: adminData.role_id,
           role: 'support',
           is_active: true
@@ -821,7 +818,6 @@ class AdminService {
   async updateAdmin(adminId: string, updates: {
     full_name?: string;
     email?: string;
-    phone?: string;
     role_id?: string;
   }): Promise<boolean> {
     try {

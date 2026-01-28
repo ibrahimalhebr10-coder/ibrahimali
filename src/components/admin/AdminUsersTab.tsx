@@ -12,7 +12,6 @@ export default function AdminUsersTab() {
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
-    phone: '',
     role_id: '',
     password: ''
   });
@@ -43,7 +42,6 @@ export default function AdminUsersTab() {
     setFormData({
       full_name: '',
       email: '',
-      phone: '',
       role_id: roles.length > 0 ? roles[0].id : '',
       password: ''
     });
@@ -57,7 +55,6 @@ export default function AdminUsersTab() {
     setFormData({
       full_name: admin.full_name,
       email: admin.email,
-      phone: admin.phone || '',
       role_id: admin.role_id || '',
       password: ''
     });
@@ -87,7 +84,6 @@ export default function AdminUsersTab() {
         const result = await adminService.updateAdmin(editingAdmin.id, {
           full_name: formData.full_name,
           email: formData.email,
-          phone: formData.phone,
           role_id: formData.role_id
         });
 
@@ -112,7 +108,6 @@ export default function AdminUsersTab() {
         const result = await adminService.createAdmin({
           full_name: formData.full_name,
           email: formData.email,
-          phone: formData.phone,
           role_id: formData.role_id,
           password: formData.password
         });
@@ -255,12 +250,6 @@ export default function AdminUsersTab() {
                         <span className="font-semibold">البريد:</span>
                         <span>{admin.email}</span>
                       </div>
-                      {admin.phone && (
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold">الجوال:</span>
-                          <span>{admin.phone}</span>
-                        </div>
-                      )}
                       {adminRole && (
                         <div className="flex items-center gap-2">
                           <Shield className="w-4 h-4 text-green-600" />
@@ -341,19 +330,6 @@ export default function AdminUsersTab() {
                   placeholder="example@domain.com"
                   required
                   disabled={!!editingAdmin}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  رقم الجوال
-                </label>
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none"
-                  placeholder="05xxxxxxxx"
                 />
               </div>
 
