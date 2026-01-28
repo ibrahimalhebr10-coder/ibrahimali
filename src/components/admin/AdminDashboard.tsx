@@ -12,6 +12,7 @@ import PermissionsManagement from './PermissionsManagement';
 import AdminRouteGuard from './AdminRouteGuard';
 import MyHarvest from '../MyHarvest';
 import InvestorMessaging from './InvestorMessaging';
+import MessagesCenter from './MessagesCenter';
 import { adminService, DashboardStats, FarmStats } from '../../services/adminService';
 import { useAdmin } from '../../contexts/AdminContext';
 
@@ -89,6 +90,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
       reservations: 'إدارة الحجوزات',
       finance: 'الإدارة المالية',
       harvest: 'إدارة محصولي',
+      messages: 'إدارة الرسائل',
       messaging: 'مراسلة المستثمرين',
       video: 'الفيديو التعريفي',
       settings: 'إعدادات النظام'
@@ -155,6 +157,10 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
 
     if (currentPage === 'harvest') {
       return <MyHarvest isOpen={true} onClose={() => {}} inDashboard={true} />;
+    }
+
+    if (currentPage === 'messages') {
+      return <MessagesCenter />;
     }
 
     if (currentPage === 'messaging') {
