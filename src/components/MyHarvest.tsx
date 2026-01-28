@@ -31,11 +31,52 @@ export default function MyHarvest({ isOpen, onClose }: MyHarvestProps) {
   async function loadCompletedFarms() {
     setLoading(true);
     try {
-      const { data, error } = await supabase
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) {
+        setFarms([]);
+        setLoading(false);
+        return;
+      }
+
+      const { data: admin } = await supabase
+        .from('admins')
+        .select('id, role_id, admin_roles!inner(role_key)')
+        .eq('user_id', user.user.id)
+        .eq('is_active', true)
+        .single();
+
+      if (!admin) {
+        setFarms([]);
+        setLoading(false);
+        return;
+      }
+
+      const isSuperAdmin = (admin.admin_roles as any).role_key === 'super_admin';
+
+      let query = supabase
         .from('farms')
         .select('*')
         .eq('status', 'completed')
         .order('name_ar');
+
+      if (!isSuperAdmin) {
+        const { data: assignedFarms } = await supabase
+          .from('admin_farm_assignments')
+          .select('farm_id')
+          .eq('admin_id', admin.id)
+          .eq('is_active', true);
+
+        if (!assignedFarms || assignedFarms.length === 0) {
+          setFarms([]);
+          setLoading(false);
+          return;
+        }
+
+        const farmIds = assignedFarms.map(a => a.farm_id);
+        query = query.in('id', farmIds);
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setFarms(data || []);

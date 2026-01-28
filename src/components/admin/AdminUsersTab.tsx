@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { User, Plus, Edit2, UserX, UserCheck, AlertCircle, Check, X, Shield } from 'lucide-react';
+import { User, Plus, Edit2, UserX, UserCheck, AlertCircle, Check, X, Shield, MapPin } from 'lucide-react';
 import { adminService, type Admin } from '../../services/adminService';
 import { permissionsService, type AdminRole } from '../../services/permissionsService';
+import ManageFarmAssignments from './ManageFarmAssignments';
 
 export default function AdminUsersTab() {
   const [admins, setAdmins] = useState<Admin[]>([]);
@@ -9,6 +10,7 @@ export default function AdminUsersTab() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
+  const [managingFarmsFor, setManagingFarmsFor] = useState<Admin | null>(null);
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
@@ -263,6 +265,13 @@ export default function AdminUsersTab() {
 
                 <div className="flex items-center gap-2">
                   <button
+                    onClick={() => setManagingFarmsFor(admin)}
+                    className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                    title="إدارة المزارع التابعة"
+                  >
+                    <MapPin className="w-5 h-5" />
+                  </button>
+                  <button
                     onClick={() => openEditModal(admin)}
                     className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                     title="تعديل"
@@ -386,6 +395,14 @@ export default function AdminUsersTab() {
             </form>
           </div>
         </div>
+      )}
+
+      {managingFarmsFor && (
+        <ManageFarmAssignments
+          admin={managingFarmsFor}
+          onClose={() => setManagingFarmsFor(null)}
+          onUpdate={loadData}
+        />
       )}
     </div>
   );

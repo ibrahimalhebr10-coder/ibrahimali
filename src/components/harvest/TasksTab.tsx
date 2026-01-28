@@ -18,6 +18,7 @@ export default function TasksTab({ farm }: TasksTabProps) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [availableUsers, setAvailableUsers] = useState<any[]>([]);
   const [currentAdminId, setCurrentAdminId] = useState<string>('');
+  const [canManageFarm, setCanManageFarm] = useState(false);
   const [formData, setFormData] = useState({
     task_type: '',
     description: '',
@@ -37,10 +38,30 @@ export default function TasksTab({ farm }: TasksTabProps) {
     if (user.user) {
       const { data: admin } = await supabase
         .from('admins')
-        .select('id')
+        .select('id, admin_roles!inner(role_key)')
         .eq('user_id', user.user.id)
         .single();
-      if (admin) setCurrentAdminId(admin.id);
+
+      if (admin) {
+        setCurrentAdminId(admin.id);
+
+        const isSuperAdmin = (admin.admin_roles as any).role_key === 'super_admin';
+
+        if (isSuperAdmin) {
+          setCanManageFarm(true);
+        } else {
+          const { data: assignment } = await supabase
+            .from('admin_farm_assignments')
+            .select('assignment_type')
+            .eq('admin_id', admin.id)
+            .eq('farm_id', farm.id)
+            .eq('is_active', true)
+            .in('assignment_type', ['full_access', 'supervisor'])
+            .maybeSingle();
+
+          setCanManageFarm(!!assignment);
+        }
+      }
     }
   }
 
@@ -111,7 +132,8 @@ export default function TasksTab({ farm }: TasksTabProps) {
   }
 
   function canCompleteTask(task: FarmTaskWithDetails): boolean {
-    return task.assigned_to === currentAdminId || task.status !== 'completed';
+    if (task.status === 'completed') return false;
+    return task.assigned_to === currentAdminId || canManageFarm;
   }
 
   const statusColors = {
