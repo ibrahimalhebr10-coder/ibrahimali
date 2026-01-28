@@ -574,6 +574,104 @@ class PermissionsService {
       return null;
     }
   }
+
+  async getAllActionCategories(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('action_categories')
+        .select('*')
+        .eq('is_active', true)
+        .order('display_order');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting action categories:', error);
+      return [];
+    }
+  }
+
+  async getAllActions(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase
+        .from('admin_actions')
+        .select(`
+          *,
+          category:action_categories(*)
+        `)
+        .eq('is_active', true)
+        .order('display_order');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting all actions:', error);
+      return [];
+    }
+  }
+
+  async getAllActionsWithCategories(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_all_actions_with_categories');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting actions with categories:', error);
+      return [];
+    }
+  }
+
+  async getActionsByCategory(categoryKey: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_actions_by_category', {
+        p_category_key: categoryKey
+      });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting actions by category:', error);
+      return [];
+    }
+  }
+
+  async getActionByKey(actionKey: string): Promise<any | null> {
+    try {
+      const { data, error } = await supabase
+        .from('admin_actions')
+        .select(`
+          *,
+          category:action_categories(*)
+        `)
+        .eq('action_key', actionKey)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error getting action by key:', error);
+      return null;
+    }
+  }
+
+  async getCategoryByKey(categoryKey: string): Promise<any | null> {
+    try {
+      const { data, error } = await supabase
+        .from('action_categories')
+        .select('*')
+        .eq('category_key', categoryKey)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error getting category by key:', error);
+      return null;
+    }
+  }
 }
 
 export const permissionsService = new PermissionsService();

@@ -1,19 +1,21 @@
 import { useState } from 'react';
-import { Shield, Users, Key, X } from 'lucide-react';
+import { Shield, Users, Key, X, List } from 'lucide-react';
 import RolesTab from './RolesTab';
 import PermissionsTab from './PermissionsTab';
 import AdminUsersTab from './AdminUsersTab';
+import ActionsRegistry from './ActionsRegistry';
 
 interface PermissionsManagementProps {
   onClose: () => void;
 }
 
-type TabType = 'roles' | 'permissions' | 'users';
+type TabType = 'roles' | 'permissions' | 'users' | 'actions';
 
 export default function PermissionsManagement({ onClose }: PermissionsManagementProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('roles');
+  const [activeTab, setActiveTab] = useState<TabType>('actions');
 
   const tabs = [
+    { id: 'actions' as TabType, label: 'سجل الصلاحيات', icon: List },
     { id: 'roles' as TabType, label: 'الأدوار', icon: Shield },
     { id: 'permissions' as TabType, label: 'الصلاحيات', icon: Key },
     { id: 'users' as TabType, label: 'مستخدمو الإدارة', icon: Users }
@@ -66,6 +68,7 @@ export default function PermissionsManagement({ onClose }: PermissionsManagement
           </div>
 
           <div className="p-6">
+            {activeTab === 'actions' && <ActionsRegistry />}
             {activeTab === 'roles' && <RolesTab />}
             {activeTab === 'permissions' && <PermissionsTab />}
             {activeTab === 'users' && <AdminUsersTab />}
