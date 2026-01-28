@@ -471,6 +471,109 @@ class PermissionsService {
       console.error('Error logging permission action:', error);
     }
   }
+
+  async getAdminAssignedFarms(adminId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_admin_assigned_farms', {
+        p_admin_id: adminId
+      });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting admin assigned farms:', error);
+      return [];
+    }
+  }
+
+  async getFarmAssignedAdmins(farmId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_farm_assigned_admins', {
+        p_farm_id: farmId
+      });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting farm assigned admins:', error);
+      return [];
+    }
+  }
+
+  async assignFarmToAdmin(
+    adminId: string,
+    farmId: string,
+    assignedBy: string,
+    notes?: string
+  ): Promise<boolean> {
+    try {
+      const { error } = await supabase.rpc('assign_farm_to_admin', {
+        p_admin_id: adminId,
+        p_farm_id: farmId,
+        p_assigned_by: assignedBy,
+        p_notes: notes || null
+      });
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error assigning farm to admin:', error);
+      return false;
+    }
+  }
+
+  async unassignFarmFromAdmin(adminId: string, farmId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase.rpc('unassign_farm_from_admin', {
+        p_admin_id: adminId,
+        p_farm_id: farmId
+      });
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error unassigning farm from admin:', error);
+      return false;
+    }
+  }
+
+  async updateAdminScope(
+    adminId: string,
+    scopeType: 'all' | 'farms' | 'farm' | 'tasks',
+    scopeValue?: any
+  ): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('admins')
+        .update({
+          scope_type: scopeType,
+          scope_value: scopeValue
+        })
+        .eq('id', adminId);
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error updating admin scope:', error);
+      return false;
+    }
+  }
+
+  async getAdminScope(adminId: string): Promise<{ scope_type: string; scope_value: any } | null> {
+    try {
+      const { data, error } = await supabase
+        .from('admins')
+        .select('scope_type, scope_value')
+        .eq('id', adminId)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error('Error getting admin scope:', error);
+      return null;
+    }
+  }
 }
 
 export const permissionsService = new PermissionsService();

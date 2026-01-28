@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { X, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import { X, MapPin, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { permissionsService } from '../../services/permissionsService';
 
 interface Farm {
   id: string;
@@ -11,10 +12,11 @@ interface Farm {
 }
 
 interface Assignment {
-  id: string;
   farm_id: string;
-  assignment_type: string;
-  is_active: boolean;
+  farm_name_ar: string;
+  farm_name_en: string;
+  assigned_at: string;
+  assigned_by_name: string;
 }
 
 interface ManageFarmAssignmentsProps {
@@ -22,16 +24,20 @@ interface ManageFarmAssignmentsProps {
     id: string;
     full_name: string;
     email: string;
+    scope_type?: string;
+    scope_value?: any;
   };
   onClose: () => void;
   onUpdate: () => void;
+  currentAdminId: string;
 }
 
-export default function ManageFarmAssignments({ admin, onClose, onUpdate }: ManageFarmAssignmentsProps) {
+export default function ManageFarmAssignments({ admin, onClose, onUpdate, currentAdminId }: ManageFarmAssignmentsProps) {
   const [farms, setFarms] = useState<Farm[]>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     loadData();
@@ -39,59 +45,59 @@ export default function ManageFarmAssignments({ admin, onClose, onUpdate }: Mana
 
   async function loadData() {
     setLoading(true);
+    setError('');
     try {
-      const [farmsResult, assignmentsResult] = await Promise.all([
+      const [farmsResult, assignmentsData] = await Promise.all([
         supabase
           .from('farms')
           .select('*')
           .eq('status', 'completed')
           .order('name_ar'),
-        supabase
-          .from('admin_farm_assignments')
-          .select('*')
-          .eq('admin_id', admin.id)
-          .eq('is_active', true)
+        permissionsService.getAdminAssignedFarms(admin.id)
       ]);
 
       if (farmsResult.data) setFarms(farmsResult.data);
-      if (assignmentsResult.data) setAssignments(assignmentsResult.data);
+      setAssignments(assignmentsData);
     } catch (error) {
       console.error('Error loading data:', error);
+      setError('حدث خطأ أثناء تحميل البيانات');
     } finally {
       setLoading(false);
     }
   }
 
   function isAssigned(farmId: string): boolean {
-    return assignments.some(a => a.farm_id === farmId && a.is_active);
+    return assignments.some(a => a.farm_id === farmId);
   }
 
   async function toggleAssignment(farmId: string) {
     setSaving(true);
+    setError('');
     try {
-      const existingAssignment = assignments.find(a => a.farm_id === farmId);
+      const assigned = isAssigned(farmId);
 
-      if (existingAssignment) {
-        await supabase
-          .from('admin_farm_assignments')
-          .update({ is_active: false })
-          .eq('id', existingAssignment.id);
+      if (assigned) {
+        const success = await permissionsService.unassignFarmFromAdmin(admin.id, farmId);
+        if (!success) {
+          throw new Error('فشل إلغاء التعيين');
+        }
       } else {
-        await supabase
-          .from('admin_farm_assignments')
-          .insert({
-            admin_id: admin.id,
-            farm_id: farmId,
-            assignment_type: 'full_access',
-            is_active: true
-          });
+        const success = await permissionsService.assignFarmToAdmin(
+          admin.id,
+          farmId,
+          currentAdminId,
+          `تم التعيين من خلال واجهة إدارة المزارع`
+        );
+        if (!success) {
+          throw new Error('فشل التعيين');
+        }
       }
 
       await loadData();
       onUpdate();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error toggling assignment:', error);
-      alert('حدث خطأ أثناء تحديث الربط');
+      setError(error.message || 'حدث خطأ أثناء تحديث الربط');
     } finally {
       setSaving(false);
     }
@@ -114,6 +120,13 @@ export default function ManageFarmAssignments({ admin, onClose, onUpdate }: Mana
         </div>
 
         <div className="p-6 overflow-y-auto max-h-[calc(90vh-120px)]">
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border-2 border-red-200 rounded-xl flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+              <span className="text-red-800">{error}</span>
+            </div>
+          )}
+
           {loading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
@@ -179,7 +192,7 @@ export default function ManageFarmAssignments({ admin, onClose, onUpdate }: Mana
         <div className="sticky bottom-0 bg-gray-50 p-4 border-t border-gray-200">
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">
-              {assignments.filter(a => a.is_active).length} مزرعة مرتبطة
+              {assignments.length} مزرعة مرتبطة
             </span>
             <button
               onClick={onClose}

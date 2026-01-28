@@ -11,6 +11,7 @@ export default function AdminUsersTab() {
   const [showModal, setShowModal] = useState(false);
   const [editingAdmin, setEditingAdmin] = useState<Admin | null>(null);
   const [managingFarmsFor, setManagingFarmsFor] = useState<Admin | null>(null);
+  const [currentAdminId, setCurrentAdminId] = useState<string>('');
   const [formData, setFormData] = useState({
     full_name: '',
     email: '',
@@ -22,7 +23,19 @@ export default function AdminUsersTab() {
 
   useEffect(() => {
     loadData();
+    loadCurrentAdmin();
   }, []);
+
+  async function loadCurrentAdmin() {
+    try {
+      const result = await permissionsService.getCurrentAdminWithRole();
+      if (result?.admin) {
+        setCurrentAdminId(result.admin.id);
+      }
+    } catch (error) {
+      console.error('Error loading current admin:', error);
+    }
+  }
 
   async function loadData() {
     setLoading(true);
@@ -397,11 +410,12 @@ export default function AdminUsersTab() {
         </div>
       )}
 
-      {managingFarmsFor && (
+      {managingFarmsFor && currentAdminId && (
         <ManageFarmAssignments
           admin={managingFarmsFor}
           onClose={() => setManagingFarmsFor(null)}
           onUpdate={loadData}
+          currentAdminId={currentAdminId}
         />
       )}
     </div>
