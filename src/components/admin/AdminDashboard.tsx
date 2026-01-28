@@ -8,6 +8,7 @@ import FarmManagement from './FarmManagement';
 import VideoIntroManagement from './VideoIntroManagement';
 import ReservationsManagement from './ReservationsManagement';
 import FinanceManagement from './FinanceManagement';
+import PermissionsManagement from './PermissionsManagement';
 import AdminRouteGuard from './AdminRouteGuard';
 import { adminService, DashboardStats, FarmStats } from '../../services/adminService';
 import { useAdmin } from '../../contexts/AdminContext';
@@ -31,6 +32,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
   const [farms, setFarms] = useState<FarmStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFarmId, setSelectedFarmId] = useState<number | null>(null);
+  const [showPermissionsManagement, setShowPermissionsManagement] = useState(false);
 
   useEffect(() => {
     loadDashboardData();
@@ -155,9 +157,23 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
     if (currentPage === 'settings') {
       return (
         <div className="p-6">
-          <div className="max-w-7xl mx-auto text-center py-20">
-            <h2 className="text-2xl font-bold text-white mb-4">إعدادات النظام</h2>
-            <p className="text-gray-400">قريباً: إدارة الموظفين والصلاحيات</p>
+          <div className="max-w-7xl mx-auto">
+            <div className="grid gap-6">
+              <button
+                onClick={() => setShowPermissionsManagement(true)}
+                className="p-8 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl text-right hover:scale-105 transition-transform"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-xl bg-white/20 flex items-center justify-center">
+                    <Users className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2">إدارة الصلاحيات</h3>
+                    <p className="text-white/80">إدارة الأدوار، الصلاحيات، ومستخدمي الإدارة</p>
+                  </div>
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -324,6 +340,9 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
           </div>
         </div>
       </div>
+      {showPermissionsManagement && (
+        <PermissionsManagement onClose={() => setShowPermissionsManagement(false)} />
+      )}
     </AdminRouteGuard>
   );
 }

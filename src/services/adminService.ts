@@ -5,7 +5,9 @@ export interface Admin {
   user_id: string;
   email: string;
   full_name: string;
+  phone?: string;
   role: 'super_admin' | 'farm_manager' | 'financial_manager' | 'support';
+  role_id?: string;
   permissions: {
     view_farms: boolean;
     manage_farms: boolean;
@@ -754,6 +756,111 @@ class AdminService {
       if (error) throw error;
     } catch (error) {
       console.error('Error logging action:', error);
+    }
+  }
+
+  async getAllAdmins(): Promise<Admin[]> {
+    try {
+      const { data, error } = await supabase
+        .from('admins')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting all admins:', error);
+      return [];
+    }
+  }
+
+  async createAdmin(adminData: {
+    full_name: string;
+    email: string;
+    phone?: string;
+    role_id: string;
+    password: string;
+  }): Promise<boolean> {
+    try {
+      const { data: authUser, error: authError } = await supabase.auth.signUp({
+        email: adminData.email,
+        password: adminData.password,
+        options: {
+          data: {
+            full_name: adminData.full_name
+          }
+        }
+      });
+
+      if (authError) throw authError;
+      if (!authUser.user) throw new Error('Failed to create user');
+
+      const { error: adminError } = await supabase
+        .from('admins')
+        .insert({
+          user_id: authUser.user.id,
+          email: adminData.email,
+          full_name: adminData.full_name,
+          phone: adminData.phone,
+          role_id: adminData.role_id,
+          role: 'support',
+          is_active: true
+        });
+
+      if (adminError) throw adminError;
+
+      await this.logAction('create', 'user', authUser.user.id, `تم إنشاء مستخدم إداري جديد: ${adminData.full_name}`);
+
+      return true;
+    } catch (error) {
+      console.error('Error creating admin:', error);
+      return false;
+    }
+  }
+
+  async updateAdmin(adminId: string, updates: {
+    full_name?: string;
+    email?: string;
+    phone?: string;
+    role_id?: string;
+  }): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('admins')
+        .update(updates)
+        .eq('id', adminId);
+
+      if (error) throw error;
+
+      await this.logAction('update', 'user', adminId, 'تم تحديث بيانات المستخدم الإداري');
+
+      return true;
+    } catch (error) {
+      console.error('Error updating admin:', error);
+      return false;
+    }
+  }
+
+  async toggleAdminStatus(adminId: string, isActive: boolean): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('admins')
+        .update({ is_active: isActive })
+        .eq('id', adminId);
+
+      if (error) throw error;
+
+      await this.logAction(
+        'update',
+        'user',
+        adminId,
+        `تم ${isActive ? 'تفعيل' : 'إيقاف'} المستخدم الإداري`
+      );
+
+      return true;
+    } catch (error) {
+      console.error('Error toggling admin status:', error);
+      return false;
     }
   }
 }
