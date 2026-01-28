@@ -672,6 +672,122 @@ class PermissionsService {
       return null;
     }
   }
+
+  async getRoleActions(roleId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_role_actions', {
+        p_role_id: roleId
+      });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting role actions:', error);
+      return [];
+    }
+  }
+
+  async getEnabledRoleActions(roleId: string): Promise<any[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_enabled_role_actions', {
+        p_role_id: roleId
+      });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting enabled role actions:', error);
+      return [];
+    }
+  }
+
+  async checkRoleHasAction(roleId: string, actionKey: string): Promise<boolean> {
+    try {
+      const { data, error } = await supabase.rpc('check_role_has_action', {
+        p_role_id: roleId,
+        p_action_key: actionKey
+      });
+
+      if (error) throw error;
+      return data || false;
+    } catch (error) {
+      console.error('Error checking role action:', error);
+      return false;
+    }
+  }
+
+  async assignActionsToRole(roleId: string, actionKeys: string[]): Promise<boolean> {
+    try {
+      const { data, error } = await supabase.rpc('assign_actions_to_role', {
+        p_role_id: roleId,
+        p_action_keys: actionKeys
+      });
+
+      if (error) throw error;
+      return data || false;
+    } catch (error) {
+      console.error('Error assigning actions to role:', error);
+      return false;
+    }
+  }
+
+  async toggleRoleAction(roleId: string, actionId: string, isEnabled: boolean): Promise<boolean> {
+    try {
+      const { data, error } = await supabase.rpc('toggle_role_action', {
+        p_role_id: roleId,
+        p_action_id: actionId,
+        p_is_enabled: isEnabled
+      });
+
+      if (error) throw error;
+      return data || false;
+    } catch (error) {
+      console.error('Error toggling role action:', error);
+      return false;
+    }
+  }
+
+  async getRolesActionsCount(): Promise<any[]> {
+    try {
+      const { data, error } = await supabase.rpc('get_roles_actions_count');
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error getting roles actions count:', error);
+      return [];
+    }
+  }
+
+  async syncRoleActions(roleId: string, actionIds: string[]): Promise<boolean> {
+    try {
+      const { error: deleteError } = await supabase
+        .from('role_actions')
+        .delete()
+        .eq('role_id', roleId);
+
+      if (deleteError) throw deleteError;
+
+      if (actionIds.length > 0) {
+        const insertData = actionIds.map(actionId => ({
+          role_id: roleId,
+          action_id: actionId,
+          is_enabled: true
+        }));
+
+        const { error: insertError } = await supabase
+          .from('role_actions')
+          .insert(insertData);
+
+        if (insertError) throw insertError;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error syncing role actions:', error);
+      return false;
+    }
+  }
 }
 
 export const permissionsService = new PermissionsService();

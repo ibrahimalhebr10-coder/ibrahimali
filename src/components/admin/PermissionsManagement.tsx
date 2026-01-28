@@ -1,20 +1,22 @@
 import { useState } from 'react';
-import { Shield, Users, Key, X, List } from 'lucide-react';
+import { Shield, Users, Key, X, List, Link2 } from 'lucide-react';
 import RolesTab from './RolesTab';
 import PermissionsTab from './PermissionsTab';
 import AdminUsersTab from './AdminUsersTab';
 import ActionsRegistry from './ActionsRegistry';
+import RoleActionsMapping from './RoleActionsMapping';
 
 interface PermissionsManagementProps {
   onClose: () => void;
 }
 
-type TabType = 'roles' | 'permissions' | 'users' | 'actions';
+type TabType = 'roles' | 'permissions' | 'users' | 'actions' | 'mapping';
 
 export default function PermissionsManagement({ onClose }: PermissionsManagementProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('actions');
+  const [activeTab, setActiveTab] = useState<TabType>('mapping');
 
   const tabs = [
+    { id: 'mapping' as TabType, label: 'ربط الصلاحيات', icon: Link2 },
     { id: 'actions' as TabType, label: 'سجل الصلاحيات', icon: List },
     { id: 'roles' as TabType, label: 'الأدوار', icon: Shield },
     { id: 'permissions' as TabType, label: 'الصلاحيات', icon: Key },
@@ -39,16 +41,16 @@ export default function PermissionsManagement({ onClose }: PermissionsManagement
               </button>
             </div>
 
-            <div className="flex gap-2 px-6 pb-4">
+            <div className="flex gap-2 px-6 pb-4 overflow-x-auto">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
-                
+
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all"
+                    className="flex items-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all whitespace-nowrap"
                     style={{
                       background: isActive
                         ? 'linear-gradient(145deg, #10b981, #059669)'
@@ -68,6 +70,7 @@ export default function PermissionsManagement({ onClose }: PermissionsManagement
           </div>
 
           <div className="p-6">
+            {activeTab === 'mapping' && <RoleActionsMapping />}
             {activeTab === 'actions' && <ActionsRegistry />}
             {activeTab === 'roles' && <RolesTab />}
             {activeTab === 'permissions' && <PermissionsTab />}
