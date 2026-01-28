@@ -301,7 +301,7 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
                             </div>
                           )}
 
-                          {/* القسم الأول: عقد X سنوات */}
+                          {/* القسم الأول: عقد X سنة */}
                           <div className={`flex-1 flex flex-col items-center justify-center relative ${
                             isSelected
                               ? 'bg-gradient-to-br from-green-600 via-green-500 to-green-600'
@@ -310,34 +310,18 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
                               : 'bg-gradient-to-br from-green-50 via-white to-green-50'
                           }`}>
                             <div className="text-center px-2">
-                              <p className={`text-lg sm:text-xl font-bold mb-1 ${
-                                isSelected || isRecommended ? 'text-white/90' : 'text-gray-600'
+                              <p className={`text-sm sm:text-base font-bold ${
+                                isSelected || isRecommended ? 'text-white' : 'text-gray-700'
                               }`}>
-                                عقد
-                              </p>
-                              <p className={`text-5xl sm:text-6xl font-black leading-none tracking-tight ${
-                                isSelected || isRecommended ? 'text-white drop-shadow-lg' : 'text-green-700'
-                              }`}>
-                                {contract.duration_years}
-                              </p>
-                              <p className={`text-lg sm:text-xl font-bold mt-1 ${
-                                isSelected || isRecommended ? 'text-white/90' : 'text-gray-600'
-                              }`}>
-                                {contract.duration_years === 1 ? 'سنة' : 'سنوات'}
+                                عقد {contract.duration_years} {contract.duration_years === 1 ? 'سنة' : 'سنوات'}
                               </p>
                             </div>
                           </div>
 
-                          {/* فاصل مبتكر بتدرج */}
-                          <div className="relative h-1">
-                            <div className={`absolute inset-0 ${
-                              isSelected || isRecommended
-                                ? 'bg-gradient-to-r from-transparent via-white/40 to-transparent'
-                                : 'bg-gradient-to-r from-transparent via-gray-300 to-transparent'
-                            }`} />
-                          </div>
+                          {/* فاصل بسيط */}
+                          <div className="h-px bg-white/20"></div>
 
-                          {/* القسم الثاني: +X سنوات */}
+                          {/* القسم الثاني: +X سنوات مجاناً */}
                           <div className={`flex-1 flex flex-col items-center justify-center relative ${
                             isSelected
                               ? 'bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-500'
@@ -349,29 +333,16 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
                           }`}>
                             {contract.bonus_years > 0 ? (
                               <div className="text-center px-2">
-                                <div className="flex items-center justify-center gap-2 mb-1">
-                                  <Gift className={`w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0 ${
-                                    isSelected || isRecommended ? 'text-white drop-shadow-md' : 'text-emerald-600'
-                                  }`} />
-                                  <p className={`text-5xl sm:text-6xl font-black leading-none ${
-                                    isSelected || isRecommended ? 'text-white drop-shadow-lg' : 'text-emerald-600'
-                                  }`}>
-                                    +{contract.bonus_years}
-                                  </p>
-                                </div>
-                                <p className={`text-lg sm:text-xl font-bold ${
-                                  isSelected || isRecommended ? 'text-white/90' : 'text-emerald-700'
+                                <p className={`text-sm sm:text-base font-bold ${
+                                  isSelected || isRecommended ? 'text-white' : 'text-emerald-700'
                                 }`}>
-                                  {contract.bonus_years === 1 ? 'سنة' : 'سنوات'}
+                                  +{contract.bonus_years} {contract.bonus_years === 1 ? 'سنة' : 'سنوات'} مجاناً
                                 </p>
                               </div>
                             ) : (
-                              <div className="text-center opacity-30 px-2">
-                                <Award className={`w-6 h-6 mx-auto mb-1 ${
-                                  isSelected || isRecommended ? 'text-white' : 'text-gray-400'
-                                }`} />
-                                <p className={`text-sm font-bold ${
-                                  isSelected || isRecommended ? 'text-white' : 'text-gray-400'
+                              <div className="text-center px-2">
+                                <p className={`text-sm font-semibold opacity-50 ${
+                                  isSelected || isRecommended ? 'text-white' : 'text-gray-500'
                                 }`}>
                                   لا إضافات
                                 </p>
@@ -379,16 +350,10 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
                             )}
                           </div>
 
-                          {/* فاصل مبتكر بتدرج */}
-                          <div className="relative h-1">
-                            <div className={`absolute inset-0 ${
-                              isSelected || isRecommended
-                                ? 'bg-gradient-to-r from-transparent via-white/40 to-transparent'
-                                : 'bg-gradient-to-r from-transparent via-gray-300 to-transparent'
-                            }`} />
-                          </div>
+                          {/* فاصل بسيط */}
+                          <div className="h-px bg-white/20"></div>
 
-                          {/* القسم الثالث: السعر بالريال */}
+                          {/* القسم الثالث: السعر */}
                           <div className={`flex-1 flex flex-col items-center justify-center relative ${
                             isSelected
                               ? 'bg-gradient-to-br from-green-700 via-green-600 to-green-700'
@@ -397,15 +362,10 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
                               : 'bg-gradient-to-br from-slate-50 via-white to-slate-50'
                           }`}>
                             <div className="text-center px-2">
-                              <p className={`text-5xl sm:text-6xl font-black leading-none ${
-                                isSelected || isRecommended ? 'text-white drop-shadow-lg' : 'text-green-700'
+                              <p className={`text-base sm:text-lg font-bold ${
+                                isSelected || isRecommended ? 'text-white' : 'text-green-700'
                               }`}>
-                                {contract.investor_price}
-                              </p>
-                              <p className={`text-lg sm:text-xl font-bold mt-1 ${
-                                isSelected || isRecommended ? 'text-white/90' : 'text-gray-600'
-                              }`}>
-                                ريال
+                                {contract.investor_price} ريال
                               </p>
                             </div>
                           </div>
