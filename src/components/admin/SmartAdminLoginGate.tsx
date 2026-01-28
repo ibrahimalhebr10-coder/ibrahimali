@@ -9,7 +9,10 @@ import {
   Shield,
   Loader2,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Sprout,
+  LayoutDashboard,
+  ArrowRight
 } from 'lucide-react';
 import { adminSessionService } from '../../services/adminSessionService';
 import { permissionsService, AdminPermission, AdminRole } from '../../services/permissionsService';
@@ -28,6 +31,19 @@ export default function SmartAdminLoginGate({ onSuccess, onClose }: SmartAdminLo
   const [adminRole, setAdminRole] = useState<AdminRole | null>(null);
   const [permissions, setPermissions] = useState<AdminPermission[]>([]);
   const [showPermissions, setShowPermissions] = useState(false);
+  const [defaultPage, setDefaultPage] = useState<'dashboard' | 'harvest'>('dashboard');
+
+  function determineDefaultPage(role: AdminRole | null): 'dashboard' | 'harvest' {
+    if (!role) return 'dashboard';
+
+    const operationalRoles = ['worker', 'supervisor', 'farm_supervisor'];
+
+    if (operationalRoles.includes(role.role_key)) {
+      return 'harvest';
+    }
+
+    return 'dashboard';
+  }
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -46,7 +62,7 @@ export default function SmartAdminLoginGate({ onSuccess, onClose }: SmartAdminLo
       setStep('loading');
 
       const [role, perms] = await Promise.all([
-        result.admin.role_id 
+        result.admin.role_id
           ? permissionsService.getRoleById(result.admin.role_id)
           : null,
         permissionsService.getAdminPermissions(result.admin.id, false)
@@ -54,6 +70,9 @@ export default function SmartAdminLoginGate({ onSuccess, onClose }: SmartAdminLo
 
       setAdminRole(role);
       setPermissions(perms);
+
+      const page = determineDefaultPage(role);
+      setDefaultPage(page);
 
       await new Promise(resolve => setTimeout(resolve, 1000));
 
@@ -217,7 +236,26 @@ export default function SmartAdminLoginGate({ onSuccess, onClose }: SmartAdminLo
           )}
 
           <div className="text-center">
-            <p className="text-white/60 mb-4">جاري تحويلك إلى لوحة التحكم...</p>
+            <div className="mb-4 p-4 rounded-xl" style={{
+              background: 'rgba(34, 197, 94, 0.1)',
+              border: '1px solid rgba(34, 197, 94, 0.3)'
+            }}>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                {defaultPage === 'harvest' ? (
+                  <Sprout className="w-5 h-5 text-green-400" />
+                ) : (
+                  <LayoutDashboard className="w-5 h-5 text-blue-400" />
+                )}
+                <ArrowRight className="w-4 h-4 text-white/40" />
+              </div>
+              <p className="text-white/80 text-sm font-medium">
+                {defaultPage === 'harvest'
+                  ? 'سيتم توجيهك إلى محصولي'
+                  : 'سيتم توجيهك إلى لوحة التحكم'
+                }
+              </p>
+            </div>
+            <p className="text-white/60 mb-4">جاري تحميل البيانات...</p>
             <Loader2 className="w-8 h-8 text-yellow-400 animate-spin mx-auto" />
           </div>
         </div>

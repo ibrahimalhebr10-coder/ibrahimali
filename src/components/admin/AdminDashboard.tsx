@@ -20,7 +20,7 @@ interface AdminDashboardProps {
 }
 
 export default function AdminDashboard({ onClose }: AdminDashboardProps) {
-  const { admin, signOutAdmin } = useAdmin();
+  const { admin, adminRole, defaultPage, signOutAdmin } = useAdmin();
   const [currentPage, setCurrentPage] = useState<AdminPage>('dashboard');
   const [stats, setStats] = useState<DashboardStats>({
     totalUsers: 0,
@@ -35,6 +35,13 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
   const [loading, setLoading] = useState(true);
   const [selectedFarmId, setSelectedFarmId] = useState<number | null>(null);
   const [showPermissionsManagement, setShowPermissionsManagement] = useState(false);
+
+  useEffect(() => {
+    if (defaultPage) {
+      console.log('🎯 Setting initial page to:', defaultPage);
+      setCurrentPage(defaultPage);
+    }
+  }, [defaultPage]);
 
   useEffect(() => {
     loadDashboardData();
