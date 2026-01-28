@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { X, ArrowRight, Play, Wrench, ClipboardList, Truck, DollarSign } from 'lucide-react';
+import { usePermissions } from '../../contexts/PermissionsContext';
 import OperationsTab from './OperationsTab';
 import MaintenanceTab from './MaintenanceTab';
 import TasksTab from './TasksTab';
@@ -25,15 +26,51 @@ interface FarmDetailsProps {
 type TabType = 'operations' | 'maintenance' | 'tasks' | 'equipment' | 'finance';
 
 export default function FarmDetails({ farm, onBack, onClose, inDashboard = false }: FarmDetailsProps) {
+  const { hasAnyAction } = usePermissions();
   const [activeTab, setActiveTab] = useState<TabType>('operations');
 
-  const tabs = [
-    { id: 'operations' as TabType, name: 'التشغيل', icon: Play },
-    { id: 'maintenance' as TabType, name: 'الصيانة', icon: Wrench },
-    { id: 'tasks' as TabType, name: 'مهام العمل', icon: ClipboardList },
-    { id: 'equipment' as TabType, name: 'المعدات', icon: Truck },
-    { id: 'finance' as TabType, name: 'المالية التشغيلية', icon: DollarSign },
+  const allTabs = [
+    {
+      id: 'operations' as TabType,
+      name: 'التشغيل',
+      icon: Play,
+      actions: ['operations.view', 'operations.update', 'operations.start_season']
+    },
+    {
+      id: 'maintenance' as TabType,
+      name: 'الصيانة',
+      icon: Wrench,
+      actions: ['maintenance.view', 'maintenance.schedule', 'maintenance.update']
+    },
+    {
+      id: 'tasks' as TabType,
+      name: 'مهام العمل',
+      icon: ClipboardList,
+      actions: ['tasks.view', 'tasks.view_own', 'tasks.create']
+    },
+    {
+      id: 'equipment' as TabType,
+      name: 'المعدات',
+      icon: Truck,
+      actions: ['equipment.view', 'equipment.add', 'equipment.update']
+    },
+    {
+      id: 'finance' as TabType,
+      name: 'المالية التشغيلية',
+      icon: DollarSign,
+      actions: ['finance.view', 'finance.record_expense', 'finance.record_revenue']
+    },
   ];
+
+  const tabs = useMemo(() => {
+    return allTabs.filter(tab => hasAnyAction(tab.actions));
+  }, [hasAnyAction]);
+
+  useMemo(() => {
+    if (tabs.length > 0 && !tabs.find(t => t.id === activeTab)) {
+      setActiveTab(tabs[0].id);
+    }
+  }, [tabs, activeTab]);
 
   if (inDashboard) {
     return (

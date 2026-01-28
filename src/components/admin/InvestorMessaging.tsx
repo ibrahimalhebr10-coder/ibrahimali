@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Send, Users, MessageSquare, TrendingUp, Eye, Mail, BarChart3 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import { usePermissions } from '../../contexts/PermissionsContext';
 import { investorMessagingService } from '../../services/investorMessagingService';
 import CreateInvestorMessage from './CreateInvestorMessage';
 import SupervisorDashboard from './SupervisorDashboard';
 import MessagesLog from './MessagesLog';
 import MessageDetails from './MessageDetails';
+import ActionGuard from './ActionGuard';
 
 interface Farm {
   id: string;
@@ -24,6 +26,7 @@ interface FarmWithStats extends Farm {
 type View = 'farms' | 'supervisor' | 'messages-log' | 'message-details';
 
 export default function InvestorMessaging() {
+  const { hasAction, isSuperAdmin: isSuperAdminRole } = usePermissions();
   const [farms, setFarms] = useState<FarmWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFarm, setSelectedFarm] = useState<FarmWithStats | null>(null);
@@ -31,6 +34,10 @@ export default function InvestorMessaging() {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [currentView, setCurrentView] = useState<View>('farms');
   const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
+
+  const canViewMessages = hasAction('messaging.view');
+  const canSendMessages = hasAction('messaging.send');
+  const canViewSupervisor = hasAction('supervision.monitor_messages');
 
   useEffect(() => {
     loadFarms();

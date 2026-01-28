@@ -3,7 +3,8 @@ import { usePermissions } from '../../contexts/PermissionsContext';
 import { Lock } from 'lucide-react';
 
 interface ProtectedButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  permissions: string | string[];
+  action?: string | string[];
+  permissions?: string | string[];
   requireAll?: boolean;
   hideIfUnauthorized?: boolean;
   showLockIcon?: boolean;
@@ -11,6 +12,7 @@ interface ProtectedButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export default function ProtectedButton({
+  action,
   permissions,
   requireAll = false,
   hideIfUnauthorized = false,
@@ -18,13 +20,28 @@ export default function ProtectedButton({
   children,
   ...buttonProps
 }: ProtectedButtonProps) {
-  const { isAuthorized, loading } = usePermissions();
+  const {
+    isAuthorized,
+    hasAction,
+    hasAnyAction,
+    hasAllActions,
+    loading
+  } = usePermissions();
 
   if (loading) {
     return null;
   }
 
-  const authorized = isAuthorized(permissions, requireAll);
+  let authorized = true;
+
+  if (action) {
+    const actions = Array.isArray(action) ? action : [action];
+    authorized = requireAll
+      ? hasAllActions(actions)
+      : hasAnyAction(actions);
+  } else if (permissions) {
+    authorized = isAuthorized(permissions, requireAll);
+  }
 
   if (!authorized && hideIfUnauthorized) {
     return null;
