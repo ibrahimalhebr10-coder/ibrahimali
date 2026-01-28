@@ -16,6 +16,7 @@ import {
 import { paymentService, PaymentReceipt } from '../../services/paymentService';
 import { paymentMethodsService, PaymentMethod } from '../../services/paymentMethodsService';
 import { supabase } from '../../lib/supabase';
+import ActionGuard from './ActionGuard';
 
 interface ReceiptWithDetails extends PaymentReceipt {
   reservation_details?: {
@@ -206,6 +207,7 @@ export default function PaymentReceiptsManagement() {
   }
 
   return (
+    <ActionGuard action="finance.review_receipts">
     <div className="space-y-6">
       <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
         <div className="border-b-2 border-gray-200 flex">
@@ -521,5 +523,6 @@ export default function PaymentReceiptsManagement() {
         </div>
       )}
     </div>
+    </ActionGuard>
   );
 }

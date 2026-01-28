@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { CreditCard, CalendarCheck, Clock, Building2, CheckCircle, XCircle, Settings, AlertCircle, ArrowUp, ArrowDown, Save } from 'lucide-react';
 import { paymentMethodsService, PaymentMethod, PaymentMethodType } from '../../services/paymentMethodsService';
+import ActionGuard from './ActionGuard';
 
 const methodIcons: Record<PaymentMethodType, React.ComponentType<{ className?: string }>> = {
   mada: CreditCard,
@@ -102,6 +103,7 @@ export default function PaymentMethodsSettings() {
   }
 
   return (
+    <ActionGuard action="finance.manage_payment_methods">
     <div className="space-y-6">
       <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-100">
         <div className="flex items-center gap-3 mb-2">
@@ -271,6 +273,7 @@ export default function PaymentMethodsSettings() {
         />
       )}
     </div>
+    </ActionGuard>
   );
 }
 
@@ -284,12 +287,25 @@ function ConfigModal({
   onSave: () => void;
 }) {
   const [config, setConfig] = useState(method.config);
+  const [gatewayConfig, setGatewayConfig] = useState<Record<string, any>>({
+    merchant_id: '',
+    api_key: '',
+    environment: 'sandbox',
+    ...((method as any).gateway_config || {})
+  });
   const [saving, setSaving] = useState(false);
+
+  const isGateway = ['mada', 'tabby', 'tamara'].includes(method.method_type);
 
   async function handleSave() {
     try {
       setSaving(true);
       await paymentMethodsService.updateMethodConfig(method.id, config);
+
+      if (isGateway) {
+        await paymentMethodsService.updateGatewayConfig(method.id, gatewayConfig);
+      }
+
       onSave();
     } catch (err) {
       console.error('Error saving config:', err);
@@ -334,22 +350,125 @@ function ConfigModal({
             </div>
           </div>
 
-          <div className="space-y-4">
-            {Object.entries(config).map(([key, value]) => (
-              <div key={key}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {key.replace(/_/g, ' ').toUpperCase()}
-                </label>
-                <input
-                  type={key.includes('secret') || key.includes('key') ? 'password' : 'text'}
-                  value={typeof value === 'string' ? value : JSON.stringify(value)}
-                  onChange={(e) => setConfig({ ...config, [key]: e.target.value })}
-                  placeholder={`أدخل ${key}`}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
+          {!isGateway && (
+            <div className="space-y-4">
+              <h4 className="font-semibold text-gray-900">إعدادات الوسيلة:</h4>
+              {Object.entries(config).map(([key, value]) => (
+                <div key={key}>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {key.replace(/_/g, ' ').toUpperCase()}
+                  </label>
+                  <input
+                    type={key.includes('secret') || key.includes('key') ? 'password' : 'text'}
+                    value={typeof value === 'string' ? value : JSON.stringify(value)}
+                    onChange={(e) => setConfig({ ...config, [key]: e.target.value })}
+                    placeholder={`أدخل ${key}`}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {isGateway && (
+            <div className="space-y-6">
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-4">إعدادات بوابة الدفع:</h4>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      رقم التاجر (Merchant ID) *
+                    </label>
+                    <input
+                      type="text"
+                      value={gatewayConfig.merchant_id || ''}
+                      onChange={(e) => setGatewayConfig({ ...gatewayConfig, merchant_id: e.target.value })}
+                      placeholder="أدخل رقم التاجر"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      رقم التاجر الخاص بك من بوابة الدفع
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      مفتاح API (API Key) *
+                    </label>
+                    <input
+                      type="password"
+                      value={gatewayConfig.api_key || ''}
+                      onChange={(e) => setGatewayConfig({ ...gatewayConfig, api_key: e.target.value })}
+                      placeholder="أدخل مفتاح API"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      مفتاح API السري - سيتم تخزينه بشكل آمن
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      البيئة (Environment) *
+                    </label>
+                    <select
+                      value={gatewayConfig.environment || 'sandbox'}
+                      onChange={(e) => setGatewayConfig({ ...gatewayConfig, environment: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="sandbox">تجريبي (Sandbox)</option>
+                      <option value="production">إنتاج (Production)</option>
+                    </select>
+                    <p className="mt-1 text-xs text-gray-500">
+                      استخدم البيئة التجريبية للاختبار والإنتاج للعمليات الحقيقية
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Webhook Secret (اختياري)
+                    </label>
+                    <input
+                      type="password"
+                      value={gatewayConfig.webhook_secret || ''}
+                      onChange={(e) => setGatewayConfig({ ...gatewayConfig, webhook_secret: e.target.value })}
+                      placeholder="أدخل Webhook Secret"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      مفتاح التحقق من webhooks - لتأكيد صحة الإشعارات
+                    </p>
+                  </div>
+                </div>
               </div>
-            ))}
-          </div>
+
+              <div className="bg-red-50 rounded-lg p-4 border border-red-200">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-red-900">
+                    <p className="font-semibold mb-1">تنبيه أمني:</p>
+                    <p>
+                      لا تشارك هذه المعلومات مع أي شخص.
+                      مفاتيح API والأسرار يتم تخزينها بشكل آمن في قاعدة البيانات.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 rounded-lg p-4 border border-yellow-200">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0" />
+                  <div className="text-sm text-yellow-900">
+                    <p className="font-semibold mb-1">ملاحظة:</p>
+                    <p>
+                      التفعيل الفعلي لبوابات الدفع سيكون في مراحل قادمة.
+                      حالياً، يمكنك حفظ الإعدادات للتجهيز فقط.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="p-6 border-t border-gray-200 flex gap-3">

@@ -120,6 +120,18 @@ class PaymentMethodsService {
     return this.updateMethod(id, { priority });
   }
 
+  async updateGatewayConfig(id: string, gatewayConfig: Record<string, any>): Promise<void> {
+    const { error } = await supabase
+      .from('payment_methods')
+      .update({ gateway_config: gatewayConfig })
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error updating gateway config:', error);
+      throw error;
+    }
+  }
+
   async isMethodAvailable(methodType: PaymentMethodType): Promise<boolean> {
     const method = await this.getMethodByType(methodType);
     return method?.is_active || false;
