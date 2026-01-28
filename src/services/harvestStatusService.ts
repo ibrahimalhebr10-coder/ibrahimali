@@ -20,14 +20,14 @@ export async function checkUserHarvestStatus(): Promise<HarvestStatus> {
 
     const { data: reservations, error } = await supabase
       .from('reservations')
-      .select('id, number_of_trees')
+      .select('id, total_trees')
       .eq('user_id', user.id)
       .eq('status', 'transferred_to_harvest');
 
     if (error) throw error;
 
     const hasActiveHarvest = (reservations && reservations.length > 0) || false;
-    const totalTrees = reservations?.reduce((sum, r) => sum + r.number_of_trees, 0) || 0;
+    const totalTrees = reservations?.reduce((sum, r) => sum + r.total_trees, 0) || 0;
     const reservationIds = reservations?.map(r => r.id) || [];
 
     return {

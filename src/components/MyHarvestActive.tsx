@@ -33,7 +33,7 @@ export default function MyHarvestActive({ isOpen, onClose }: MyHarvestActiveProp
         .from('reservations')
         .select(`
           id,
-          number_of_trees,
+          total_trees,
           created_at,
           farms!inner(name_ar)
         `)
@@ -43,7 +43,7 @@ export default function MyHarvestActive({ isOpen, onClose }: MyHarvestActiveProp
       if (error) throw error;
 
       if (reservations && reservations.length > 0) {
-        const totalTrees = reservations.reduce((sum, r) => sum + r.number_of_trees, 0);
+        const totalTrees = reservations.reduce((sum, r) => sum + r.total_trees, 0);
         const farmNames = [...new Set(reservations.map(r => (r.farms as any).name_ar))];
         const startDate = new Date(reservations[0].created_at).toLocaleDateString('ar-SA');
 
