@@ -172,6 +172,9 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
           setShowPreAuthReservation(false);
           onComplete(reservationData);
         }}
+        onGoBack={() => {
+          setShowPreAuthReservation(false);
+        }}
       />
     );
   }

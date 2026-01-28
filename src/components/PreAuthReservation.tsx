@@ -6,6 +6,7 @@ interface PreAuthReservationProps {
   totalPrice: number;
   contractName: string;
   onContinue: () => void;
+  onGoBack?: () => void;
 }
 
 export default function PreAuthReservation({
@@ -13,7 +14,8 @@ export default function PreAuthReservation({
   totalTrees,
   totalPrice,
   contractName,
-  onContinue
+  onContinue,
+  onGoBack
 }: PreAuthReservationProps) {
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-green-50 via-emerald-50 to-green-50 z-[100] flex items-center justify-center p-3">
@@ -52,24 +54,24 @@ export default function PreAuthReservation({
             <div className="grid grid-cols-2 gap-2">
               {/* المزرعة */}
               <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1.5">
                   <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0">
                     <Sparkles className="w-4 h-4 text-white" />
                   </div>
                   <p className="text-[10px] text-gray-500 font-medium">المزرعة</p>
                 </div>
-                <p className="text-sm font-black text-gray-900 truncate">{farmName}</p>
+                <p className="text-xs font-black text-gray-900 leading-tight break-words">{farmName}</p>
               </div>
 
               {/* العقد */}
               <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
-                <div className="flex items-center gap-2 mb-1">
+                <div className="flex items-center gap-2 mb-1.5">
                   <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center flex-shrink-0">
                     <Award className="w-4 h-4 text-white" />
                   </div>
                   <p className="text-[10px] text-gray-500 font-medium">العقد</p>
                 </div>
-                <p className="text-sm font-black text-gray-900 truncate">{contractName}</p>
+                <p className="text-xs font-black text-gray-900 leading-tight break-words">{contractName}</p>
               </div>
             </div>
 
@@ -121,6 +123,17 @@ export default function PreAuthReservation({
             <span>إنشاء حسابي الآن</span>
             <ArrowLeft className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </button>
+
+          {/* زر الرجوع */}
+          {onGoBack && (
+            <button
+              onClick={onGoBack}
+              className="w-full bg-white hover:bg-gray-50 text-gray-700 font-bold py-3 px-6 rounded-xl border-2 border-gray-200 hover:border-gray-300 transition-all duration-300 flex items-center justify-center gap-2 text-sm group"
+            >
+              <ArrowLeft className="w-4 h-4 rotate-180 group-hover:-translate-x-1 transition-transform" />
+              <span>تعديل الحجز</span>
+            </button>
+          )}
 
           {/* نص تشجيعي */}
           <p className="text-center text-[11px] text-gray-500">
