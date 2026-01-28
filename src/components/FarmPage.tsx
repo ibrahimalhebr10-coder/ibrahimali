@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Play, TreePine, Plus, Minus, CheckCircle2, Gift, Award, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { farmService, type FarmProject, type TreeVariety, type FarmContract } from '../services/farmService';
+import PreAuthReservation from './PreAuthReservation';
 
 interface FarmPageProps {
   farmId: string;
@@ -23,6 +24,8 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
   const [selectedContract, setSelectedContract] = useState<FarmContract | null>(null);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [priceUpdateAnimation, setPriceUpdateAnimation] = useState(false);
+  const [showPreAuthReservation, setShowPreAuthReservation] = useState(false);
+  const [reservationData, setReservationData] = useState<any>(null);
   const contractsScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -106,7 +109,7 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
       pricePerTree: selectedContract.investor_price
     }));
 
-    const reservationData = {
+    const tempReservationData = {
       farmId: farm!.id,
       farmName: farm!.name,
       cart,
@@ -119,7 +122,9 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
       treeDetails
     };
 
-    onComplete(reservationData);
+    localStorage.setItem('pendingReservation', JSON.stringify(tempReservationData));
+    setReservationData(tempReservationData);
+    setShowPreAuthReservation(true);
   };
 
   const scrollContracts = (direction: 'left' | 'right') => {
@@ -532,6 +537,20 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
             />
           </div>
         </div>
+      )}
+
+      {/* PRE-AUTH RESERVATION SCREEN */}
+      {showPreAuthReservation && reservationData && (
+        <PreAuthReservation
+          farmName={reservationData.farmName}
+          totalTrees={reservationData.totalTrees}
+          totalPrice={reservationData.totalPrice}
+          contractName={reservationData.contractName}
+          onContinue={() => {
+            setShowPreAuthReservation(false);
+            onComplete(reservationData);
+          }}
+        />
       )}
     </div>
   );
