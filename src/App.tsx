@@ -379,8 +379,8 @@ function App() {
       <FarmPage
         farmId={selectedFarmId}
         onClose={handleCloseFarm}
-        onOpenAuth={() => setShowAuthForm(true)}
-        onNavigateToReservations={() => {
+        onComplete={(reservationData) => {
+          localStorage.setItem('pendingReservation', JSON.stringify(reservationData));
           handleCloseFarm();
           setShowMyReservations(true);
         }}
