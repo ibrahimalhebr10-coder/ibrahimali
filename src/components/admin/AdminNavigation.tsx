@@ -58,7 +58,7 @@ const navItems: NavItem[] = [
     id: 'messages',
     label: 'إدارة الرسائل',
     icon: MessageSquare,
-    allowedRoles: ['super_admin', 'farm_manager'],
+    allowedRoles: ['super_admin'],
     requiredPermissions: ['dashboard:view']
   },
   {
