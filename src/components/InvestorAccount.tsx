@@ -17,7 +17,6 @@ import {
   Calendar,
   DollarSign,
   MapPin,
-  TrendingUp,
   AlertCircle,
   Sparkles,
   CreditCard
@@ -91,319 +90,376 @@ export default function InvestorAccount() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {journeyState.status === 'no_reservation' && (
-          <NoReservationView />
-        )}
-
-        {journeyState.status === 'pending' && journeyState.reservation && (
-          <PendingReviewView reservation={journeyState.reservation} />
-        )}
-
-        {journeyState.status === 'waiting_for_payment' && journeyState.reservation && (
-          <WaitingForPaymentView
-            reservation={journeyState.reservation}
-            onProceed={() => setShowPaymentPage(true)}
-          />
-        )}
-
-        {journeyState.status === 'payment_submitted' && journeyState.reservation && (
-          <PaymentSubmittedView
-            reservation={journeyState.reservation}
-            receipt={journeyState.latestReceipt}
-          />
-        )}
-
-        {journeyState.status === 'paid' && journeyState.reservation && (
-          <PaidConfirmedView reservation={journeyState.reservation} />
-        )}
-
-        {journeyState.status === 'transferred_to_harvest' && journeyState.reservation && (
-          <TransferredToHarvestView reservation={journeyState.reservation} />
-        )}
-
-        {journeyState.status === 'cancelled' && journeyState.reservation && (
-          <CancelledView reservation={journeyState.reservation} />
-        )}
+        <InvestorAccountCard
+          journeyState={journeyState}
+          onPaymentClick={() => setShowPaymentPage(true)}
+        />
       </div>
     </div>
   );
 }
 
-function NoReservationView() {
+function InvestorAccountCard({
+  journeyState,
+  onPaymentClick
+}: {
+  journeyState: InvestorJourneyState;
+  onPaymentClick: () => void;
+}) {
+  const config = getStateConfig(journeyState);
+
   return (
-    <div className="text-center py-12">
-      <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-green-200">
-        <div className="bg-gradient-to-br from-green-100 to-emerald-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
-          <TreePine className="w-12 h-12 text-green-600" />
+    <div className="bg-white rounded-3xl p-8 shadow-xl border-2" style={{ borderColor: config.borderColor }}>
+      <div className="text-center mb-6">
+        <div
+          className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4"
+          style={{ background: config.iconBg }}
+        >
+          {config.icon}
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">ابدأ رحلتك الاستثمارية</h2>
-        <p className="text-gray-600 text-lg mb-8">
-          لا يوجد لديك حجز بعد. استثمر في مزرعتك الخاصة وابدأ جني الأرباح
+
+        {config.badge && (
+          <div
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-bold mb-4 border-2"
+            style={{
+              backgroundColor: config.badge.bg,
+              borderColor: config.badge.border,
+              color: config.badge.text
+            }}
+          >
+            {config.badge.animated && (
+              <span
+                className="w-2 h-2 rounded-full animate-pulse"
+                style={{ backgroundColor: config.badge.dotColor }}
+              />
+            )}
+            {config.badge.text}
+          </div>
+        )}
+
+        <h2 className="text-3xl font-bold text-gray-900 mb-3">{config.title}</h2>
+        <p className="text-gray-700 text-lg leading-relaxed max-w-2xl mx-auto">
+          {config.description}
         </p>
-        <button
-          onClick={() => window.location.href = '/'}
-          className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-105 shadow-lg"
-        >
-          <span className="flex items-center gap-2 justify-center">
-            تصفح المزارع المتاحة
-            <ArrowRight className="w-5 h-5" />
-          </span>
-        </button>
       </div>
-    </div>
-  );
-}
 
-function PendingReviewView({ reservation }: { reservation: InvestorReservation }) {
-  return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-green-200">
-        <div className="text-center mb-6">
-          <div className="bg-gradient-to-br from-green-100 to-emerald-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
-            <TreePine className="w-12 h-12 text-green-600" />
-          </div>
-
-          <div className="inline-flex items-center gap-2 bg-amber-100 border-2 border-amber-300 text-amber-800 px-5 py-2 rounded-full text-sm font-bold mb-4">
-            <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
-            محجوز مؤقتاً باسمك
-          </div>
-
-          <h2 className="text-3xl font-bold text-gray-900 mb-3">
-            تم حجز مزرعتك بنجاح
-          </h2>
-          <p className="text-gray-700 text-lg leading-relaxed max-w-2xl mx-auto">
-            أشجارك محفوظة باسمك، وهي الآن في انتظار اعتماد ضمّها إلى حوزتك
-          </p>
+      {journeyState.reservation && (
+        <div
+          className="rounded-2xl p-6 border-2 mb-6"
+          style={{
+            background: config.summaryBg,
+            borderColor: config.summaryBorder
+          }}
+        >
+          <ReservationSummary reservation={journeyState.reservation} />
         </div>
+      )}
 
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
-          <ReservationSummary reservation={reservation} />
-        </div>
-
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-5">
-            <div className="flex items-start gap-3">
-              <CheckCircle2 className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="font-bold text-blue-900 mb-1">أشجارك محجوزة</h3>
-                <p className="text-sm text-blue-800">
-                  تم تأمين الأشجار المطلوبة باسمك ولن تكون متاحة لأي مستثمر آخر
-                </p>
+      {config.infoCards && config.infoCards.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {config.infoCards.map((card, index) => (
+            <div
+              key={index}
+              className="rounded-2xl p-5 border-2"
+              style={{
+                backgroundColor: card.bg,
+                borderColor: card.border
+              }}
+            >
+              <div className="flex items-start gap-3">
+                <div style={{ color: card.iconColor }}>{card.icon}</div>
+                <div>
+                  <h3 className="font-bold mb-1" style={{ color: card.titleColor }}>
+                    {card.title}
+                  </h3>
+                  <p className="text-sm" style={{ color: card.textColor }}>
+                    {card.description}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="bg-purple-50 border-2 border-purple-200 rounded-2xl p-5">
-            <div className="flex items-start gap-3">
-              <Clock className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="font-bold text-purple-900 mb-1">مراجعة سريعة</h3>
-                <p className="text-sm text-purple-800">
-                  فريقنا يراجع طلبك. عادة ما تستغرق هذه العملية 24-48 ساعة
-                </p>
-              </div>
-            </div>
-          </div>
+          ))}
         </div>
+      )}
 
-        <div className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-6 text-center">
-          <Sparkles className="w-8 h-8 text-green-600 mx-auto mb-3" />
-          <h3 className="font-bold text-green-900 text-lg mb-2">الخطوة التالية</h3>
-          <p className="text-sm text-green-800 leading-relaxed">
-            سنرسل لك إشعاراً فور اعتماد حجزك، وبعدها يمكنك إتمام عملية السداد لضم الأشجار رسمياً إلى حوزتك
+      {config.nextStep && (
+        <div
+          className="rounded-2xl p-6 text-center mb-6 border-2"
+          style={{
+            background: config.nextStep.bg,
+            borderColor: config.nextStep.border
+          }}
+        >
+          <div style={{ color: config.nextStep.iconColor }} className="mx-auto mb-3 w-8 h-8 flex items-center justify-center">
+            {config.nextStep.icon}
+          </div>
+          <h3 className="font-bold text-lg mb-2" style={{ color: config.nextStep.titleColor }}>
+            {config.nextStep.title}
+          </h3>
+          <p className="text-sm leading-relaxed" style={{ color: config.nextStep.textColor }}>
+            {config.nextStep.description}
           </p>
         </div>
-      </div>
-    </div>
-  );
-}
+      )}
 
-function WaitingForPaymentView({
-  reservation,
-  onProceed
-}: {
-  reservation: InvestorReservation;
-  onProceed: () => void;
-}) {
-  return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-blue-200">
-        <div className="text-center mb-6">
-          <div className="bg-gradient-to-br from-blue-100 to-cyan-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle2 className="w-12 h-12 text-blue-600" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">تم اعتماد حجزك!</h2>
-          <p className="text-gray-600 text-lg">
-            مبروك! حجزك معتمد الآن. أكمل عملية السداد لتأمين أشجارك
-          </p>
-        </div>
-
-        <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-2xl p-6 border-2 border-blue-200 mb-6">
-          <ReservationSummary reservation={reservation} />
-        </div>
-
+      {config.cta && (
         <button
-          onClick={onProceed}
-          className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white px-8 py-5 rounded-xl font-bold text-xl transition-all transform hover:scale-105 shadow-lg"
+          onClick={() => {
+            if (config.cta!.action === 'payment') {
+              onPaymentClick();
+            } else if (config.cta!.action === 'navigate') {
+              window.location.href = config.cta!.href || '/';
+            }
+          }}
+          className="w-full px-8 py-5 rounded-xl font-bold text-xl transition-all transform hover:scale-105 shadow-lg text-white"
+          style={{
+            background: config.cta.gradient
+          }}
         >
           <span className="flex items-center gap-3 justify-center">
-            <CreditCard className="w-6 h-6" />
-            إتمام عملية السداد
-            <ArrowRight className="w-6 h-6" />
+            {config.cta.iconLeft}
+            {config.cta.text}
+            {config.cta.iconRight}
           </span>
         </button>
-
-        <div className="mt-4 text-center text-sm text-gray-600">
-          <p>بعد السداد، سيتم تأكيد ملكيتك للأشجار ونقلها إلى قسم "محصولي"</p>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
 
-function PaymentSubmittedView({
-  reservation,
-  receipt
-}: {
-  reservation: InvestorReservation;
-  receipt: any;
-}) {
-  return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-purple-200">
-        <div className="text-center mb-6">
-          <div className="bg-gradient-to-br from-purple-100 to-pink-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <FileCheck className="w-12 h-12 text-purple-600" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">تم رفع إيصال السداد</h2>
-          <p className="text-gray-600 text-lg">
-            فريقنا المالي يراجع الإيصال الآن. سنرسل لك إشعاراً فور التأكيد
-          </p>
-        </div>
+function getStateConfig(journeyState: InvestorJourneyState) {
+  switch (journeyState.status) {
+    case 'no_reservation':
+      return {
+        borderColor: '#86efac',
+        iconBg: 'linear-gradient(to bottom right, #d1fae5, #a7f3d0)',
+        icon: <TreePine className="w-12 h-12 text-green-600" />,
+        title: 'ابدأ رحلتك الاستثمارية',
+        description: 'لا يوجد لديك حجز بعد. استثمر في مزرعتك الخاصة وابدأ جني الأرباح',
+        summaryBg: 'linear-gradient(to bottom right, #d1fae5, #a7f3d0)',
+        summaryBorder: '#86efac',
+        cta: {
+          text: 'تصفح المزارع المتاحة',
+          action: 'navigate',
+          href: '/',
+          gradient: 'linear-gradient(to right, #16a34a, #059669)',
+          iconLeft: null,
+          iconRight: <ArrowRight className="w-6 h-6" />
+        }
+      };
 
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border-2 border-purple-200">
-          <ReservationSummary reservation={reservation} />
-        </div>
+    case 'pending':
+      return {
+        borderColor: '#86efac',
+        iconBg: 'linear-gradient(to bottom right, #d1fae5, #a7f3d0)',
+        icon: <TreePine className="w-12 h-12 text-green-600" />,
+        badge: {
+          text: 'محجوز مؤقتاً باسمك',
+          bg: '#fef3c7',
+          border: '#fcd34d',
+          textColor: '#92400e',
+          dotColor: '#f59e0b',
+          animated: true
+        },
+        title: 'تم حجز مزرعتك بنجاح',
+        description: 'أشجارك محفوظة باسمك، وهي الآن في انتظار اعتماد ضمّها إلى حوزتك',
+        summaryBg: 'linear-gradient(to bottom right, #d1fae5, #a7f3d0)',
+        summaryBorder: '#86efac',
+        infoCards: [
+          {
+            bg: '#dbeafe',
+            border: '#93c5fd',
+            iconColor: '#2563eb',
+            titleColor: '#1e3a8a',
+            textColor: '#1e40af',
+            icon: <CheckCircle2 className="w-6 h-6 flex-shrink-0 mt-1" />,
+            title: 'أشجارك محجوزة',
+            description: 'تم تأمين الأشجار المطلوبة باسمك ولن تكون متاحة لأي مستثمر آخر'
+          },
+          {
+            bg: '#f3e8ff',
+            border: '#d8b4fe',
+            iconColor: '#9333ea',
+            titleColor: '#581c87',
+            textColor: '#7e22ce',
+            icon: <Clock className="w-6 h-6 flex-shrink-0 mt-1" />,
+            title: 'مراجعة سريعة',
+            description: 'فريقنا يراجع طلبك. عادة ما تستغرق هذه العملية 24-48 ساعة'
+          }
+        ],
+        nextStep: {
+          bg: 'linear-gradient(to right, #d1fae5, #a7f3d0)',
+          border: '#6ee7b7',
+          iconColor: '#059669',
+          titleColor: '#064e3b',
+          textColor: '#065f46',
+          icon: <Sparkles className="w-8 h-8" />,
+          title: 'الخطوة التالية',
+          description: 'سنرسل لك إشعاراً فور اعتماد حجزك، وبعدها يمكنك إتمام عملية السداد لضم الأشجار رسمياً إلى حوزتك'
+        }
+      };
 
-        {receipt && (
-          <div className="mt-6 bg-indigo-50 border-2 border-indigo-200 rounded-2xl p-5">
-            <div className="flex items-start gap-3">
-              <FileCheck className="w-6 h-6 text-indigo-600 flex-shrink-0 mt-1" />
-              <div>
-                <h3 className="font-bold text-indigo-900 mb-1">تفاصيل الإيصال</h3>
-                <p className="text-sm text-indigo-800">
-                  تم رفع الإيصال بتاريخ {new Date(receipt.created_at).toLocaleDateString('ar-SA')}
-                </p>
-                <p className="text-xs text-indigo-700 mt-1">
-                  عادة ما تستغرق المراجعة 1-3 أيام عمل
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+    case 'waiting_for_payment':
+      return {
+        borderColor: '#93c5fd',
+        iconBg: 'linear-gradient(to bottom right, #dbeafe, #bfdbfe)',
+        icon: <CheckCircle2 className="w-12 h-12 text-blue-600" />,
+        badge: {
+          text: 'معتمد - جاهز للسداد',
+          bg: '#dbeafe',
+          border: '#60a5fa',
+          textColor: '#1e40af',
+          dotColor: '#3b82f6',
+          animated: true
+        },
+        title: 'تم اعتماد حجزك',
+        description: 'مبروك! حجزك معتمد الآن. أكمل عملية السداد لتأمين أشجارك بشكل نهائي',
+        summaryBg: 'linear-gradient(to bottom right, #dbeafe, #bfdbfe)',
+        summaryBorder: '#93c5fd',
+        nextStep: {
+          bg: 'linear-gradient(to right, #dbeafe, #bfdbfe)',
+          border: '#93c5fd',
+          iconColor: '#2563eb',
+          titleColor: '#1e3a8a',
+          textColor: '#1e40af',
+          icon: <Sparkles className="w-8 h-8" />,
+          title: 'بعد السداد',
+          description: 'بعد إتمام السداد، سيتم تأكيد ملكيتك للأشجار ونقلها إلى قسم "محصولي"'
+        },
+        cta: {
+          text: 'انتقل للسداد',
+          action: 'payment',
+          gradient: 'linear-gradient(to right, #2563eb, #0891b2)',
+          iconLeft: <CreditCard className="w-6 h-6" />,
+          iconRight: <ArrowRight className="w-6 h-6" />
+        }
+      };
 
-function PaidConfirmedView({ reservation }: { reservation: InvestorReservation }) {
-  return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-green-200">
-        <div className="text-center mb-6">
-          <div className="bg-gradient-to-br from-green-100 to-emerald-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle2 className="w-12 h-12 text-green-600" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">تم تأكيد سدادك!</h2>
-          <p className="text-gray-600 text-lg">
-            مبروك! تم تأكيد سدادك بنجاح. جاري نقل أشجارك إلى قسم "محصولي"
-          </p>
-        </div>
+    case 'payment_submitted':
+      return {
+        borderColor: '#d8b4fe',
+        iconBg: 'linear-gradient(to bottom right, #f3e8ff, #e9d5ff)',
+        icon: <FileCheck className="w-12 h-12 text-purple-600" />,
+        badge: {
+          text: 'في انتظار اعتماد السداد',
+          bg: '#f3e8ff',
+          border: '#c084fc',
+          textColor: '#6b21a8',
+          dotColor: '#a855f7',
+          animated: true
+        },
+        title: 'تم رفع إيصال السداد',
+        description: 'فريقنا المالي يراجع الإيصال الآن. سنرسل لك إشعاراً فور التأكيد',
+        summaryBg: 'linear-gradient(to bottom right, #f3e8ff, #e9d5ff)',
+        summaryBorder: '#d8b4fe',
+        nextStep: {
+          bg: 'linear-gradient(to right, #f3e8ff, #e9d5ff)',
+          border: '#d8b4fe',
+          iconColor: '#9333ea',
+          titleColor: '#581c87',
+          textColor: '#6b21a8',
+          icon: <Clock className="w-8 h-8" />,
+          title: 'مراجعة الإيصال',
+          description: journeyState.latestReceipt
+            ? `تم رفع الإيصال بتاريخ ${new Date(journeyState.latestReceipt.created_at).toLocaleDateString('ar-SA')}. عادة ما تستغرق المراجعة 1-3 أيام عمل`
+            : 'عادة ما تستغرق مراجعة الإيصال 1-3 أيام عمل'
+        }
+      };
 
-        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200 mb-6">
-          <ReservationSummary reservation={reservation} />
-        </div>
+    case 'paid':
+      return {
+        borderColor: '#86efac',
+        iconBg: 'linear-gradient(to bottom right, #d1fae5, #a7f3d0)',
+        icon: <CheckCircle2 className="w-12 h-12 text-green-600" />,
+        badge: {
+          text: 'تم اعتماد السداد',
+          bg: '#d1fae5',
+          border: '#4ade80',
+          textColor: '#14532d',
+          dotColor: '#22c55e',
+          animated: false
+        },
+        title: 'مبروك! تم تأكيد سدادك',
+        description: 'تم تأكيد سدادك بنجاح. جاري نقل أشجارك إلى قسم "محصولي"',
+        summaryBg: 'linear-gradient(to bottom right, #d1fae5, #a7f3d0)',
+        summaryBorder: '#86efac',
+        nextStep: {
+          bg: 'linear-gradient(to right, #d1fae5, #a7f3d0)',
+          border: '#86efac',
+          iconColor: '#059669',
+          titleColor: '#064e3b',
+          textColor: '#065f46',
+          icon: <Sparkles className="w-8 h-8" />,
+          title: 'الخطوة التالية',
+          description: 'سيتم نقل أشجارك قريباً إلى قسم "محصولي" حيث يمكنك متابعة نموها ومواعيد الصيانة والحصاد'
+        }
+      };
 
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-5">
-          <div className="flex items-start gap-3">
-            <TrendingUp className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="font-bold text-blue-900 mb-1">الخطوة التالية</h3>
-              <p className="text-sm text-blue-800">
-                سيتم نقل أشجارك قريباً إلى قسم "محصولي" حيث يمكنك متابعة نموها ومواعيد الصيانة والحصاد
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+    case 'transferred_to_harvest':
+      return {
+        borderColor: '#6ee7b7',
+        iconBg: 'linear-gradient(to bottom right, #d1fae5, #99f6e4)',
+        icon: <Sprout className="w-12 h-12 text-emerald-600" />,
+        badge: {
+          text: 'نشط في محصولي',
+          bg: '#d1fae5',
+          border: '#34d399',
+          textColor: '#064e3b',
+          dotColor: '#10b981',
+          animated: false
+        },
+        title: 'مبروك! أشجارك في محصولي',
+        description: 'رحلتك الاستثمارية بدأت الآن. تابع أشجارك وعملياتها الزراعية',
+        summaryBg: 'linear-gradient(to bottom right, #d1fae5, #99f6e4)',
+        summaryBorder: '#6ee7b7',
+        cta: {
+          text: 'انتقل إلى محصولي',
+          action: 'navigate',
+          href: '#harvest',
+          gradient: 'linear-gradient(to right, #059669, #0d9488)',
+          iconLeft: <Sprout className="w-6 h-6" />,
+          iconRight: <ArrowRight className="w-6 h-6" />
+        }
+      };
 
-function TransferredToHarvestView({ reservation }: { reservation: InvestorReservation }) {
-  return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-emerald-200">
-        <div className="text-center mb-6">
-          <div className="bg-gradient-to-br from-emerald-100 to-teal-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Sprout className="w-12 h-12 text-emerald-600" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">مبروك! أشجارك في محصولي</h2>
-          <p className="text-gray-600 text-lg">
-            رحلتك الاستثمارية بدأت الآن. تابع أشجارك وعملياتها الزراعية
-          </p>
-        </div>
+    case 'cancelled':
+      return {
+        borderColor: '#fca5a5',
+        iconBg: 'linear-gradient(to bottom right, #fee2e2, #fecaca)',
+        icon: <XCircle className="w-12 h-12 text-red-600" />,
+        badge: {
+          text: 'تم الإلغاء',
+          bg: '#fee2e2',
+          border: '#f87171',
+          textColor: '#7f1d1d',
+          dotColor: '#ef4444',
+          animated: false
+        },
+        title: 'تم إلغاء هذا الحجز',
+        description: 'يمكنك إنشاء حجز جديد في أي وقت',
+        summaryBg: 'linear-gradient(to bottom right, #fee2e2, #fecaca)',
+        summaryBorder: '#fca5a5',
+        cta: {
+          text: 'تصفح المزارع المتاحة',
+          action: 'navigate',
+          href: '/',
+          gradient: 'linear-gradient(to right, #4b5563, #374151)',
+          iconLeft: <TreePine className="w-6 h-6" />,
+          iconRight: <ArrowRight className="w-6 h-6" />
+        }
+      };
 
-        <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-2xl p-6 border-2 border-emerald-200 mb-6">
-          <ReservationSummary reservation={reservation} />
-        </div>
-
-        <button
-          onClick={() => window.location.href = '#harvest'}
-          className="w-full bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-8 py-5 rounded-xl font-bold text-xl transition-all transform hover:scale-105 shadow-lg"
-        >
-          <span className="flex items-center gap-3 justify-center">
-            <Sprout className="w-6 h-6" />
-            انتقل إلى محصولي
-            <ArrowRight className="w-6 h-6" />
-          </span>
-        </button>
-      </div>
-    </div>
-  );
-}
-
-function CancelledView({ reservation }: { reservation: InvestorReservation }) {
-  return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-red-200">
-        <div className="text-center mb-6">
-          <div className="bg-gradient-to-br from-red-100 to-pink-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
-            <XCircle className="w-12 h-12 text-red-600" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">تم إلغاء هذا الحجز</h2>
-          <p className="text-gray-600 text-lg">
-            يمكنك إنشاء حجز جديد في أي وقت
-          </p>
-        </div>
-
-        <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-2xl p-6 border-2 border-red-200 mb-6">
-          <ReservationSummary reservation={reservation} />
-        </div>
-
-        <button
-          onClick={() => window.location.href = '/'}
-          className="w-full bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white px-8 py-5 rounded-xl font-bold text-xl transition-all transform hover:scale-105 shadow-lg"
-        >
-          <span className="flex items-center gap-3 justify-center">
-            <TreePine className="w-6 h-6" />
-            تصفح المزارع المتاحة
-            <ArrowRight className="w-6 h-6" />
-          </span>
-        </button>
-      </div>
-    </div>
-  );
+    default:
+      return {
+        borderColor: '#d1d5db',
+        iconBg: 'linear-gradient(to bottom right, #f3f4f6, #e5e7eb)',
+        icon: <AlertCircle className="w-12 h-12 text-gray-600" />,
+        title: 'حالة غير معروفة',
+        description: 'يرجى التواصل مع الدعم',
+        summaryBg: 'linear-gradient(to bottom right, #f3f4f6, #e5e7eb)',
+        summaryBorder: '#d1d5db'
+      };
+  }
 }
 
 function ReservationSummary({ reservation }: { reservation: InvestorReservation }) {
@@ -447,10 +503,7 @@ function ReservationSummary({ reservation }: { reservation: InvestorReservation 
           </div>
           <div>
             <p className="text-sm text-gray-600">مدة العقد</p>
-            <p className="font-bold text-gray-900">
-              {reservation.duration_years} سنوات
-              {reservation.bonus_years > 0 && ` + ${reservation.bonus_years} مجاناً`}
-            </p>
+            <p className="font-bold text-gray-900">{reservation.contract_years} سنوات</p>
           </div>
         </div>
 
@@ -461,38 +514,11 @@ function ReservationSummary({ reservation }: { reservation: InvestorReservation 
           <div>
             <p className="text-sm text-gray-600">المبلغ الإجمالي</p>
             <p className="font-bold text-gray-900">
-              {reservation.total_price.toLocaleString('ar-SA')} ريال
+              {reservation.total_amount.toLocaleString('ar-SA')} ريال
             </p>
           </div>
         </div>
       </div>
-
-      {reservation.tree_details && reservation.tree_details.length > 0 && (
-        <div className="pt-4 border-t-2 border-gray-200">
-          <h4 className="font-bold text-gray-900 mb-3">تفاصيل الأشجار</h4>
-          <div className="space-y-2">
-            {reservation.tree_details.map((tree, index) => (
-              <div
-                key={index}
-                className="flex items-center justify-between bg-gray-50 rounded-lg p-3"
-              >
-                <div className="flex items-center gap-2">
-                  <TreePine className="w-4 h-4 text-green-600" />
-                  <span className="text-sm font-semibold text-gray-900">
-                    {tree.variety_name} ({tree.type_name})
-                  </span>
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-bold text-gray-900">{tree.quantity} شجرة</p>
-                  <p className="text-xs text-gray-600">
-                    {tree.price_per_tree.toLocaleString('ar-SA')} ريال/شجرة
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
