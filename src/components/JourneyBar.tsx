@@ -17,7 +17,7 @@ export default function JourneyBar({ currentStep }: JourneyBarProps) {
   const currentIndex = steps.findIndex(s => s.id === currentStep);
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-gray-100 mb-6">
+    <div className="bg-white rounded-xl sm:rounded-2xl p-5 sm:p-6 shadow-sm border border-gray-200 mb-6">
       <div className="relative">
         <div className="flex items-center justify-between relative">
           {steps.map((step, index) => {
@@ -31,18 +31,18 @@ export default function JourneyBar({ currentStep }: JourneyBarProps) {
                 <div className="flex flex-col items-center relative z-10">
                   <div
                     className={`
-                      w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 border-4
-                      ${isCompleted ? 'bg-green-500 border-green-600 scale-100' : ''}
-                      ${isCurrent ? 'bg-gradient-to-br from-blue-500 to-cyan-500 border-blue-600 scale-110 shadow-lg' : ''}
-                      ${isFuture ? 'bg-gray-200 border-gray-300 scale-90' : ''}
+                      w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 border-2 sm:border-3
+                      ${isCompleted ? 'bg-emerald-500 border-emerald-600 scale-100' : ''}
+                      ${isCurrent ? 'bg-gradient-to-br from-sky-500 to-cyan-500 border-sky-600 scale-105 sm:scale-110 shadow-md' : ''}
+                      ${isFuture ? 'bg-gray-100 border-gray-200 scale-90 sm:scale-95' : ''}
                     `}
                   >
                     {isCompleted ? (
-                      <Check className="w-7 h-7 text-white stroke-[3]" />
+                      <Check className="w-5 h-5 sm:w-6 sm:h-6 text-white stroke-[2.5]" />
                     ) : (
                       <StepIcon
                         className={`
-                          w-6 h-6 transition-all
+                          w-4 h-4 sm:w-5 sm:h-5 transition-all
                           ${isCurrent ? 'text-white' : ''}
                           ${isFuture ? 'text-gray-400' : ''}
                         `}
@@ -52,9 +52,9 @@ export default function JourneyBar({ currentStep }: JourneyBarProps) {
 
                   <p
                     className={`
-                      mt-3 text-sm font-bold text-center whitespace-nowrap transition-all
-                      ${isCompleted ? 'text-green-600' : ''}
-                      ${isCurrent ? 'text-blue-600 scale-105' : ''}
+                      mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-center whitespace-nowrap transition-all
+                      ${isCompleted ? 'text-emerald-700' : ''}
+                      ${isCurrent ? 'text-sky-700' : ''}
                       ${isFuture ? 'text-gray-400' : ''}
                     `}
                   >
@@ -63,11 +63,11 @@ export default function JourneyBar({ currentStep }: JourneyBarProps) {
                 </div>
 
                 {index < steps.length - 1 && (
-                  <div className="absolute top-7 right-0 w-full h-1 -z-0" style={{ left: '50%', width: 'calc(100% - 28px)' }}>
+                  <div className="absolute top-5 sm:top-6 right-0 w-full h-0.5 sm:h-1 -z-0" style={{ left: '50%', width: 'calc(100% - 20px)' }}>
                     <div
                       className={`
-                        h-full transition-all duration-500
-                        ${index < currentIndex ? 'bg-green-500' : 'bg-gray-200'}
+                        h-full transition-all duration-500 rounded-full
+                        ${index < currentIndex ? 'bg-emerald-500' : 'bg-gray-200'}
                       `}
                     />
                   </div>
