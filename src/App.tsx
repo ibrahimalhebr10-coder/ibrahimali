@@ -17,7 +17,6 @@ import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
 import Header from './components/Header';
 import AuthForm from './components/AuthForm';
 import QuickRegistration from './components/QuickRegistration';
-import RegistrationSuccess from './components/RegistrationSuccess';
 import ErrorBoundary from './components/ErrorBoundary';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
@@ -49,7 +48,6 @@ function App() {
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
   const [showQuickRegistration, setShowQuickRegistration] = useState(false);
-  const [showRegistrationSuccess, setShowRegistrationSuccess] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
   const [showMyHarvestActive, setShowMyHarvestActive] = useState(false);
   const [harvestStatus, setHarvestStatus] = useState<HarvestStatus>({
@@ -358,11 +356,11 @@ function App() {
     try {
       await reservationService.savePendingReservationFromStorage(userId);
       setShowQuickRegistration(false);
-      setShowRegistrationSuccess(true);
+      setShowMyReservations(true);
     } catch (error) {
       console.error('Error saving pending reservation:', error);
       setShowQuickRegistration(false);
-      setShowRegistrationSuccess(true);
+      setShowMyReservations(true);
     }
   };
 
@@ -1084,15 +1082,6 @@ function App() {
         <QuickRegistration
           onSuccess={handleQuickRegistrationSuccess}
           onBack={() => setShowQuickRegistration(false)}
-        />
-      )}
-
-      {showRegistrationSuccess && (
-        <RegistrationSuccess
-          onClose={() => {
-            setShowRegistrationSuccess(false);
-            setShowMyReservations(true);
-          }}
         />
       )}
 
