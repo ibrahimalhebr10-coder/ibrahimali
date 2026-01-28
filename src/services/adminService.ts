@@ -61,6 +61,7 @@ export interface FarmStats {
   id: string;
   name: string;
   category: string;
+  location?: string;
   image: string;
   totalTrees: number;
   availableTrees: number;
@@ -152,20 +153,21 @@ class AdminService {
       if (error) throw error;
 
       return (data || []).map(farm => {
-        const totalTrees = (farm.available_trees || 0) + (farm.reserved_trees || 0);
-        const bookingPercentage = totalTrees > 0 ? (farm.reserved_trees / totalTrees) * 100 : 0;
+        const totalTrees = farm.total_trees || (farm.available_trees || 0) + (farm.reserved_trees || 0);
+        const bookingPercentage = totalTrees > 0 ? ((farm.reserved_trees || 0) / totalTrees) * 100 : 0;
 
         return {
           id: farm.id,
           name: farm.name_ar || farm.name_en,
           category: farm.category?.name_ar || '',
+          location: farm.location || '',
           image: farm.image_url || '',
           totalTrees,
           availableTrees: farm.available_trees || 0,
           reservedTrees: farm.reserved_trees || 0,
           bookingPercentage: Math.round(bookingPercentage),
           status: farm.status,
-          isOpenForBooking: true,
+          isOpenForBooking: farm.is_open_for_booking !== false,
           maintenanceStatus: 'active',
           lastMaintenanceDate: null,
           nextMaintenanceDate: null
@@ -214,10 +216,9 @@ class AdminService {
 
   async updateFarmStatus(farmId: string, isOpenForBooking: boolean) {
     try {
-      const newStatus = isOpenForBooking ? 'active' : 'upcoming';
       const { error } = await supabase
         .from('farms')
-        .update({ status: newStatus })
+        .update({ is_open_for_booking: isOpenForBooking })
         .eq('id', farmId);
 
       if (error) throw error;
@@ -226,7 +227,7 @@ class AdminService {
 
       return true;
     } catch (error) {
-      console.error('Error updating farm status:', error);
+      console.error('Error updating farm booking status:', error);
       return false;
     }
   }

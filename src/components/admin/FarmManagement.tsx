@@ -187,28 +187,42 @@ export default function FarmManagement({ initialFarmId = null }: FarmManagementP
 
                   <div className="p-5">
                     <h3 className="text-xl font-bold text-white mb-1">{farm.name}</h3>
-                    <p className="text-gray-400 text-sm mb-4">{farm.category}</p>
+                    <p className="text-gray-400 text-sm mb-1">{farm.category}</p>
+                    <p className="text-gray-500 text-xs mb-4 flex items-center gap-1">
+                      <span>📍</span>
+                      <span>{farm.location || 'غير محدد'}</span>
+                    </p>
 
-                    <div className="grid grid-cols-2 gap-3 mb-4">
+                    <div className="grid grid-cols-3 gap-2 mb-4">
                       <div
-                        className="p-3 rounded-xl"
+                        className="p-3 rounded-xl text-center"
                         style={{
                           background: 'rgba(76, 175, 80, 0.1)',
                           border: '1px solid rgba(76, 175, 80, 0.3)'
                         }}
                       >
                         <p className="text-gray-400 text-xs mb-1">متاح</p>
-                        <p className="text-green-400 font-bold text-lg">{farm.availableTrees}</p>
+                        <p className="text-green-400 font-bold text-base">{farm.availableTrees}</p>
                       </div>
                       <div
-                        className="p-3 rounded-xl"
+                        className="p-3 rounded-xl text-center"
                         style={{
                           background: 'rgba(255, 152, 0, 0.1)',
                           border: '1px solid rgba(255, 152, 0, 0.3)'
                         }}
                       >
                         <p className="text-gray-400 text-xs mb-1">محجوز</p>
-                        <p className="text-orange-400 font-bold text-lg">{farm.reservedTrees}</p>
+                        <p className="text-orange-400 font-bold text-base">{farm.reservedTrees}</p>
+                      </div>
+                      <div
+                        className="p-3 rounded-xl text-center"
+                        style={{
+                          background: 'rgba(33, 150, 243, 0.1)',
+                          border: '1px solid rgba(33, 150, 243, 0.3)'
+                        }}
+                      >
+                        <p className="text-gray-400 text-xs mb-1">الكلي</p>
+                        <p className="text-blue-400 font-bold text-base">{farm.totalTrees}</p>
                       </div>
                     </div>
 
@@ -231,48 +245,34 @@ export default function FarmManagement({ initialFarmId = null }: FarmManagementP
                     <div className="space-y-2">
                       <button
                         onClick={() => handleViewDetails(farm.id)}
-                        className="w-full px-4 py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2"
+                        className="w-full px-4 py-3 rounded-xl font-bold transition-all duration-300 hover:shadow-lg flex items-center justify-center gap-2"
                         style={{
                           background: 'linear-gradient(145deg, #3AA17E, #2D8B6A)',
                           color: 'white'
                         }}
                       >
-                        <Eye className="w-4 h-4" />
-                        <span>الدخول للمزرعة</span>
+                        <Eye className="w-5 h-5" />
+                        <span>عرض المزرعة</span>
                       </button>
 
-                      <div className="grid grid-cols-4 gap-2">
-                        <button
-                          onClick={() => handleEdit(farm.id)}
-                          className="px-3 py-2 rounded-xl font-bold transition-all duration-300 flex items-center justify-center"
-                          style={{
-                            background: 'rgba(255, 152, 0, 0.2)',
-                            border: '1px solid rgba(255, 152, 0, 0.5)',
-                            color: '#FF9800'
-                          }}
-                          title="تحرير"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
+                      <div className="grid grid-cols-3 gap-2">
                         <button
                           onClick={async () => {
                             const newStatus = !farm.isOpenForBooking;
                             const success = await adminService.updateFarmStatus(farm.id, newStatus);
                             if (success) await loadFarms();
                           }}
-                          className="px-3 py-2 rounded-xl font-bold transition-all duration-300 flex items-center justify-center"
+                          className="px-3 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 hover:shadow-lg flex items-center justify-center gap-1.5"
                           style={{
                             background: farm.isOpenForBooking
-                              ? 'rgba(156, 39, 176, 0.2)'
-                              : 'rgba(33, 150, 243, 0.2)',
-                            border: farm.isOpenForBooking
-                              ? '1px solid rgba(156, 39, 176, 0.5)'
-                              : '1px solid rgba(33, 150, 243, 0.5)',
-                            color: farm.isOpenForBooking ? '#9C27B0' : '#2196F3'
+                              ? 'linear-gradient(145deg, rgba(156, 39, 176, 0.9), rgba(123, 31, 162, 0.9))'
+                              : 'linear-gradient(145deg, rgba(33, 150, 243, 0.9), rgba(25, 118, 210, 0.9))',
+                            color: 'white'
                           }}
                           title={farm.isOpenForBooking ? 'إغلاق الحجز' : 'فتح الحجز'}
                         >
                           {farm.isOpenForBooking ? <Lock className="w-4 h-4" /> : <Unlock className="w-4 h-4" />}
+                          <span>{farm.isOpenForBooking ? 'إغلاق' : 'فتح'}</span>
                         </button>
                         <button
                           onClick={async () => {
@@ -280,31 +280,29 @@ export default function FarmManagement({ initialFarmId = null }: FarmManagementP
                             const success = await adminService.toggleFarmActive(farm.id, newActive);
                             if (success) await loadFarms();
                           }}
-                          className="px-3 py-2 rounded-xl font-bold transition-all duration-300 flex items-center justify-center"
+                          className="px-3 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 hover:shadow-lg flex items-center justify-center gap-1.5"
                           style={{
                             background: farm.status === 'active'
-                              ? 'rgba(76, 175, 80, 0.2)'
-                              : 'rgba(158, 158, 158, 0.2)',
-                            border: farm.status === 'active'
-                              ? '1px solid rgba(76, 175, 80, 0.5)'
-                              : '1px solid rgba(158, 158, 158, 0.5)',
-                            color: farm.status === 'active' ? '#4CAF50' : '#9E9E9E'
+                              ? 'linear-gradient(145deg, rgba(244, 67, 54, 0.9), rgba(211, 47, 47, 0.9))'
+                              : 'linear-gradient(145deg, rgba(76, 175, 80, 0.9), rgba(56, 142, 60, 0.9))',
+                            color: 'white'
                           }}
                           title={farm.status === 'active' ? 'إيقاف المزرعة' : 'تشغيل المزرعة'}
                         >
                           <Power className="w-4 h-4" />
+                          <span>{farm.status === 'active' ? 'إيقاف' : 'تشغيل'}</span>
                         </button>
                         <button
-                          onClick={() => handleDelete(farm.id)}
-                          className="px-3 py-2 rounded-xl font-bold transition-all duration-300 flex items-center justify-center"
+                          onClick={() => handleEdit(farm.id)}
+                          className="px-3 py-2.5 rounded-xl font-bold text-xs transition-all duration-300 hover:shadow-lg flex items-center justify-center gap-1.5"
                           style={{
-                            background: 'rgba(244, 67, 54, 0.2)',
-                            border: '1px solid rgba(244, 67, 54, 0.5)',
-                            color: '#F44336'
+                            background: 'linear-gradient(145deg, rgba(255, 152, 0, 0.9), rgba(245, 124, 0, 0.9))',
+                            color: 'white'
                           }}
-                          title="حذف"
+                          title="تحرير"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Edit className="w-4 h-4" />
+                          <span>تحرير</span>
                         </button>
                       </div>
                     </div>
