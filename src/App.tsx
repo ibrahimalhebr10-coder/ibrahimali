@@ -9,7 +9,7 @@ import SmartAssistant from './components/SmartAssistant';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
 import MyHarvestComingSoon from './components/MyHarvestComingSoon';
-import MyReservations from './components/MyReservations';
+import InvestorAccount from './components/InvestorAccount';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
 import Header from './components/Header';
@@ -1012,7 +1012,7 @@ function App() {
 
       {showMyReservations && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
-          <MyReservations />
+          <InvestorAccount />
           <button
             onClick={() => setShowMyReservations(false)}
             className="fixed top-4 left-4 z-50 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
