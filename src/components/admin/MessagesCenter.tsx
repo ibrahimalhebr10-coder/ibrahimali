@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { MessageSquare, Send, Users, Bell, Filter, Search, Mail, Phone } from 'lucide-react';
+import { MessageSquare, Send, Users, Bell, Filter, Search, Mail, Phone, FileText } from 'lucide-react';
+import MessageTemplates from './MessageTemplates';
 
 export default function MessagesCenter() {
-  const [activeTab, setActiveTab] = useState<'inbox' | 'sent' | 'compose'>('inbox');
+  const [activeTab, setActiveTab] = useState<'inbox' | 'sent' | 'compose' | 'templates'>('inbox');
 
   return (
     <div className="p-6">
@@ -110,6 +111,19 @@ export default function MessagesCenter() {
               الرسائل المرسلة
             </button>
             <button
+              onClick={() => setActiveTab('templates')}
+              className="flex-1 px-4 py-3 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center gap-2"
+              style={{
+                background: activeTab === 'templates'
+                  ? 'linear-gradient(145deg, #3AA17E, #2D8B6A)'
+                  : 'transparent',
+                color: activeTab === 'templates' ? '#FFFFFF' : '#9CA3AF'
+              }}
+            >
+              <FileText className="w-5 h-5" />
+              قوالب الرسائل
+            </button>
+            <button
               onClick={() => setActiveTab('compose')}
               className="flex-1 px-4 py-3 rounded-lg transition-all duration-300 font-semibold"
               style={{
@@ -124,14 +138,17 @@ export default function MessagesCenter() {
           </div>
         </div>
 
-        <div
-          className="p-6 rounded-2xl"
-          style={{
-            background: 'linear-gradient(145deg, rgba(31, 41, 55, 0.8), rgba(17, 24, 39, 0.8))',
-            border: '1px solid rgba(75, 85, 99, 0.3)'
-          }}
-        >
-          {activeTab === 'inbox' && (
+        {activeTab === 'templates' ? (
+          <MessageTemplates />
+        ) : (
+          <div
+            className="p-6 rounded-2xl"
+            style={{
+              background: 'linear-gradient(145deg, rgba(31, 41, 55, 0.8), rgba(17, 24, 39, 0.8))',
+              border: '1px solid rgba(75, 85, 99, 0.3)'
+            }}
+          >
+            {activeTab === 'inbox' && (
             <div>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-white">صندوق الوارد</h2>
@@ -257,9 +274,11 @@ export default function MessagesCenter() {
               </div>
             </div>
           )}
-        </div>
+          </div>
+        )}
 
-        <div className="mt-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+        {activeTab !== 'templates' && (
+          <div className="mt-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
           <div className="flex items-start gap-3">
             <Bell className="w-5 h-5 text-blue-400 mt-0.5" />
             <div>
@@ -270,7 +289,8 @@ export default function MessagesCenter() {
               </p>
             </div>
           </div>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
