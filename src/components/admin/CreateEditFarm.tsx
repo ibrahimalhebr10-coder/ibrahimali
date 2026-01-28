@@ -971,161 +971,178 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
                     border: '1px solid rgba(255, 255, 255, 0.1)'
                   }}
                 >
-                  <div className="grid grid-cols-5 gap-3">
-                    <div className="col-span-2">
-                      <label className="block text-xs font-semibold text-white/60 mb-1">
-                        اسم العقد / العرض *
-                      </label>
-                      <input
-                        type="text"
-                        value={contract.contract_name}
-                        onChange={(e) => updateContract(index, 'contract_name', e.target.value)}
-                        className="w-full px-3 py-2 rounded-lg text-right text-sm"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          color: 'white'
-                        }}
-                        placeholder="مثال: عقد 3 سنوات + 7 مجاناً"
-                      />
-                    </div>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    {/* نموذج الإدخال */}
+                    <div className="lg:col-span-2 space-y-3">
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-white/60 mb-1">
+                            مدة العقد المدفوعة (سنوات) *
+                          </label>
+                          <input
+                            type="number"
+                            value={contract.duration_years}
+                            onChange={(e) => updateContract(index, 'duration_years', parseInt(e.target.value) || 1)}
+                            min="1"
+                            className="w-full px-3 py-2 rounded-lg text-right text-sm"
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              color: 'white'
+                            }}
+                          />
+                        </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-white/60 mb-1">
-                        مدة العقد المدفوعة (سنوات) *
-                      </label>
-                      <input
-                        type="number"
-                        value={contract.duration_years}
-                        onChange={(e) => updateContract(index, 'duration_years', parseInt(e.target.value) || 1)}
-                        min="1"
-                        className="w-full px-3 py-2 rounded-lg text-right text-sm"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          color: 'white'
-                        }}
-                      />
-                    </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-white/60 mb-1">
+                            سنوات مجانية
+                          </label>
+                          <input
+                            type="number"
+                            value={contract.bonus_years}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 0;
+                              updateContract(index, 'bonus_years', val);
+                              updateContract(index, 'has_bonus_years', val > 0);
+                            }}
+                            min="0"
+                            className="w-full px-3 py-2 rounded-lg text-right text-sm"
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              color: 'white'
+                            }}
+                            placeholder="مثال: 3"
+                          />
+                        </div>
 
-                    <div className="col-span-2">
-                      <label className="block text-xs font-semibold text-white/60 mb-1">
-                        سعر الشجرة (قيمة ثابتة) *
-                      </label>
-                      <input
-                        type="number"
-                        value={contract.investor_price}
-                        onChange={(e) => updateContract(index, 'investor_price', parseInt(e.target.value) || 0)}
-                        className="w-full px-3 py-2 rounded-lg text-right text-sm"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          color: 'white'
-                        }}
-                        placeholder="مثال: 300 أو 490"
-                      />
-                    </div>
-                  </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-white/60 mb-1">
+                            سعر الشجرة (ريال) *
+                          </label>
+                          <input
+                            type="number"
+                            value={contract.investor_price}
+                            onChange={(e) => updateContract(index, 'investor_price', parseInt(e.target.value) || 0)}
+                            className="w-full px-3 py-2 rounded-lg text-right text-sm"
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              color: 'white'
+                            }}
+                            placeholder="مثال: 390"
+                          />
+                        </div>
+                      </div>
 
-                  <div className="p-3 rounded-xl" style={{
-                    background: contract.has_bonus_years ? 'rgba(58, 161, 126, 0.1)' : 'rgba(255, 255, 255, 0.02)',
-                    border: contract.has_bonus_years ? '2px solid rgba(58, 161, 126, 0.3)' : '1px solid rgba(255, 255, 255, 0.1)'
-                  }}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <input
-                        type="checkbox"
-                        id={`bonus-toggle-${index}`}
-                        checked={contract.has_bonus_years}
-                        onChange={(e) => {
-                          const isEnabled = e.target.checked;
-                          updateContract(index, 'has_bonus_years', isEnabled);
-                          if (!isEnabled) {
-                            updateContract(index, 'bonus_years', 0);
-                          }
-                        }}
-                        className="w-5 h-5 rounded cursor-pointer"
-                        style={{
-                          accentColor: '#3AA17E'
-                        }}
-                      />
-                      <label
-                        htmlFor={`bonus-toggle-${index}`}
-                        className="text-sm font-bold text-white cursor-pointer flex-1"
-                      >
-                        🎁 تفعيل سنوات مجانية كميزة عرض
-                        <span className="block text-xs text-white/60 mt-0.5">
-                          السنوات المجانية لا تدخل في أي حساب وهي ميزة تسويقية فقط
-                        </span>
-                      </label>
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-semibold text-white/60 mb-1">
-                        عدد السنوات المجانية
-                      </label>
-                      <input
-                        type="number"
-                        value={contract.bonus_years}
-                        onChange={(e) => updateContract(index, 'bonus_years', parseInt(e.target.value) || 0)}
-                        disabled={!contract.has_bonus_years}
-                        min="0"
-                        className="w-full px-3 py-2 rounded-lg text-right text-sm"
-                        style={{
-                          background: contract.has_bonus_years ? 'rgba(255, 255, 255, 0.05)' : 'rgba(255, 255, 255, 0.02)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          color: contract.has_bonus_years ? 'white' : 'rgba(255, 255, 255, 0.3)',
-                          cursor: contract.has_bonus_years ? 'text' : 'not-allowed'
-                        }}
-                        placeholder={contract.has_bonus_years ? "مثال: 3 أو 7" : "معطل"}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <label className="flex items-center gap-2 cursor-pointer">
+                      <div>
+                        <label className="block text-xs font-semibold text-white/60 mb-1">
+                          اسم العقد / العرض (اختياري)
+                        </label>
                         <input
-                          type="checkbox"
-                          checked={contract.is_active}
-                          onChange={(e) => updateContract(index, 'is_active', e.target.checked)}
-                          className="w-4 h-4 rounded"
+                          type="text"
+                          value={contract.contract_name}
+                          onChange={(e) => updateContract(index, 'contract_name', e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg text-right text-sm"
+                          style={{
+                            background: 'rgba(255, 255, 255, 0.05)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            color: 'white'
+                          }}
+                          placeholder="يتم إنشاؤه تلقائياً إذا تركته فارغاً"
                         />
-                        <span className="text-sm text-white font-semibold">مفعل</span>
-                      </label>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={contract.is_active}
+                              onChange={(e) => updateContract(index, 'is_active', e.target.checked)}
+                              className="w-4 h-4 rounded"
+                            />
+                            <span className="text-sm text-white font-semibold">مفعل</span>
+                          </label>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-white/60 mb-1">
+                            ترتيب العرض
+                          </label>
+                          <input
+                            type="number"
+                            value={contract.display_order}
+                            onChange={(e) => updateContract(index, 'display_order', parseInt(e.target.value) || 0)}
+                            min="0"
+                            className="w-full px-3 py-2 rounded-lg text-right text-sm"
+                            style={{
+                              background: 'rgba(255, 255, 255, 0.05)',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                              color: 'white'
+                            }}
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-white/60 mb-1">
+                            حذف
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => removeContract(index)}
+                            className="w-full px-3 py-2 rounded-lg font-bold text-white transition-all duration-300"
+                            style={{
+                              background: 'linear-gradient(145deg, #F44336, #D32F2F)'
+                            }}
+                          >
+                            <Trash2 className="w-4 h-4 mx-auto" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-white/60 mb-1">
-                        ترتيب العرض
-                      </label>
-                      <input
-                        type="number"
-                        value={contract.display_order}
-                        onChange={(e) => updateContract(index, 'display_order', parseInt(e.target.value) || 0)}
-                        min="0"
-                        className="w-full px-3 py-2 rounded-lg text-right text-sm"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '1px solid rgba(255, 255, 255, 0.1)',
-                          color: 'white'
-                        }}
-                      />
-                    </div>
+                    {/* معاينة البطاقة */}
+                    <div className="flex flex-col items-center justify-center">
+                      <p className="text-xs text-white/60 mb-2 font-semibold">معاينة البطاقة:</p>
+                      <div className="w-28 aspect-[3/4] rounded-2xl overflow-hidden shadow-lg border-2 border-green-400">
+                        {/* القسم الأول: عقد X سنة */}
+                        <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-green-600 via-green-500 to-green-600 py-3">
+                          <p className="text-xs font-bold text-white">
+                            عقد {contract.duration_years} {contract.duration_years === 1 ? 'سنة' : 'سنوات'}
+                          </p>
+                        </div>
 
-                    <div>
-                      <label className="block text-xs font-semibold text-white/60 mb-1">
-                        حذف
-                      </label>
-                      <button
-                        type="button"
-                        onClick={() => removeContract(index)}
-                        className="w-full px-3 py-2 rounded-lg font-bold text-white transition-all duration-300"
-                        style={{
-                          background: 'linear-gradient(145deg, #F44336, #D32F2F)'
-                        }}
-                      >
-                        <Trash2 className="w-4 h-4 mx-auto" />
-                      </button>
+                        {/* فاصل */}
+                        <div className="h-px bg-white/20"></div>
+
+                        {/* القسم الثاني: +X سنوات مجاناً */}
+                        <div className={`flex-1 flex flex-col items-center justify-center py-3 ${
+                          contract.bonus_years > 0
+                            ? 'bg-gradient-to-br from-emerald-600 via-emerald-500 to-green-500'
+                            : 'bg-gradient-to-br from-gray-50 via-white to-gray-50'
+                        }`}>
+                          {contract.bonus_years > 0 ? (
+                            <p className="text-xs font-bold text-white">
+                              +{contract.bonus_years} {contract.bonus_years === 1 ? 'سنة' : 'سنوات'} مجاناً
+                            </p>
+                          ) : (
+                            <p className="text-xs font-semibold text-gray-500 opacity-50">
+                              لا إضافات
+                            </p>
+                          )}
+                        </div>
+
+                        {/* فاصل */}
+                        <div className="h-px bg-white/20"></div>
+
+                        {/* القسم الثالث: السعر */}
+                        <div className="flex-1 flex flex-col items-center justify-center bg-gradient-to-br from-green-700 via-green-600 to-green-700 py-3">
+                          <p className="text-sm font-bold text-white">
+                            {contract.investor_price} ريال
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
