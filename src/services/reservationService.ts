@@ -237,6 +237,66 @@ class ReservationService {
     }
   }
 
+  async savePendingReservationFromStorage(userId: string): Promise<boolean> {
+    try {
+      const pendingDataStr = localStorage.getItem('pendingReservation');
+      if (!pendingDataStr) {
+        console.log('No pending reservation found in localStorage');
+        return false;
+      }
+
+      const pendingData = JSON.parse(pendingDataStr);
+
+      const { data: reservation, error: reservationError } = await supabase
+        .from('reservations')
+        .insert({
+          user_id: userId,
+          farm_id: pendingData.farmId,
+          farm_name: pendingData.farmName,
+          total_trees: pendingData.totalTrees,
+          total_price: pendingData.totalPrice,
+          contract_id: pendingData.contractId || null,
+          contract_name: pendingData.contractName || null,
+          duration_years: pendingData.durationYears || 1,
+          bonus_years: pendingData.bonusYears || 0,
+          tree_details: pendingData.treeDetails || [],
+          status: 'pending'
+        })
+        .select()
+        .maybeSingle();
+
+      if (reservationError || !reservation) {
+        console.error('Error creating reservation:', reservationError);
+        return false;
+      }
+
+      const items = Object.values(pendingData.cart).map((item: any) => ({
+        reservation_id: reservation.id,
+        variety_name: item.varietyName,
+        type_name: item.typeName,
+        quantity: item.quantity,
+        price_per_tree: item.price
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('reservation_items')
+        .insert(items);
+
+      if (itemsError) {
+        console.error('Error creating reservation items:', itemsError);
+        await supabase.from('reservations').delete().eq('id', reservation.id);
+        return false;
+      }
+
+      localStorage.removeItem('pendingReservation');
+      console.log('Pending reservation saved successfully');
+      return true;
+    } catch (error) {
+      console.error('Error in savePendingReservationFromStorage:', error);
+      return false;
+    }
+  }
+
   private mapReservation(data: any): Reservation {
     return {
       id: data.id,

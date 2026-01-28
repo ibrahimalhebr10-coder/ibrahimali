@@ -16,9 +16,12 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
 import Header from './components/Header';
 import AuthForm from './components/AuthForm';
+import QuickRegistration from './components/QuickRegistration';
+import RegistrationSuccess from './components/RegistrationSuccess';
 import ErrorBoundary from './components/ErrorBoundary';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
+import { reservationService } from './services/reservationService';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext';
 import { initializeSupabase } from './lib/supabase';
@@ -45,6 +48,8 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
+  const [showQuickRegistration, setShowQuickRegistration] = useState(false);
+  const [showRegistrationSuccess, setShowRegistrationSuccess] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
   const [showMyHarvestActive, setShowMyHarvestActive] = useState(false);
   const [harvestStatus, setHarvestStatus] = useState<HarvestStatus>({
@@ -349,6 +354,18 @@ function App() {
     setShowAdminDashboard(true);
   };
 
+  const handleQuickRegistrationSuccess = async (userId: string) => {
+    try {
+      await reservationService.savePendingReservationFromStorage(userId);
+      setShowQuickRegistration(false);
+      setShowRegistrationSuccess(true);
+    } catch (error) {
+      console.error('Error saving pending reservation:', error);
+      setShowQuickRegistration(false);
+      setShowRegistrationSuccess(true);
+    }
+  };
+
   useEffect(() => {
     if (isAdminAuthenticated && !isAdminLoading) {
       setShowAdminDashboard(true);
@@ -382,7 +399,11 @@ function App() {
         onComplete={(reservationData) => {
           localStorage.setItem('pendingReservation', JSON.stringify(reservationData));
           handleCloseFarm();
-          setShowMyReservations(true);
+          if (user) {
+            setShowMyReservations(true);
+          } else {
+            setShowQuickRegistration(true);
+          }
         }}
       />
     );
@@ -1058,6 +1079,22 @@ function App() {
           setShowAccountProfile(true);
         }}
       />
+
+      {showQuickRegistration && (
+        <QuickRegistration
+          onSuccess={handleQuickRegistrationSuccess}
+          onBack={() => setShowQuickRegistration(false)}
+        />
+      )}
+
+      {showRegistrationSuccess && (
+        <RegistrationSuccess
+          onClose={() => {
+            setShowRegistrationSuccess(false);
+            setShowMyReservations(true);
+          }}
+        />
+      )}
 
       {showMyReservations && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
