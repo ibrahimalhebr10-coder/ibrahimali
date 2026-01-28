@@ -1,5 +1,6 @@
 import { X, User, Sprout, LogOut, CheckCircle, Clock } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import WhatsAppButton from './WhatsAppButton';
 
 interface AccountProfileProps {
   isOpen: boolean;
@@ -107,6 +108,13 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenRese
                 <Clock className="w-5 h-5" />
                 عرض حجوزاتي
               </button>
+
+              <WhatsAppButton
+                investorName={user.email?.split('@')[0] || 'مستثمر'}
+                variant="secondary"
+                size="large"
+                className="w-full"
+              />
 
               <button
                 onClick={handleSignOut}

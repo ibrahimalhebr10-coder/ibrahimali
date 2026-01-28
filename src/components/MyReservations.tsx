@@ -3,6 +3,7 @@ import { Clock, TreePine, Calendar, FileText, AlertCircle, DollarSign, CheckCirc
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { paymentService } from '../services/paymentService';
+import WhatsAppButton from './WhatsAppButton';
 
 interface Reservation {
   id: string;
@@ -322,6 +323,17 @@ export default function MyReservations() {
                       </div>
                     </div>
                   )}
+
+                  <div className="mt-4">
+                    <WhatsAppButton
+                      investorName={user?.email?.split('@')[0] || 'مستثمر'}
+                      reservationNumber={reservation.id.substring(0, 8)}
+                      farmName={reservation.farm_name}
+                      variant="secondary"
+                      size="medium"
+                      className="w-full"
+                    />
+                  </div>
 
                   <div className="mt-4 pt-4 border-t border-gray-200 flex items-center gap-2 text-xs text-gray-500">
                     <Calendar className="w-4 h-4" />
