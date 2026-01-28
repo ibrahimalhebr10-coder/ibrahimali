@@ -22,6 +22,7 @@ import {
   CreditCard
 } from 'lucide-react';
 import PaymentPage from './PaymentPage';
+import JourneyBar, { getJourneyStep } from './JourneyBar';
 
 export default function InvestorAccount() {
   const { user } = useAuth();
@@ -90,6 +91,7 @@ export default function InvestorAccount() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
+        <JourneyBar currentStep={getJourneyStep(journeyState.status)} />
         <InvestorAccountCard
           journeyState={journeyState}
           onPaymentClick={() => setShowPaymentPage(true)}
