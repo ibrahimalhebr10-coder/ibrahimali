@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, AlertCircle, CheckCircle, Building2, Upload, FileText, Loader, CreditCard, CalendarCheck, Clock } from 'lucide-react';
+import { X, AlertCircle, CheckCircle, Building2, Upload, FileText, Loader, CreditCard, CalendarCheck, Clock, Bell } from 'lucide-react';
 import { paymentMethodsService, PaymentMethod } from '../services/paymentMethodsService';
 import { paymentService, PaymentReceipt } from '../services/paymentService';
 
@@ -30,6 +30,8 @@ export default function PaymentPage({ reservation, onClose, onSuccess }: Payment
   const [selectedMethod, setSelectedMethod] = useState<PaymentMethod | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [sendingNotification, setSendingNotification] = useState(false);
+  const [notificationSent, setNotificationSent] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [existingReceipts, setExistingReceipts] = useState<PaymentReceipt[]>([]);
@@ -86,6 +88,27 @@ export default function PaymentPage({ reservation, onClose, onSuccess }: Payment
 
     setUploadForm({ ...uploadForm, file });
     setError('');
+  }
+
+  async function handleSendNotification() {
+    try {
+      setSendingNotification(true);
+      setError('');
+
+      await paymentService.sendPaymentOpenedNotification(reservation.id);
+
+      setNotificationSent(true);
+      setSuccess('تم إرسال إشعار فتح السداد بنجاح');
+
+      setTimeout(() => {
+        setSuccess('');
+      }, 3000);
+    } catch (err: any) {
+      console.error('Error sending notification:', err);
+      setError('فشل إرسال الإشعار');
+    } finally {
+      setSendingNotification(false);
+    }
   }
 
   async function handleUploadReceipt() {
@@ -213,7 +236,35 @@ export default function PaymentPage({ reservation, onClose, onSuccess }: Payment
           </div>
 
           <div className="bg-gray-50 rounded-xl p-6">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">ملخص الحجز</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">ملخص الحجز</h3>
+              <button
+                onClick={handleSendNotification}
+                disabled={sendingNotification || notificationSent}
+                className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-2 ${
+                  notificationSent
+                    ? 'bg-green-100 text-green-700 cursor-default'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-50'
+                }`}
+              >
+                {sendingNotification ? (
+                  <>
+                    <Loader className="w-4 h-4 animate-spin" />
+                    <span className="text-sm">جاري الإرسال...</span>
+                  </>
+                ) : notificationSent ? (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    <span className="text-sm">تم الإرسال</span>
+                  </>
+                ) : (
+                  <>
+                    <Bell className="w-4 h-4" />
+                    <span className="text-sm">إرسال إشعار</span>
+                  </>
+                )}
+              </button>
+            </div>
             <div className="space-y-3">
               <div className="flex justify-between">
                 <span className="text-gray-600">المزرعة:</span>

@@ -421,5 +421,60 @@ export const paymentService = {
 
     if (error) throw error;
     return data as PaymentReceipt[];
+  },
+
+  async sendPaymentOpenedNotification(reservationId: string): Promise<void> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('المستخدم غير مسجل');
+    }
+
+    const { data: reservation, error: resError } = await supabase
+      .from('reservations')
+      .select('farm_name, total_amount')
+      .eq('id', reservationId)
+      .maybeSingle();
+
+    if (resError) throw resError;
+    if (!reservation) throw new Error('الحجز غير موجود');
+
+    const { error } = await supabase
+      .from('messages')
+      .insert({
+        user_id: user.id,
+        type: 'operational',
+        priority: 'medium',
+        category: 'general',
+        title: 'تم فتح صفحة السداد',
+        content: `قمت بفتح صفحة السداد لحجزك في ${reservation.farm_name}. المبلغ المطلوب: ${reservation.total_amount.toLocaleString()} ر.س. يرجى إتمام السداد في أقرب وقت ممكن.`,
+        is_read: false
+      });
+
+    if (error) throw error;
+  },
+
+  async sendPaymentApprovedNotification(reservationId: string, userId: string): Promise<void> {
+    const { data: reservation, error: resError } = await supabase
+      .from('reservations')
+      .select('farm_name, total_amount')
+      .eq('id', reservationId)
+      .maybeSingle();
+
+    if (resError) throw resError;
+    if (!reservation) throw new Error('الحجز غير موجود');
+
+    const { error } = await supabase
+      .from('messages')
+      .insert({
+        user_id: userId,
+        type: 'important',
+        priority: 'high',
+        category: 'important',
+        title: 'تم استلام السداد بنجاح',
+        content: `تم استلام وتأكيد سدادك لحجزك في ${reservation.farm_name} بمبلغ ${reservation.total_amount.toLocaleString()} ر.س. تم تأكيد حجزك بنجاح وسيتم التواصل معك قريباً.`,
+        is_read: false
+      });
+
+    if (error) throw error;
   }
 };

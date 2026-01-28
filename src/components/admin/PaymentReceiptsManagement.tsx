@@ -122,6 +122,25 @@ export default function PaymentReceiptsManagement() {
         reviewNotes.trim() || undefined
       );
 
+      if (status === 'approved') {
+        const { data: receipt, error: receiptError } = await supabase
+          .from('payment_receipts')
+          .select('reservation_id, user_id')
+          .eq('id', selectedReceipt.id)
+          .maybeSingle();
+
+        if (!receiptError && receipt) {
+          try {
+            await paymentService.sendPaymentApprovedNotification(
+              receipt.reservation_id,
+              receipt.user_id
+            );
+          } catch (notifErr) {
+            console.error('Error sending notification:', notifErr);
+          }
+        }
+      }
+
       setSelectedReceipt(null);
       setReviewNotes('');
       setFileUrl(null);
