@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Send, Users, MessageSquare, TrendingUp, Eye, Mail } from 'lucide-react';
+import { Send, Users, MessageSquare, TrendingUp, Eye, Mail, BarChart3 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { investorMessagingService } from '../../services/investorMessagingService';
 import CreateInvestorMessage from './CreateInvestorMessage';
+import SupervisorDashboard from './SupervisorDashboard';
+import MessagesLog from './MessagesLog';
+import MessageDetails from './MessageDetails';
 
 interface Farm {
   id: string;
@@ -18,12 +21,16 @@ interface FarmWithStats extends Farm {
   last_message_date?: string;
 }
 
+type View = 'farms' | 'supervisor' | 'messages-log' | 'message-details';
+
 export default function InvestorMessaging() {
   const [farms, setFarms] = useState<FarmWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedFarm, setSelectedFarm] = useState<FarmWithStats | null>(null);
   const [showCreateMessage, setShowCreateMessage] = useState(false);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
+  const [currentView, setCurrentView] = useState<View>('farms');
+  const [selectedMessageId, setSelectedMessageId] = useState<string | null>(null);
 
   useEffect(() => {
     loadFarms();
@@ -149,8 +156,103 @@ export default function InvestorMessaging() {
     );
   }
 
+  if (currentView === 'supervisor' && isSuperAdmin) {
+    return (
+      <div className="space-y-6">
+        <div className="flex gap-3">
+          <button
+            onClick={() => setCurrentView('farms')}
+            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            إرسال الرسائل
+          </button>
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium"
+          >
+            لوحة الإشراف
+          </button>
+          <button
+            onClick={() => setCurrentView('messages-log')}
+            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            سجل الرسائل
+          </button>
+        </div>
+        <SupervisorDashboard />
+      </div>
+    );
+  }
+
+  if (currentView === 'messages-log' && isSuperAdmin) {
+    return (
+      <div className="space-y-6">
+        <div className="flex gap-3">
+          <button
+            onClick={() => setCurrentView('farms')}
+            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            إرسال الرسائل
+          </button>
+          <button
+            onClick={() => setCurrentView('supervisor')}
+            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            لوحة الإشراف
+          </button>
+          <button
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium"
+          >
+            سجل الرسائل
+          </button>
+        </div>
+        <MessagesLog
+          onViewMessage={(id) => {
+            setSelectedMessageId(id);
+            setCurrentView('message-details');
+          }}
+        />
+      </div>
+    );
+  }
+
+  if (currentView === 'message-details' && selectedMessageId && isSuperAdmin) {
+    return (
+      <MessageDetails
+        messageId={selectedMessageId}
+        onBack={() => {
+          setSelectedMessageId(null);
+          setCurrentView('messages-log');
+        }}
+      />
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {isSuperAdmin && (
+        <div className="flex gap-3">
+          <button
+            className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium"
+          >
+            إرسال الرسائل
+          </button>
+          <button
+            onClick={() => setCurrentView('supervisor')}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <BarChart3 className="w-4 h-4" />
+            لوحة الإشراف
+          </button>
+          <button
+            onClick={() => setCurrentView('messages-log')}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <MessageSquare className="w-4 h-4" />
+            سجل الرسائل
+          </button>
+        </div>
+      )}
+
       <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
         <div className="flex items-start gap-4">
           <div className="bg-green-600 text-white p-3 rounded-lg">

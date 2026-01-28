@@ -293,5 +293,121 @@ export const investorMessagingService = {
         ? Math.round((completedTasks / tasks.length) * 100)
         : 0
     };
+  },
+
+  async getSuperAdminStats(): Promise<{
+    total_messages: number;
+    total_recipients: number;
+    total_farms_messaged: number;
+    total_farm_managers: number;
+    avg_read_rate: number;
+    messages_last_7_days: number;
+    messages_last_30_days: number;
+  }> {
+    const [messagesResult, recipientsResult] = await Promise.all([
+      supabase
+        .from('investor_messages')
+        .select('*'),
+
+      supabase
+        .from('investor_message_recipients')
+        .select('*')
+    ]);
+
+    const messages = messagesResult.data || [];
+    const recipients = recipientsResult.data || [];
+
+    const now = new Date();
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+    const messagesLast7Days = messages.filter(m =>
+      new Date(m.sent_at) >= sevenDaysAgo
+    ).length;
+
+    const messagesLast30Days = messages.filter(m =>
+      new Date(m.sent_at) >= thirtyDaysAgo
+    ).length;
+
+    const uniqueFarms = new Set(messages.map(m => m.farm_id)).size;
+    const uniqueManagers = new Set(messages.map(m => m.sender_id)).size;
+
+    const readRecipients = recipients.filter(r => r.is_read).length;
+    const avgReadRate = recipients.length > 0
+      ? Math.round((readRecipients / recipients.length) * 100)
+      : 0;
+
+    return {
+      total_messages: messages.length,
+      total_recipients: recipients.length,
+      total_farms_messaged: uniqueFarms,
+      total_farm_managers: uniqueManagers,
+      avg_read_rate: avgReadRate,
+      messages_last_7_days: messagesLast7Days,
+      messages_last_30_days: messagesLast30Days
+    };
+  },
+
+  async getAllMessagesWithStats(): Promise<Array<InvestorMessageWithDetails & {
+    read_rate: number;
+  }>> {
+    const messages = await this.getAllMessagesForAdmin();
+
+    return messages.map(message => ({
+      ...message,
+      read_rate: message.recipients_count > 0
+        ? Math.round((message.read_count / message.recipients_count) * 100)
+        : 0
+    }));
+  },
+
+  async getFarmManagerStats(): Promise<Array<{
+    admin_id: string;
+    admin_name: string;
+    admin_email: string;
+    total_messages: number;
+    total_recipients: number;
+    last_message_date?: string;
+    farms_count: number;
+  }>> {
+    const { data: admins, error: adminsError } = await supabase
+      .from('admins')
+      .select('id, email, full_name')
+      .eq('is_active', true);
+
+    if (adminsError) throw adminsError;
+
+    const stats = await Promise.all(
+      (admins || []).map(async (admin) => {
+        const [messagesResult, farmsResult] = await Promise.all([
+          supabase
+            .from('investor_messages')
+            .select('sent_at, recipients_count')
+            .eq('sender_id', admin.id)
+            .order('sent_at', { ascending: false }),
+
+          supabase
+            .from('admin_farm_assignments')
+            .select('farm_id', { count: 'exact', head: true })
+            .eq('admin_id', admin.id)
+            .eq('is_active', true)
+        ]);
+
+        const messages = messagesResult.data || [];
+        const totalRecipients = messages.reduce((sum, m) => sum + (m.recipients_count || 0), 0);
+
+        return {
+          admin_id: admin.id,
+          admin_name: admin.full_name || admin.email,
+          admin_email: admin.email,
+          total_messages: messages.length,
+          total_recipients: totalRecipients,
+          last_message_date: messages[0]?.sent_at,
+          farms_count: farmsResult.count || 0
+        };
+      })
+    );
+
+    return stats.filter(s => s.total_messages > 0 || s.farms_count > 0);
   }
 };
