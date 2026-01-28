@@ -50,6 +50,16 @@ export default function MessageTemplates() {
   };
 
   const handleSave = async () => {
+    if (!formData.name.trim()) {
+      alert('يرجى إدخال اسم القالب');
+      return;
+    }
+
+    if (!formData.content.trim()) {
+      alert('يرجى إدخال محتوى القالب');
+      return;
+    }
+
     try {
       const extractedVariables = messageTemplatesService.extractVariables(formData.content);
 
@@ -58,19 +68,21 @@ export default function MessageTemplates() {
           ...formData,
           variables: extractedVariables
         });
+        alert('✅ تم تحديث القالب بنجاح!');
       } else if (isCreating) {
         await messageTemplatesService.createTemplate({
           ...formData,
           variables: extractedVariables,
           is_system: false
         });
+        alert('✅ تم حفظ القالب بنجاح!');
       }
 
       await loadTemplates();
       handleCancel();
     } catch (error) {
       console.error('Error saving template:', error);
-      alert('حدث خطأ أثناء حفظ القالب');
+      alert('حدث خطأ أثناء حفظ القالب. يرجى المحاولة مرة أخرى.');
     }
   };
 

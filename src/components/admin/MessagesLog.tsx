@@ -233,8 +233,13 @@ export default function MessagesLog() {
           {filteredMessages.length === 0 ? (
             <div className="text-center py-12">
               <MessageSquare className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد رسائل</h3>
-              <p className="text-gray-600">لم يتم إرسال أي رسائل بعد</p>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد رسائل مرسلة بعد</h3>
+              <p className="text-gray-600">
+                {messages.length === 0
+                  ? 'لم يتم إرسال أي رسائل حتى الآن. ستظهر جميع الرسائل المرسلة هنا.'
+                  : 'لا توجد رسائل تطابق معايير البحث والفلترة المحددة.'
+                }
+              </p>
             </div>
           ) : (
             filteredMessages.map((message) => (

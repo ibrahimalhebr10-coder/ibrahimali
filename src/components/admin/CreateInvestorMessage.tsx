@@ -75,17 +75,33 @@ export default function CreateInvestorMessage({ farm, onBack, onMessageSent }: P
   }
 
   async function handleSendMessage() {
-    if (!title.trim() || !content.trim()) {
-      setError('يرجى إدخال العنوان والمحتوى');
+    if (!title.trim()) {
+      setError('يرجى إدخال عنوان الرسالة');
       return;
     }
+
+    if (!content.trim()) {
+      setError('يرجى إدخال محتوى الرسالة');
+      return;
+    }
+
+    if (!farm.id) {
+      setError('يرجى اختيار مزرعة أولاً');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `هل أنت متأكد من إرسال هذه الرسالة؟\n\nسيتم إرسالها إلى ${farm.investors_count} مستثمر في ${farm.name_ar}.\n\nالعنوان: ${title.trim()}`
+    );
+
+    if (!confirmed) return;
 
     try {
       setSending(true);
       setError('');
 
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('User not authenticated');
+      if (!user) throw new Error('المستخدم غير مصادق عليه');
 
       const { data: admin } = await supabase
         .from('admins')
@@ -94,7 +110,7 @@ export default function CreateInvestorMessage({ farm, onBack, onMessageSent }: P
         .eq('is_active', true)
         .single();
 
-      if (!admin) throw new Error('Admin not found');
+      if (!admin) throw new Error('لم يتم العثور على حساب المدير');
 
       await investorMessagingService.createMessage(
         {
@@ -112,7 +128,7 @@ export default function CreateInvestorMessage({ farm, onBack, onMessageSent }: P
       }, 2000);
     } catch (err: any) {
       console.error('Error sending message:', err);
-      setError(err.message || 'فشل إرسال الرسالة');
+      setError(err.message || 'حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.');
     } finally {
       setSending(false);
     }

@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle2, XCircle, Clock, TreePine, User, Calendar, Ale
 import { supabase } from '../../lib/supabase';
 import { notificationService } from '../../services/notificationService';
 import Breadcrumb from './Breadcrumb';
+import SendMessageButton from './SendMessageButton';
 
 interface Reservation {
   id: string;
@@ -472,23 +473,35 @@ export default function FarmReservationsDetails({ farmId, farmName, onBack, onUp
                   </div>
 
                   {activeTab === 'pending' && (
-                    <div className="mt-4 flex gap-3">
-                      <button
-                        onClick={() => handleApproveReservations([reservation.id])}
-                        disabled={processing}
-                        className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                        تعميد الحجز
-                      </button>
-                      <button
-                        onClick={() => handleCancelReservations([reservation.id])}
-                        disabled={processing}
-                        className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-                      >
-                        <XCircle className="w-4 h-4" />
-                        إلغاء الحجز
-                      </button>
+                    <div className="mt-4 space-y-3">
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => handleApproveReservations([reservation.id])}
+                          disabled={processing}
+                          className="flex-1 px-4 py-2 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                          تعميد الحجز
+                        </button>
+                        <button
+                          onClick={() => handleCancelReservations([reservation.id])}
+                          disabled={processing}
+                          className="flex-1 px-4 py-2 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                        >
+                          <XCircle className="w-4 h-4" />
+                          إلغاء الحجز
+                        </button>
+                      </div>
+                      <SendMessageButton
+                        userId={reservation.user_id}
+                        farmId={reservation.farm_id}
+                        farmName={reservation.farm_name}
+                        reservationId={reservation.id}
+                        eventType="reservation_approved"
+                        buttonText="إرسال رسالة للمستثمر"
+                        buttonVariant="primary"
+                        onMessageSent={() => loadReservations()}
+                      />
                     </div>
                   )}
                 </div>
