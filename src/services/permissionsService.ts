@@ -203,16 +203,16 @@ class PermissionsService {
     return result;
   }
 
-  hasPermission(permissions: AdminPermission[], permissionKey: string): boolean {
+  checkPermissionInList(permissions: AdminPermission[], permissionKey: string): boolean {
     return permissions.some(p => p.permission_key === permissionKey);
   }
 
-  hasAnyPermission(permissions: AdminPermission[], permissionKeys: string[]): boolean {
-    return permissionKeys.some(key => this.hasPermission(permissions, key));
+  checkAnyPermissionInList(permissions: AdminPermission[], permissionKeys: string[]): boolean {
+    return permissionKeys.some(key => this.checkPermissionInList(permissions, key));
   }
 
-  hasAllPermissions(permissions: AdminPermission[], permissionKeys: string[]): boolean {
-    return permissionKeys.every(key => this.hasPermission(permissions, key));
+  checkAllPermissionsInList(permissions: AdminPermission[], permissionKeys: string[]): boolean {
+    return permissionKeys.every(key => this.checkPermissionInList(permissions, key));
   }
 
   filterByCategory(permissions: AdminPermission[], category: string): AdminPermission[] {
@@ -367,6 +367,108 @@ class PermissionsService {
     } catch (error) {
       console.error('Error deleting role:', error);
       return false;
+    }
+  }
+
+  async getCurrentAdminWithRole(): Promise<{ admin: any; role: AdminRole | null; permissions: AdminPermission[] } | null> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return null;
+
+      const { data: admin, error: adminError } = await supabase
+        .from('admins')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (adminError) throw adminError;
+      if (!admin || !admin.role_id) return null;
+
+      const { data: role, error: roleError } = await supabase
+        .from('admin_roles')
+        .select('*')
+        .eq('id', admin.role_id)
+        .maybeSingle();
+
+      if (roleError) throw roleError;
+      if (!role) return null;
+
+      const permissions = await this.getAdminPermissions(admin.id);
+
+      return { admin, role, permissions };
+    } catch (error) {
+      console.error('Error getting current admin with role:', error);
+      return null;
+    }
+  }
+
+  async hasPermission(permissionKey: string): Promise<boolean> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+
+      const { data: admin } = await supabase
+        .from('admins')
+        .select('id, role_id')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (!admin || !admin.role_id) return false;
+
+      const { data: role } = await supabase
+        .from('admin_roles')
+        .select('role_key')
+        .eq('id', admin.role_id)
+        .maybeSingle();
+
+      if (role?.role_key === 'super_admin') return true;
+
+      return await this.checkPermission(admin.id, permissionKey);
+    } catch (error) {
+      console.error('Error checking hasPermission:', error);
+      return false;
+    }
+  }
+
+  async hasAnyPermission(permissionKeys: string[]): Promise<boolean> {
+    for (const key of permissionKeys) {
+      if (await this.hasPermission(key)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async logPermissionAction(
+    action: 'create_role' | 'update_role' | 'delete_role' | 'assign_permission' | 'revoke_permission' | 'create_admin' | 'update_admin' | 'disable_admin',
+    targetId: string,
+    description: string,
+    metadata?: Record<string, any>
+  ): Promise<void> {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: admin } = await supabase
+        .from('admins')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+      if (!admin) return;
+
+      await supabase.from('admin_logs').insert({
+        admin_id: admin.id,
+        action_type: action.includes('delete') ? 'delete' : action.includes('create') ? 'create' : 'update',
+        entity_type: action.includes('role') ? 'settings' : action.includes('permission') ? 'settings' : 'user',
+        entity_id: targetId,
+        description,
+        metadata: metadata || {}
+      });
+    } catch (error) {
+      console.error('Error logging permission action:', error);
     }
   }
 }

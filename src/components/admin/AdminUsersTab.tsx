@@ -92,6 +92,13 @@ export default function AdminUsersTab() {
         });
 
         if (result) {
+          const role = roles.find(r => r.id === formData.role_id);
+          await permissionsService.logPermissionAction(
+            'update_admin',
+            editingAdmin.id,
+            `تم تحديث بيانات المستخدم الإداري: ${formData.full_name}`,
+            { email: formData.email, role: role?.role_name_ar }
+          );
           setSuccess('تم تحديث المستخدم بنجاح');
           await loadData();
           setTimeout(() => {
@@ -111,6 +118,13 @@ export default function AdminUsersTab() {
         });
 
         if (result) {
+          const role = roles.find(r => r.id === formData.role_id);
+          await permissionsService.logPermissionAction(
+            'create_admin',
+            formData.email,
+            `تم إضافة مستخدم إداري جديد: ${formData.full_name}`,
+            { email: formData.email, role: role?.role_name_ar }
+          );
           setSuccess('تم إضافة المستخدم بنجاح');
           await loadData();
           setTimeout(() => {
@@ -138,6 +152,12 @@ export default function AdminUsersTab() {
     try {
       const result = await adminService.toggleAdminStatus(admin.id, newStatus);
       if (result) {
+        await permissionsService.logPermissionAction(
+          'disable_admin',
+          admin.id,
+          `تم ${action} المستخدم الإداري: ${admin.full_name}`,
+          { email: admin.email, new_status: newStatus }
+        );
         setSuccess(`تم ${action} المستخدم بنجاح`);
         await loadData();
         setTimeout(() => setSuccess(''), 2000);

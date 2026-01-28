@@ -78,6 +78,12 @@ export default function RolesTab() {
         });
 
         if (result) {
+          await permissionsService.logPermissionAction(
+            'update_role',
+            editingRole.id,
+            `تم تحديث الدور: ${formData.role_name_ar}`,
+            { old_name: editingRole.role_name_ar, new_name: formData.role_name_ar }
+          );
           setSuccess('تم تحديث الدور بنجاح');
           await loadRoles();
           setTimeout(() => {
@@ -98,6 +104,12 @@ export default function RolesTab() {
         });
 
         if (newRole) {
+          await permissionsService.logPermissionAction(
+            'create_role',
+            newRole.id,
+            `تم إنشاء دور جديد: ${formData.role_name_ar}`,
+            { role_key: roleKey, role_name: formData.role_name_ar }
+          );
           setSuccess('تم إنشاء الدور بنجاح');
           await loadRoles();
           setTimeout(() => {
@@ -127,6 +139,12 @@ export default function RolesTab() {
     try {
       const result = await permissionsService.deleteRole(role.id);
       if (result) {
+        await permissionsService.logPermissionAction(
+          'delete_role',
+          role.id,
+          `تم حذف الدور: ${role.role_name_ar}`,
+          { role_key: role.role_key, role_name: role.role_name_ar }
+        );
         setSuccess('تم حذف الدور بنجاح');
         await loadRoles();
         setTimeout(() => setSuccess(''), 2000);

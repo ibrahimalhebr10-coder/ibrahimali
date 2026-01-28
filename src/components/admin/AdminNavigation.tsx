@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react';
 import { Home, Sprout, Calendar, DollarSign, Package, Settings, BarChart3, Video } from 'lucide-react';
+import { usePermissions } from '../../contexts/PermissionsContext';
 
 export type AdminPage = 'dashboard' | 'farms' | 'reservations' | 'finance' | 'harvest' | 'settings' | 'video';
 
@@ -13,6 +15,7 @@ interface NavItem {
   label: string;
   icon: any;
   allowedRoles: string[];
+  requiredPermissions?: string[];
 }
 
 const navItems: NavItem[] = [
@@ -20,48 +23,82 @@ const navItems: NavItem[] = [
     id: 'dashboard',
     label: 'لوحة التحكم',
     icon: Home,
-    allowedRoles: ['super_admin', 'farm_manager', 'financial_manager', 'support']
+    allowedRoles: ['super_admin', 'farm_manager', 'financial_manager', 'support'],
+    requiredPermissions: ['dashboard:view']
   },
   {
     id: 'farms',
     label: 'إدارة المزارع',
     icon: Sprout,
-    allowedRoles: ['super_admin', 'farm_manager']
+    allowedRoles: ['super_admin', 'farm_manager'],
+    requiredPermissions: ['farms:view']
   },
   {
     id: 'reservations',
     label: 'إدارة الحجوزات',
     icon: Calendar,
-    allowedRoles: ['super_admin', 'farm_manager', 'support']
+    allowedRoles: ['super_admin', 'farm_manager', 'support'],
+    requiredPermissions: ['reservations:view']
   },
   {
     id: 'finance',
     label: 'الإدارة المالية',
     icon: DollarSign,
-    allowedRoles: ['super_admin', 'financial_manager']
+    allowedRoles: ['super_admin', 'financial_manager'],
+    requiredPermissions: ['finance:view']
   },
   {
     id: 'harvest',
     label: 'إدارة محصولي',
     icon: Package,
-    allowedRoles: ['super_admin', 'farm_manager']
+    allowedRoles: ['super_admin', 'farm_manager'],
+    requiredPermissions: ['dashboard:view']
   },
   {
     id: 'video',
     label: 'الفيديو التعريفي',
     icon: Video,
-    allowedRoles: ['super_admin']
+    allowedRoles: ['super_admin'],
+    requiredPermissions: ['settings:edit']
   },
   {
     id: 'settings',
     label: 'إعدادات النظام',
     icon: Settings,
-    allowedRoles: ['super_admin']
+    allowedRoles: ['super_admin'],
+    requiredPermissions: ['settings:view']
   }
 ];
 
 export default function AdminNavigation({ currentPage, onNavigate, adminRole }: AdminNavigationProps) {
-  const visibleItems = navItems.filter(item => item.allowedRoles.includes(adminRole));
+  const { isAuthorized } = usePermissions();
+  const [visibleItems, setVisibleItems] = useState<NavItem[]>([]);
+
+  useEffect(() => {
+    const filterItems = async () => {
+      if (adminRole === 'super_admin') {
+        setVisibleItems(navItems);
+        return;
+      }
+
+      const filtered: NavItem[] = [];
+      for (const item of navItems) {
+        if (item.allowedRoles.includes(adminRole)) {
+          if (item.requiredPermissions) {
+            const hasPermission = isAuthorized(item.requiredPermissions, false);
+            if (hasPermission) {
+              filtered.push(item);
+            }
+          } else {
+            filtered.push(item);
+          }
+        }
+      }
+      setVisibleItems(filtered);
+    };
+
+    filterItems();
+  }, [adminRole, isAuthorized]);
 
   return (
     <nav

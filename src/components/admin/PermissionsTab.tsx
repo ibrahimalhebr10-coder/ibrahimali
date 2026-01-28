@@ -131,6 +131,15 @@ export default function PermissionsTab() {
       );
 
       if (result) {
+        await permissionsService.logPermissionAction(
+          'assign_permission',
+          selectedRole.id,
+          `تم تحديث صلاحيات الدور: ${selectedRole.role_name_ar}`,
+          {
+            role_name: selectedRole.role_name_ar,
+            permissions_count: selectedPermissionIds.size
+          }
+        );
         setSuccess('تم حفظ الصلاحيات بنجاح');
         await loadRolePermissions();
         setTimeout(() => setSuccess(''), 2000);
