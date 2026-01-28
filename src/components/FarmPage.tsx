@@ -50,12 +50,18 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
   async function loadFarmData() {
     try {
       setLoading(true);
+      console.log('🔍 Loading farm with ID:', farmId);
       const farmData = await farmService.getFarmProjectById(farmId);
+      console.log('📦 Farm data received:', farmData);
       if (farmData) {
+        console.log('🌳 Tree types:', farmData.tree_types);
+        console.log('📋 Contracts:', farmData.contracts);
         setFarm(farmData);
+      } else {
+        console.warn('⚠️ No farm data returned');
       }
     } catch (error) {
-      console.error('Error loading farm:', error);
+      console.error('❌ Error loading farm:', error);
     } finally {
       setLoading(false);
     }
@@ -342,7 +348,11 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
         )}
 
         {/* TREE SELECTION - شريط حجز واضح وبارز */}
-        {farm.tree_types && farm.tree_types.length > 0 && (
+        {(() => {
+          console.log('🎯 Checking tree_types:', farm.tree_types);
+          console.log('📊 tree_types length:', farm.tree_types?.length);
+          return farm.tree_types && farm.tree_types.length > 0;
+        })() && (
           <section className="space-y-3 sm:space-y-4">
             <div className="text-center">
               <div className="inline-flex items-center gap-2 bg-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border-2 border-green-200 shadow-sm">
