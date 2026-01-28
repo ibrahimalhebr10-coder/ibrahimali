@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
-import { Globe, MessageCircle, Smartphone, Mail, CheckCircle, Clock, Settings, Info } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Globe, MessageCircle, Smartphone, Mail, CheckCircle, Clock, Settings, Info, Wrench } from 'lucide-react';
+import { messagingChannelsService } from '../../services/messagingChannelsService';
+import SMSProviderConfigModal from './SMSProviderConfig';
+import WhatsAppBusinessConfigModal from './WhatsAppBusinessConfig';
 
 interface Channel {
   id: string;
@@ -14,6 +17,37 @@ interface Channel {
 }
 
 export default function ChannelsSettings() {
+  const [showSMSConfig, setShowSMSConfig] = useState(false);
+  const [showWhatsAppConfig, setShowWhatsAppConfig] = useState(false);
+  const [smsConfigured, setSmsConfigured] = useState(false);
+  const [whatsappConfigured, setWhatsappConfigured] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    checkChannelsConfiguration();
+  }, []);
+
+  const checkChannelsConfiguration = async () => {
+    try {
+      setLoading(true);
+      const [smsConfig, whatsappConfig] = await Promise.all([
+        messagingChannelsService.isChannelConfigured('sms'),
+        messagingChannelsService.isChannelConfigured('whatsapp_business')
+      ]);
+
+      setSmsConfigured(smsConfig);
+      setWhatsappConfigured(whatsappConfig);
+    } catch (error) {
+      console.error('Error checking configuration:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleConfigSaved = () => {
+    checkChannelsConfiguration();
+  };
+
   const channels: Channel[] = [
     {
       id: 'website',
@@ -183,12 +217,80 @@ export default function ChannelsSettings() {
               )}
 
               {channel.status === 'coming_soon' && (
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <div className="bg-yellow-50 rounded-lg p-3">
-                    <p className="text-sm text-yellow-800">
-                      ستتوفر هذه القناة في التحديثات القادمة. يتم العمل على التكامل حالياً.
-                    </p>
-                  </div>
+                <div className="mt-6 pt-4 border-t border-gray-200 space-y-3">
+                  {channel.id === 'sms' && (
+                    <>
+                      {smsConfigured ? (
+                        <div className="bg-green-50 rounded-lg p-3 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-600" />
+                            <p className="text-sm text-green-800 font-medium">تم تكوين المزود</p>
+                          </div>
+                          <button
+                            onClick={() => setShowSMSConfig(true)}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-white border border-green-300 text-green-700 rounded-lg hover:bg-green-50 transition-colors text-sm"
+                          >
+                            <Wrench className="w-4 h-4" />
+                            تعديل الإعدادات
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="bg-yellow-50 rounded-lg p-3">
+                          <p className="text-sm text-yellow-800 mb-3">
+                            ستتوفر هذه القناة في التحديثات القادمة. يتم العمل على تكاملها مع مزودي خدمة الرسائل النصية حالياً.
+                          </p>
+                          <button
+                            onClick={() => setShowSMSConfig(true)}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium"
+                          >
+                            <Settings className="w-4 h-4" />
+                            تكوين مزود SMS
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {channel.id === 'whatsapp' && (
+                    <>
+                      {whatsappConfigured ? (
+                        <div className="bg-green-50 rounded-lg p-3 flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle className="w-4 h-4 text-green-600" />
+                            <p className="text-sm text-green-800 font-medium">تم تكوين المزود</p>
+                          </div>
+                          <button
+                            onClick={() => setShowWhatsAppConfig(true)}
+                            className="flex items-center gap-2 px-3 py-1.5 bg-white border border-green-300 text-green-700 rounded-lg hover:bg-green-50 transition-colors text-sm"
+                          >
+                            <Wrench className="w-4 h-4" />
+                            تعديل الإعدادات
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="bg-yellow-50 rounded-lg p-3">
+                          <p className="text-sm text-yellow-800 mb-3">
+                            ستتوفر هذه القناة في التحديثات القادمة. يتم العمل على التكامل حالياً.
+                          </p>
+                          <button
+                            onClick={() => setShowWhatsAppConfig(true)}
+                            className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                          >
+                            <Settings className="w-4 h-4" />
+                            تكوين WhatsApp Business API
+                          </button>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {channel.id !== 'sms' && channel.id !== 'whatsapp' && (
+                    <div className="bg-yellow-50 rounded-lg p-3">
+                      <p className="text-sm text-yellow-800">
+                        ستتوفر هذه القناة في التحديثات القادمة. يتم العمل على التكامل حالياً.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -270,6 +372,20 @@ export default function ChannelsSettings() {
           </div>
         </div>
       </div>
+
+      {showSMSConfig && (
+        <SMSProviderConfigModal
+          onClose={() => setShowSMSConfig(false)}
+          onSaved={handleConfigSaved}
+        />
+      )}
+
+      {showWhatsAppConfig && (
+        <WhatsAppBusinessConfigModal
+          onClose={() => setShowWhatsAppConfig(false)}
+          onSaved={handleConfigSaved}
+        />
+      )}
     </div>
   );
 }
