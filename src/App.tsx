@@ -8,7 +8,7 @@ import HowToStart from './components/HowToStart';
 import SmartAssistant from './components/SmartAssistant';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
-import MyHarvest from './components/MyHarvest';
+import MyHarvestComingSoon from './components/MyHarvestComingSoon';
 import MyReservations from './components/MyReservations';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
@@ -996,10 +996,9 @@ function App() {
         onOpenReservations={() => setShowMyReservations(true)}
       />
 
-      <MyHarvest
+      <MyHarvestComingSoon
         isOpen={showMyHarvest}
         onClose={() => setShowMyHarvest(false)}
-        onOpenAuth={() => {}}
       />
 
       <AuthForm
