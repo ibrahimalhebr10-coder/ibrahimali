@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Clock, CheckCircle, AlertCircle, User, Calendar, X } from 'lucide-react';
+import { Plus, Clock, CheckCircle, AlertCircle, User, Calendar, X, ClipboardList } from 'lucide-react';
 import { farmTasksService, type FarmTaskWithDetails } from '../../services/farmTasksService';
 import { supabase } from '../../lib/supabase';
 
@@ -190,7 +190,7 @@ export default function TasksTab({ farm }: TasksTabProps) {
               <div className="grid grid-cols-2 gap-3 mb-3 text-sm">
                 <div className="flex items-center gap-2 text-gray-600">
                   <User className="w-4 h-4" />
-                  <span>{task.assigned_to_admin.full_name}</span>
+                  <span>{task.assigned_to_admin?.full_name || 'غير محدد'}</span>
                 </div>
                 <div className="flex items-center gap-2 text-gray-600">
                   <Calendar className="w-4 h-4" />

@@ -21,17 +21,17 @@ export interface FarmTaskWithDetails extends FarmTask {
     id: string;
     full_name: string;
     email: string;
-  };
+  } | null;
   assigned_by_admin?: {
     id: string;
     full_name: string;
     email: string;
-  };
+  } | null;
   farm: {
     id: string;
     name_ar: string;
     name_en: string;
-  };
+  } | null;
 }
 
 class FarmTasksService {
