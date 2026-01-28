@@ -370,37 +370,45 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
             <div
               className="rounded-2xl p-6 space-y-5"
               style={{
-                background: 'linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-                border: '2px solid rgba(255, 255, 255, 0.1)'
+                background: 'linear-gradient(145deg, rgba(33, 150, 243, 0.08), rgba(25, 118, 210, 0.05))',
+                border: '2px solid rgba(33, 150, 243, 0.2)'
               }}
             >
-              <h2 className="text-xl font-bold text-white mb-4 pb-3 border-b border-white/10">
-                1️⃣ البيانات العامة للمزرعة
-              </h2>
+              <div className="flex items-center gap-3 mb-4 pb-3 border-b border-blue-400/20">
+                <span className="text-3xl">🏷️</span>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    1️⃣ بيانات بطاقة المزرعة
+                  </h2>
+                  <p className="text-xs text-white/60 mt-0.5">
+                    المعلومات التي تظهر في بطاقة المزرعة للمستثمرين
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-white/80 mb-2">
+                  اسم المزرعة *
+                </label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  className="w-full px-4 py-3 rounded-xl text-right"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '2px solid rgba(255, 255, 255, 0.1)',
+                    color: 'white'
+                  }}
+                  placeholder="مثال: مزرعة الزيتون الأخضر"
+                />
+              </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-white/80 mb-2">
-                    اسم المزرعة *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    required
-                    className="w-full px-4 py-3 rounded-xl text-right"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '2px solid rgba(255, 255, 255, 0.1)',
-                      color: 'white'
-                    }}
-                    placeholder="مثال: مزرعة الزيتون الأخضر"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-white/80 mb-2">
-                    المنطقة *
+                    المنطقة / الفئة *
                   </label>
                   <select
                     value={formData.category_slug}
@@ -418,12 +426,10 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
                     <option value="mixed">مزارع متنوعة</option>
                   </select>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-white/80 mb-2">
-                    الموقع النصي *
+                    الموقع *
                   </label>
                   <input
                     type="text"
@@ -439,62 +445,12 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
                     placeholder="مثال: الجوف، السعودية"
                   />
                 </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-white/80 mb-2">
-                    مساحة المزرعة
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.area_size}
-                    onChange={(e) => setFormData({ ...formData, area_size: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl text-right"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '2px solid rgba(255, 255, 255, 0.1)',
-                      color: 'white'
-                    }}
-                    placeholder="مثال: 50 هكتار"
-                  />
-                </div>
               </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-white/80 mb-2">
-                  الحالة *
-                </label>
-                <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                  required
-                  className="w-full px-4 py-3 rounded-xl text-right"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '2px solid rgba(255, 255, 255, 0.1)',
-                    color: 'white'
-                  }}
-                >
-                  <option value="active">مفتوحة للحجز</option>
-                  <option value="upcoming">مغلقة</option>
-                  <option value="closed">موقوفة</option>
-                </select>
-              </div>
-            </div>
-
-            <div
-              className="rounded-2xl p-6 space-y-5"
-              style={{
-                background: 'linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-                border: '2px solid rgba(255, 255, 255, 0.1)'
-              }}
-            >
-              <h2 className="text-xl font-bold text-white mb-4 pb-3 border-b border-white/10">
-                2️⃣ بيانات بطاقة المزرعة
-              </h2>
 
               <div>
                 <label className="block text-sm font-semibold text-white/80 mb-2">
                   صورة رئيسية *
+                  <span className="text-xs text-white/50 block mt-0.5">تظهر في بطاقة المزرعة</span>
                 </label>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -550,7 +506,7 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
                     <img
                       src={formData.image}
                       alt="معاينة"
-                      className="w-full h-48 object-cover rounded-xl"
+                      className="w-full h-48 object-cover rounded-xl border-2 border-blue-400/30"
                     />
                   </div>
                 )}
@@ -559,6 +515,7 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
               <div>
                 <label className="block text-sm font-semibold text-white/80 mb-2">
                   نص دعائي قصير
+                  <span className="text-xs text-white/50 block mt-0.5">يظهر في بطاقة المزرعة لجذب الانتباه</span>
                 </label>
                 <textarea
                   value={formData.marketing_text}
@@ -570,48 +527,8 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
                     border: '2px solid rgba(255, 255, 255, 0.1)',
                     color: 'white'
                   }}
-                  placeholder="نص تسويقي مختصر يظهر في البطاقة..."
+                  placeholder="مثال: استثمر في أجود أنواع الزيتون مع عوائد سنوية مضمونة"
                 />
-              </div>
-
-              <div className="flex items-center gap-3 p-4 rounded-xl" style={{
-                background: 'rgba(58, 161, 126, 0.1)',
-                border: '2px solid rgba(58, 161, 126, 0.3)'
-              }}>
-                <input
-                  type="checkbox"
-                  id="first_year_maintenance_free"
-                  checked={formData.first_year_maintenance_free}
-                  onChange={(e) => setFormData({ ...formData, first_year_maintenance_free: e.target.checked })}
-                  className="w-5 h-5 rounded cursor-pointer"
-                  style={{
-                    accentColor: '#3AA17E'
-                  }}
-                />
-                <label
-                  htmlFor="first_year_maintenance_free"
-                  className="text-sm font-semibold text-white cursor-pointer flex-1"
-                >
-                  ✨ التشغيل والصيانة للسنة الأولى مجاناً
-                  <span className="block text-xs text-white/60 mt-1">
-                    عند التفعيل، سيتم عرض "التشغيل والصيانة للسنة الأولى مجاناً" مع إظهار قيمة رسوم التشغيل والصيانة للمستثمر
-                  </span>
-                </label>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-white/80 mb-2">
-                  عرض مختصر لأنواع الأشجار (قراءة فقط)
-                </label>
-                <div
-                  className="w-full px-4 py-3 rounded-xl text-right text-sm text-white/60 italic"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    border: '2px solid rgba(255, 255, 255, 0.05)'
-                  }}
-                >
-                  {treeTypeSummary}
-                </div>
               </div>
             </div>
 
@@ -622,37 +539,106 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
                 border: '2px solid rgba(139, 195, 74, 0.2)'
               }}
             >
-              <h2 className="text-xl font-bold text-white mb-4 pb-3 border-b border-green-400/20 flex items-center gap-2">
-                <span className="text-2xl">🖼️</span>
-                صفحة المزرعة
-              </h2>
+              <div className="flex items-center gap-3 mb-4 pb-3 border-b border-green-400/20">
+                <span className="text-3xl">🖼️</span>
+                <div>
+                  <h2 className="text-xl font-bold text-white">
+                    2️⃣ بيانات صفحة المزرعة
+                  </h2>
+                  <p className="text-xs text-white/60 mt-0.5">
+                    معلومات تفصيلية تظهر في صفحة المزرعة الكاملة
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-white/80 mb-2">
+                    مساحة المزرعة
+                    <span className="text-xs text-white/50 block mt-0.5">معلومة عامة تظهر في الصفحة</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.area_size}
+                    onChange={(e) => setFormData({ ...formData, area_size: e.target.value })}
+                    className="w-full px-4 py-3 rounded-xl text-right"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '2px solid rgba(255, 255, 255, 0.1)',
+                      color: 'white'
+                    }}
+                    placeholder="مثال: 50 هكتار"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-white/80 mb-2">
+                    الحالة *
+                  </label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
+                    required
+                    className="w-full px-4 py-3 rounded-xl text-right"
+                    style={{
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '2px solid rgba(255, 255, 255, 0.1)',
+                      color: 'white'
+                    }}
+                  >
+                    <option value="active">نشطة</option>
+                    <option value="upcoming">قريباً</option>
+                    <option value="closed">موقوفة</option>
+                  </select>
+                </div>
+              </div>
 
               <div>
                 <label className="block text-sm font-semibold text-white/80 mb-2">
-                  صورة أعلى صفحة المزرعة
-                  <span className="text-xs text-white/60 block mt-1">هذه الصورة ستظهر مصغرة في أعلى صفحة المزرعة</span>
+                  الوصف التفصيلي *
+                  <span className="text-xs text-white/50 block mt-0.5">وصف شامل للمزرعة يظهر في الصفحة</span>
                 </label>
-                <div className="grid grid-cols-2 gap-4">
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  required
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-xl text-right"
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '2px solid rgba(255, 255, 255, 0.1)',
+                    color: 'white'
+                  }}
+                  placeholder="وصف تفصيلي عن المزرعة، موقعها، مميزاتها..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-white/80 mb-2">
+                  رابط فيديو المزرعة (YouTube أو رفع مباشر)
+                  <span className="text-xs text-white/50 block mt-0.5">يمكن رفع فيديو أو وضع رابط يوتيوب</span>
+                </label>
+                <div className="grid grid-cols-2 gap-3">
                   <div>
                     <input
-                      ref={heroImageInputRef}
                       type="file"
-                      onChange={handleHeroImageUpload}
-                      accept="image/*"
+                      ref={videoFileInputRef}
+                      onChange={handleVideoUpload}
+                      accept="video/mp4,video/quicktime,video/webm"
                       className="hidden"
                     />
                     <button
                       type="button"
-                      onClick={() => heroImageInputRef.current?.click()}
-                      disabled={uploadingHeroImage}
+                      onClick={() => videoFileInputRef.current?.click()}
+                      disabled={uploadingVideo}
                       className="w-full px-4 py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2"
                       style={{
-                        background: uploadingHeroImage ? 'rgba(158, 158, 158, 0.2)' : 'rgba(139, 195, 74, 0.2)',
+                        background: uploadingVideo ? 'rgba(158, 158, 158, 0.2)' : 'rgba(139, 195, 74, 0.2)',
                         border: '2px solid rgba(139, 195, 74, 0.5)',
                         color: '#8BC34A'
                       }}
                     >
-                      {uploadingHeroImage ? (
+                      {uploadingVideo ? (
                         <>
                           <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-500"></div>
                           <span>جاري الرفع...</span>
@@ -660,55 +646,61 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
                       ) : (
                         <>
                           <Upload className="w-5 h-5" />
-                          <span>رفع صورة Hero</span>
+                          <span>رفع فيديو</span>
                         </>
                       )}
                     </button>
                   </div>
-
                   <div>
                     <input
                       type="url"
-                      value={formData.hero_image}
-                      onChange={(e) => setFormData({ ...formData, hero_image: e.target.value })}
+                      value={formData.video_url}
+                      onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
                       className="w-full px-4 py-3 rounded-xl text-right"
                       style={{
                         background: 'rgba(255, 255, 255, 0.05)',
                         border: '2px solid rgba(255, 255, 255, 0.1)',
                         color: 'white'
                       }}
-                      placeholder="أو أدخل رابط URL للصورة"
+                      placeholder="أو رابط YouTube"
                     />
                   </div>
                 </div>
-
-                {formData.hero_image && (
-                  <div className="mt-3">
-                    <img
-                      src={formData.hero_image}
-                      alt="Hero Preview"
-                      className="w-full h-32 object-cover rounded-lg border-2 border-green-400/30"
-                    />
+                {formData.video_url && (
+                  <div className="mt-2 p-3 rounded-xl" style={{
+                    background: 'rgba(139, 195, 74, 0.1)',
+                    border: '1px solid rgba(139, 195, 74, 0.3)'
+                  }}>
+                    {formData.video_url.includes('supabase') ? (
+                      <div className="flex items-center gap-2 text-sm text-green-400">
+                        <span>✓</span>
+                        <span>فيديو محمّل - سيتم التشغيل مباشرة داخل التطبيق</span>
+                      </div>
+                    ) : (
+                      <div className="text-xs text-white/60">
+                        رابط: {formData.video_url.substring(0, 50)}...
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
 
               <div>
                 <label className="block text-sm font-semibold text-white/80 mb-2">
-                  عنوان زر الفيديو
-                  <span className="text-xs text-white/60 block mt-1">النص الذي سيظهر على زر الفيديو تحت الصورة</span>
+                  رابط موقع المزرعة (Google Earth / Google Maps)
+                  <span className="text-xs text-white/50 block mt-0.5">للمستثمرين لمشاهدة الموقع على الخريطة</span>
                 </label>
                 <input
-                  type="text"
-                  value={formData.video_title}
-                  onChange={(e) => setFormData({ ...formData, video_title: e.target.value })}
+                  type="url"
+                  value={formData.map_url}
+                  onChange={(e) => setFormData({ ...formData, map_url: e.target.value })}
                   className="w-full px-4 py-3 rounded-xl text-right"
                   style={{
                     background: 'rgba(255, 255, 255, 0.05)',
                     border: '2px solid rgba(255, 255, 255, 0.1)',
                     color: 'white'
                   }}
-                  placeholder="مثال: شاهد جولة المزرعة"
+                  placeholder="https://earth.google.com/... أو https://maps.google.com/..."
                 />
               </div>
             </div>
@@ -716,18 +708,26 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
             <div
               className="rounded-2xl p-6 space-y-4"
               style={{
-                background: 'linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-                border: '2px solid rgba(255, 255, 255, 0.1)'
+                background: 'linear-gradient(145deg, rgba(255, 152, 0, 0.08), rgba(245, 124, 0, 0.05))',
+                border: '2px solid rgba(255, 152, 0, 0.2)'
               }}
             >
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
-                <h2 className="text-xl font-bold text-white">
-                  3️⃣ أنواع الأشجار
-                </h2>
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-orange-400/20">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">🌳</span>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">
+                      3️⃣ الأشجار (هيكل منطقي)
+                    </h2>
+                    <p className="text-xs text-white/60 mt-0.5">
+                      أنواع الأشجار + العدد + السعر الفعلي + رسوم التشغيل (للعرض فقط)
+                    </p>
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={addTreeType}
-                  className="px-4 py-2 rounded-xl font-bold text-white transition-all duration-300 flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl font-bold text-white transition-all duration-300 flex items-center gap-2 hover:shadow-lg"
                   style={{
                     background: 'linear-gradient(145deg, #3AA17E, #2D8B6A)'
                   }}
@@ -824,7 +824,7 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
                   <div className="grid grid-cols-4 gap-3">
                     <div>
                       <label className="block text-xs font-semibold text-white/60 mb-1">
-                        السعر الأساسي (ريال) *
+                        السعر الفعلي للإدارة (ريال) *
                       </label>
                       <input
                         type="number"
@@ -836,12 +836,13 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
                           border: '1px solid rgba(255, 255, 255, 0.1)',
                           color: 'white'
                         }}
+                        placeholder="مثال: 200"
                       />
                     </div>
 
                     <div>
                       <label className="block text-xs font-semibold text-white/60 mb-1">
-                        رسوم التشغيل والصيانة السنوية (ريال) *
+                        رسوم التشغيل (ريال/سنة) - للعرض فقط
                       </label>
                       <input
                         type="number"
@@ -932,18 +933,26 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
             <div
               className="rounded-2xl p-6 space-y-4"
               style={{
-                background: 'linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-                border: '2px solid rgba(255, 255, 255, 0.1)'
+                background: 'linear-gradient(145deg, rgba(156, 39, 176, 0.08), rgba(123, 31, 162, 0.05))',
+                border: '2px solid rgba(156, 39, 176, 0.2)'
               }}
             >
-              <div className="flex items-center justify-between mb-4 pb-3 border-b border-white/10">
-                <h2 className="text-xl font-bold text-white">
-                  4️⃣ العقود / مدد الإيجار
-                </h2>
+              <div className="flex items-center justify-between mb-4 pb-3 border-b border-purple-400/20">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">📜</span>
+                  <div>
+                    <h2 className="text-xl font-bold text-white">
+                      4️⃣ العقود (الأهم - أساس التسعير)
+                    </h2>
+                    <p className="text-xs text-white/60 mt-0.5">
+                      كل عقد = مدة مدفوعة + سعر ثابت للشجرة + سنوات مجانية اختيارية
+                    </p>
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={addContract}
-                  className="px-4 py-2 rounded-xl font-bold text-white transition-all duration-300 flex items-center gap-2"
+                  className="px-4 py-2.5 rounded-xl font-bold text-white transition-all duration-300 flex items-center gap-2 hover:shadow-lg"
                   style={{
                     background: 'linear-gradient(145deg, #3AA17E, #2D8B6A)'
                   }}
@@ -1127,146 +1136,6 @@ export default function CreateEditFarm({ farmId, onClose }: CreateEditFarmProps)
                   لم يتم إضافة عقود بعد
                 </div>
               )}
-            </div>
-
-            <div
-              className="rounded-2xl p-6 space-y-5"
-              style={{
-                background: 'linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))',
-                border: '2px solid rgba(255, 255, 255, 0.1)'
-              }}
-            >
-              <h2 className="text-xl font-bold text-white mb-4 pb-3 border-b border-white/10">
-                5️⃣ صفحة المزرعة
-              </h2>
-
-              <div>
-                <label className="block text-sm font-semibold text-white/80 mb-2">
-                  الوصف التفصيلي *
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  required
-                  rows={4}
-                  className="w-full px-4 py-3 rounded-xl text-right"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '2px solid rgba(255, 255, 255, 0.1)',
-                    color: 'white'
-                  }}
-                  placeholder="وصف تفصيلي للمزرعة..."
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-white/80 mb-2">
-                    فيديو المزرعة
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <input
-                        type="file"
-                        ref={videoFileInputRef}
-                        onChange={handleVideoUpload}
-                        accept="video/mp4,video/quicktime,video/webm"
-                        className="hidden"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => videoFileInputRef.current?.click()}
-                        disabled={uploadingVideo}
-                        className="w-full px-4 py-3 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-2"
-                        style={{
-                          background: uploadingVideo ? 'rgba(158, 158, 158, 0.2)' : 'rgba(139, 116, 71, 0.2)',
-                          border: '2px solid rgba(139, 116, 71, 0.5)',
-                          color: '#8B7447'
-                        }}
-                      >
-                        {uploadingVideo ? (
-                          <>
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-amber-500"></div>
-                            <span className="text-xs">جاري الرفع...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Upload className="w-5 h-5" />
-                            <span className="text-xs">رفع فيديو</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                    <div>
-                      <input
-                        type="url"
-                        value={formData.video_url}
-                        onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl text-right"
-                        style={{
-                          background: 'rgba(255, 255, 255, 0.05)',
-                          border: '2px solid rgba(255, 255, 255, 0.1)',
-                          color: 'white'
-                        }}
-                        placeholder="أو رابط YouTube"
-                      />
-                    </div>
-                  </div>
-                  {formData.video_url && (
-                    <div className="mt-2 p-3 rounded-xl" style={{
-                      background: 'rgba(139, 116, 71, 0.1)',
-                      border: '1px solid rgba(139, 116, 71, 0.3)'
-                    }}>
-                      {formData.video_url.includes('supabase') ? (
-                        <div className="flex items-center gap-2 text-sm text-green-400">
-                          <span>✓</span>
-                          <span>فيديو محمّل - سيتم التشغيل مباشرة داخل التطبيق</span>
-                        </div>
-                      ) : (
-                        <div className="text-xs text-white/60">
-                          رابط: {formData.video_url.substring(0, 50)}...
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-white/80 mb-2">
-                    رابط موقع المزرعة (Google Earth / Maps)
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.map_url}
-                    onChange={(e) => setFormData({ ...formData, map_url: e.target.value })}
-                    className="w-full px-4 py-3 rounded-xl text-right"
-                    style={{
-                      background: 'rgba(255, 255, 255, 0.05)',
-                      border: '2px solid rgba(255, 255, 255, 0.1)',
-                      color: 'white'
-                    }}
-                    placeholder="https://earth.google.com/..."
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-white/80 mb-2">
-                  ترتيب العرض
-                </label>
-                <input
-                  type="number"
-                  value={formData.order_index}
-                  onChange={(e) => setFormData({ ...formData, order_index: parseInt(e.target.value) || 0 })}
-                  min="0"
-                  className="w-full px-4 py-3 rounded-xl text-right"
-                  style={{
-                    background: 'rgba(255, 255, 255, 0.05)',
-                    border: '2px solid rgba(255, 255, 255, 0.1)',
-                    color: 'white'
-                  }}
-                />
-              </div>
             </div>
 
             <div className="flex items-center gap-4">
