@@ -1,13 +1,62 @@
-import { X, Sprout, Mail } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Sprout, MapPin, ArrowLeft } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import FarmDetails from './harvest/FarmDetails';
 
 interface MyHarvestProps {
   isOpen: boolean;
   onClose: () => void;
-  onOpenAuth?: (mode: 'signup' | 'login') => void;
+}
+
+interface Farm {
+  id: string;
+  name_ar: string;
+  name_en: string;
+  location: string;
+  total_area: number;
+  status: string;
 }
 
 export default function MyHarvest({ isOpen, onClose }: MyHarvestProps) {
+  const [farms, setFarms] = useState<Farm[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      loadCompletedFarms();
+    }
+  }, [isOpen]);
+
+  async function loadCompletedFarms() {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('farms')
+        .select('*')
+        .eq('status', 'completed')
+        .order('name_ar');
+
+      if (error) throw error;
+      setFarms(data || []);
+    } catch (error) {
+      console.error('Error loading farms:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   if (!isOpen) return null;
+
+  if (selectedFarm) {
+    return (
+      <FarmDetails
+        farm={selectedFarm}
+        onBack={() => setSelectedFarm(null)}
+        onClose={onClose}
+      />
+    );
+  }
 
   return (
     <>
@@ -46,14 +95,50 @@ export default function MyHarvest({ isOpen, onClose }: MyHarvestProps) {
           </button>
         </div>
 
-        <div className="px-6 py-8 space-y-6">
-          <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-2xl p-8 text-center border-2 border-amber-200">
-            <Mail className="w-16 h-16 text-amber-600 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-800 mb-3">خدمة التسجيل غير متاحة حالياً</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              للاستفسارات عن المحصول والحجوزات، يرجى التواصل معنا عبر قنواتنا الرسمية
-            </p>
-          </div>
+        <div className="px-6 py-6 overflow-y-auto max-h-[calc(90vh-100px)]">
+          {loading ? (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
+              <p className="mt-4 text-gray-600">جاري التحميل...</p>
+            </div>
+          ) : farms.length === 0 ? (
+            <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-8 text-center">
+              <MapPin className="w-16 h-16 text-amber-600 mx-auto mb-4" />
+              <h3 className="text-xl font-bold text-gray-800 mb-3">لا توجد مزارع مكتملة</h3>
+              <p className="text-sm text-gray-600 leading-relaxed">
+                لم يتم العثور على مزارع مكتملة حالياً
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {farms.map((farm) => (
+                <button
+                  key={farm.id}
+                  onClick={() => setSelectedFarm(farm)}
+                  className="w-full p-6 bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-200 rounded-2xl hover:border-green-400 transition-all duration-200 text-right group"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-700 transition-colors">
+                        {farm.name_ar}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-3">{farm.name_en}</p>
+                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          <span>{farm.location}</span>
+                        </div>
+                        <span>المساحة: {farm.total_area} دونم</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-green-600 text-white group-hover:bg-green-700 transition-colors">
+                      <ArrowLeft className="w-5 h-5" />
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
