@@ -8,7 +8,7 @@ import HowToStart from './components/HowToStart';
 import SmartAssistant from './components/SmartAssistant';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
-import MyHarvestComingSoon from './components/MyHarvestComingSoon';
+import MyHarvestIntro from './components/MyHarvestIntro';
 import InvestorAccount from './components/InvestorAccount';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
@@ -18,10 +18,12 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
 import { useAdmin } from './contexts/AdminContext';
+import { useAuth } from './contexts/AuthContext';
 import { initializeSupabase } from './lib/supabase';
 
 function App() {
   const { isAdminAuthenticated, isLoading: isAdminLoading, checkAdminSession } = useAdmin();
+  const { user, loading: authLoading } = useAuth();
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
@@ -828,7 +830,13 @@ function App() {
           </button>
 
           <button
-            onClick={() => setShowMyHarvest(true)}
+            onClick={() => {
+              if (user) {
+                setShowMyReservations(true);
+              } else {
+                setShowMyHarvest(true);
+              }
+            }}
             className="flex items-center gap-3 px-8 py-3 rounded-2xl transition-all hover:scale-105"
             style={{
               background: 'linear-gradient(145deg, #F4E4B8 0%, #D4AF37 50%, #B8942F 100%)',
@@ -923,7 +931,13 @@ function App() {
 
           {/* زر محصولي - الزر الرئيسي المميز */}
           <button
-            onClick={() => setShowMyHarvest(true)}
+            onClick={() => {
+              if (user) {
+                setShowMyReservations(true);
+              } else {
+                setShowMyHarvest(true);
+              }
+            }}
             className="flex flex-col items-center justify-center gap-1 relative -mt-4"
           >
             <div
@@ -996,9 +1010,10 @@ function App() {
         onOpenReservations={() => setShowMyReservations(true)}
       />
 
-      <MyHarvestComingSoon
+      <MyHarvestIntro
         isOpen={showMyHarvest}
         onClose={() => setShowMyHarvest(false)}
+        onOpenAuth={() => setShowAuthForm(true)}
       />
 
       <AuthForm
