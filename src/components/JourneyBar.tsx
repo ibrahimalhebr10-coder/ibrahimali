@@ -1,6 +1,6 @@
-import { Check, Sprout, FileText, CreditCard, Play } from 'lucide-react';
+import { Check, Sprout, FileText, CheckCircle2, CreditCard, Clock } from 'lucide-react';
 
-type JourneyStep = 'selection' | 'reservation' | 'payment' | 'operation';
+type JourneyStep = 'selection' | 'reservation' | 'approval' | 'payment';
 
 interface JourneyBarProps {
   currentStep: JourneyStep;
@@ -8,9 +8,9 @@ interface JourneyBarProps {
 
 const steps = [
   { id: 'selection', icon: Sprout, label: 'اختيار المزرعة' },
-  { id: 'reservation', icon: FileText, label: 'الحجز' },
-  { id: 'payment', icon: CreditCard, label: 'السداد' },
-  { id: 'operation', icon: Play, label: 'التشغيل' }
+  { id: 'reservation', icon: FileText, label: 'حجز الأشجار' },
+  { id: 'approval', icon: CheckCircle2, label: 'اعتماد الحجز' },
+  { id: 'payment', icon: CreditCard, label: 'السداد' }
 ] as const;
 
 export default function JourneyBar({ currentStep }: JourneyBarProps) {
@@ -33,17 +33,18 @@ export default function JourneyBar({ currentStep }: JourneyBarProps) {
                     className={`
                       w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 border-2 sm:border-3
                       ${isCompleted ? 'bg-emerald-500 border-emerald-600 scale-100' : ''}
-                      ${isCurrent ? 'bg-gradient-to-br from-sky-500 to-cyan-500 border-sky-600 scale-105 sm:scale-110 shadow-md' : ''}
+                      ${isCurrent ? 'bg-gradient-to-br from-amber-400 to-yellow-500 border-amber-500 scale-105 sm:scale-110 shadow-md animate-pulse' : ''}
                       ${isFuture ? 'bg-gray-100 border-gray-200 scale-90 sm:scale-95' : ''}
                     `}
                   >
                     {isCompleted ? (
                       <Check className="w-5 h-5 sm:w-6 sm:h-6 text-white stroke-[2.5]" />
+                    ) : isCurrent ? (
+                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     ) : (
                       <StepIcon
                         className={`
                           w-4 h-4 sm:w-5 sm:h-5 transition-all
-                          ${isCurrent ? 'text-white' : ''}
                           ${isFuture ? 'text-gray-400' : ''}
                         `}
                       />
@@ -54,7 +55,7 @@ export default function JourneyBar({ currentStep }: JourneyBarProps) {
                     className={`
                       mt-2 sm:mt-3 text-xs sm:text-sm font-semibold text-center whitespace-nowrap transition-all
                       ${isCompleted ? 'text-emerald-700' : ''}
-                      ${isCurrent ? 'text-sky-700' : ''}
+                      ${isCurrent ? 'text-amber-700' : ''}
                       ${isFuture ? 'text-gray-400' : ''}
                     `}
                   >
@@ -87,16 +88,16 @@ export function getJourneyStep(status: string): JourneyStep {
       return 'selection';
 
     case 'pending':
-    case 'cancelled':
-      return 'reservation';
+      return 'approval';
 
     case 'waiting_for_payment':
     case 'payment_submitted':
-      return 'payment';
-
     case 'paid':
     case 'transferred_to_harvest':
-      return 'operation';
+      return 'payment';
+
+    case 'cancelled':
+      return 'reservation';
 
     default:
       return 'selection';
