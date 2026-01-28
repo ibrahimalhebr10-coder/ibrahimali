@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { MessageSquare, Send, Users, Bell, Filter, Search, Mail, Phone, FileText, List } from 'lucide-react';
+import { MessageSquare, Send, Users, Bell, Filter, Search, Mail, Phone, FileText, List, Settings } from 'lucide-react';
 import MessageTemplates from './MessageTemplates';
 import MessagesLog from './MessagesLog';
+import ChannelsSettings from './ChannelsSettings';
 
 export default function MessagesCenter() {
-  const [activeTab, setActiveTab] = useState<'inbox' | 'sent' | 'compose' | 'templates' | 'log'>('inbox');
+  const [activeTab, setActiveTab] = useState<'inbox' | 'sent' | 'compose' | 'templates' | 'log' | 'channels'>('inbox');
 
   return (
     <div className="p-6">
@@ -138,6 +139,19 @@ export default function MessagesCenter() {
               سجل الرسائل
             </button>
             <button
+              onClick={() => setActiveTab('channels')}
+              className="flex-1 px-4 py-3 rounded-lg transition-all duration-300 font-semibold flex items-center justify-center gap-2"
+              style={{
+                background: activeTab === 'channels'
+                  ? 'linear-gradient(145deg, #3AA17E, #2D8B6A)'
+                  : 'transparent',
+                color: activeTab === 'channels' ? '#FFFFFF' : '#9CA3AF'
+              }}
+            >
+              <Settings className="w-5 h-5" />
+              القنوات
+            </button>
+            <button
               onClick={() => setActiveTab('compose')}
               className="flex-1 px-4 py-3 rounded-lg transition-all duration-300 font-semibold"
               style={{
@@ -156,6 +170,8 @@ export default function MessagesCenter() {
           <MessageTemplates />
         ) : activeTab === 'log' ? (
           <MessagesLog />
+        ) : activeTab === 'channels' ? (
+          <ChannelsSettings />
         ) : (
           <div
             className="p-6 rounded-2xl"
@@ -293,7 +309,7 @@ export default function MessagesCenter() {
           </div>
         )}
 
-        {activeTab !== 'templates' && activeTab !== 'log' && (
+        {activeTab !== 'templates' && activeTab !== 'log' && activeTab !== 'channels' && (
           <div className="mt-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
           <div className="flex items-start gap-3">
             <Bell className="w-5 h-5 text-blue-400 mt-0.5" />
