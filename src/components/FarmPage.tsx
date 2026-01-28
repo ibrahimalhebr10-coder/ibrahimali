@@ -285,7 +285,7 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
 
                         <button
                           onClick={() => setSelectedContract(contract)}
-                          className={`w-full aspect-[3/4] rounded-xl sm:rounded-2xl flex flex-col items-center justify-center transition-all duration-300 active:scale-95 p-2.5 sm:p-3 relative ${
+                          className={`w-full aspect-[3/4] rounded-xl sm:rounded-2xl flex flex-col transition-all duration-300 active:scale-95 overflow-hidden relative ${
                             isSelected
                               ? 'bg-gradient-to-br from-green-500 to-green-600 shadow-xl shadow-green-300/50'
                               : isRecommended
@@ -294,61 +294,63 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
                           }`}
                         >
                           {isSelected && (
-                            <div className="absolute top-1.5 right-1.5">
+                            <div className="absolute top-1.5 right-1.5 z-10">
                               <div className="w-5 h-5 sm:w-6 sm:h-6 bg-white rounded-full flex items-center justify-center shadow-md">
                                 <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-600" />
                               </div>
                             </div>
                           )}
 
-                          <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2 w-full h-full">
-                            <div className="text-center">
-                              <p className={`text-3xl sm:text-4xl font-black ${isSelected || isRecommended ? 'text-white' : 'text-green-700'}`}>
-                                {contract.duration_years}
-                              </p>
-                              <p className={`text-[10px] sm:text-xs font-bold mt-0.5 ${isSelected || isRecommended ? 'text-white/90' : 'text-gray-600'}`}>
-                                {contract.duration_years === 1 ? 'سنة' : 'سنوات'}
-                              </p>
-                            </div>
+                          {/* القسم العلوي: مدة العقد */}
+                          <div className="flex-1 flex flex-col items-center justify-center py-2 sm:py-3">
+                            <p className={`text-4xl sm:text-5xl font-black leading-none ${isSelected || isRecommended ? 'text-white' : 'text-green-700'}`}>
+                              {contract.duration_years}
+                            </p>
+                            <p className={`text-xs sm:text-sm font-bold mt-1 ${isSelected || isRecommended ? 'text-white/90' : 'text-gray-600'}`}>
+                              {contract.duration_years === 1 ? 'سنة' : 'سنوات'}
+                            </p>
+                          </div>
 
-                            {contract.bonus_years > 0 && (
+                          {/* فاصل */}
+                          <div className={`w-full h-[1.5px] ${isSelected || isRecommended ? 'bg-white/30' : 'bg-gray-200'}`} />
+
+                          {/* القسم الأوسط: السنوات المجانية */}
+                          <div className={`flex-1 flex flex-col items-center justify-center py-2 sm:py-3 ${
+                            !isSelected && !isRecommended && contract.bonus_years > 0 ? 'bg-gradient-to-br from-emerald-50 to-green-50' : ''
+                          }`}>
+                            {contract.bonus_years > 0 ? (
                               <>
-                                <div className={`w-8 sm:w-10 h-px ${isSelected || isRecommended ? 'bg-white/30' : 'bg-gray-300'}`} />
-                                <div className={`px-2 sm:px-2.5 py-1 rounded-lg ${
-                                  isSelected || isRecommended
-                                    ? 'bg-white/20 border border-white/40'
-                                    : 'bg-gradient-to-br from-emerald-500 to-green-600'
-                                }`}>
-                                  <div className="flex items-center gap-1">
-                                    <Gift className={`w-3 h-3 sm:w-3.5 sm:h-3.5 ${isSelected || isRecommended ? 'text-white' : 'text-white'}`} />
-                                    <span className={`text-[10px] sm:text-xs font-bold whitespace-nowrap ${isSelected || isRecommended ? 'text-white' : 'text-white'}`}>
-                                      +{contract.bonus_years} {contract.bonus_years === 1 ? 'سنة' : 'سنوات'} مجاناً
-                                    </span>
-                                  </div>
+                                <div className="flex items-center gap-1 mb-0.5">
+                                  <Gift className={`w-4 h-4 sm:w-5 sm:h-5 ${isSelected || isRecommended ? 'text-white' : 'text-emerald-600'}`} />
+                                  <p className={`text-2xl sm:text-3xl font-black leading-none ${isSelected || isRecommended ? 'text-white' : 'text-emerald-600'}`}>
+                                    +{contract.bonus_years}
+                                  </p>
                                 </div>
+                                <p className={`text-[10px] sm:text-xs font-bold ${isSelected || isRecommended ? 'text-white/90' : 'text-emerald-700'}`}>
+                                  {contract.bonus_years === 1 ? 'سنة' : 'سنوات'} مجاناً
+                                </p>
                               </>
+                            ) : (
+                              <div className="flex items-center gap-1">
+                                <Award className={`w-5 h-5 sm:w-6 sm:h-6 ${isSelected || isRecommended ? 'text-white/40' : 'text-gray-300'}`} />
+                              </div>
                             )}
+                          </div>
 
-                            <div className={`w-full h-px ${isSelected || isRecommended ? 'bg-white/30' : 'bg-gray-300'} my-0.5`} />
+                          {/* فاصل */}
+                          <div className={`w-full h-[1.5px] ${isSelected || isRecommended ? 'bg-white/30' : 'bg-gray-200'}`} />
 
-                            <div className="text-center">
-                              <p className={`text-base sm:text-lg font-black ${isSelected || isRecommended ? 'text-white' : 'text-green-700'}`}>
-                                {contract.investor_price}
-                              </p>
-                              <p className={`text-[9px] sm:text-[10px] font-bold ${isSelected || isRecommended ? 'text-white/80' : 'text-gray-500'}`}>
-                                ريال/شجرة
-                              </p>
-                            </div>
+                          {/* القسم السفلي: السعر */}
+                          <div className="flex-1 flex flex-col items-center justify-center py-2 sm:py-3">
+                            <p className={`text-xl sm:text-2xl font-black leading-none ${isSelected || isRecommended ? 'text-white' : 'text-green-700'}`}>
+                              {contract.investor_price}
+                            </p>
+                            <p className={`text-[10px] sm:text-xs font-bold mt-1 ${isSelected || isRecommended ? 'text-white/80' : 'text-gray-500'}`}>
+                              ريال/شجرة
+                            </p>
                           </div>
                         </button>
 
-                        {isSelected && totalYears > contract.duration_years && (
-                          <div className="mt-1.5 sm:mt-2 text-center">
-                            <p className="text-[10px] sm:text-xs font-bold text-green-700">
-                              = {totalYears} {totalYears === 1 ? 'سنة' : 'سنوات'} إجمالي
-                            </p>
-                          </div>
-                        )}
                       </div>
                     </div>
                   );
