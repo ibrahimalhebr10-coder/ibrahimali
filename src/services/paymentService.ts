@@ -400,5 +400,26 @@ export const paymentService = {
 
     if (error) throw error;
     return data as PaymentReceipt;
+  },
+
+  async getAllReceipts(): Promise<PaymentReceipt[]> {
+    const { data, error } = await supabase
+      .from('payment_receipts')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as PaymentReceipt[];
+  },
+
+  async getReceiptsByStatus(status: 'pending' | 'approved' | 'rejected'): Promise<PaymentReceipt[]> {
+    const { data, error } = await supabase
+      .from('payment_receipts')
+      .select('*')
+      .eq('status', status)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as PaymentReceipt[];
   }
 };

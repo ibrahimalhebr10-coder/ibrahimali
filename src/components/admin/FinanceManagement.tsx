@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, DollarSign, AlertCircle, Loader2, TrendingUp } from 'lucide-react';
+import { ArrowRight, DollarSign, AlertCircle, Loader2, TrendingUp, FileText, Building2 } from 'lucide-react';
 import { paymentService, Payment } from '../../services/paymentService';
 import FarmFinanceCard from './FarmFinanceCard';
 import FarmFinanceDetails from './FarmFinanceDetails';
 import Breadcrumb from './Breadcrumb';
+import PaymentReceiptsManagement from './PaymentReceiptsManagement';
 
 interface FarmFinanceStats {
   farmId: number;
@@ -31,6 +32,7 @@ export default function FinanceManagement({ onBack }: FinanceManagementProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedFarmId, setSelectedFarmId] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState<'farms' | 'receipts'>('receipts');
 
   useEffect(() => {
     loadFarmsFinanceStats();
@@ -147,12 +149,45 @@ export default function FinanceManagement({ onBack }: FinanceManagementProps) {
 
         <div className="mt-4">
           <h1 className="text-3xl font-black text-gray-900">القسم المالي</h1>
-          <p className="text-gray-600 mt-1">إدارة العمليات المالية حسب المزارع</p>
+          <p className="text-gray-600 mt-1">إدارة العمليات المالية والإيصالات</p>
+        </div>
+      </div>
+
+      <div className="border-b-2 border-gray-200 bg-white px-6">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveTab('receipts')}
+            className={`px-6 py-3 font-bold transition-all border-b-4 ${
+              activeTab === 'receipts'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              <span>الإيصالات</span>
+            </div>
+          </button>
+          <button
+            onClick={() => setActiveTab('farms')}
+            className={`px-6 py-3 font-bold transition-all border-b-4 ${
+              activeTab === 'farms'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              <Building2 className="w-5 h-5" />
+              <span>المزارع</span>
+            </div>
+          </button>
         </div>
       </div>
 
       <div className="p-6">
-        {loading ? (
+        {activeTab === 'receipts' ? (
+          <PaymentReceiptsManagement />
+        ) : loading ? (
           <div className="flex flex-col items-center justify-center py-20 gap-4">
             <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
             <p className="text-gray-600 font-semibold">جاري تحميل الإحصائيات المالية...</p>
