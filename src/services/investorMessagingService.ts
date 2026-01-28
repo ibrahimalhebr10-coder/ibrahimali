@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { messagingEngine, ChannelType } from './messagingEngineService';
 
 export interface InvestorMessage {
   id: string;
@@ -45,6 +46,7 @@ export interface CreateMessageData {
   content: string;
   summary_data?: Record<string, any>;
   image_urls?: string[];
+  preferred_channel?: ChannelType;
 }
 
 export const investorMessagingService = {
@@ -178,7 +180,18 @@ export const investorMessagingService = {
       throw recipientsError;
     }
 
+    const preferredChannel = messageData.preferred_channel || 'internal';
+
     for (const investor of investors) {
+      await messagingEngine.send({
+        recipient_id: investor.investor_id,
+        recipient_phone: investor.email,
+        subject: messageData.title,
+        content: `تحديث جديد من مزرعتك: ${messageData.title}\n\n${messageData.content}`,
+        preferred_channel: preferredChannel,
+        farm_id: messageData.farm_id
+      });
+
       await supabase.from('notifications').insert({
         user_id: investor.investor_id,
         type: 'farm_update',

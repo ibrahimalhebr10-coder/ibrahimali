@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Send, Image as ImageIcon, Users, CheckCircle, AlertCircle, TrendingUp, Activity } from 'lucide-react';
+import { ArrowRight, Send, Image as ImageIcon, Users, CheckCircle, AlertCircle, TrendingUp, Activity, MessageSquare, MessageCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { investorMessagingService } from '../../services/investorMessagingService';
+import { useChannelStatus } from '../../hooks/useChannelStatus';
+import { ChannelType } from '../../services/messagingEngineService';
 
 interface Farm {
   id: string;
@@ -25,6 +27,8 @@ export default function CreateInvestorMessage({ farm, onBack, onMessageSent }: P
   const [sending, setSending] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [selectedChannel, setSelectedChannel] = useState<ChannelType>('internal');
+  const { status: channelStatus } = useChannelStatus();
 
   useEffect(() => {
     loadFarmSummary();
@@ -117,7 +121,8 @@ export default function CreateInvestorMessage({ farm, onBack, onMessageSent }: P
           farm_id: farm.id,
           title: title.trim(),
           content: content.trim(),
-          summary_data: summary
+          summary_data: summary,
+          preferred_channel: selectedChannel
         },
         admin.id
       );
@@ -241,6 +246,92 @@ export default function CreateInvestorMessage({ farm, onBack, onMessageSent }: P
             placeholder="مثال: تحديث شهري - تقدم ممتاز في أعمال الزراعة"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
           />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-3">
+            قناة الإرسال
+          </label>
+          <div className="grid grid-cols-1 gap-3">
+            <button
+              type="button"
+              onClick={() => setSelectedChannel('internal')}
+              className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                selectedChannel === 'internal'
+                  ? 'border-green-600 bg-green-50'
+                  : 'border-gray-200 bg-white hover:border-gray-300'
+              }`}
+            >
+              <MessageSquare className={`w-5 h-5 ${selectedChannel === 'internal' ? 'text-green-600' : 'text-gray-400'}`} />
+              <div className="flex-1 text-right">
+                <p className={`font-medium ${selectedChannel === 'internal' ? 'text-green-900' : 'text-gray-700'}`}>
+                  الرسائل الداخلية
+                </p>
+                <p className="text-sm text-gray-500">
+                  إشعار داخل المنصة فقط
+                </p>
+              </div>
+              {selectedChannel === 'internal' && (
+                <CheckCircle className="w-5 h-5 text-green-600" />
+              )}
+            </button>
+
+            {channelStatus?.sms?.available && (
+              <button
+                type="button"
+                onClick={() => setSelectedChannel('sms')}
+                className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                  selectedChannel === 'sms'
+                    ? 'border-blue-600 bg-blue-50'
+                    : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
+              >
+                <MessageCircle className={`w-5 h-5 ${selectedChannel === 'sms' ? 'text-blue-600' : 'text-gray-400'}`} />
+                <div className="flex-1 text-right">
+                  <p className={`font-medium ${selectedChannel === 'sms' ? 'text-blue-900' : 'text-gray-700'}`}>
+                    رسالة نصية SMS
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    إشعار فوري عبر الجوال + إشعار داخلي
+                  </p>
+                </div>
+                {selectedChannel === 'sms' && (
+                  <CheckCircle className="w-5 h-5 text-blue-600" />
+                )}
+              </button>
+            )}
+
+            {channelStatus?.whatsapp_business?.available && (
+              <button
+                type="button"
+                onClick={() => setSelectedChannel('whatsapp_business')}
+                className={`flex items-center gap-3 p-4 rounded-lg border-2 transition-all ${
+                  selectedChannel === 'whatsapp_business'
+                    ? 'border-emerald-600 bg-emerald-50'
+                    : 'border-gray-200 bg-white hover:border-gray-300'
+                }`}
+              >
+                <MessageCircle className={`w-5 h-5 ${selectedChannel === 'whatsapp_business' ? 'text-emerald-600' : 'text-gray-400'}`} />
+                <div className="flex-1 text-right">
+                  <p className={`font-medium ${selectedChannel === 'whatsapp_business' ? 'text-emerald-900' : 'text-gray-700'}`}>
+                    واتساب WhatsApp
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    رسالة واتساب تفاعلية + إشعار داخلي
+                  </p>
+                </div>
+                {selectedChannel === 'whatsapp_business' && (
+                  <CheckCircle className="w-5 h-5 text-emerald-600" />
+                )}
+              </button>
+            )}
+          </div>
+          {selectedChannel !== 'internal' && (
+            <p className="mt-2 text-xs text-amber-600 flex items-center gap-1">
+              <AlertCircle className="w-3.5 h-3.5" />
+              سيتم الإرسال عبر {selectedChannel === 'sms' ? 'SMS' : 'WhatsApp'} مع نسخة احتياطية داخلية
+            </p>
+          )}
         </div>
 
         <div>
