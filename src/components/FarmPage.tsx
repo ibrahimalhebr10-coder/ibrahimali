@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Play, TreePine, Plus, Minus, CheckCircle2, Gift, Award, Sparkles, ChevronLeft, ChevronRight, MapPin, Calendar } from 'lucide-react';
+import { X, Play, TreePine, Plus, Minus, CheckCircle2, Gift, Award, Sparkles, MapPin } from 'lucide-react';
 import { farmService, type FarmProject, type TreeVariety, type FarmContract } from '../services/farmService';
 import PreAuthReservation from './PreAuthReservation';
 
@@ -119,16 +119,6 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
     setShowPreAuthReservation(true);
   };
 
-  const scrollContracts = (direction: 'left' | 'right') => {
-    if (contractsScrollRef.current) {
-      const scrollAmount = 200;
-      contractsScrollRef.current.scrollBy({
-        left: direction === 'right' ? scrollAmount : -scrollAmount,
-        behavior: 'smooth'
-      });
-    }
-  };
-
   if (loading) {
     return (
       <div className="fixed inset-0 bg-gradient-to-br from-gray-50 to-green-50 z-50 flex items-center justify-center">
@@ -174,7 +164,7 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-slate-50 via-stone-50 to-neutral-50 z-50 overflow-y-auto">
-      {/* HEADER - Mobile Optimized */}
+      {/* HEADER */}
       <div className="sticky top-0 bg-white/95 backdrop-blur-xl z-20 border-b border-gray-200 shadow-sm">
         <div className="max-w-3xl mx-auto px-3 sm:px-4 py-2.5 sm:py-3 flex items-center justify-between">
           <button
@@ -223,7 +213,7 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
           </section>
         )}
 
-        {/* FARM INFO - Mobile Compact */}
+        {/* FARM INFO */}
         <section className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-200">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center flex-shrink-0 shadow-md">
@@ -242,7 +232,7 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
           )}
         </section>
 
-        {/* CONTRACT SLIDER - Mobile First Compact */}
+        {/* CONTRACT SLIDER - Compact Mobile First */}
         {farm.contracts && farm.contracts.length > 0 && (
           <section>
             <div className="text-center mb-3 sm:mb-4">
@@ -351,82 +341,105 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
           </section>
         )}
 
-        {/* TREE SELECTION - Mobile Compact */}
+        {/* TREE SELECTION - شريط حجز واضح وبارز */}
         {farm.tree_types && farm.tree_types.length > 0 && (
           <section className="space-y-3 sm:space-y-4">
             <div className="text-center">
               <div className="inline-flex items-center gap-2 bg-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-full border-2 border-green-200 shadow-sm">
                 <TreePine className="w-4 h-4 sm:w-5 sm:h-5 text-green-700" />
-                <span className="font-bold text-sm sm:text-base text-gray-900">اختر أشجارك</span>
+                <span className="font-bold text-sm sm:text-base text-gray-900">احجز أشجارك</span>
               </div>
             </div>
 
             {farm.tree_types.map((treeType) => (
-              <div key={treeType.id} className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-200">
-                <div className="flex items-center justify-between mb-3 sm:mb-4">
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md">
-                      <TreePine className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-                    </div>
-                    <div>
-                      <h4 className="text-sm sm:text-base font-bold text-gray-900">{treeType.name}</h4>
-                      <p className="text-xs text-gray-500">متاح: {treeType.varieties.reduce((sum, v) => sum + v.available, 0)} شجرة</p>
-                    </div>
-                  </div>
-                </div>
+              <div key={treeType.id} className="space-y-2.5 sm:space-y-3">
+                {treeType.varieties.map((variety) => {
+                  const selection = treeSelections[variety.id];
+                  const quantity = selection?.quantity || 0;
 
-                <div className="space-y-2 sm:space-y-3">
-                  {treeType.varieties.map((variety) => {
-                    const selection = treeSelections[variety.id];
-                    const quantity = selection?.quantity || 0;
-
-                    return (
-                      <div key={variety.id} className="flex items-center justify-between gap-3 p-2.5 sm:p-3 bg-gradient-to-br from-gray-50 to-stone-50 rounded-lg">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs sm:text-sm font-bold text-gray-900 truncate">{variety.name}</p>
-                          <p className="text-[10px] sm:text-xs text-gray-500">متاح: {variety.available}</p>
+                  return (
+                    <div
+                      key={variety.id}
+                      className="bg-white rounded-xl sm:rounded-2xl p-3 sm:p-4 shadow-sm border-2 border-gray-200 hover:border-green-300 transition-all"
+                    >
+                      {/* معلومات الشجرة */}
+                      <div className="flex items-center gap-3 mb-3 sm:mb-4">
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center shadow-md flex-shrink-0">
+                          <TreePine className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                         </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm sm:text-base font-bold text-gray-900 truncate">{variety.name}</h4>
+                          <p className="text-xs text-gray-500">{treeType.name} • متاح: {variety.available} شجرة</p>
+                        </div>
+                      </div>
 
-                        <div className="flex items-center gap-2">
+                      {/* شريط Counter - واضح وبارز */}
+                      <div className="bg-gradient-to-br from-gray-50 to-stone-50 rounded-xl p-3 sm:p-4 border border-gray-200">
+                        <div className="flex items-center justify-between gap-3 sm:gap-4">
+                          {/* زر النقصان */}
                           <button
                             onClick={() => handleTreeQuantityChange(variety, treeType.name, -1)}
                             disabled={quantity === 0}
-                            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all shadow-sm active:scale-95 ${
+                            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all shadow-md active:scale-95 ${
                               quantity === 0
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                : 'bg-white text-red-600 hover:bg-red-50 border border-red-200'
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-white text-red-600 hover:bg-red-50 border-2 border-red-300 hover:border-red-400'
                             }`}
                           >
-                            <Minus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <Minus className="w-5 h-5 sm:w-6 sm:h-6 font-bold" strokeWidth={3} />
                           </button>
 
-                          <div className="w-9 sm:w-10 text-center">
-                            <span className="text-base sm:text-lg font-black text-gray-900">{quantity}</span>
+                          {/* العدد في المنتصف - كبير وواضح */}
+                          <div className="flex-1 text-center">
+                            <div className="bg-white rounded-xl px-4 py-2 sm:py-3 border-2 border-gray-200 shadow-sm">
+                              <p className="text-2xl sm:text-3xl font-black text-gray-900">{quantity}</p>
+                              <p className="text-[10px] sm:text-xs text-gray-500 font-semibold mt-0.5">شجرة</p>
+                            </div>
                           </div>
 
+                          {/* زر الزيادة */}
                           <button
                             onClick={() => handleTreeQuantityChange(variety, treeType.name, 1)}
                             disabled={quantity >= variety.available}
-                            className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center transition-all shadow-sm active:scale-95 ${
+                            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all shadow-md active:scale-95 ${
                               quantity >= variety.available
-                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                : 'bg-gradient-to-br from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700'
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-gradient-to-br from-green-500 to-green-600 text-white hover:from-green-600 hover:to-green-700 shadow-green-300/50'
                             }`}
                           >
-                            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <Plus className="w-5 h-5 sm:w-6 sm:h-6 font-bold" strokeWidth={3} />
                           </button>
                         </div>
+
+                        {/* رسالة عند الوصول للحد الأقصى */}
+                        {quantity >= variety.available && variety.available > 0 && (
+                          <div className="mt-2 text-center">
+                            <p className="text-xs text-amber-600 font-semibold">وصلت للحد الأقصى المتاح</p>
+                          </div>
+                        )}
+
+                        {/* السعر الإجمالي لهذا النوع */}
+                        {quantity > 0 && selectedContract && (
+                          <div className="mt-3 pt-3 border-t border-gray-200">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs sm:text-sm text-gray-600 font-semibold">الإجمالي</span>
+                              <span className="text-base sm:text-lg font-black text-green-700">
+                                {(quantity * selectedContract.investor_price).toLocaleString('ar-SA')} ريال
+                              </span>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+                })}
               </div>
             ))}
           </section>
         )}
       </div>
 
-      {/* STICKY BOTTOM BAR - Mobile Optimized */}
+      {/* STICKY BOTTOM BAR */}
       {selectedContract && (
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t-2 border-gray-200 shadow-2xl z-30">
           <div className="max-w-3xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
