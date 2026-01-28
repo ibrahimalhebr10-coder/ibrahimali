@@ -103,7 +103,7 @@ class InvestorJourneyService {
           latestReceipt,
           canProceed: false,
           nextAction: 'wait_approval',
-          message: 'حجزك قيد المراجعة من قبل فريق الإدارة'
+          message: 'تم حجز مزرعتك بنجاح - أشجارك محفوظة باسمك'
         };
 
       case 'waiting_for_payment':

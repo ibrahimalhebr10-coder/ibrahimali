@@ -157,31 +157,61 @@ function NoReservationView() {
 function PendingReviewView({ reservation }: { reservation: InvestorReservation }) {
   return (
     <div className="space-y-6">
-      <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-amber-200">
+      <div className="bg-white rounded-3xl p-8 shadow-xl border-2 border-green-200">
         <div className="text-center mb-6">
-          <div className="bg-gradient-to-br from-amber-100 to-orange-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-            <Clock className="w-12 h-12 text-amber-600" />
+          <div className="bg-gradient-to-br from-green-100 to-emerald-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4">
+            <TreePine className="w-12 h-12 text-green-600" />
           </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">حجزك قيد المراجعة</h2>
-          <p className="text-gray-600 text-lg">
-            فريقنا يراجع طلبك الآن. سنرسل لك إشعاراً فور الاعتماد
+
+          <div className="inline-flex items-center gap-2 bg-amber-100 border-2 border-amber-300 text-amber-800 px-5 py-2 rounded-full text-sm font-bold mb-4">
+            <span className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+            محجوز مؤقتاً باسمك
+          </div>
+
+          <h2 className="text-3xl font-bold text-gray-900 mb-3">
+            تم حجز مزرعتك بنجاح
+          </h2>
+          <p className="text-gray-700 text-lg leading-relaxed max-w-2xl mx-auto">
+            أشجارك محفوظة باسمك، وهي الآن في انتظار اعتماد ضمّها إلى حوزتك
           </p>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-6 border-2 border-amber-200">
+        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200">
           <ReservationSummary reservation={reservation} />
         </div>
 
-        <div className="mt-6 bg-blue-50 border-2 border-blue-200 rounded-2xl p-5">
-          <div className="flex items-start gap-3">
-            <Sparkles className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
-            <div>
-              <h3 className="font-bold text-blue-900 mb-1">ماذا يحدث الآن؟</h3>
-              <p className="text-sm text-blue-800">
-                فريق المزارع يتحقق من توفر الأشجار المطلوبة ويعد حجزك. عادة ما تستغرق هذه العملية 24-48 ساعة.
-              </p>
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-5">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="font-bold text-blue-900 mb-1">أشجارك محجوزة</h3>
+                <p className="text-sm text-blue-800">
+                  تم تأمين الأشجار المطلوبة باسمك ولن تكون متاحة لأي مستثمر آخر
+                </p>
+              </div>
             </div>
           </div>
+
+          <div className="bg-purple-50 border-2 border-purple-200 rounded-2xl p-5">
+            <div className="flex items-start gap-3">
+              <Clock className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="font-bold text-purple-900 mb-1">مراجعة سريعة</h3>
+                <p className="text-sm text-purple-800">
+                  فريقنا يراجع طلبك. عادة ما تستغرق هذه العملية 24-48 ساعة
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl p-6 text-center">
+          <Sparkles className="w-8 h-8 text-green-600 mx-auto mb-3" />
+          <h3 className="font-bold text-green-900 text-lg mb-2">الخطوة التالية</h3>
+          <p className="text-sm text-green-800 leading-relaxed">
+            سنرسل لك إشعاراً فور اعتماد حجزك، وبعدها يمكنك إتمام عملية السداد لضم الأشجار رسمياً إلى حوزتك
+          </p>
         </div>
       </div>
     </div>
