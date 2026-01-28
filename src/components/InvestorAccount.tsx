@@ -125,20 +125,28 @@ export default function InvestorAccount() {
 
 function WelcomeNotification({ onClose }: { onClose: () => void }) {
   return (
-    <div className="mb-6 bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-4 shadow-sm animate-slide-down">
-      <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-          <Sprout className="w-5 h-5 text-white" />
+    <div className="mb-6 bg-gradient-to-r from-green-50 via-emerald-50 to-green-50 border-2 border-green-300 rounded-2xl p-5 shadow-lg animate-slide-down">
+      <div className="flex items-start gap-4">
+        <div className="flex-shrink-0 w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
+          <CheckCircle2 className="w-7 h-7 text-white" />
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="font-bold text-green-900 mb-1">تم حفظ حجزك بنجاح</h4>
-          <p className="text-sm text-green-800 leading-relaxed">
-            نحن نراجع الطلب حاليًا، وستصلك رسالة فور فتح السداد.
+          <h4 className="text-lg font-black text-green-900 mb-2 flex items-center gap-2">
+            تم حفظ حجز مزرعتك بنجاح
+            <Sparkles className="w-5 h-5 text-amber-500" />
+          </h4>
+          <p className="text-sm text-green-800 leading-relaxed font-medium mb-2">
+            أشجارك الآن <span className="font-bold">محفوظة باسمك</span>، وفي انتظار اعتماد ضمّها إلى حوزتك.
           </p>
+          <div className="bg-white/60 rounded-lg px-3 py-2 mt-3 border border-green-200">
+            <p className="text-xs text-green-700 leading-relaxed">
+              <span className="font-bold">حجزك محفوظ باسمك</span> - نحن نراجع الطلب، وسننتقل للخطوة التالية قريباً
+            </p>
+          </div>
         </div>
         <button
           onClick={onClose}
-          className="flex-shrink-0 w-8 h-8 rounded-full hover:bg-green-100 flex items-center justify-center transition-colors"
+          className="flex-shrink-0 w-8 h-8 rounded-full hover:bg-green-200 flex items-center justify-center transition-colors"
         >
           <X className="w-4 h-4 text-green-700" />
         </button>

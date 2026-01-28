@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Play, TreePine, Plus, Minus, CheckCircle2, Gift, Award, Sparkles, MapPin } from 'lucide-react';
+import { X, Play, TreePine, Plus, Minus, CheckCircle2, Gift, Award, Sparkles, MapPin, Sprout } from 'lucide-react';
 import { farmService, type FarmProject, type TreeVariety, type FarmContract } from '../services/farmService';
 import PreAuthReservation from './PreAuthReservation';
+import LoadingTransition from './LoadingTransition';
 
 interface FarmPageProps {
   farmId: string;
@@ -26,6 +27,8 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
   const [priceUpdateAnimation, setPriceUpdateAnimation] = useState(false);
   const [showPreAuthReservation, setShowPreAuthReservation] = useState(false);
   const [reservationData, setReservationData] = useState<any>(null);
+  const [showBookingMessage, setShowBookingMessage] = useState(false);
+  const [showLoadingTransition, setShowLoadingTransition] = useState(false);
   const contractsScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -89,34 +92,46 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
       return;
     }
 
-    const totalTrees = Object.values(treeSelections).reduce((sum, sel) => sum + sel.quantity, 0);
-    const totalCost = totalTrees * selectedContract.investor_price;
+    // عرض الرسالة الخفيفة
+    setShowBookingMessage(true);
 
-    const cart: Record<string, any> = {};
-    Object.entries(treeSelections).forEach(([varietyId, selection]) => {
-      cart[varietyId] = {
-        varietyName: selection.variety.name,
-        typeName: selection.typeName,
-        quantity: selection.quantity,
-        pricePerTree: selectedContract.investor_price
-      };
-    });
+    setTimeout(() => {
+      setShowBookingMessage(false);
+      setShowLoadingTransition(true);
 
-    const data = {
-      farmId: farm!.id,
-      farmName: farm!.name,
-      contractId: selectedContract.id,
-      contractYears: selectedContract.duration_years,
-      bonusYears: selectedContract.bonus_years,
-      totalYears: selectedContract.duration_years + selectedContract.bonus_years,
-      totalTrees,
-      totalCost,
-      pricePerTree: selectedContract.investor_price,
-      cart
-    };
+      setTimeout(() => {
+        const totalTrees = Object.values(treeSelections).reduce((sum, sel) => sum + sel.quantity, 0);
+        const totalCost = totalTrees * selectedContract.investor_price;
 
-    setReservationData(data);
-    setShowPreAuthReservation(true);
+        const cart: Record<string, any> = {};
+        Object.entries(treeSelections).forEach(([varietyId, selection]) => {
+          cart[varietyId] = {
+            varietyName: selection.variety.name,
+            typeName: selection.typeName,
+            quantity: selection.quantity,
+            pricePerTree: selectedContract.investor_price
+          };
+        });
+
+        const data = {
+          farmId: farm!.id,
+          farmName: farm!.name,
+          contractId: selectedContract.id,
+          contractYears: selectedContract.duration_years,
+          bonusYears: selectedContract.bonus_years,
+          totalYears: selectedContract.duration_years + selectedContract.bonus_years,
+          totalTrees,
+          totalCost,
+          pricePerTree: selectedContract.investor_price,
+          cart,
+          contractName: `عقد ${selectedContract.duration_years} ${selectedContract.duration_years === 1 ? 'سنة' : 'سنوات'}${selectedContract.bonus_years > 0 ? ` + ${selectedContract.bonus_years} ${selectedContract.bonus_years === 1 ? 'سنة' : 'سنوات'} هدية` : ''}`
+        };
+
+        setReservationData(data);
+        setShowLoadingTransition(false);
+        setShowPreAuthReservation(true);
+      }, 1500);
+    }, 1500);
   };
 
   if (loading) {
@@ -340,6 +355,16 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
                 })}
               </div>
             </div>
+
+            {/* رسالة تحفيزية */}
+            <div className="mt-4 text-center animate-fade-in">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-50 to-emerald-50 px-4 py-2 rounded-full border border-green-200">
+                <Sprout className="w-4 h-4 text-green-600" />
+                <p className="text-sm font-semibold text-green-700">
+                  اختر عقدك وابدأ بتأسيس مزرعتك خطوة بخطوة
+                </p>
+              </div>
+            </div>
           </section>
         )}
 
@@ -484,6 +509,26 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
         </div>
       )}
 
+      {/* BOOKING MESSAGE - رسالة خفيفة */}
+      {showBookingMessage && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[150] flex items-center justify-center animate-fade-in">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl max-w-sm mx-4 text-center animate-scale-in">
+            <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Sprout className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-black text-green-700 mb-2">خطوة جميلة!</h3>
+            <p className="text-sm text-gray-700 leading-relaxed">
+              أنت الآن تؤسس مزرعتك ونحفظ اختيارك مؤقتاً
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* LOADING TRANSITION */}
+      {showLoadingTransition && (
+        <LoadingTransition message="نجهز مزرعتك..." />
+      )}
+
       {/* VIDEO MODAL */}
       {showVideoModal && farm.video && (
         <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-3 sm:p-4">
@@ -511,6 +556,34 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
       <style>{`
         .scrollbar-hide::-webkit-scrollbar {
           display: none;
+        }
+
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes scale-in {
+          from {
+            opacity: 0;
+            transform: scale(0.9);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.4s ease-out;
+        }
+
+        .animate-scale-in {
+          animation: scale-in 0.3s ease-out;
         }
       `}</style>
     </div>

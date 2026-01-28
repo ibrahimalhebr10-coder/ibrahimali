@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Phone, Lock, Eye, EyeOff, User, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Phone, Lock, Eye, EyeOff, User, ArrowLeft, CheckCircle2, Shield } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface QuickRegistrationProps {
@@ -109,8 +109,26 @@ export default function QuickRegistration({ onSuccess, onBack }: QuickRegistrati
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-scale-in">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+      <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden animate-scale-in my-4">
+        {/* رسالة نفسية واضحة */}
+        {!isLogin && (
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 border-b-2 border-blue-200 p-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 shadow-md">
+                <Shield className="w-5 h-5 text-white" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-blue-900 leading-relaxed">
+                  <span className="font-bold">لحفظ حجز أشجارك باسمك</span>، نحتاج إنشاء حسابك أولاً.
+                  <br />
+                  <span className="text-blue-700">لا تقلق، لن نفقد أي اختيار قمت به.</span>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-6 text-white relative overflow-hidden">
           <div className="absolute inset-0 opacity-10">
             <div className="absolute top-5 right-5 w-24 h-24 bg-white rounded-full blur-2xl"></div>
