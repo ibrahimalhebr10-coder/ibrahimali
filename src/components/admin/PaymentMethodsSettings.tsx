@@ -103,7 +103,7 @@ export default function PaymentMethodsSettings() {
   }
 
   return (
-    <ActionGuard action="finance.manage_payment_methods">
+    <ActionGuard action="finance.manage_payment_methods" showFallback={true}>
     <div className="space-y-6">
       <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-100">
         <div className="flex items-center gap-3 mb-2">

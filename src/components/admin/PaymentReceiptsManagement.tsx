@@ -207,7 +207,7 @@ export default function PaymentReceiptsManagement() {
   }
 
   return (
-    <ActionGuard action="finance.review_receipts">
+    <ActionGuard action="finance.review_receipts" showFallback={true}>
     <div className="space-y-6">
       <div className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden">
         <div className="border-b-2 border-gray-200 flex">
