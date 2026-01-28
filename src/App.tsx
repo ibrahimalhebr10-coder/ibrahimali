@@ -16,7 +16,8 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
 import Header from './components/Header';
 import AuthForm from './components/AuthForm';
-import QuickRegistration from './components/QuickRegistration';
+import SmartAuthScreen from './components/SmartAuthScreen';
+import AuthSuccessTransition from './components/AuthSuccessTransition';
 import ErrorBoundary from './components/ErrorBoundary';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
@@ -47,7 +48,9 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showAuthForm, setShowAuthForm] = useState(false);
-  const [showQuickRegistration, setShowQuickRegistration] = useState(false);
+  const [showSmartAuth, setShowSmartAuth] = useState(false);
+  const [showAuthSuccessTransition, setShowAuthSuccessTransition] = useState(false);
+  const [isNewUser, setIsNewUser] = useState(true);
   const [showMyReservations, setShowMyReservations] = useState(false);
   const [showMyHarvestActive, setShowMyHarvestActive] = useState(false);
   const [harvestStatus, setHarvestStatus] = useState<HarvestStatus>({
@@ -352,16 +355,21 @@ function App() {
     setShowAdminDashboard(true);
   };
 
-  const handleQuickRegistrationSuccess = async (userId: string) => {
+  const handleSmartAuthSuccess = async (userId: string) => {
     try {
       await reservationService.savePendingReservationFromStorage(userId);
-      setShowQuickRegistration(false);
-      setShowMyReservations(true);
+      setShowSmartAuth(false);
+      setShowAuthSuccessTransition(true);
     } catch (error) {
       console.error('Error saving pending reservation:', error);
-      setShowQuickRegistration(false);
-      setShowMyReservations(true);
+      setShowSmartAuth(false);
+      setShowAuthSuccessTransition(true);
     }
+  };
+
+  const handleAuthSuccessTransitionComplete = () => {
+    setShowAuthSuccessTransition(false);
+    setShowMyReservations(true);
   };
 
   useEffect(() => {
@@ -400,7 +408,7 @@ function App() {
           if (user) {
             setShowMyReservations(true);
           } else {
-            setShowQuickRegistration(true);
+            setShowSmartAuth(true);
           }
         }}
       />
@@ -1054,14 +1062,14 @@ function App() {
       <AccountProfile
         isOpen={showAccountProfile}
         onClose={() => setShowAccountProfile(false)}
-        onOpenAuth={() => setShowAuthForm(true)}
+        onOpenAuth={() => setShowSmartAuth(true)}
         onOpenReservations={() => setShowMyReservations(true)}
       />
 
       <MyHarvestIntro
         isOpen={showMyHarvest}
         onClose={() => setShowMyHarvest(false)}
-        onOpenAuth={() => setShowAuthForm(true)}
+        onOpenAuth={() => setShowSmartAuth(true)}
       />
 
       <MyHarvestActive
@@ -1069,19 +1077,17 @@ function App() {
         onClose={() => setShowMyHarvestActive(false)}
       />
 
-      <AuthForm
-        isOpen={showAuthForm}
-        onClose={() => setShowAuthForm(false)}
-        onSuccess={() => {
-          setShowAuthForm(false);
-          setShowAccountProfile(true);
-        }}
-      />
+      {showSmartAuth && (
+        <SmartAuthScreen
+          onSuccess={handleSmartAuthSuccess}
+          onBack={() => setShowSmartAuth(false)}
+        />
+      )}
 
-      {showQuickRegistration && (
-        <QuickRegistration
-          onSuccess={handleQuickRegistrationSuccess}
-          onBack={() => setShowQuickRegistration(false)}
+      {showAuthSuccessTransition && (
+        <AuthSuccessTransition
+          onComplete={handleAuthSuccessTransitionComplete}
+          isNewUser={isNewUser}
         />
       )}
 
