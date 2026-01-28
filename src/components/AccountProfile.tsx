@@ -1,4 +1,4 @@
-import { X, User, Sprout, LogOut, CheckCircle, Clock } from 'lucide-react';
+import { X, User, Sprout, LogOut, CheckCircle, Clock, Sparkles, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import WhatsAppButton from './WhatsAppButton';
 
@@ -128,28 +128,71 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenRese
         ) : (
           <>
             <div className="text-center mb-8">
-              <div className="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                <User className="w-12 h-12 text-green-700" />
-              </div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">حسابي</h2>
-              <p className="text-gray-600">سجل دخولك للوصول إلى حسابك</p>
-            </div>
-
-            <div className="space-y-4">
-              <button
-                onClick={() => {
-                  onClose();
-                  onOpenAuth();
-                }}
-                className="w-full py-4 rounded-xl font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+              <div
+                className="w-28 h-28 rounded-full flex items-center justify-center mx-auto mb-6 relative"
                 style={{
                   background: 'linear-gradient(145deg, #3AA17E 0%, #2F5233 100%)',
-                  boxShadow: '0 4px 16px rgba(58,161,126,0.3)'
+                  boxShadow: '0 12px 24px rgba(58,161,126,0.4)'
                 }}
               >
-                تسجيل الدخول أو إنشاء حساب
-              </button>
+                <User className="w-14 h-14 text-white" />
+                <div className="absolute -top-1 -right-1 w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center animate-pulse">
+                  <Sparkles className="w-6 h-6 text-yellow-900" />
+                </div>
+              </div>
+              <h2 className="text-3xl font-bold text-darkgreen mb-3">مرحباً بك!</h2>
+              <p className="text-base text-gray-600 leading-relaxed px-4">
+                ابدأ رحلتك الاستثمارية معنا
+              </p>
             </div>
+
+            <div
+              className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 mb-6"
+              style={{
+                border: '2px solid #3AA17E'
+              }}
+            >
+              <div className="space-y-3 text-right">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-gray-700 flex-1">
+                    سجل دخولك بسهولة باستخدام رقم الجوال
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-gray-700 flex-1">
+                    احجز أشجارك في أفضل المزارع
+                  </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-gray-700 flex-1">
+                    تابع محصولك وعوائدك بكل شفافية
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                onClose();
+                onOpenAuth();
+              }}
+              className="w-full py-5 rounded-2xl font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 relative overflow-hidden group"
+              style={{
+                background: 'linear-gradient(145deg, #3AA17E 0%, #2F5233 100%)',
+                boxShadow: '0 8px 24px rgba(58,161,126,0.4)'
+              }}
+            >
+              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+              <span className="text-lg">ابدأ الآن</span>
+              <ArrowLeft className="w-6 h-6 transform group-hover:-translate-x-1 transition-transform" />
+            </button>
+
+            <p className="text-xs text-center text-gray-500 mt-4 px-4">
+              بالضغط على "ابدأ الآن" فإنك توافق على الشروط والأحكام
+            </p>
           </>
         )}
       </div>
