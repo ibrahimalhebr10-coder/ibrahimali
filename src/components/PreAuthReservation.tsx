@@ -111,7 +111,7 @@ export default function PreAuthReservation({
             <div className="bg-gradient-to-br from-green-600 via-green-500 to-emerald-600 rounded-2xl p-5 shadow-xl shadow-green-200">
               <div className="text-center">
                 <p className="text-xs font-bold text-white/80 uppercase tracking-widest mb-1">الإجمالي المطلوب</p>
-                <p className="text-4xl font-black text-white mb-1">{totalPrice.toLocaleString()}</p>
+                <p className="text-4xl font-black text-white mb-1">{(totalPrice || 0).toLocaleString()}</p>
                 <p className="text-sm font-bold text-white/90">ريال سعودي</p>
               </div>
             </div>

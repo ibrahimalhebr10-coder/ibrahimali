@@ -149,11 +149,13 @@ export default function FarmPage({ farmId, onClose, onComplete }: FarmPageProps)
   if (showPreAuthReservation && reservationData) {
     return (
       <PreAuthReservation
-        reservationData={reservationData}
-        onBack={() => setShowPreAuthReservation(false)}
-        onComplete={(data) => {
+        farmName={reservationData.farmName}
+        totalTrees={reservationData.totalTrees}
+        totalPrice={reservationData.totalCost}
+        contractName={reservationData.contractName}
+        onContinue={() => {
           setShowPreAuthReservation(false);
-          onComplete(data);
+          onComplete(reservationData);
         }}
       />
     );
