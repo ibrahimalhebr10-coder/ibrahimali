@@ -39,6 +39,31 @@ export interface PaymentStats {
   tamaraCount: number;
 }
 
+export interface PaymentReceipt {
+  id: string;
+  reservation_id: string;
+  user_id: string;
+  payment_method_id: string;
+  amount: number;
+  receipt_file_path: string;
+  receipt_file_type: string;
+  notes?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  reviewed_by?: string;
+  review_notes?: string;
+  reviewed_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UploadReceiptData {
+  reservation_id: string;
+  payment_method_id: string;
+  amount: number;
+  file: File;
+  notes?: string;
+}
+
 export const paymentService = {
   async getAllPayments() {
     const { data, error } = await supabase
@@ -249,5 +274,131 @@ export const paymentService = {
     );
 
     return updatedPayment;
+  },
+
+  async uploadReceipt(data: UploadReceiptData): Promise<PaymentReceipt> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('المستخدم غير مسجل');
+    }
+
+    const fileExt = data.file.name.split('.').pop();
+    const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('payment-receipts')
+      .upload(fileName, data.file, {
+        contentType: data.file.type,
+        upsert: false
+      });
+
+    if (uploadError) {
+      console.error('Upload error:', uploadError);
+      throw new Error('فشل رفع الملف');
+    }
+
+    const { data: receipt, error: insertError } = await supabase
+      .from('payment_receipts')
+      .insert({
+        reservation_id: data.reservation_id,
+        user_id: user.id,
+        payment_method_id: data.payment_method_id,
+        amount: data.amount,
+        receipt_file_path: fileName,
+        receipt_file_type: data.file.type,
+        notes: data.notes || null,
+        status: 'pending'
+      })
+      .select()
+      .single();
+
+    if (insertError) {
+      await supabase.storage.from('payment-receipts').remove([fileName]);
+      throw new Error('فشل حفظ بيانات الإيصال');
+    }
+
+    return receipt as PaymentReceipt;
+  },
+
+  async getReceiptsByReservation(reservationId: string): Promise<PaymentReceipt[]> {
+    const { data, error } = await supabase
+      .from('payment_receipts')
+      .select('*')
+      .eq('reservation_id', reservationId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data as PaymentReceipt[];
+  },
+
+  async getReceiptById(receiptId: string): Promise<PaymentReceipt | null> {
+    const { data, error } = await supabase
+      .from('payment_receipts')
+      .select('*')
+      .eq('id', receiptId)
+      .maybeSingle();
+
+    if (error) throw error;
+    return data as PaymentReceipt | null;
+  },
+
+  async getReceiptFileUrl(filePath: string): Promise<string> {
+    const { data } = await supabase.storage
+      .from('payment-receipts')
+      .createSignedUrl(filePath, 3600);
+
+    if (!data?.signedUrl) {
+      throw new Error('فشل الحصول على رابط الملف');
+    }
+
+    return data.signedUrl;
+  },
+
+  async deleteReceipt(receiptId: string): Promise<void> {
+    const receipt = await this.getReceiptById(receiptId);
+    if (!receipt) {
+      throw new Error('الإيصال غير موجود');
+    }
+
+    if (receipt.status !== 'pending') {
+      throw new Error('لا يمكن حذف إيصال تمت مراجعته');
+    }
+
+    await supabase.storage
+      .from('payment-receipts')
+      .remove([receipt.receipt_file_path]);
+
+    const { error } = await supabase
+      .from('payment_receipts')
+      .delete()
+      .eq('id', receiptId);
+
+    if (error) throw error;
+  },
+
+  async reviewReceipt(
+    receiptId: string,
+    status: 'approved' | 'rejected',
+    reviewNotes?: string
+  ): Promise<PaymentReceipt> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      throw new Error('المستخدم غير مسجل');
+    }
+
+    const { data, error } = await supabase
+      .from('payment_receipts')
+      .update({
+        status,
+        review_notes: reviewNotes || null,
+        reviewed_at: new Date().toISOString(),
+        reviewed_by: user.id
+      })
+      .eq('id', receiptId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data as PaymentReceipt;
   }
 };

@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { paymentService } from '../services/paymentService';
 import WhatsAppButton from './WhatsAppButton';
+import PaymentPage from './PaymentPage';
 
 interface Reservation {
   id: string;
@@ -29,6 +30,8 @@ export default function MyReservations() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingPayment, setProcessingPayment] = useState<string | null>(null);
+  const [showPaymentPage, setShowPaymentPage] = useState(false);
+  const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
 
   useEffect(() => {
     loadReservations();
@@ -216,44 +219,16 @@ export default function MyReservations() {
                         </div>
                       </div>
 
-                      <div className="space-y-2">
-                        <p className="text-sm font-bold text-gray-700 mb-3">اختر وسيلة الدفع:</p>
-
-                        <button
-                          onClick={() => handlePayment(reservation, 'mada')}
-                          disabled={processingPayment === reservation.id}
-                          className="w-full flex items-center justify-between px-4 py-3 bg-white border-2 border-blue-300 rounded-xl hover:bg-blue-50 transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                              <CreditCard className="w-5 h-5 text-white" />
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-bold text-gray-900">مدى</p>
-                              <p className="text-xs text-gray-600">الدفع عبر بطاقة مدى</p>
-                            </div>
-                          </div>
-                          <span className="text-blue-600 font-bold group-hover:translate-x-1 transition-transform">
-                            {processingPayment === reservation.id ? '...' : '←'}
-                          </span>
-                        </button>
-
-                        <button
-                          disabled
-                          className="w-full flex items-center justify-between px-4 py-3 bg-white border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all group opacity-60 cursor-not-allowed"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                              <DollarSign className="w-5 h-5 text-white" />
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-bold text-gray-900">تابي / تمارا</p>
-                              <p className="text-xs text-gray-600">الدفع بالتقسيط</p>
-                            </div>
-                          </div>
-                          <span className="text-xs bg-amber-100 text-amber-800 px-2 py-1 rounded-full font-bold">قريباً</span>
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => {
+                          setSelectedReservation(reservation);
+                          setShowPaymentPage(true);
+                        }}
+                        className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white rounded-xl font-bold transition-all shadow-lg hover:shadow-xl"
+                      >
+                        <CreditCard className="w-5 h-5" />
+                        <span>إتمام السداد</span>
+                      </button>
                     </div>
                   )}
 
@@ -345,6 +320,28 @@ export default function MyReservations() {
           </div>
         )}
       </div>
+
+      {showPaymentPage && selectedReservation && (
+        <PaymentPage
+          reservation={{
+            id: selectedReservation.id,
+            farm_name: selectedReservation.farm_name,
+            tree_count: selectedReservation.total_trees,
+            contract_years: selectedReservation.duration_years,
+            total_amount: selectedReservation.total_price,
+            status: selectedReservation.status
+          }}
+          onClose={() => {
+            setShowPaymentPage(false);
+            setSelectedReservation(null);
+          }}
+          onSuccess={() => {
+            setShowPaymentPage(false);
+            setSelectedReservation(null);
+            loadReservations();
+          }}
+        />
+      )}
     </div>
   );
 }
