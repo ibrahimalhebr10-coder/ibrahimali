@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Send, Users, MessageSquare, TrendingUp, Eye, Mail, BarChart3 } from 'lucide-react';
+import { Send, Users, MessageSquare, TrendingUp, Eye, Mail, BarChart3, MessageCircle } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { usePermissions } from '../../contexts/PermissionsContext';
 import { investorMessagingService } from '../../services/investorMessagingService';
@@ -7,6 +7,7 @@ import CreateInvestorMessage from './CreateInvestorMessage';
 import SupervisorDashboard from './SupervisorDashboard';
 import MessagesLog from './MessagesLog';
 import MessageDetails from './MessageDetails';
+import WhatsAppSettings from './WhatsAppSettings';
 import ActionGuard from './ActionGuard';
 
 interface Farm {
@@ -23,7 +24,7 @@ interface FarmWithStats extends Farm {
   last_message_date?: string;
 }
 
-type View = 'farms' | 'supervisor' | 'messages-log' | 'message-details';
+type View = 'farms' | 'supervisor' | 'messages-log' | 'message-details' | 'whatsapp-settings';
 
 export default function InvestorMessaging() {
   const { hasAction, isSuperAdmin: isSuperAdminRole } = usePermissions();
@@ -184,6 +185,13 @@ export default function InvestorMessaging() {
           >
             سجل الرسائل
           </button>
+          <button
+            onClick={() => setCurrentView('whatsapp-settings')}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <MessageCircle className="w-4 h-4" />
+            إعدادات واتساب
+          </button>
         </div>
         <SupervisorDashboard />
       </div>
@@ -211,6 +219,13 @@ export default function InvestorMessaging() {
           >
             سجل الرسائل
           </button>
+          <button
+            onClick={() => setCurrentView('whatsapp-settings')}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <MessageCircle className="w-4 h-4" />
+            إعدادات واتساب
+          </button>
         </div>
         <MessagesLog
           onViewMessage={(id) => {
@@ -231,6 +246,42 @@ export default function InvestorMessaging() {
           setCurrentView('messages-log');
         }}
       />
+    );
+  }
+
+  if (currentView === 'whatsapp-settings' && isSuperAdmin) {
+    return (
+      <div className="space-y-6">
+        <div className="flex gap-3">
+          <button
+            onClick={() => setCurrentView('farms')}
+            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            إرسال الرسائل
+          </button>
+          <button
+            onClick={() => setCurrentView('supervisor')}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <BarChart3 className="w-4 h-4" />
+            لوحة الإشراف
+          </button>
+          <button
+            onClick={() => setCurrentView('messages-log')}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <MessageSquare className="w-4 h-4" />
+            سجل الرسائل
+          </button>
+          <button
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg font-medium"
+          >
+            <MessageCircle className="w-4 h-4" />
+            إعدادات واتساب
+          </button>
+        </div>
+        <WhatsAppSettings />
+      </div>
     );
   }
 
@@ -256,6 +307,13 @@ export default function InvestorMessaging() {
           >
             <MessageSquare className="w-4 h-4" />
             سجل الرسائل
+          </button>
+          <button
+            onClick={() => setCurrentView('whatsapp-settings')}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <MessageCircle className="w-4 h-4" />
+            إعدادات واتساب
           </button>
         </div>
       )}
