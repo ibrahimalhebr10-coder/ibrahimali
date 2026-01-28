@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Sprout, TreeDeciduous, Package, AlertCircle, DollarSign, X, LogOut, Home, Target } from 'lucide-react';
+import { Users, Sprout, TreeDeciduous, Package, AlertCircle, DollarSign, X, LogOut, Home, Target, CreditCard } from 'lucide-react';
 import KPICard from './KPICard';
 import AdminFarmCard from './AdminFarmCard';
 import Breadcrumb from './Breadcrumb';
@@ -9,6 +9,7 @@ import VideoIntroManagement from './VideoIntroManagement';
 import ReservationsManagement from './ReservationsManagement';
 import FinanceManagement from './FinanceManagement';
 import PermissionsManagement from './PermissionsManagement';
+import PaymentMethodsSettings from './PaymentMethodsSettings';
 import AdminRouteGuard from './AdminRouteGuard';
 import MyHarvest from '../MyHarvest';
 import InvestorMessaging from './InvestorMessaging';
@@ -36,6 +37,7 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
   const [loading, setLoading] = useState(true);
   const [selectedFarmId, setSelectedFarmId] = useState<number | null>(null);
   const [showPermissionsManagement, setShowPermissionsManagement] = useState(false);
+  const [showPaymentMethods, setShowPaymentMethods] = useState(false);
 
   useEffect(() => {
     if (defaultPage) {
@@ -189,6 +191,21 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
                   <div>
                     <h3 className="text-2xl font-bold text-white mb-2">إدارة الصلاحيات</h3>
                     <p className="text-white/80">إدارة الأدوار، الصلاحيات، ومستخدمي الإدارة</p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => setShowPaymentMethods(true)}
+                className="p-8 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-2xl text-right hover:scale-105 transition-transform"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-xl bg-white/20 flex items-center justify-center">
+                    <CreditCard className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-white mb-2">وسائل السداد</h3>
+                    <p className="text-white/80">إدارة وسائل السداد المتاحة للمستثمرين (مدى، تابي، تمارا، تحويل بنكي)</p>
                   </div>
                 </div>
               </button>
@@ -361,6 +378,32 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
       </div>
       {showPermissionsManagement && (
         <PermissionsManagement onClose={() => setShowPermissionsManagement(false)} />
+      )}
+      {showPaymentMethods && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-50 rounded-xl max-w-6xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between z-10">
+              <div className="flex items-center gap-3">
+                <div className="bg-blue-100 p-3 rounded-lg">
+                  <CreditCard className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">وسائل السداد</h2>
+                  <p className="text-sm text-gray-600">إدارة وتكوين وسائل السداد المتاحة</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPaymentMethods(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
+            <div className="p-6">
+              <PaymentMethodsSettings />
+            </div>
+          </div>
+        </div>
       )}
     </AdminRouteGuard>
   );
