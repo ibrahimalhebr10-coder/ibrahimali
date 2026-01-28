@@ -73,16 +73,28 @@ export default function TasksTab({ farm }: TasksTabProps) {
   }
 
   async function loadAvailableUsers() {
-    const { data } = await supabase
-      .from('admin_farm_assignments')
-      .select(`
-        admin:admins!admin_farm_assignments_admin_id_fkey(id, full_name, email)
-      `)
-      .eq('farm_id', farm.id)
-      .eq('is_active', true);
+    try {
+      const { data, error } = await supabase
+        .from('admin_farm_assignments')
+        .select(`
+          admins!admin_farm_assignments_admin_id_fkey(id, full_name, email)
+        `)
+        .eq('farm_id', farm.id)
+        .eq('is_active', true);
 
-    if (data) {
-      setAvailableUsers(data.map(item => item.admin));
+      if (error) {
+        console.error('Error loading available users:', error);
+        return;
+      }
+
+      if (data) {
+        const users = data
+          .map((item: any) => item.admins)
+          .filter((admin: any) => admin !== null);
+        setAvailableUsers(users);
+      }
+    } catch (error) {
+      console.error('Error loading available users:', error);
     }
   }
 
@@ -172,7 +184,7 @@ export default function TasksTab({ farm }: TasksTabProps) {
         </div>
       ) : (
         <div className="space-y-3">
-          {tasks.map((task) => (
+          {tasks.filter(task => task !== null).map((task) => (
             <div
               key={task.id}
               className="p-4 bg-white border-2 border-gray-200 rounded-xl hover:border-green-300 transition-colors"
@@ -294,7 +306,7 @@ export default function TasksTab({ farm }: TasksTabProps) {
                   required
                 >
                   <option value="">-- اختر المكلف --</option>
-                  {availableUsers.map((user) => (
+                  {availableUsers.filter(user => user !== null).map((user) => (
                     <option key={user.id} value={user.id}>
                       {user.full_name} ({user.email})
                     </option>
