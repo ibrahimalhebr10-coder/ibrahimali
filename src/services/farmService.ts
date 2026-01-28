@@ -404,17 +404,12 @@ export const farmService = {
   },
 
   async getFarmProjectById(farmId: string): Promise<FarmProject | null> {
-    console.log('🔎 getFarmProjectById called with farmId:', farmId);
-
     const { data: project, error } = await supabase
       .from('farms')
       .select('*')
       .eq('id', farmId)
       .eq('status', 'active')
       .maybeSingle()
-
-    console.log('📥 Raw project data from DB:', project);
-    console.log('❌ Error:', error);
 
     if (error || !project) {
       console.error('Error fetching farm project:', error)
@@ -428,33 +423,23 @@ export const farmService = {
       .eq('is_active', true)
       .order('display_order', { ascending: true })
 
-    console.log('📋 Contracts from DB:', contracts);
-
     const treeTypes = project.tree_types || []
-    console.log('🌲 Raw tree_types from DB:', treeTypes);
-    console.log('🌲 tree_types is Array?', Array.isArray(treeTypes));
-    console.log('🌲 tree_types length:', treeTypes.length);
 
-    const formattedTreeTypes: TreeType[] = treeTypes.map((tree: any) => {
-      console.log('🌳 Processing tree:', tree);
-      return {
-        id: tree.id || `tree-${Date.now()}-${Math.random()}`,
-        slug: tree.name?.toLowerCase().replace(/\s+/g, '-') || '',
-        name: tree.name || '',
-        varieties: [{
-          id: tree.id || `variety-${Date.now()}-${Math.random()}`,
-          name: tree.subtitle || tree.name || '',
-          price: tree.base_price || tree.price || 0,
-          icon: '🌳',
-          available: tree.count || tree.available || 0,
-          maintenance_fee: tree.maintenance_fee || 0
-        }]
-      };
-    })
+    const formattedTreeTypes: TreeType[] = treeTypes.map((tree: any) => ({
+      id: tree.id || `tree-${Date.now()}-${Math.random()}`,
+      slug: tree.name?.toLowerCase().replace(/\s+/g, '-') || '',
+      name: tree.name || '',
+      varieties: [{
+        id: tree.id || `variety-${Date.now()}-${Math.random()}`,
+        name: tree.subtitle || tree.name || '',
+        price: tree.base_price || tree.price || 0,
+        icon: '🌳',
+        available: tree.count || tree.available || 0,
+        maintenance_fee: tree.maintenance_fee || 0
+      }]
+    }))
 
-    console.log('✅ Formatted tree types:', formattedTreeTypes);
-
-    const result = {
+    return {
       id: project.id,
       name: project.name_ar || project.name_en,
       description: project.description_ar,
@@ -471,12 +456,6 @@ export const farmService = {
       firstYearMaintenanceFree: project.first_year_maintenance_free ?? true,
       treeTypes: formattedTreeTypes,
       contracts: contracts || []
-    };
-
-    console.log('🎁 Final result to return:', result);
-    console.log('🎁 Result.treeTypes:', result.treeTypes);
-    console.log('🎁 Result.contracts:', result.contracts);
-
-    return result;
+    }
   }
 }
