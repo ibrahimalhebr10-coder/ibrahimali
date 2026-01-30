@@ -36,7 +36,8 @@ export const investorAccountService = {
           status,
           created_at,
           contract_id,
-          farms!inner(
+          farm_id,
+          farms!fk_reservations_farm_id(
             name,
             hero_image
           )
