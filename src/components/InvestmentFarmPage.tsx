@@ -2,11 +2,10 @@ import { useState, useEffect } from 'react';
 import { X, Video, HelpCircle, MapPin, Minus, Plus, TrendingUp, Clock, Gift, DollarSign, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import type { FarmProject, FarmContract } from '../services/farmService';
-import BookingSuccessScreen from './BookingSuccessScreen';
 import InvestmentReviewScreen from './InvestmentReviewScreen';
 import PaymentMethodSelector from './PaymentMethodSelector';
 import PrePaymentRegistration from './PrePaymentRegistration';
-import InvestorWelcomeScreen from './InvestorWelcomeScreen';
+import PaymentSuccessScreen from './PaymentSuccessScreen';
 
 interface InvestmentFarmPageProps {
   farm: FarmProject;
@@ -21,10 +20,9 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
   const [showReviewScreen, setShowReviewScreen] = useState(false);
   const [showPrePaymentRegistration, setShowPrePaymentRegistration] = useState(false);
   const [showPaymentSelector, setShowPaymentSelector] = useState(false);
-  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
+  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   const [isCreatingReservation, setIsCreatingReservation] = useState(false);
   const [reservationData, setReservationData] = useState<any>(null);
-  const [guestId, setGuestId] = useState<string>('');
   const [registeredUserId, setRegisteredUserId] = useState<string>('');
   const [registeredUserName, setRegisteredUserName] = useState<string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mada' | 'bank_transfer' | null>(null);
@@ -34,17 +32,6 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
       setSelectedContract(farm.contracts[0]);
     }
   }, [farm.contracts]);
-
-  useEffect(() => {
-    const existingGuestId = localStorage.getItem('guestId');
-    if (existingGuestId) {
-      setGuestId(existingGuestId);
-    } else {
-      const newGuestId = `guest_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-      localStorage.setItem('guestId', newGuestId);
-      setGuestId(newGuestId);
-    }
-  }, []);
 
   const maxTrees = farm.availableTrees || 0;
 
@@ -128,11 +115,12 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
         durationYears: selectedContract.duration_years,
         bonusYears: selectedContract.bonus_years,
         totalPrice,
+        investmentNumber: reservation.id.substring(0, 8).toUpperCase(),
         createdAt: reservation.created_at
       });
 
-      setShowPaymentSelector(false);
       setIsCreatingReservation(false);
+      handlePaymentSuccess();
     } catch (error) {
       console.error('Error creating reservation:', error);
       alert('حدث خطأ غير متوقع');
@@ -140,9 +128,9 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
     }
   };
 
-  const handleRegistrationComplete = () => {
-    setReservationData(null);
-    setShowWelcomeScreen(true);
+  const handlePaymentSuccess = () => {
+    setShowPaymentSelector(false);
+    setShowPaymentSuccess(true);
   };
 
   const handleGoToAccount = () => {
@@ -503,20 +491,16 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
         />
       )}
 
-      {/* Booking Success Screen */}
-      {reservationData && !showWelcomeScreen && (
-        <BookingSuccessScreen
-          reservation={reservationData}
-          guestId={registeredUserId}
-          onRegistrationComplete={handleRegistrationComplete}
-          onClose={handleGoToAccount}
-        />
-      )}
-
-      {/* Welcome Screen */}
-      {showWelcomeScreen && (
-        <InvestorWelcomeScreen
-          investorName={registeredUserName}
+      {/* Payment Success Screen */}
+      {showPaymentSuccess && reservationData && (
+        <PaymentSuccessScreen
+          reservationId={reservationData.id}
+          farmName={reservationData.farmName}
+          treeCount={reservationData.treeCount}
+          durationYears={reservationData.durationYears}
+          bonusYears={reservationData.bonusYears}
+          totalPrice={reservationData.totalPrice}
+          investmentNumber={reservationData.investmentNumber}
           onGoToAccount={handleGoToAccount}
         />
       )}
