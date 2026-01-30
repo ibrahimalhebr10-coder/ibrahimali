@@ -43,7 +43,7 @@ export interface PaymentReceipt {
   id: string;
   reservation_id: string;
   user_id: string;
-  payment_method_id: string;
+  payment_method: string;
   amount: number;
   receipt_file_path: string;
   receipt_file_type: string;
@@ -58,7 +58,7 @@ export interface PaymentReceipt {
 
 export interface UploadReceiptData {
   reservation_id: string;
-  payment_method_id: string;
+  payment_method: string;
   amount: number;
   file: File;
   notes?: string;
@@ -302,7 +302,7 @@ export const paymentService = {
       .insert({
         reservation_id: data.reservation_id,
         user_id: user.id,
-        payment_method_id: data.payment_method_id,
+        payment_method: data.payment_method,
         amount: data.amount,
         receipt_file_path: fileName,
         receipt_file_type: data.file.type,

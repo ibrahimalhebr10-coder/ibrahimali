@@ -32,7 +32,7 @@ export interface InvestorReservation {
     id: string;
     status: string;
     created_at: string;
-    payment_method_id: string;
+    payment_method: string;
     review_notes?: string;
   }>;
 }
@@ -56,7 +56,7 @@ class InvestorJourneyService {
           payment_receipts (
             id,
             status,
-            payment_method_id,
+            payment_method,
             created_at,
             review_notes
           )
@@ -177,7 +177,7 @@ class InvestorJourneyService {
           payment_receipts (
             id,
             status,
-            payment_method_id,
+            payment_method,
             created_at,
             review_notes
           )
@@ -202,7 +202,7 @@ class InvestorJourneyService {
           payment_receipts (
             id,
             status,
-            payment_method_id,
+            payment_method,
             created_at,
             review_notes
           )

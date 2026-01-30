@@ -124,7 +124,7 @@ export default function PaymentPage({ reservation, onClose, onSuccess }: Payment
 
       await paymentService.uploadReceipt({
         reservation_id: reservation.id,
-        payment_method_id: selectedMethod.id,
+        payment_method: selectedMethod.method_type,
         amount: reservation.total_amount,
         file: uploadForm.file,
         notes: uploadForm.notes

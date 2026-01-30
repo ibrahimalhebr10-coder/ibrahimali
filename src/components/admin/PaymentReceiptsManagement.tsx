@@ -190,9 +190,9 @@ export default function PaymentReceiptsManagement() {
     );
   }
 
-  function getMethodName(methodId: string): string {
-    const method = paymentMethods.find(m => m.id === methodId);
-    return method?.name_ar || 'غير محدد';
+  function getMethodName(methodType: string): string {
+    const method = paymentMethods.find(m => m.method_type === methodType);
+    return method?.name_ar || methodType || 'غير محدد';
   }
 
   const filteredReceipts = receipts.filter(r => r.status === activeTab);
@@ -303,7 +303,7 @@ export default function PaymentReceiptsManagement() {
                         </div>
                         <div className="bg-gray-50 rounded-lg p-2">
                           <p className="text-xs text-gray-600 mb-0.5">الوسيلة</p>
-                          <p className="font-bold text-gray-900 text-sm">{getMethodName(receipt.payment_method_id)}</p>
+                          <p className="font-bold text-gray-900 text-sm">{getMethodName(receipt.payment_method)}</p>
                         </div>
                         <div className="bg-gray-50 rounded-lg p-2">
                           <p className="text-xs text-gray-600 mb-0.5">عدد الأشجار</p>
