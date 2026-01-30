@@ -5,6 +5,8 @@ import type { FarmProject, FarmContract } from '../services/farmService';
 import BookingSuccessScreen from './BookingSuccessScreen';
 import InvestmentReviewScreen from './InvestmentReviewScreen';
 import PaymentMethodSelector from './PaymentMethodSelector';
+import PrePaymentRegistration from './PrePaymentRegistration';
+import InvestorWelcomeScreen from './InvestorWelcomeScreen';
 
 interface InvestmentFarmPageProps {
   farm: FarmProject;
@@ -17,10 +19,14 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showReviewScreen, setShowReviewScreen] = useState(false);
+  const [showPrePaymentRegistration, setShowPrePaymentRegistration] = useState(false);
   const [showPaymentSelector, setShowPaymentSelector] = useState(false);
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState(false);
   const [isCreatingReservation, setIsCreatingReservation] = useState(false);
   const [reservationData, setReservationData] = useState<any>(null);
   const [guestId, setGuestId] = useState<string>('');
+  const [registeredUserId, setRegisteredUserId] = useState<string>('');
+  const [registeredUserName, setRegisteredUserName] = useState<string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mada' | 'bank_transfer' | null>(null);
 
   useEffect(() => {
@@ -66,11 +72,18 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
 
   const handleConfirmReview = () => {
     setShowReviewScreen(false);
+    setShowPrePaymentRegistration(true);
+  };
+
+  const handleRegistrationSuccess = (userId: string, userName: string) => {
+    setRegisteredUserId(userId);
+    setRegisteredUserName(userName);
+    setShowPrePaymentRegistration(false);
     setShowPaymentSelector(true);
   };
 
   const handlePaymentMethodSelected = async (method: 'mada' | 'bank_transfer') => {
-    if (!selectedContract || treeCount === 0 || !guestId) {
+    if (!selectedContract || treeCount === 0 || !registeredUserId) {
       return;
     }
 
@@ -85,7 +98,7 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
       const { data: reservation, error: reservationError } = await supabase
         .from('reservations')
         .insert({
-          guest_id: guestId,
+          user_id: registeredUserId,
           farm_id: farm.id,
           farm_name: farm.name,
           contract_id: selectedContract.id,
@@ -94,9 +107,8 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
           bonus_years: selectedContract.bonus_years,
           total_trees: treeCount,
           total_price: totalPrice,
-          status: 'temporary',
-          payment_method: method,
-          temporary_expires_at: expiresAt.toISOString()
+          status: 'pending',
+          payment_method: method
         })
         .select()
         .single();
@@ -128,28 +140,13 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
     }
   };
 
-  const handleRegistrationComplete = async (userId: string) => {
-    try {
-      if (!reservationData) return;
+  const handleRegistrationComplete = () => {
+    setReservationData(null);
+    setShowWelcomeScreen(true);
+  };
 
-      await supabase
-        .from('reservations')
-        .update({
-          user_id: userId,
-          guest_id: null,
-          status: 'pending'
-        })
-        .eq('id', reservationData.id)
-        .eq('guest_id', guestId);
-
-      localStorage.removeItem('guestId');
-
-      alert('تم ربط الحجز بحسابك بنجاح! سيتم مراجعة حجزك من قبل الإدارة.');
-      onClose();
-    } catch (error) {
-      console.error('Error linking reservation:', error);
-      alert('حدث خطأ في ربط الحجز');
-    }
+  const handleGoToAccount = () => {
+    onClose();
   };
 
   return (
@@ -483,26 +480,44 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
         />
       )}
 
+      {/* Pre-Payment Registration */}
+      {showPrePaymentRegistration && (
+        <PrePaymentRegistration
+          farmName={farm.name}
+          treeCount={treeCount}
+          onSuccess={handleRegistrationSuccess}
+          onBack={() => setShowPrePaymentRegistration(false)}
+        />
+      )}
+
       {/* Payment Method Selector */}
       {showPaymentSelector && (
         <PaymentMethodSelector
           totalAmount={calculateTotal()}
           onSelectMethod={handlePaymentMethodSelected}
-          onBack={() => setShowPaymentSelector(false)}
+          onBack={() => {
+            setShowPaymentSelector(false);
+            setShowPrePaymentRegistration(true);
+          }}
           isLoading={isCreatingReservation}
         />
       )}
 
       {/* Booking Success Screen */}
-      {reservationData && guestId && (
+      {reservationData && !showWelcomeScreen && (
         <BookingSuccessScreen
           reservation={reservationData}
-          guestId={guestId}
+          guestId={registeredUserId}
           onRegistrationComplete={handleRegistrationComplete}
-          onClose={() => {
-            setReservationData(null);
-            onClose();
-          }}
+          onClose={handleGoToAccount}
+        />
+      )}
+
+      {/* Welcome Screen */}
+      {showWelcomeScreen && (
+        <InvestorWelcomeScreen
+          investorName={registeredUserName}
+          onGoToAccount={handleGoToAccount}
         />
       )}
 
