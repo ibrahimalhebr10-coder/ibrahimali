@@ -28,15 +28,15 @@ export const investorAccountService = {
         .from('reservations')
         .select(`
           id,
-          tree_count,
+          total_trees,
           duration_years,
           bonus_years,
           total_price,
-          investment_number,
           status,
           created_at,
           contract_id,
           farm_id,
+          contract_name,
           farms!fk_reservations_farm_id(
             name_ar,
             hero_image
@@ -59,11 +59,11 @@ export const investorAccountService = {
         id: reservation.id,
         farmName: reservation.farms?.name_ar || 'مزرعة غير محددة',
         farmImage: reservation.farms?.hero_image,
-        treeCount: reservation.tree_count,
+        treeCount: reservation.total_trees,
         durationYears: reservation.duration_years,
         bonusYears: reservation.bonus_years || 0,
         totalPrice: reservation.total_price,
-        investmentNumber: reservation.investment_number,
+        investmentNumber: reservation.contract_name || reservation.id.slice(0, 8),
         status: reservation.status as 'confirmed' | 'pending' | 'active',
         createdAt: reservation.created_at,
         contractId: reservation.contract_id
