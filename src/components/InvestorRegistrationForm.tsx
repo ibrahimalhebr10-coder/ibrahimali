@@ -142,7 +142,7 @@ export default function InvestorRegistrationForm({ guestId, onSuccess, onCancel 
           <User className="w-8 h-8 text-white" />
         </div>
         <h2 className="text-2xl font-bold text-[#B8942F] mb-2">إنشاء حساب المستثمر</h2>
-        <p className="text-sm text-gray-600">سجّل حسابك لإكمال حجز مزرعتك</p>
+        <p className="text-sm text-gray-600">سجّل حسابك لربط استثمارك بحسابك الشخصي</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">

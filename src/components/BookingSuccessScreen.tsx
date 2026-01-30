@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { CheckCircle2, Award, ArrowRight, X } from 'lucide-react';
 import TemporaryCertificate from './TemporaryCertificate';
 import InvestorRegistrationForm from './InvestorRegistrationForm';
+import InvestorWelcomeScreen from './InvestorWelcomeScreen';
+import { supabase } from '../lib/supabase';
 
 interface BookingSuccessScreenProps {
   reservation: {
@@ -27,6 +29,31 @@ export default function BookingSuccessScreen({
 }: BookingSuccessScreenProps) {
   const [showCertificate, setShowCertificate] = useState(false);
   const [showRegistration, setShowRegistration] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [investorName, setInvestorName] = useState('');
+
+  const handleRegistrationSuccess = async (userId: string) => {
+    const { data } = await supabase.auth.getUser();
+    if (data.user) {
+      const fullName = data.user.user_metadata?.full_name || 'المستثمر';
+      setInvestorName(fullName);
+      setShowRegistration(false);
+      setShowWelcome(true);
+    }
+  };
+
+  const handleGoToAccount = () => {
+    onRegistrationComplete('');
+  };
+
+  if (showWelcome) {
+    return (
+      <InvestorWelcomeScreen
+        investorName={investorName}
+        onGoToAccount={handleGoToAccount}
+      />
+    );
+  }
 
   if (showCertificate && !showRegistration) {
     return (
@@ -79,7 +106,7 @@ export default function BookingSuccessScreen({
 
             <InvestorRegistrationForm
               guestId={guestId}
-              onSuccess={onRegistrationComplete}
+              onSuccess={handleRegistrationSuccess}
               onCancel={() => setShowRegistration(false)}
             />
           </div>
@@ -111,15 +138,15 @@ export default function BookingSuccessScreen({
 
               <div className="space-y-2">
                 <h1 className="text-2xl font-bold text-[#B8942F]">
-                  تم تثبيت حجز مزرعتك الاستثمارية بنجاح
+                  تم تفعيل استثمار أشجارك بنجاح
                 </h1>
-                <p className="text-sm text-gray-600">حجزك محفوظ ومؤمّن في النظام</p>
+                <p className="text-base font-semibold text-green-700">أصبحت الآن مستثمرًا زراعيًا معنا</p>
               </div>
             </div>
 
             <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-6 space-y-4 border-2 border-[#D4AF37]/30">
               <h3 className="text-lg font-bold text-[#B8942F] text-center border-b-2 border-[#D4AF37]/30 pb-3">
-                تفاصيل الحجز
+                تفاصيل الاستثمار
               </h3>
 
               <div className="space-y-3">
@@ -182,17 +209,17 @@ export default function BookingSuccessScreen({
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-6 border-2 border-purple-200 space-y-4 text-center">
-              <h3 className="text-lg font-bold text-purple-800">
-                حتى تضم مزرعتك إلى حسابك
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200 space-y-4 text-center">
+              <h3 className="text-lg font-bold text-green-800">
+                حتى تضم استثمارك إلى حسابك
               </h3>
               <p className="text-base font-bold text-[#B8942F]">
-                بقي عليك إنشاء حساب المستثمر
+                أنشئ حساب المستثمر الآن
               </p>
 
               <button
                 onClick={() => setShowRegistration(true)}
-                className="w-full py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+                className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
               >
                 <ArrowRight className="w-5 h-5" />
                 <span>إنشاء حساب المستثمر</span>

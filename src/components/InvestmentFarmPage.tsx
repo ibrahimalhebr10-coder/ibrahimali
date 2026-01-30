@@ -3,6 +3,8 @@ import { X, Video, HelpCircle, MapPin, Minus, Plus, TrendingUp, Clock, Gift, Dol
 import { supabase } from '../lib/supabase';
 import type { FarmProject, FarmContract } from '../services/farmService';
 import BookingSuccessScreen from './BookingSuccessScreen';
+import InvestmentReviewScreen from './InvestmentReviewScreen';
+import PaymentMethodSelector from './PaymentMethodSelector';
 
 interface InvestmentFarmPageProps {
   farm: FarmProject;
@@ -14,9 +16,12 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
   const [treeCount, setTreeCount] = useState(0);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showReviewScreen, setShowReviewScreen] = useState(false);
+  const [showPaymentSelector, setShowPaymentSelector] = useState(false);
   const [isCreatingReservation, setIsCreatingReservation] = useState(false);
   const [reservationData, setReservationData] = useState<any>(null);
   const [guestId, setGuestId] = useState<string>('');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mada' | 'bank_transfer' | null>(null);
 
   useEffect(() => {
     if (farm.contracts && farm.contracts.length > 0) {
@@ -51,12 +56,25 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
     setTreeCount(parseInt(e.target.value));
   };
 
-  const handleInvestNow = async () => {
-    if (!selectedContract || treeCount === 0 || !guestId) {
+  const handleInvestNow = () => {
+    if (!selectedContract || treeCount === 0) {
       alert('يرجى اختيار باقة وعدد الأشجار');
       return;
     }
+    setShowReviewScreen(true);
+  };
 
+  const handleConfirmReview = () => {
+    setShowReviewScreen(false);
+    setShowPaymentSelector(true);
+  };
+
+  const handlePaymentMethodSelected = async (method: 'mada' | 'bank_transfer') => {
+    if (!selectedContract || treeCount === 0 || !guestId) {
+      return;
+    }
+
+    setSelectedPaymentMethod(method);
     setIsCreatingReservation(true);
 
     try {
@@ -77,6 +95,7 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
           total_trees: treeCount,
           total_price: totalPrice,
           status: 'temporary',
+          payment_method: method,
           temporary_expires_at: expiresAt.toISOString()
         })
         .select()
@@ -100,6 +119,7 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
         createdAt: reservation.created_at
       });
 
+      setShowPaymentSelector(false);
       setIsCreatingReservation(false);
     } catch (error) {
       console.error('Error creating reservation:', error);
@@ -322,6 +342,15 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
                 </div>
               </div>
 
+              <div className="text-center mb-2">
+                <p className="text-sm font-bold text-[#B8942F]">
+                  أنت على بعد خطوة من امتلاك استثمارك الزراعي
+                </p>
+                <p className="text-xs text-gray-600 mt-1">
+                  سيتم تفعيل استثمار أشجارك مباشرة بعد الدفع
+                </p>
+              </div>
+
               <div className="flex items-center justify-between bg-gradient-to-r from-[#D4AF37]/20 to-[#B8942F]/10 rounded-xl p-4 border-2 border-[#D4AF37]/40">
                 <div>
                   <div className="text-xs text-gray-600 mb-1">الإجمالي</div>
@@ -338,12 +367,12 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
                   {isCreatingReservation ? (
                     <>
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>جاري الحجز...</span>
+                      <span>جاري التأكيد...</span>
                     </>
                   ) : (
                     <>
                       <DollarSign className="w-5 h-5" />
-                      <span>استثمر الآن</span>
+                      <span>ابدأ استثمار أشجارك الآن</span>
                     </>
                   )}
                 </button>
@@ -436,6 +465,32 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
             </div>
           </div>
         </div>
+      )}
+
+      {/* Investment Review Screen */}
+      {showReviewScreen && selectedContract && (
+        <InvestmentReviewScreen
+          farmName={farm.name}
+          farmLocation={farm.location}
+          contractName={selectedContract.contract_name}
+          durationYears={selectedContract.duration_years}
+          bonusYears={selectedContract.bonus_years}
+          treeCount={treeCount}
+          totalPrice={calculateTotal()}
+          pricePerTree={selectedContract.investor_price}
+          onConfirm={handleConfirmReview}
+          onBack={() => setShowReviewScreen(false)}
+        />
+      )}
+
+      {/* Payment Method Selector */}
+      {showPaymentSelector && (
+        <PaymentMethodSelector
+          totalAmount={calculateTotal()}
+          onSelectMethod={handlePaymentMethodSelected}
+          onBack={() => setShowPaymentSelector(false)}
+          isLoading={isCreatingReservation}
+        />
       )}
 
       {/* Booking Success Screen */}
