@@ -9,6 +9,7 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
+import AppModeSelector, { type AppMode } from './components/AppModeSelector';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
 import { useAdmin } from './contexts/AdminContext';
@@ -18,6 +19,10 @@ import { initializeSupabase } from './lib/supabase';
 function App() {
   const { isAdminAuthenticated, isLoading: isAdminLoading, checkAdminSession } = useAdmin();
   const { user } = useAuth();
+  const [appMode, setAppMode] = useState<AppMode>(() => {
+    const savedMode = localStorage.getItem('appMode');
+    return (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
+  });
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
@@ -32,6 +37,12 @@ function App() {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+
+  const handleAppModeChange = (mode: AppMode) => {
+    setAppMode(mode);
+    localStorage.setItem('appMode', mode);
+    setCurrentSlideIndex(0);
+  };
 
   useEffect(() => {
     let retryCount = 0;
@@ -412,6 +423,11 @@ function App() {
           </div>
         </section>
 
+        <AppModeSelector
+          activeMode={appMode}
+          onModeChange={handleAppModeChange}
+        />
+
         <section className="px-3 lg:px-6 py-1 lg:py-3 flex-shrink-0">
           <h3 className="text-xs lg:text-2xl xl:text-3xl font-bold mb-1 lg:mb-4 text-darkgreen text-center lg:text-right">المزارع المتاحة</h3>
           {categories.length === 0 ? (
@@ -442,7 +458,7 @@ function App() {
                       WebkitBackdropFilter: 'blur(12px)'
                     }}
                   >
-                    <Icon className={`w-6 h-6 lg:w-12 lg:h-12 xl:w-14 xl:h-14 ${isActive ? 'text-darkgreen drop-shadow-sm' : 'text-darkgreen/60'}`} />
+                    <Icon className={`w-5 h-5 lg:w-9 lg:h-9 xl:w-11 xl:h-11 ${isActive ? 'text-darkgreen drop-shadow-sm' : 'text-darkgreen/60'}`} />
                   </button>
                   <span className={`text-[8px] lg:text-sm xl:text-base font-bold text-center leading-tight ${isActive ? 'text-darkgreen' : 'text-darkgreen/60'}`}>
                     {category.name}
@@ -703,16 +719,26 @@ function App() {
           </button>
 
           <button
-            onClick={() => alert('قريباً: محصولي')}
+            onClick={() => alert(`قريباً: ${appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}`)}
             className="flex items-center gap-3 px-8 py-3 rounded-2xl transition-all hover:scale-105"
             style={{
-              background: 'linear-gradient(145deg, #F4E4B8 0%, #D4AF37 50%, #B8942F 100%)',
-              boxShadow: '0 4px 16px rgba(212,175,55,0.4)',
+              background: appMode === 'agricultural'
+                ? 'linear-gradient(145deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)'
+                : 'linear-gradient(145deg, #F4E4B8 0%, #D4AF37 50%, #B8942F 100%)',
+              boxShadow: appMode === 'agricultural'
+                ? '0 4px 16px rgba(58,161,126,0.4)'
+                : '0 4px 16px rgba(212,175,55,0.4)',
               border: '2px solid #3AA17E'
             }}
           >
-            <Sprout className="w-7 h-7 text-white" />
-            <span className="text-base font-bold text-white">محصولي</span>
+            {appMode === 'agricultural' ? (
+              <Sprout className="w-7 h-7 text-white" />
+            ) : (
+              <TrendingUp className="w-7 h-7 text-white" />
+            )}
+            <span className="text-base font-bold text-white">
+              {appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}
+            </span>
           </button>
 
           <NotificationCenter
@@ -776,20 +802,30 @@ function App() {
           </button>
 
           <button
-            onClick={() => alert('قريباً: محصولي')}
+            onClick={() => alert(`قريباً: ${appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}`)}
             className="flex flex-col items-center justify-center gap-1 relative -mt-4"
           >
             <div
               className="w-16 h-16 rounded-3xl flex items-center justify-center transition-all duration-300 active:scale-95"
               style={{
-                background: 'linear-gradient(145deg, #F4E4B8 0%, #D4AF37 50%, #B8942F 100%)',
-                boxShadow: '0 8px 24px rgba(212,175,55,0.5), 0 4px 12px rgba(184,148,47,0.3), inset 0 2px 4px rgba(255,255,255,0.4)',
+                background: appMode === 'agricultural'
+                  ? 'linear-gradient(145deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)'
+                  : 'linear-gradient(145deg, #F4E4B8 0%, #D4AF37 50%, #B8942F 100%)',
+                boxShadow: appMode === 'agricultural'
+                  ? '0 8px 24px rgba(58,161,126,0.5), 0 4px 12px rgba(47,130,102,0.3), inset 0 2px 4px rgba(255,255,255,0.4)'
+                  : '0 8px 24px rgba(212,175,55,0.5), 0 4px 12px rgba(184,148,47,0.3), inset 0 2px 4px rgba(255,255,255,0.4)',
                 border: '2.5px solid #3AA17E'
               }}
             >
-              <Sprout className="w-8 h-8 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+              {appMode === 'agricultural' ? (
+                <Sprout className="w-8 h-8 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+              ) : (
+                <TrendingUp className="w-8 h-8 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+              )}
             </div>
-            <span className="text-[11px] font-bold text-darkgreen">محصولي</span>
+            <span className="text-[11px] font-bold text-darkgreen">
+              {appMode === 'agricultural' ? 'زراعي' : 'استثماري'}
+            </span>
           </button>
 
           <NotificationCenter
