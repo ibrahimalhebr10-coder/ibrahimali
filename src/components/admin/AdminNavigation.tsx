@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Home, Sprout, Calendar, DollarSign, Package, Settings, BarChart3, Video, Mail, MessageSquare } from 'lucide-react';
 import { usePermissions } from '../../contexts/PermissionsContext';
 
-export type AdminPage = 'dashboard' | 'farms' | 'reservations' | 'finance' | 'harvest' | 'messaging' | 'messages' | 'settings' | 'video';
+export type AdminPage = 'dashboard' | 'farms' | 'reservations' | 'finance' | 'messaging' | 'messages' | 'settings' | 'video';
 
 interface AdminNavigationProps {
   currentPage: AdminPage;
@@ -46,13 +46,6 @@ const navItems: NavItem[] = [
     icon: DollarSign,
     allowedRoles: ['super_admin', 'financial_manager'],
     requiredPermissions: ['finance:view']
-  },
-  {
-    id: 'harvest',
-    label: 'إدارة محصولي',
-    icon: Package,
-    allowedRoles: ['super_admin', 'farm_manager'],
-    requiredPermissions: ['dashboard:view']
   },
   {
     id: 'messages',

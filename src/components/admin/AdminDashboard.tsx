@@ -11,7 +11,6 @@ import FinanceManagement from './FinanceManagement';
 import PermissionsManagement from './PermissionsManagement';
 import PaymentMethodsSettings from './PaymentMethodsSettings';
 import AdminRouteGuard from './AdminRouteGuard';
-import MyHarvest from '../MyHarvest';
 import InvestorMessaging from './InvestorMessaging';
 import MessagesCenter from './MessagesCenter';
 import { adminService, DashboardStats, FarmStats } from '../../services/adminService';
@@ -91,7 +90,6 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
       farms: 'إدارة المزارع',
       reservations: 'إدارة الحجوزات',
       finance: 'الإدارة المالية',
-      harvest: 'إدارة محصولي',
       messages: 'إدارة الرسائل',
       messaging: 'مراسلة المستثمرين',
       video: 'الفيديو التعريفي',
@@ -155,10 +153,6 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
 
     if (currentPage === 'finance') {
       return <FinanceManagement onBack={() => setCurrentPage('dashboard')} />;
-    }
-
-    if (currentPage === 'harvest') {
-      return <MyHarvest isOpen={true} onClose={() => {}} inDashboard={true} />;
     }
 
     if (currentPage === 'messages') {

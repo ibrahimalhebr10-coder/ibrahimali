@@ -1,63 +1,37 @@
 import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import FarmPage from './components/FarmPage';
-import FarmCalculator from './components/FarmCalculator';
-import FarmCalculatorConfirmation from './components/FarmCalculatorConfirmation';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
 import SmartAssistant from './components/SmartAssistant';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
-import MyHarvestIntro from './components/MyHarvestIntro';
-import MyHarvestActive from './components/MyHarvestActive';
-import InvestorAccount from './components/InvestorAccount';
-import { checkUserHarvestStatus, type HarvestStatus } from './services/harvestStatusService';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
 import Header from './components/Header';
-import AuthForm from './components/AuthForm';
-import SmartAuthScreen from './components/SmartAuthScreen';
-import AuthSuccessTransition from './components/AuthSuccessTransition';
 import ErrorBoundary from './components/ErrorBoundary';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
-import { reservationService } from './services/reservationService';
 import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext';
 import { initializeSupabase } from './lib/supabase';
 
 function App() {
   const { isAdminAuthenticated, isLoading: isAdminLoading, checkAdminSession } = useAdmin();
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
-  const [selectedFarmId, setSelectedFarmId] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<'home' | 'farm' | 'calculator' | 'confirmation'>('home');
   const [categories, setCategories] = useState<FarmCategory[]>([]);
   const [farmProjects, setFarmProjects] = useState<Record<string, FarmProject[]>>({});
   const [loading, setLoading] = useState(true);
-  const [calculatorData, setCalculatorData] = useState<any>(null);
   const [showVideoIntro, setShowVideoIntro] = useState(false);
   const [showHowToStart, setShowHowToStart] = useState(false);
   const [showAssistant, setShowAssistant] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
-  const [showMyHarvest, setShowMyHarvest] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
-  const [showAuthForm, setShowAuthForm] = useState(false);
-  const [showSmartAuth, setShowSmartAuth] = useState(false);
-  const [showAuthSuccessTransition, setShowAuthSuccessTransition] = useState(false);
-  const [isNewUser, setIsNewUser] = useState(true);
-  const [showMyReservations, setShowMyReservations] = useState(false);
-  const [showMyHarvestActive, setShowMyHarvestActive] = useState(false);
-  const [harvestStatus, setHarvestStatus] = useState<HarvestStatus>({
-    hasActiveHarvest: false,
-    totalTrees: 0,
-    reservationIds: []
-  });
 
   useEffect(() => {
     let retryCount = 0;
@@ -170,7 +144,6 @@ function App() {
 
       try {
         await initializeSupabase();
-
         await new Promise(resolve => setTimeout(resolve, 500));
 
         const count = await getUnreadCount();
@@ -212,7 +185,6 @@ function App() {
     Apple: Apple
   };
 
-  // Glass morphism 3D color scheme for each category
   const colorScheme: Record<string, {
     iconGradient: string;
     cardGradient: string;
@@ -251,7 +223,6 @@ function App() {
     }
   };
 
-  // Get color scheme for icon
   const getColorForIcon = (iconName: string) => {
     const normalizedName = iconName.toLowerCase();
     return colorScheme[normalizedName] || colorScheme.leaf;
@@ -263,15 +234,8 @@ function App() {
   };
 
   const currentFarms = farmProjects[activeCategory] || [];
-
-  // Get active category icon for card colors
   const activeIconName = categories.find(cat => cat.slug === activeCategory)?.icon || 'leaf';
   const activeColors = getColorForIcon(activeIconName);
-
-  console.log('[App Render] Active category:', activeCategory);
-  console.log('[App Render] Available categories:', Object.keys(farmProjects));
-  console.log('[App Render] Current farms count:', currentFarms.length);
-  console.log('[App Render] Categories state:', categories.length, 'categories');
 
   const handlePrevSlide = () => {
     setCurrentSlideIndex((prev) =>
@@ -304,34 +268,6 @@ function App() {
     }
   };
 
-  const handleFarmClick = (farmId: string) => {
-    setSelectedFarmId(farmId);
-    setCurrentView('farm');
-  };
-
-  const handleCloseFarm = () => {
-    setCurrentView('home');
-    setSelectedFarmId(null);
-  };
-
-  const handleOpenCalculator = () => {
-    setCurrentView('calculator');
-  };
-
-  const handleCalculatorComplete = (data: any) => {
-    setCalculatorData(data);
-    setCurrentView('confirmation');
-  };
-
-  const handleCloseCalculator = () => {
-    setCurrentView('home');
-  };
-
-  const handleConfirmationComplete = () => {
-    setCurrentView('home');
-    setCalculatorData(null);
-  };
-
   const handleUnreadCountChange = async () => {
     if (isAdminAuthenticated) {
       return;
@@ -355,23 +291,6 @@ function App() {
     setShowAdminDashboard(true);
   };
 
-  const handleSmartAuthSuccess = async (userId: string) => {
-    try {
-      await reservationService.savePendingReservationFromStorage(userId);
-      setShowSmartAuth(false);
-      setShowAuthSuccessTransition(true);
-    } catch (error) {
-      console.error('Error saving pending reservation:', error);
-      setShowSmartAuth(false);
-      setShowAuthSuccessTransition(true);
-    }
-  };
-
-  const handleAuthSuccessTransitionComplete = () => {
-    setShowAuthSuccessTransition(false);
-    setShowMyReservations(true);
-  };
-
   useEffect(() => {
     if (isAdminAuthenticated && !isAdminLoading) {
       setShowAdminDashboard(true);
@@ -379,59 +298,6 @@ function App() {
       setShowAdminDashboard(false);
     }
   }, [isAdminAuthenticated, isAdminLoading]);
-
-  useEffect(() => {
-    async function loadHarvestStatus() {
-      if (user && !isAdminAuthenticated) {
-        const status = await checkUserHarvestStatus();
-        setHarvestStatus(status);
-      } else {
-        setHarvestStatus({
-          hasActiveHarvest: false,
-          totalTrees: 0,
-          reservationIds: []
-        });
-      }
-    }
-
-    loadHarvestStatus();
-  }, [user, isAdminAuthenticated]);
-
-  if (currentView === 'farm' && selectedFarmId) {
-    return (
-      <FarmPage
-        farmId={selectedFarmId}
-        onClose={handleCloseFarm}
-        onComplete={(reservationData) => {
-          localStorage.setItem('pendingReservation', JSON.stringify(reservationData));
-          handleCloseFarm();
-          if (user) {
-            setShowMyReservations(true);
-          } else {
-            setShowSmartAuth(true);
-          }
-        }}
-      />
-    );
-  }
-
-  if (currentView === 'calculator') {
-    return <FarmCalculator onClose={handleCloseCalculator} onComplete={handleCalculatorComplete} />;
-  }
-
-  if (currentView === 'confirmation' && calculatorData) {
-    return (
-      <FarmCalculatorConfirmation
-        calculatorData={calculatorData}
-        onComplete={handleConfirmationComplete}
-        onBack={() => setCurrentView('calculator')}
-        onGoHome={() => {
-          setCurrentView('home');
-          setCalculatorData(null);
-        }}
-      />
-    );
-  }
 
   return (
     <ErrorBoundary>
@@ -441,13 +307,10 @@ function App() {
           onOpenAdminDashboard={() => setShowAdminDashboard(true)}
         />
 
-        {/* MAIN CONTENT - Scrollable */}
         <div className="flex-1 overflow-y-auto pb-20 lg:pb-4 pt-14 lg:pt-16">
           <div className="max-w-7xl mx-auto">
-        {/* HERO SECTION - Enhanced Visual Design */}
         <section className="px-3 lg:px-6 pt-1.5 lg:pt-4 pb-0.5 lg:pb-2 flex-shrink-0">
           <div className="relative w-full h-20 lg:h-72 xl:h-80 overflow-hidden rounded-2xl lg:rounded-3xl" style={{ border: '3px solid #3AA17E' }}>
-            {/* Background Image with Zoom Effect */}
             <div className="absolute inset-0">
               <img
                 src="https://images.pexels.com/photos/2132250/pexels-photo-2132250.jpeg?auto=compress&cs=tinysrgb&w=1200"
@@ -456,7 +319,6 @@ function App() {
               />
             </div>
 
-            {/* Decorative Border Overlay */}
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
@@ -469,7 +331,6 @@ function App() {
               }}
             />
 
-            {/* Subtle Pattern Overlay */}
             <div
               className="absolute inset-0 opacity-10 pointer-events-none"
               style={{
@@ -478,7 +339,6 @@ function App() {
               }}
             />
 
-            {/* Content */}
             <div className="absolute inset-0 flex flex-col items-center justify-center px-4 lg:px-8 text-center">
               <div
                 className="relative px-4 py-2 lg:px-12 lg:py-6 rounded-xl lg:rounded-2xl backdrop-blur-sm"
@@ -506,7 +366,6 @@ function App() {
               </div>
             </div>
 
-            {/* Corner Accents */}
             <div className="absolute top-0 left-0 w-8 h-8 lg:w-16 lg:h-16" style={{
               background: 'linear-gradient(135deg, rgba(58,161,126,0.4) 0%, transparent 100%)',
               borderTopLeftRadius: '12px'
@@ -518,11 +377,10 @@ function App() {
           </div>
         </section>
 
-        {/* QUICK ACTIONS - Green Glass Border System */}
         <section className="px-3 lg:px-6 py-1 lg:py-3 flex-shrink-0">
           <div className="flex gap-2 lg:gap-4 justify-between lg:max-w-4xl lg:mx-auto">
             {[
-              { icon: Calculator, label: 'حاسبة مزرعتك', color: '#2F5233', onClick: handleOpenCalculator },
+              { icon: Calculator, label: 'حاسبة مزرعتك', color: '#2F5233', onClick: () => alert('قريباً: حاسبة المزرعة') },
               { icon: Video, label: 'فيديو تعريفي', color: '#3D6B42', onClick: () => setShowVideoIntro(true) },
               { icon: HelpCircle, label: 'كيف تبدأ؟', color: '#2F5233', onClick: () => setShowHowToStart(true) }
             ].map((action, idx) => (
@@ -542,33 +400,6 @@ function App() {
                   transform: 'translateY(0)',
                   transition: 'all 0.2s ease'
                 }}
-                onMouseDown={(e) => {
-                  e.currentTarget.style.transform = 'translateY(4px)';
-                  e.currentTarget.style.boxShadow = `
-                    0 2px 0 0 rgba(58,161,126,0.3),
-                    0 4px 8px rgba(58,161,126,0.2),
-                    inset 0 1px 0 rgba(255,255,255,0.8),
-                    inset 0 -1px 0 rgba(58,161,126,0.1)
-                  `;
-                }}
-                onMouseUp={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = `
-                    0 6px 0 0 rgba(58,161,126,0.3),
-                    0 8px 16px rgba(58,161,126,0.25),
-                    inset 0 1px 0 rgba(255,255,255,0.8),
-                    inset 0 -1px 0 rgba(58,161,126,0.1)
-                  `;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = `
-                    0 6px 0 0 rgba(58,161,126,0.3),
-                    0 8px 16px rgba(58,161,126,0.25),
-                    inset 0 1px 0 rgba(255,255,255,0.8),
-                    inset 0 -1px 0 rgba(58,161,126,0.1)
-                  `;
-                }}
               >
                 <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/40 via-transparent to-black/5 pointer-events-none"></div>
                 <action.icon
@@ -581,7 +412,6 @@ function App() {
           </div>
         </section>
 
-        {/* CATEGORY SLIDER - Green Glass Border System */}
         <section className="px-3 lg:px-6 py-1 lg:py-3 flex-shrink-0">
           <h3 className="text-xs lg:text-2xl xl:text-3xl font-bold mb-1 lg:mb-4 text-darkgreen text-center lg:text-right">المزارع المتاحة</h3>
           {categories.length === 0 ? (
@@ -594,7 +424,7 @@ function App() {
               const Icon = iconMap[category.icon] || Leaf;
               const isActive = activeCategory === category.slug;
               const colors = getColorForIcon(category.icon);
-              console.log('[Category Render]', category.name, '- slug:', category.slug, '- icon:', category.icon, '- isActive:', isActive);
+
               return (
                 <div key={category.slug} className="flex-1 flex flex-col items-center gap-1 lg:gap-2">
                   <button
@@ -624,7 +454,6 @@ function App() {
           )}
         </section>
 
-        {/* FARM CARDS SLIDER - Ultra Compact */}
         <section className="px-3 lg:px-6 py-1 lg:py-4 flex-shrink-0">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
@@ -634,8 +463,7 @@ function App() {
           ) : currentFarms.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 gap-3">
               <Sprout className="w-16 h-16 text-darkgreen/30" />
-              <p className="text-sm text-darkgreen/70 font-bold">لا توجد مزارع متاحة حالياً في "{activeCategory}"</p>
-              <p className="text-xs text-darkgreen/50">المتاح: {JSON.stringify(Object.keys(farmProjects))}</p>
+              <p className="text-sm text-darkgreen/70 font-bold">لا توجد مزارع متاحة حالياً</p>
             </div>
           ) : (
             <>
@@ -656,9 +484,8 @@ function App() {
 
                       return (
                         <div key={farm.id} className="w-full flex-shrink-0 px-0.5">
-                          <button
-                            onClick={() => handleFarmClick(farm.id)}
-                            className="w-full rounded-xl overflow-hidden transition-all duration-300 active:scale-[0.97] hover:shadow-xl text-right group backdrop-blur-xl relative"
+                          <div
+                            className="w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative"
                             style={{
                               background: activeColors.cardGradient,
                               boxShadow: `0 8px 24px ${activeColors.shadow}, 0 4px 12px ${activeColors.shadow}, inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.03)`,
@@ -671,7 +498,7 @@ function App() {
                               <img
                                 src={farm.image}
                                 alt={farm.name}
-                                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                className="w-full h-full object-cover"
                               />
                               <div
                                 className="absolute inset-0"
@@ -690,7 +517,7 @@ function App() {
                         <div className="p-2.5 space-y-1.5">
                           <div className="flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border border-amber-200 shadow-sm">
                             <Sparkles className="w-2.5 h-2.5 text-amber-500" strokeWidth={2.5} fill="currentColor" />
-                            <span className="text-[9px] font-black text-amber-800">احجز شجرتك الآن</span>
+                            <span className="text-[9px] font-black text-amber-800">قريباً</span>
                           </div>
 
                           <div className="flex items-center justify-between gap-1.5 text-[8px]">
@@ -712,8 +539,7 @@ function App() {
                                 className="h-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 transition-all duration-700"
                                 style={{
                                   width: `${reservationPercentage}%`,
-                                  backgroundSize: '200% 100%',
-                                  animation: 'shimmer 3s linear infinite'
+                                  backgroundSize: '200% 100%'
                                 }}
                               />
                             </div>
@@ -726,7 +552,7 @@ function App() {
                             {farm.description}
                           </p>
                         </div>
-                      </button>
+                      </div>
                     </div>
                   );
                 })}
@@ -759,7 +585,6 @@ function App() {
             )}
           </div>
 
-          {/* Pagination Dots - Compact */}
           {currentFarms.length > 1 && (
             <div className="flex justify-center gap-1.5 mt-2">
               {currentFarms.map((_, index) => (
@@ -776,17 +601,15 @@ function App() {
             </div>
           )}
 
-          {/* Desktop Grid */}
           <div className="hidden md:grid md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
             {currentFarms.map((farm) => {
               const totalTrees = farm.availableTrees + farm.reservedTrees;
               const reservationPercentage = (farm.reservedTrees / totalTrees) * 100;
 
               return (
-                <button
+                <div
                   key={farm.id}
-                  onClick={() => handleFarmClick(farm.id)}
-                  className="w-full rounded-xl overflow-hidden transition-all duration-300 active:scale-[0.97] hover:shadow-xl text-right group backdrop-blur-xl relative"
+                  className="w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative"
                   style={{
                     background: activeColors.cardGradient,
                     boxShadow: `0 8px 24px ${activeColors.shadow}, 0 4px 12px ${activeColors.shadow}, inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.03)`,
@@ -799,7 +622,7 @@ function App() {
                     <img
                       src={farm.image}
                       alt={farm.name}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="w-full h-full object-cover"
                     />
                     <div
                       className="absolute inset-0"
@@ -818,7 +641,7 @@ function App() {
                   <div className="p-2.5 space-y-1.5">
                     <div className="flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-lg bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border border-amber-200 shadow-sm">
                       <Sparkles className="w-2.5 h-2.5 text-amber-500" strokeWidth={2.5} fill="currentColor" />
-                      <span className="text-[9px] font-black text-amber-800">احجز شجرتك الآن</span>
+                      <span className="text-[9px] font-black text-amber-800">قريباً</span>
                     </div>
 
                     <div className="flex items-center justify-between gap-1.5 text-[8px]">
@@ -840,8 +663,7 @@ function App() {
                           className="h-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 transition-all duration-700"
                           style={{
                             width: `${reservationPercentage}%`,
-                            backgroundSize: '200% 100%',
-                            animation: 'shimmer 3s linear infinite'
+                            backgroundSize: '200% 100%'
                           }}
                         />
                       </div>
@@ -854,7 +676,7 @@ function App() {
                       {farm.description}
                     </p>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -864,7 +686,6 @@ function App() {
         </div>
       </div>
 
-      {/* DESKTOP NAVIGATION - Top Navigation for Large Screens */}
       <nav className="hidden lg:flex fixed bottom-0 left-0 right-0 bg-white z-50 border-t-2 border-darkgreen/20">
         <div className="max-w-7xl mx-auto w-full px-6 py-4 flex items-center justify-around">
           <button className="flex flex-col items-center gap-2 px-6 py-2 rounded-xl transition-all hover:bg-darkgreen/5">
@@ -882,15 +703,7 @@ function App() {
           </button>
 
           <button
-            onClick={() => {
-              if (!user) {
-                setShowMyHarvest(true);
-              } else if (harvestStatus.hasActiveHarvest) {
-                setShowMyHarvestActive(true);
-              } else {
-                setShowMyReservations(true);
-              }
-            }}
+            onClick={() => alert('قريباً: محصولي')}
             className="flex items-center gap-3 px-8 py-3 rounded-2xl transition-all hover:scale-105"
             style={{
               background: 'linear-gradient(145deg, #F4E4B8 0%, #D4AF37 50%, #B8942F 100%)',
@@ -917,7 +730,6 @@ function App() {
         </div>
       </nav>
 
-      {/* BOTTOM NAVIGATION - Mobile Only */}
       <nav
         className="fixed bottom-0 left-0 right-0 bg-white lg:hidden z-50"
         style={{
@@ -928,18 +740,7 @@ function App() {
         }}
       >
         <div className="h-[4.5rem] flex items-center justify-around px-3 relative">
-          {/* زر الرئيسية */}
-          <button
-            className="flex flex-col items-center justify-center gap-1 relative group"
-            onMouseEnter={(e) => {
-              const div = e.currentTarget.querySelector('div') as HTMLElement;
-              div.style.background = 'linear-gradient(145deg, #F0FFF4 0%, #E8F5E9 100%)';
-            }}
-            onMouseLeave={(e) => {
-              const div = e.currentTarget.querySelector('div') as HTMLElement;
-              div.style.background = 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)';
-            }}
-          >
+          <button className="flex flex-col items-center justify-center gap-1 relative group">
             <div
               className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300"
               style={{
@@ -953,18 +754,9 @@ function App() {
             <span className="text-[10px] font-semibold text-gray-600">الرئيسية</span>
           </button>
 
-          {/* زر المساعد الذكي */}
           <button
             onClick={() => setShowAssistant(true)}
             className="flex flex-col items-center justify-center gap-1 relative group"
-            onMouseEnter={(e) => {
-              const div = e.currentTarget.querySelector('div') as HTMLElement;
-              div.style.background = 'linear-gradient(145deg, #F0FFF4 0%, #E8F5E9 100%)';
-            }}
-            onMouseLeave={(e) => {
-              const div = e.currentTarget.querySelector('div') as HTMLElement;
-              div.style.background = 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)';
-            }}
           >
             <div
               className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 relative"
@@ -983,17 +775,8 @@ function App() {
             <span className="text-[10px] font-semibold text-gray-600">المساعد</span>
           </button>
 
-          {/* زر محصولي - الزر الرئيسي المميز */}
           <button
-            onClick={() => {
-              if (!user) {
-                setShowMyHarvest(true);
-              } else if (harvestStatus.hasActiveHarvest) {
-                setShowMyHarvestActive(true);
-              } else {
-                setShowMyReservations(true);
-              }
-            }}
+            onClick={() => alert('قريباً: محصولي')}
             className="flex flex-col items-center justify-center gap-1 relative -mt-4"
           >
             <div
@@ -1014,18 +797,9 @@ function App() {
             onCountChange={handleUnreadCountChange}
           />
 
-          {/* زر حسابي - مميز ثانوي */}
           <button
             onClick={() => setShowAccountProfile(true)}
             className="flex flex-col items-center justify-center gap-1 relative group"
-            onMouseEnter={(e) => {
-              const div = e.currentTarget.querySelector('div') as HTMLElement;
-              div.style.background = 'linear-gradient(145deg, #E8F5E9 0%, #C8E6C9 100%)';
-            }}
-            onMouseLeave={(e) => {
-              const div = e.currentTarget.querySelector('div') as HTMLElement;
-              div.style.background = 'linear-gradient(145deg, #f0f4f0 0%, #e8ede8 100%)';
-            }}
           >
             <div
               className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300"
@@ -1045,13 +819,13 @@ function App() {
       <VideoIntro
         isOpen={showVideoIntro}
         onClose={() => setShowVideoIntro(false)}
-        onStartFarm={handleOpenCalculator}
+        onStartFarm={() => alert('قريباً')}
       />
 
       <HowToStart
         isOpen={showHowToStart}
         onClose={() => setShowHowToStart(false)}
-        onStart={handleOpenCalculator}
+        onStart={() => alert('قريباً')}
       />
 
       <SmartAssistant
@@ -1062,46 +836,9 @@ function App() {
       <AccountProfile
         isOpen={showAccountProfile}
         onClose={() => setShowAccountProfile(false)}
-        onOpenAuth={() => setShowSmartAuth(true)}
-        onOpenReservations={() => setShowMyReservations(true)}
+        onOpenAuth={() => alert('قريباً: تسجيل الدخول')}
+        onOpenReservations={() => alert('قريباً: حجوزاتي')}
       />
-
-      <MyHarvestIntro
-        isOpen={showMyHarvest}
-        onClose={() => setShowMyHarvest(false)}
-        onOpenAuth={() => setShowSmartAuth(true)}
-      />
-
-      <MyHarvestActive
-        isOpen={showMyHarvestActive}
-        onClose={() => setShowMyHarvestActive(false)}
-      />
-
-      {showSmartAuth && (
-        <SmartAuthScreen
-          onSuccess={handleSmartAuthSuccess}
-          onBack={() => setShowSmartAuth(false)}
-        />
-      )}
-
-      {showAuthSuccessTransition && (
-        <AuthSuccessTransition
-          onComplete={handleAuthSuccessTransitionComplete}
-          isNewUser={isNewUser}
-        />
-      )}
-
-      {showMyReservations && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <InvestorAccount />
-          <button
-            onClick={() => setShowMyReservations(false)}
-            className="fixed top-4 left-4 z-50 w-10 h-10 bg-white rounded-full shadow-lg flex items-center justify-center hover:bg-gray-100 transition-colors"
-          >
-            <span className="text-gray-700 text-xl">✕</span>
-          </button>
-        </div>
-      )}
 
       {showAdminLogin && (
         <SmartAdminLoginGate
