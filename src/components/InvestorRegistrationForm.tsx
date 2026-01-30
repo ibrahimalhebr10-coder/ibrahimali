@@ -47,8 +47,8 @@ export default function InvestorRegistrationForm({ guestId, onSuccess, onCancel 
       setError('يرجى إدخال كلمة المرور');
       return false;
     }
-    if (formData.password.length < 4) {
-      setError('كلمة المرور يجب أن تكون 4 أحرف أو أرقام على الأقل');
+    if (formData.password.length < 6) {
+      setError('كلمة المرور يجب أن تكون 6 أحرف أو أرقام على الأقل');
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -83,10 +83,13 @@ export default function InvestorRegistrationForm({ guestId, onSuccess, onCancel 
       });
 
       if (signUpError) {
+        console.error('Supabase signup error:', signUpError);
         if (signUpError.message.includes('already registered')) {
           setError('رقم الجوال مسجل مسبقاً. يرجى تسجيل الدخول أو استخدام رقم آخر');
+        } else if (signUpError.message.includes('Password should be at least 6 characters')) {
+          setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل (متطلب من النظام)');
         } else {
-          setError('حدث خطأ في التسجيل. يرجى المحاولة مرة أخرى');
+          setError(`خطأ في التسجيل: ${signUpError.message}`);
         }
         setLoading(false);
         return;
@@ -196,7 +199,7 @@ export default function InvestorRegistrationForm({ guestId, onSuccess, onCancel 
               disabled={loading}
             />
           </div>
-          <p className="text-xs text-gray-500 mt-1 text-right">4 أحرف أو أرقام على الأقل</p>
+          <p className="text-xs text-gray-500 mt-1 text-right">6 أحرف أو أرقام على الأقل</p>
         </div>
 
         <div>

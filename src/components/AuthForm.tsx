@@ -61,8 +61,8 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
       return;
     }
 
-    if (password.length < 4) {
-      setError('كلمة المرور يجب أن تكون 4 أحرف أو أرقام على الأقل');
+    if (password.length < 6) {
+      setError('كلمة المرور يجب أن تكون 6 أحرف أو أرقام على الأقل');
       setLoading(false);
       return;
     }
@@ -217,7 +217,7 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
                 />
               </div>
               <p className="text-xs text-gray-500 mt-2">
-                {mode === 'signup' && '4 أحرف أو أرقام على الأقل'}
+                {mode === 'signup' && '6 أحرف أو أرقام على الأقل'}
               </p>
             </div>
 
