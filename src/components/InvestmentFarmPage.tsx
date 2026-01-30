@@ -10,9 +10,10 @@ import PaymentSuccessScreen from './PaymentSuccessScreen';
 interface InvestmentFarmPageProps {
   farm: FarmProject;
   onClose: () => void;
+  onGoToAccount?: () => void;
 }
 
-export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPageProps) {
+export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: InvestmentFarmPageProps) {
   const [selectedContract, setSelectedContract] = useState<FarmContract | null>(null);
   const [treeCount, setTreeCount] = useState(0);
   const [showVideoModal, setShowVideoModal] = useState(false);
@@ -141,6 +142,9 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
 
   const handleGoToAccount = () => {
     onClose();
+    if (onGoToAccount) {
+      onGoToAccount();
+    }
   };
 
   return (

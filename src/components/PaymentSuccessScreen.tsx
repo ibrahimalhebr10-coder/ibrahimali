@@ -1,6 +1,4 @@
-import { CheckCircle2, TreePine, MapPin, Calendar, FileText, LogIn, Sparkles } from 'lucide-react';
-import { useState } from 'react';
-import TemporaryCertificate from './TemporaryCertificate';
+import { CheckCircle2, TreePine, MapPin, Calendar, FileText, ArrowLeft, Sparkles } from 'lucide-react';
 
 interface PaymentSuccessScreenProps {
   reservationId: string;
@@ -23,16 +21,6 @@ export default function PaymentSuccessScreen({
   investmentNumber,
   onGoToAccount
 }: PaymentSuccessScreenProps) {
-  const [showCertificate, setShowCertificate] = useState(false);
-
-  if (showCertificate) {
-    return (
-      <TemporaryCertificate
-        reservationId={reservationId}
-        onClose={() => setShowCertificate(false)}
-      />
-    );
-  }
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 z-50 overflow-y-auto">
@@ -53,13 +41,12 @@ export default function PaymentSuccessScreen({
 
               <div className="space-y-3">
                 <h1 className="text-3xl md:text-4xl font-bold text-green-800">
-                  🎉 تم تفعيل استثمار أشجارك بنجاح
+                  تم تفعيل استثمار أشجارك بنجاح 🎉
                 </h1>
-                <p className="text-xl font-bold text-[#B8942F]">
-                  استثمارك أصبح نشطًا وتم ربطه بحسابك
-                </p>
-                <p className="text-gray-600 text-lg">
-                  هذه لحظة انتصار نفسي - استثمارك محمي ومُفعّل رسميًا
+                <p className="text-xl text-gray-800 leading-relaxed">
+                  استثمارك أصبح نشطًا ومُفعّل رسميًا في نظامنا
+                  <br />
+                  وتم ربطه بحسابك الاستثماري
                 </p>
               </div>
             </div>
@@ -147,52 +134,56 @@ export default function PaymentSuccessScreen({
               </div>
             </div>
 
-            {/* Certificate Section */}
+            {/* Certificate Info Section */}
             <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-2xl p-6 border-2 border-[#D4AF37]/30 text-center space-y-3">
               <div className="w-16 h-16 bg-gradient-to-br from-[#D4AF37] to-[#B8942F] rounded-full flex items-center justify-center mx-auto shadow-lg">
                 <FileText className="w-8 h-8 text-white" />
               </div>
               <div className="space-y-2">
                 <h3 className="text-xl font-bold text-[#B8942F]">
-                  شهادة استثمارك أصبحت رسمية
+                  تم إنشاء شهادة استثمار رقمية خاصة بك
                 </h3>
-                <p className="text-sm text-gray-600">
-                  يمكنك الآن عرض شهادتك وتحميلها وطباعتها
+                <p className="text-gray-700 leading-relaxed">
+                  يمكنك الاطلاع عليها في صفحة حسابك في أي وقت
                 </p>
               </div>
-              <button
-                onClick={() => setShowCertificate(true)}
-                className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#B8942F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
-              >
-                <FileText className="w-5 h-5" />
-                <span>عرض الشهادة</span>
-              </button>
+            </div>
+
+            {/* Welcome Message */}
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200 text-center">
+              <p className="text-lg text-gray-800 leading-relaxed">
+                <span className="font-bold text-green-700">مرحبًا بك مستثمرًا زراعيًا معنا</span>
+                <br />
+                <span className="text-green-600">استثمارك بدأ رحلته الآن</span>
+              </p>
             </div>
 
             {/* Go to Account Button */}
             <button
               onClick={onGoToAccount}
-              className="w-full py-5 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
+              className="w-full py-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
             >
-              <LogIn className="w-6 h-6" />
-              <span>ادخل إلى حسابي</span>
+              <span>الآن تفضل إلى صفحة حسابك الاستثماري</span>
+              <ArrowLeft className="w-6 h-6" />
             </button>
 
             {/* Footer Message */}
             <div className="text-center pt-4 border-t border-gray-200">
               <p className="text-sm text-gray-600 leading-relaxed">
-                ✔ دفعت وتم التفعيل فورًا • ✔ العملية نظيفة • ✔ استلم استثمارك رسميًا
+                ✔ استلمت استثمار رسمي • ✔ لديك شهادة محفوظة • ✔ الحساب أصبح مركز الإدارة
               </p>
               <p className="text-xs text-green-600 mt-2 font-bold">
-                الحساب جاهز • لا يوجد انتظار • هذه لحظة تثبيت الثقة
+                لا يوجد انتظار • العملية انتهت بنجاح
               </p>
             </div>
           </div>
 
           {/* Additional Info */}
           <div className="bg-white/80 rounded-xl p-4 shadow-lg backdrop-blur-sm border border-green-200">
-            <p className="text-center text-sm text-gray-700">
-              <span className="font-bold text-green-700">مبروك!</span> أصبحت الآن مستثمرًا زراعيًا معنا. استثمارك نشط ومُفعّل في نظامنا.
+            <p className="text-center text-gray-700 leading-relaxed">
+              <span className="font-bold text-green-700 text-lg">مبروك!</span>
+              <br />
+              <span className="text-sm">أصبحت الآن مستثمرًا زراعيًا معنا • استثمارك نشط ومُفعّل رسميًا</span>
             </p>
           </div>
         </div>

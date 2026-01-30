@@ -948,6 +948,7 @@ function App() {
         <InvestmentFarmPage
           farm={selectedInvestmentFarm}
           onClose={() => setSelectedInvestmentFarm(null)}
+          onGoToAccount={() => setShowAccountProfile(true)}
         />
       )}
       </div>
