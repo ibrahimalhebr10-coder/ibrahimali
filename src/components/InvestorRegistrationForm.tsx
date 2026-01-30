@@ -47,8 +47,8 @@ export default function InvestorRegistrationForm({ guestId, onSuccess, onCancel 
       setError('يرجى إدخال كلمة المرور');
       return false;
     }
-    if (formData.password.length < 8) {
-      setError('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+    if (formData.password.length < 4) {
+      setError('كلمة المرور يجب أن تكون 4 أحرف أو أرقام على الأقل');
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
@@ -196,7 +196,7 @@ export default function InvestorRegistrationForm({ guestId, onSuccess, onCancel 
               disabled={loading}
             />
           </div>
-          <p className="text-xs text-gray-500 mt-1 text-right">8 أحرف على الأقل</p>
+          <p className="text-xs text-gray-500 mt-1 text-right">4 أحرف أو أرقام على الأقل</p>
         </div>
 
         <div>
