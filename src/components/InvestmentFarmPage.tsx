@@ -23,7 +23,6 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
   const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   const [isCreatingReservation, setIsCreatingReservation] = useState(false);
   const [reservationData, setReservationData] = useState<any>(null);
-  const [registeredUserId, setRegisteredUserId] = useState<string>('');
   const [registeredUserName, setRegisteredUserName] = useState<string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mada' | 'bank_transfer' | null>(null);
 
@@ -63,14 +62,13 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
   };
 
   const handleRegistrationSuccess = (userId: string, userName: string) => {
-    setRegisteredUserId(userId);
     setRegisteredUserName(userName);
     setShowPrePaymentRegistration(false);
     setShowPaymentSelector(true);
   };
 
   const handlePaymentMethodSelected = async (method: 'mada' | 'bank_transfer') => {
-    if (!selectedContract || treeCount === 0 || !registeredUserId) {
+    if (!selectedContract || treeCount === 0) {
       return;
     }
 
@@ -78,6 +76,14 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
     setIsCreatingReservation(true);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        alert('الرجاء تسجيل الدخول أولاً');
+        setIsCreatingReservation(false);
+        return;
+      }
+
       const totalPrice = calculateTotal();
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 24);
@@ -85,7 +91,7 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
       const { data: reservation, error: reservationError } = await supabase
         .from('reservations')
         .insert({
-          user_id: registeredUserId,
+          user_id: user.id,
           farm_id: farm.id,
           farm_name: farm.name,
           contract_id: selectedContract.id,
