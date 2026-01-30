@@ -10,6 +10,7 @@ import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
+import InvestmentFarmPage from './components/InvestmentFarmPage';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
 import { useAdmin } from './contexts/AdminContext';
@@ -37,6 +38,7 @@ function App() {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+  const [selectedInvestmentFarm, setSelectedInvestmentFarm] = useState<FarmProject | null>(null);
 
   const handleAppModeChange = (mode: AppMode) => {
     setAppMode(mode);
@@ -546,7 +548,12 @@ function App() {
                       return (
                         <div key={farm.id} className="w-full flex-shrink-0 px-0.5">
                           <div
-                            className="w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative"
+                            onClick={() => {
+                              if (appMode === 'investment') {
+                                setSelectedInvestmentFarm(farm);
+                              }
+                            }}
+                            className={`w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative ${appMode === 'investment' ? 'cursor-pointer active:scale-95' : ''} transition-transform duration-200`}
                             style={{
                               background: activeColors.cardGradient,
                               boxShadow: `0 8px 24px ${activeColors.shadow}, 0 4px 12px ${activeColors.shadow}, inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.03)`,
@@ -670,7 +677,12 @@ function App() {
               return (
                 <div
                   key={farm.id}
-                  className="w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative"
+                  onClick={() => {
+                    if (appMode === 'investment') {
+                      setSelectedInvestmentFarm(farm);
+                    }
+                  }}
+                  className={`w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative ${appMode === 'investment' ? 'cursor-pointer hover:scale-105 active:scale-95' : ''} transition-transform duration-200`}
                   style={{
                     background: activeColors.cardGradient,
                     boxShadow: `0 8px 24px ${activeColors.shadow}, 0 4px 12px ${activeColors.shadow}, inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.03)`,
@@ -930,6 +942,13 @@ function App() {
 
       {showAdminDashboard && (
         <AdminDashboard onClose={() => setShowAdminDashboard(false)} />
+      )}
+
+      {selectedInvestmentFarm && appMode === 'investment' && (
+        <InvestmentFarmPage
+          farm={selectedInvestmentFarm}
+          onClose={() => setSelectedInvestmentFarm(null)}
+        />
       )}
       </div>
     </ErrorBoundary>
