@@ -196,47 +196,87 @@ function App() {
     Apple: Apple
   };
 
-  const colorScheme: Record<string, {
+  const colorScheme: Record<string, Record<AppMode, {
     iconGradient: string;
     cardGradient: string;
     border: string;
     shadow: string;
-  }> = {
+  }>> = {
     leaf: {
-      iconGradient: 'linear-gradient(145deg, rgba(200, 255, 200, 0.95) 0%, rgba(220, 255, 220, 0.90) 50%, rgba(200, 255, 200, 0.95) 100%)',
-      cardGradient: 'linear-gradient(135deg, rgba(220, 255, 220, 0.85) 0%, rgba(230, 255, 230, 0.80) 50%, rgba(220, 255, 220, 0.85) 100%)',
-      border: 'rgba(144, 238, 144, 0.70)',
-      shadow: 'rgba(144, 238, 144, 0.45)'
+      agricultural: {
+        iconGradient: 'linear-gradient(145deg, rgba(180, 240, 180, 0.95) 0%, rgba(200, 255, 200, 0.90) 50%, rgba(180, 240, 180, 0.95) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(200, 255, 200, 0.85) 0%, rgba(220, 255, 220, 0.80) 50%, rgba(200, 255, 200, 0.85) 100%)',
+        border: 'rgba(58, 161, 126, 0.70)',
+        shadow: 'rgba(58, 161, 126, 0.45)'
+      },
+      investment: {
+        iconGradient: 'linear-gradient(145deg, rgba(255, 245, 210, 0.95) 0%, rgba(255, 250, 230, 0.90) 50%, rgba(255, 245, 210, 0.95) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(255, 250, 230, 0.85) 0%, rgba(255, 255, 245, 0.80) 50%, rgba(255, 250, 230, 0.85) 100%)',
+        border: 'rgba(212, 175, 55, 0.70)',
+        shadow: 'rgba(212, 175, 55, 0.45)'
+      }
     },
     wheat: {
-      iconGradient: 'linear-gradient(145deg, rgba(255, 253, 245, 0.95) 0%, rgba(255, 248, 230, 0.88) 50%, rgba(255, 251, 240, 0.92) 100%)',
-      cardGradient: 'linear-gradient(135deg, rgba(255, 251, 240, 0.72) 0%, rgba(255, 246, 225, 0.65) 50%, rgba(255, 249, 235, 0.70) 100%)',
-      border: 'rgba(255, 240, 200, 0.45)',
-      shadow: 'rgba(245, 215, 150, 0.28)'
+      agricultural: {
+        iconGradient: 'linear-gradient(145deg, rgba(180, 240, 190, 0.95) 0%, rgba(200, 255, 210, 0.88) 50%, rgba(190, 248, 200, 0.92) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(200, 255, 210, 0.72) 0%, rgba(220, 255, 225, 0.65) 50%, rgba(210, 255, 220, 0.70) 100%)',
+        border: 'rgba(58, 161, 126, 0.60)',
+        shadow: 'rgba(58, 161, 126, 0.38)'
+      },
+      investment: {
+        iconGradient: 'linear-gradient(145deg, rgba(255, 248, 220, 0.95) 0%, rgba(255, 240, 190, 0.88) 50%, rgba(255, 245, 210, 0.92) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(255, 245, 210, 0.72) 0%, rgba(255, 235, 180, 0.65) 50%, rgba(255, 241, 200, 0.70) 100%)',
+        border: 'rgba(212, 175, 55, 0.60)',
+        shadow: 'rgba(212, 175, 55, 0.38)'
+      }
     },
     apple: {
-      iconGradient: 'linear-gradient(145deg, rgba(220, 255, 235, 0.92) 0%, rgba(230, 255, 240, 0.88) 50%, rgba(225, 255, 238, 0.90) 100%)',
-      cardGradient: 'linear-gradient(135deg, rgba(225, 255, 238, 0.75) 0%, rgba(230, 255, 242, 0.68) 50%, rgba(228, 255, 240, 0.72) 100%)',
-      border: 'rgba(144, 238, 144, 0.50)',
-      shadow: 'rgba(144, 238, 144, 0.35)'
+      agricultural: {
+        iconGradient: 'linear-gradient(145deg, rgba(200, 255, 220, 0.92) 0%, rgba(220, 255, 235, 0.88) 50%, rgba(210, 255, 228, 0.90) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(210, 255, 228, 0.75) 0%, rgba(225, 255, 238, 0.68) 50%, rgba(218, 255, 233, 0.72) 100%)',
+        border: 'rgba(58, 161, 126, 0.55)',
+        shadow: 'rgba(58, 161, 126, 0.40)'
+      },
+      investment: {
+        iconGradient: 'linear-gradient(145deg, rgba(255, 250, 225, 0.92) 0%, rgba(255, 245, 210, 0.88) 50%, rgba(255, 248, 218, 0.90) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(255, 248, 218, 0.75) 0%, rgba(255, 242, 200, 0.68) 50%, rgba(255, 246, 212, 0.72) 100%)',
+        border: 'rgba(212, 175, 55, 0.55)',
+        shadow: 'rgba(212, 175, 55, 0.40)'
+      }
     },
     grape: {
-      iconGradient: 'linear-gradient(145deg, rgba(255, 248, 240, 0.95) 0%, rgba(255, 238, 220, 0.88) 50%, rgba(255, 245, 233, 0.92) 100%)',
-      cardGradient: 'linear-gradient(135deg, rgba(255, 245, 233, 0.72) 0%, rgba(255, 235, 215, 0.65) 50%, rgba(255, 241, 226, 0.70) 100%)',
-      border: 'rgba(255, 225, 185, 0.45)',
-      shadow: 'rgba(255, 200, 150, 0.28)'
+      agricultural: {
+        iconGradient: 'linear-gradient(145deg, rgba(190, 250, 210, 0.95) 0%, rgba(210, 255, 225, 0.88) 50%, rgba(200, 253, 218, 0.92) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(200, 253, 218, 0.72) 0%, rgba(220, 255, 230, 0.65) 50%, rgba(212, 254, 225, 0.70) 100%)',
+        border: 'rgba(58, 161, 126, 0.58)',
+        shadow: 'rgba(58, 161, 126, 0.35)'
+      },
+      investment: {
+        iconGradient: 'linear-gradient(145deg, rgba(255, 242, 200, 0.95) 0%, rgba(255, 235, 180, 0.88) 50%, rgba(255, 240, 192, 0.92) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(255, 240, 192, 0.72) 0%, rgba(255, 232, 170, 0.65) 50%, rgba(255, 237, 183, 0.70) 100%)',
+        border: 'rgba(212, 175, 55, 0.58)',
+        shadow: 'rgba(212, 175, 55, 0.35)'
+      }
     },
     palm: {
-      iconGradient: 'linear-gradient(145deg, rgba(255, 250, 243, 0.95) 0%, rgba(255, 242, 225, 0.88) 50%, rgba(255, 247, 236, 0.92) 100%)',
-      cardGradient: 'linear-gradient(135deg, rgba(255, 247, 236, 0.72) 0%, rgba(255, 240, 220, 0.65) 50%, rgba(255, 244, 230, 0.70) 100%)',
-      border: 'rgba(255, 230, 190, 0.45)',
-      shadow: 'rgba(255, 210, 160, 0.28)'
+      agricultural: {
+        iconGradient: 'linear-gradient(145deg, rgba(185, 245, 200, 0.95) 0%, rgba(205, 255, 215, 0.88) 50%, rgba(195, 251, 208, 0.92) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(195, 251, 208, 0.72) 0%, rgba(215, 255, 220, 0.65) 50%, rgba(207, 253, 215, 0.70) 100%)',
+        border: 'rgba(58, 161, 126, 0.62)',
+        shadow: 'rgba(58, 161, 126, 0.33)'
+      },
+      investment: {
+        iconGradient: 'linear-gradient(145deg, rgba(255, 245, 205, 0.95) 0%, rgba(255, 238, 185, 0.88) 50%, rgba(255, 242, 196, 0.92) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(255, 242, 196, 0.72) 0%, rgba(255, 235, 175, 0.65) 50%, rgba(255, 239, 188, 0.70) 100%)',
+        border: 'rgba(212, 175, 55, 0.62)',
+        shadow: 'rgba(212, 175, 55, 0.33)'
+      }
     }
   };
 
-  const getColorForIcon = (iconName: string) => {
+  const getColorForIcon = (iconName: string, mode: AppMode) => {
     const normalizedName = iconName.toLowerCase();
-    return colorScheme[normalizedName] || colorScheme.leaf;
+    return colorScheme[normalizedName]?.[mode] || colorScheme.leaf[mode];
   };
 
   const handleCategoryChange = (categoryId: string) => {
@@ -246,7 +286,7 @@ function App() {
 
   const currentFarms = farmProjects[activeCategory] || [];
   const activeIconName = categories.find(cat => cat.slug === activeCategory)?.icon || 'leaf';
-  const activeColors = getColorForIcon(activeIconName);
+  const activeColors = getColorForIcon(activeIconName, appMode);
 
   const handlePrevSlide = () => {
     setCurrentSlideIndex((prev) =>
@@ -439,7 +479,9 @@ function App() {
             {categories.map((category) => {
               const Icon = iconMap[category.icon] || Leaf;
               const isActive = activeCategory === category.slug;
-              const colors = getColorForIcon(category.icon);
+              const colors = getColorForIcon(category.icon, appMode);
+              const iconColor = appMode === 'agricultural' ? '#3AA17E' : '#D4AF37';
+              const textColor = appMode === 'agricultural' ? 'text-darkgreen' : 'text-[#B8942F]';
 
               return (
                 <div key={category.slug} className="flex-1 flex flex-col items-center gap-1 lg:gap-2">
@@ -453,14 +495,17 @@ function App() {
                       background: isActive
                         ? colors.iconGradient
                         : 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(249,249,249,0.8) 100%)',
-                      border: `2px solid ${isActive ? colors.border : 'rgba(255,255,255,0.7)'}`,
+                      border: `2px solid ${isActive ? colors.border : 'rgba(220,220,220,0.5)'}`,
                       backdropFilter: 'blur(12px)',
                       WebkitBackdropFilter: 'blur(12px)'
                     }}
                   >
-                    <Icon className={`w-5 h-5 lg:w-9 lg:h-9 xl:w-11 xl:h-11 ${isActive ? 'text-darkgreen drop-shadow-sm' : 'text-darkgreen/60'}`} />
+                    <Icon
+                      className={`w-5 h-5 lg:w-9 lg:h-9 xl:w-11 xl:h-11 transition-colors duration-300 ${isActive ? 'drop-shadow-sm' : ''}`}
+                      style={{ color: isActive ? iconColor : `${iconColor}60` }}
+                    />
                   </button>
-                  <span className={`text-[8px] lg:text-sm xl:text-base font-bold text-center leading-tight ${isActive ? 'text-darkgreen' : 'text-darkgreen/60'}`}>
+                  <span className={`text-[8px] lg:text-sm xl:text-base font-bold text-center leading-tight transition-colors duration-300 ${isActive ? textColor : `${textColor}/60`}`}>
                     {category.name}
                   </span>
                 </div>
