@@ -68,7 +68,7 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
         .from('reservations')
         .insert({
           guest_id: guestId,
-          farm_id: parseInt(farm.id),
+          farm_id: farm.id,
           farm_name: farm.name,
           contract_id: selectedContract.id,
           contract_name: selectedContract.contract_name,
