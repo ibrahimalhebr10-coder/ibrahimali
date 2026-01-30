@@ -38,7 +38,7 @@ export const investorAccountService = {
           contract_id,
           farm_id,
           farms!fk_reservations_farm_id(
-            name,
+            name_ar,
             hero_image
           )
         `)
@@ -57,7 +57,7 @@ export const investorAccountService = {
 
       return reservations.map(reservation => ({
         id: reservation.id,
-        farmName: reservation.farms?.name || 'مزرعة غير محددة',
+        farmName: reservation.farms?.name_ar || 'مزرعة غير محددة',
         farmImage: reservation.farms?.hero_image,
         treeCount: reservation.tree_count,
         durationYears: reservation.duration_years,
