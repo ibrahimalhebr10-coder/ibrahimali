@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { X, Video, HelpCircle, MapPin, Minus, Plus, TrendingUp, Clock, Gift, DollarSign, ArrowLeft } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import type { FarmProject, FarmContract } from '../services/farmService';
+import BookingSuccessScreen from './BookingSuccessScreen';
 
 interface InvestmentFarmPageProps {
   farm: FarmProject;
@@ -12,12 +14,26 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
   const [treeCount, setTreeCount] = useState(0);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [isCreatingReservation, setIsCreatingReservation] = useState(false);
+  const [reservationData, setReservationData] = useState<any>(null);
+  const [guestId, setGuestId] = useState<string>('');
 
   useEffect(() => {
     if (farm.contracts && farm.contracts.length > 0) {
       setSelectedContract(farm.contracts[0]);
     }
   }, [farm.contracts]);
+
+  useEffect(() => {
+    const existingGuestId = localStorage.getItem('guestId');
+    if (existingGuestId) {
+      setGuestId(existingGuestId);
+    } else {
+      const newGuestId = `guest_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      localStorage.setItem('guestId', newGuestId);
+      setGuestId(newGuestId);
+    }
+  }, []);
 
   const maxTrees = farm.availableTrees || 0;
 
@@ -33,6 +49,87 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTreeCount(parseInt(e.target.value));
+  };
+
+  const handleInvestNow = async () => {
+    if (!selectedContract || treeCount === 0 || !guestId) {
+      alert('يرجى اختيار باقة وعدد الأشجار');
+      return;
+    }
+
+    setIsCreatingReservation(true);
+
+    try {
+      const totalPrice = calculateTotal();
+      const expiresAt = new Date();
+      expiresAt.setHours(expiresAt.getHours() + 24);
+
+      const { data: reservation, error: reservationError } = await supabase
+        .from('reservations')
+        .insert({
+          guest_id: guestId,
+          farm_id: parseInt(farm.id),
+          farm_name: farm.name,
+          contract_id: selectedContract.id,
+          contract_name: selectedContract.contract_name,
+          duration_years: selectedContract.duration_years,
+          bonus_years: selectedContract.bonus_years,
+          total_trees: treeCount,
+          total_price: totalPrice,
+          status: 'temporary',
+          temporary_expires_at: expiresAt.toISOString()
+        })
+        .select()
+        .single();
+
+      if (reservationError) {
+        console.error('Reservation error:', reservationError);
+        alert('حدث خطأ في إنشاء الحجز. يرجى المحاولة مرة أخرى');
+        setIsCreatingReservation(false);
+        return;
+      }
+
+      setReservationData({
+        id: reservation.id,
+        farmName: farm.name,
+        contractName: selectedContract.contract_name,
+        treeCount,
+        durationYears: selectedContract.duration_years,
+        bonusYears: selectedContract.bonus_years,
+        totalPrice,
+        createdAt: reservation.created_at
+      });
+
+      setIsCreatingReservation(false);
+    } catch (error) {
+      console.error('Error creating reservation:', error);
+      alert('حدث خطأ غير متوقع');
+      setIsCreatingReservation(false);
+    }
+  };
+
+  const handleRegistrationComplete = async (userId: string) => {
+    try {
+      if (!reservationData) return;
+
+      await supabase
+        .from('reservations')
+        .update({
+          user_id: userId,
+          guest_id: null,
+          status: 'pending'
+        })
+        .eq('id', reservationData.id)
+        .eq('guest_id', guestId);
+
+      localStorage.removeItem('guestId');
+
+      alert('تم ربط الحجز بحسابك بنجاح! سيتم مراجعة حجزك من قبل الإدارة.');
+      onClose();
+    } catch (error) {
+      console.error('Error linking reservation:', error);
+      alert('حدث خطأ في ربط الحجز');
+    }
   };
 
   return (
@@ -233,9 +330,22 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
                   </div>
                 </div>
 
-                <button className="px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#B8942F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-2">
-                  <DollarSign className="w-5 h-5" />
-                  <span>استثمر الآن</span>
+                <button
+                  onClick={handleInvestNow}
+                  disabled={isCreatingReservation}
+                  className="px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#B8942F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isCreatingReservation ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>جاري الحجز...</span>
+                    </>
+                  ) : (
+                    <>
+                      <DollarSign className="w-5 h-5" />
+                      <span>استثمر الآن</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>
@@ -326,6 +436,19 @@ export default function InvestmentFarmPage({ farm, onClose }: InvestmentFarmPage
             </div>
           </div>
         </div>
+      )}
+
+      {/* Booking Success Screen */}
+      {reservationData && guestId && (
+        <BookingSuccessScreen
+          reservation={reservationData}
+          guestId={guestId}
+          onRegistrationComplete={handleRegistrationComplete}
+          onClose={() => {
+            setReservationData(null);
+            onClose();
+          }}
+        />
       )}
 
       <style>{`
