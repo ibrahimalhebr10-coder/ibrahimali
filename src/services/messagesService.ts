@@ -19,11 +19,9 @@ export async function getMessages(category?: 'important' | 'general'): Promise<M
   try {
     await initializeSupabase();
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError) {
-      console.warn('Auth error in getMessages:', authError);
-    }
+    // Use getSession() to avoid errors when no session exists
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
 
     let query = supabase
       .from('messages')
@@ -54,11 +52,9 @@ export async function getUnreadCount(): Promise<number> {
   try {
     await initializeSupabase();
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError) {
-      console.warn('Auth error in getUnreadCount:', authError);
-    }
+    // Use getSession() to avoid errors when no session exists
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
 
     let query = supabase
       .from('messages')
@@ -98,9 +94,11 @@ export async function markAllAsRead(): Promise<void> {
   try {
     await initializeSupabase();
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    // Use getSession() to avoid errors when no session exists
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
 
-    if (authError || !user) {
+    if (!user) {
       console.warn('Cannot mark as read - no user session');
       return;
     }

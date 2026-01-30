@@ -111,7 +111,8 @@ class MessagingChannelsService {
   }
 
   async createProvider(providerData: CreateProviderData): Promise<MessagingProvider> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     if (!user) throw new Error('User not authenticated');
 
     const { data: admin } = await supabase
@@ -138,7 +139,8 @@ class MessagingChannelsService {
   }
 
   async updateProvider(id: string, updates: UpdateProviderData): Promise<MessagingProvider> {
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user;
     if (!user) throw new Error('User not authenticated');
 
     const { data: admin } = await supabase

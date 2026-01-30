@@ -28,7 +28,9 @@ function generateSessionId(): string {
 export async function askAIAssistant(question: string): Promise<AIResponse> {
   const sessionId = generateSessionId();
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // Use getSession() to avoid errors when no session exists
+  const { data: { session } } = await supabase.auth.getSession();
+  const user = session?.user;
 
   const response = await fetch(
     `${SUPABASE_URL}/functions/v1/smart-assistant`,
