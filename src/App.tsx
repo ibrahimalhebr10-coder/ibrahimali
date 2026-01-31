@@ -349,7 +349,14 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <div className="h-screen bg-pearl flex flex-col overflow-hidden">
+      <div
+        className="h-screen flex flex-col overflow-hidden"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(254, 254, 254, 0.95) 100%)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)'
+        }}
+      >
         <Header />
 
         <div className="flex-1 overflow-y-auto pb-24 lg:pb-4 pt-14 lg:pt-16">
@@ -750,7 +757,7 @@ function App() {
       <nav
         className="hidden lg:flex fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl"
         style={{
-          background: 'linear-gradient(180deg, rgba(240, 242, 245, 0.85) 0%, rgba(248, 249, 251, 0.80) 100%)',
+          background: 'linear-gradient(180deg, rgba(230, 232, 235, 0.85) 0%, rgba(238, 239, 241, 0.80) 100%)',
           borderTop: '2px solid rgba(58,161,126,0.3)',
           boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)',
           backdropFilter: 'blur(20px)',
@@ -813,7 +820,7 @@ function App() {
       <nav
         className="fixed bottom-0 left-0 right-0 lg:hidden z-50 backdrop-blur-xl"
         style={{
-          background: 'linear-gradient(180deg, rgba(240, 242, 245, 0.85) 0%, rgba(248, 249, 251, 0.80) 100%)',
+          background: 'linear-gradient(180deg, rgba(230, 232, 235, 0.85) 0%, rgba(238, 239, 241, 0.80) 100%)',
           borderTop: '2px solid rgba(58,161,126,0.3)',
           boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)',
           backdropFilter: 'blur(20px)',
