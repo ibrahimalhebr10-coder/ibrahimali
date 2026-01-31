@@ -317,12 +317,12 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
         )}
       </div>
 
-      <form onSubmit={handleCustomSubmit} className="mt-4">
+      <form onSubmit={handleCustomSubmit} className="mt-4 mb-4">
         <div className="flex gap-2">
           <button
             type="submit"
             disabled={!customQuestion.trim() || isLoading}
-            className="px-4 py-3 rounded-xl flex items-center justify-center disabled:opacity-50"
+            className="px-4 py-3 rounded-xl flex items-center justify-center disabled:opacity-50 flex-shrink-0"
             style={{
               background: 'linear-gradient(135deg, #2F5233 0%, #3D6B42 100%)',
             }}
@@ -407,7 +407,7 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
     <>
       <div
         className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm transition-opacity duration-300"
-        style={{ animation: 'fadeIn 0.3s ease-out', zIndex: 60 }}
+        style={{ animation: 'fadeIn 0.3s ease-out', zIndex: 999999 }}
         onClick={handleClose}
       />
 
@@ -416,9 +416,11 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
         dir="rtl"
         style={{
           animation: 'slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          maxHeight: 'calc(100vh - 80px)',
-          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
-          zIndex: 70
+          maxHeight: '85vh',
+          height: '85vh',
+          paddingBottom: 'max(env(safe-area-inset-bottom, 20px), 20px)',
+          zIndex: 9999999,
+          WebkitOverflowScrolling: 'touch'
         }}
       >
         <div className="flex justify-center pt-3 pb-2 bg-white rounded-t-3xl flex-shrink-0">
@@ -452,7 +454,13 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
           </div>
         </div>
 
-        <div className="overflow-y-auto flex-1 px-4 py-4">
+        <div
+          className="overflow-y-auto flex-1 px-4 py-4"
+          style={{
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 20px)',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
           {messages.length > 0 ? renderConversation() : showCustomInput ? renderCustomInput() : renderWelcomeScreen()}
         </div>
       </div>
