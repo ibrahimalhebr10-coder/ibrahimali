@@ -570,8 +570,8 @@ function App() {
                           background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%)'
                         }}
                       />
-                      <div className="absolute top-2 md:top-3 right-2 md:right-3 bg-white/98 backdrop-blur-md rounded-lg px-2 md:px-3 py-1 md:py-1.5 shadow-lg border border-emerald-200">
-                        <span className="text-[10px] md:text-base font-black text-darkgreen">{farm.name}</span>
+                      <div className="absolute top-2 md:top-3 right-2 md:right-3 bg-white/98 backdrop-blur-md rounded-lg px-2.5 md:px-3 py-1.5 md:py-2 shadow-lg border-2 border-emerald-200">
+                        <span className="text-xs md:text-base font-black text-darkgreen drop-shadow-sm" style={{ textShadow: '0 1px 2px rgba(255,255,255,0.8)' }}>{farm.name}</span>
                       </div>
                       <div className="absolute top-2 md:top-3 left-2 md:left-3 bg-gradient-to-r from-green-100 to-emerald-100 backdrop-blur-md rounded-full px-2 md:px-3 py-1 md:py-1.5 flex items-center gap-1 md:gap-2 shadow-lg border border-green-300 animate-pulse">
                         <TrendingUp className="w-3 md:w-4 h-3 md:h-4 text-green-700" strokeWidth={2.5} />
