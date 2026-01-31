@@ -154,13 +154,20 @@ export default function NotificationCenter({ unreadCount, onCountChange }: Notif
           />
 
           <div
-            className="fixed top-0 left-0 right-0 bg-white shadow-2xl z-50 max-h-[85vh] overflow-hidden rounded-b-3xl"
+            className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 overflow-hidden rounded-t-3xl flex flex-col"
             style={{
-              animation: 'slideDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+              animation: 'slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+              maxHeight: 'calc(100vh - 80px)',
+              paddingBottom: 'max(env(safe-area-inset-bottom), 16px)'
             }}
           >
+            {/* Drag Handle */}
+            <div className="flex justify-center pt-3 pb-2 bg-white rounded-t-3xl flex-shrink-0">
+              <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+            </div>
+
             <div
-              className="sticky top-0 z-10 px-6 py-6"
+              className="flex-shrink-0 px-6 py-5"
               style={{
                 background: 'linear-gradient(135deg, #3AA17E 0%, #2D8B6A 100%)',
                 boxShadow: '0 6px 20px rgba(58, 161, 126, 0.3)'
@@ -198,7 +205,7 @@ export default function NotificationCenter({ unreadCount, onCountChange }: Notif
               )}
             </div>
 
-            <div className="overflow-y-auto max-h-[calc(85vh-160px)] px-4 py-4">
+            <div className="overflow-y-auto flex-1 px-4 py-4">
               {loading ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
@@ -288,9 +295,9 @@ export default function NotificationCenter({ unreadCount, onCountChange }: Notif
           to { opacity: 1; }
         }
 
-        @keyframes slideDown {
+        @keyframes slideUp {
           from {
-            transform: translateY(-100%);
+            transform: translateY(100%);
             opacity: 0;
           }
           to {
