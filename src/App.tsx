@@ -387,82 +387,9 @@ function App() {
         {!selectedInvestmentFarm && (
           <>
             <div className="flex-1 flex flex-col overflow-hidden">
-              <div className="flex-1 overflow-y-auto lg:pb-4 pt-14 lg:pt-16" style={{ paddingBottom: '12rem' }}>
+              <div className="flex-1 overflow-y-auto lg:pb-4 pt-16 lg:pt-20" style={{ paddingBottom: '12rem' }}>
                 <div className="max-w-7xl mx-auto">
-                  <section className="px-3 lg:px-6 pt-1 lg:pt-4 pb-0.5 lg:pb-2 flex-shrink-0 animate-fadeIn">
-          <div className="relative w-full h-14 lg:h-64 xl:h-72 overflow-hidden rounded-xl lg:rounded-3xl shadow-2xl group" style={{ border: '3px solid #3AA17E' }}>
-            <div className="absolute inset-0">
-              <img
-                src="https://images.pexels.com/photos/2132250/pexels-photo-2132250.jpeg?auto=compress&cs=tinysrgb&w=1200"
-                alt="مزرعة"
-                className="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-110"
-              />
-            </div>
-
-            <div
-              className="absolute inset-0 pointer-events-none transition-opacity duration-700 group-hover:opacity-80"
-              style={{
-                background: `
-                  linear-gradient(135deg, rgba(47,82,51,0.2) 0%, transparent 25%),
-                  linear-gradient(225deg, rgba(58,161,126,0.2) 0%, transparent 25%),
-                  linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 100%)
-                `,
-                boxShadow: 'inset 0 0 50px rgba(47,82,51,0.4)'
-              }}
-            />
-
-            <div
-              className="absolute inset-0 opacity-20 pointer-events-none animate-pulse"
-              style={{
-                backgroundImage: `radial-gradient(circle at 20% 50%, rgba(255,255,255,0.9) 0%, transparent 50%),
-                                  radial-gradient(circle at 80% 50%, rgba(255,255,255,0.7) 0%, transparent 50%)`
-              }}
-            />
-
-            <div className="absolute inset-0 flex flex-col items-center justify-center px-4 lg:px-8 text-center animate-scaleIn">
-              <div
-                className="relative px-4 py-2 lg:px-12 lg:py-6 rounded-xl lg:rounded-2xl backdrop-blur-md transition-all duration-500 group-hover:backdrop-blur-lg"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)',
-                  border: '2px solid rgba(255,255,255,0.4)',
-                  boxShadow: '0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.5)'
-                }}
-              >
-                <h1
-                  className="text-xs lg:text-5xl xl:text-6xl font-black text-white drop-shadow-2xl"
-                  style={{
-                    textShadow: '0 4px 15px rgba(0,0,0,0.6), 0 0 30px rgba(58,161,126,0.5)',
-                    letterSpacing: '-0.02em'
-                  }}
-                >
-                  استثمر في مزارع حقيقية
-                </h1>
-                <p className="hidden lg:block text-white/90 text-lg mt-3 font-semibold" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
-                  ازرع اليوم واحصد غداً
-                </p>
-                <div
-                  className="h-[2px] lg:h-2 mt-0.5 lg:mt-4 mx-auto rounded-full animate-pulse"
-                  style={{
-                    width: '70%',
-                    background: 'linear-gradient(90deg, transparent 0%, rgba(58,161,126,0.8) 20%, #3AA17E 50%, rgba(58,161,126,0.8) 80%, transparent 100%)',
-                    boxShadow: '0 0 20px rgba(58,161,126,0.6)'
-                  }}
-                />
-              </div>
-            </div>
-
-            <div className="absolute top-0 left-0 w-10 h-10 lg:w-20 lg:h-20" style={{
-              background: 'linear-gradient(135deg, rgba(58,161,126,0.5) 0%, transparent 100%)',
-              borderTopLeftRadius: '14px'
-            }} />
-            <div className="absolute top-0 right-0 w-10 h-10 lg:w-20 lg:h-20" style={{
-              background: 'linear-gradient(225deg, rgba(58,161,126,0.5) 0%, transparent 100%)',
-              borderTopRightRadius: '14px'
-            }} />
-          </div>
-        </section>
-
-        <section className="px-3 lg:px-6 py-0.5 lg:py-3 flex-shrink-0">
+        <section className="px-3 lg:px-6 py-3 lg:py-6 flex-shrink-0">
           <div className="flex gap-1.5 lg:gap-4 justify-between lg:max-w-4xl lg:mx-auto">
             {[
               { icon: Calculator, label: 'حاسبة مزرعتك', color: '#2F5233', onClick: () => alert('قريباً: حاسبة المزرعة'), delay: '0ms' },
