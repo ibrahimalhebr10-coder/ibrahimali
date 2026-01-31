@@ -561,7 +561,7 @@ function App() {
                   >
                     <div className={`absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-br from-white/30 via-transparent to-emerald-50/20 pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'}`}></div>
                     <Icon
-                      className={`w-2 h-2 lg:w-5 lg:h-5 xl:w-6 xl:h-6 transition-all duration-500 ${isActive ? 'drop-shadow-lg scale-110' : 'group-hover:scale-125 group-hover:drop-shadow-md'}`}
+                      className={`w-2 h-2 lg:w-5 lg:h-5 xl:w-6 xl:h-6 scale-[0.6] transition-all duration-500 ${isActive ? 'drop-shadow-lg scale-[0.66]' : 'group-hover:scale-[0.75] group-hover:drop-shadow-md'}`}
                       style={{
                         color: isActive ? iconColor : `${iconColor}60`,
                         filter: isActive ? 'drop-shadow(0 2px 6px rgba(58,161,126,0.4))' : 'none'
