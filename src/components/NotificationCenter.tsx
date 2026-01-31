@@ -5,6 +5,7 @@ import { getMessages, markAsRead, markAllAsRead, type Message } from '../service
 interface NotificationCenterProps {
   unreadCount: number;
   onCountChange: () => void;
+  onOpenChange?: (isOpen: boolean) => void;
 }
 
 const WELCOME_MESSAGE: Message = {
@@ -22,7 +23,7 @@ const WELCOME_MESSAGE: Message = {
   read_at: null
 };
 
-export default function NotificationCenter({ unreadCount, onCountChange }: NotificationCenterProps) {
+export default function NotificationCenter({ unreadCount, onCountChange, onOpenChange }: NotificationCenterProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([WELCOME_MESSAGE]);
   const [loading, setLoading] = useState(false);
@@ -57,7 +58,13 @@ export default function NotificationCenter({ unreadCount, onCountChange }: Notif
 
   const handleOpen = async () => {
     setIsOpen(true);
+    onOpenChange?.(true);
     await loadMessages();
+  };
+
+  const handleClose = () => {
+    handleClose();
+    onOpenChange?.(false);
   };
 
   const handleMarkAsRead = async (messageId: string) => {
@@ -149,7 +156,7 @@ export default function NotificationCenter({ unreadCount, onCountChange }: Notif
         <>
           <div
             className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm transition-opacity duration-300"
-            onClick={() => setIsOpen(false)}
+            onClick={() => handleClose()}
             style={{ animation: 'fadeIn 0.3s ease-out', zIndex: 60 }}
           />
 
@@ -188,7 +195,7 @@ export default function NotificationCenter({ unreadCount, onCountChange }: Notif
                 </div>
 
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => handleClose()}
                   className="w-11 h-11 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center transition-all duration-200 backdrop-blur-sm active:scale-95"
                 >
                   <X className="w-6 h-6 text-white" />

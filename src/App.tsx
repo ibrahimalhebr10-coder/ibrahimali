@@ -30,6 +30,7 @@ function App() {
   const [showVideoIntro, setShowVideoIntro] = useState(false);
   const [showHowToStart, setShowHowToStart] = useState(false);
   const [showAssistant, setShowAssistant] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showStandaloneRegistration, setShowStandaloneRegistration] = useState(false);
   const [showWelcomeToAccount, setShowWelcomeToAccount] = useState(false);
@@ -629,15 +630,16 @@ function App() {
           </>
         )}
 
-      {!selectedInvestmentFarm && (
+      {!selectedInvestmentFarm && !showAssistant && !showNotifications && (
         <nav
-          className="hidden lg:flex fixed bottom-0 left-0 right-0 z-50 backdrop-blur-2xl"
+          className="hidden lg:flex fixed bottom-0 left-0 right-0 z-50 backdrop-blur-2xl transition-all duration-500 ease-out"
           style={{
             background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.95) 0%, rgba(242, 247, 244, 0.92) 100%)',
             borderTop: '3px solid rgba(58,161,126,0.4)',
             boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
             backdropFilter: 'blur(24px)',
-            WebkitBackdropFilter: 'blur(24px)'
+            WebkitBackdropFilter: 'blur(24px)',
+            animation: 'slideUpFade 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
           }}
         >
         <div className="max-w-7xl mx-auto w-full px-8 py-5 pb-8 flex items-center justify-around">
@@ -702,6 +704,7 @@ function App() {
           <NotificationCenter
             unreadCount={unreadMessagesCount}
             onCountChange={handleUnreadCountChange}
+            onOpenChange={setShowNotifications}
           />
 
           <button
@@ -723,9 +726,9 @@ function App() {
       </nav>
       )}
 
-      {!selectedInvestmentFarm && (
+      {!selectedInvestmentFarm && !showAssistant && !showNotifications && (
         <nav
-          className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
+          className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl transition-all duration-500 ease-out"
         style={{
           bottom: 0,
           background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.98) 0%, rgba(242, 247, 244, 0.95) 100%)',
@@ -739,7 +742,8 @@ function App() {
           position: 'fixed',
           willChange: 'transform',
           transform: 'translate3d(0, 0, 0)',
-          WebkitTransform: 'translate3d(0, 0, 0)'
+          WebkitTransform: 'translate3d(0, 0, 0)',
+          animation: 'slideUpFade 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
         }}
       >
         <div className="flex items-center justify-around px-3 relative" style={{ height: '4.5rem' }}>
@@ -814,6 +818,7 @@ function App() {
           <NotificationCenter
             unreadCount={unreadMessagesCount}
             onCountChange={handleUnreadCountChange}
+            onOpenChange={setShowNotifications}
           />
 
           <button
