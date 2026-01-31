@@ -362,7 +362,7 @@ function App() {
         <div
           className="flex-1 overflow-y-auto lg:pb-4 pt-14 lg:pt-16"
           style={{
-            paddingBottom: '6.5rem'
+            paddingBottom: '8.5rem'
           }}
         >
           <div className="max-w-7xl mx-auto">
@@ -831,8 +831,8 @@ function App() {
           boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          paddingTop: '0.5rem',
-          paddingBottom: '1.5rem',
+          paddingTop: '1rem',
+          paddingBottom: '3rem',
           zIndex: 99999,
           position: 'fixed',
           willChange: 'transform',
