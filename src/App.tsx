@@ -531,7 +531,7 @@ function App() {
           onModeChange={handleAppModeChange}
         />
 
-        <section className="px-3 lg:px-6 py-0.5 lg:py-2 flex-shrink-0">
+        <section className="sticky top-0 px-3 lg:px-6 py-2 lg:py-3 flex-shrink-0 bg-white/95 backdrop-blur-md z-30 shadow-sm">
           <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-1 lg:mb-3 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
           {categories.length === 0 ? (
             <div className="text-center py-4 text-darkgreen/70 animate-pulse">
