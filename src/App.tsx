@@ -544,24 +544,24 @@ function App() {
                       border: `2.5px solid ${isActive ? colors.border : 'rgba(58,161,126,0.3)'}`,
                       backdropFilter: 'blur(16px)',
                       WebkitBackdropFilter: 'blur(16px)',
-                      transform: isActive ? 'scale(1.05)' : 'scale(1)'
+                      transform: isActive ? 'scale(0.63)' : 'scale(0.6)'
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.transform = 'scale(1.1) translateY(-4px)';
+                        e.currentTarget.style.transform = 'scale(0.66) translateY(-4px)';
                         e.currentTarget.style.boxShadow = `0 6px 20px ${colors.shadow}, 0 12px 40px ${colors.shadow}`;
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.transform = 'scale(1) translateY(0)';
+                        e.currentTarget.style.transform = 'scale(0.6) translateY(0)';
                         e.currentTarget.style.boxShadow = '0 3px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)';
                       }
                     }}
                   >
                     <div className={`absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-br from-white/30 via-transparent to-emerald-50/20 pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'}`}></div>
                     <Icon
-                      className={`w-2 h-2 lg:w-5 lg:h-5 xl:w-6 xl:h-6 scale-[0.6] transition-all duration-500 ${isActive ? 'drop-shadow-lg scale-[0.66]' : 'group-hover:scale-[0.75] group-hover:drop-shadow-md'}`}
+                      className={`w-2 h-2 lg:w-5 lg:h-5 xl:w-6 xl:h-6 transition-all duration-500 ${isActive ? 'drop-shadow-lg scale-110' : 'group-hover:scale-125 group-hover:drop-shadow-md'}`}
                       style={{
                         color: isActive ? iconColor : `${iconColor}60`,
                         filter: isActive ? 'drop-shadow(0 2px 6px rgba(58,161,126,0.4))' : 'none'
