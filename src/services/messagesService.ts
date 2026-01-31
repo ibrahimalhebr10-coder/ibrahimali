@@ -58,8 +58,9 @@ export async function getUnreadCount(): Promise<number> {
 
     let query = supabase
       .from('messages')
-      .select('id', { count: 'exact', head: true })
-      .eq('is_read', false);
+      .select('id', { count: 'exact', head: false })
+      .eq('is_read', false)
+      .limit(1);
 
     if (user) {
       query = query.eq('user_id', user.id);

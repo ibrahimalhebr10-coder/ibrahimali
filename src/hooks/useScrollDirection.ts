@@ -22,6 +22,16 @@ export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
   }, [scrollableRef]);
 
   useEffect(() => {
+    const scrollElement = scrollableRef?.current || window;
+
+    // تأكد من أن الـ element موجود قبل إضافة الـ listener
+    if (!scrollElement) {
+      console.log('⚠️ Scroll element not ready yet');
+      return;
+    }
+
+    console.log('✅ Setting up scroll listener on:', scrollElement === window ? 'window' : 'custom element');
+
     let timeoutId: NodeJS.Timeout;
     let lastY = getScrollY();
     setLastScrollY(lastY);
@@ -57,15 +67,13 @@ export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
       timeoutId = setTimeout(updateScrollDirection, debounceMs);
     };
 
-    const scrollElement = scrollableRef?.current || window;
-
     scrollElement.addEventListener('scroll', handleScroll, { passive: true } as any);
 
     return () => {
       scrollElement.removeEventListener('scroll', handleScroll);
       clearTimeout(timeoutId);
     };
-  }, [threshold, debounceMs, scrollableRef, getScrollY]);
+  }, [threshold, debounceMs, scrollableRef?.current, getScrollY]);
 
   return { scrollDirection, showHeaderFooter, lastScrollY };
 }
