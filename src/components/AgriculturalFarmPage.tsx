@@ -40,19 +40,30 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
+    if (!scrollContainer) {
+      console.log('❌ Scroll container not found');
+      return;
+    }
 
+    console.log('✅ Scroll container found, adding listener');
     let ticking = false;
 
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const currentScrollY = scrollContainer.scrollTop;
+          console.log('📜 Scroll detected:', {
+            currentScrollY,
+            lastScrollY,
+            isScrollingDown: currentScrollY > lastScrollY && currentScrollY > 80
+          });
 
           if (currentScrollY > lastScrollY && currentScrollY > 80) {
             setIsScrollingDown(true);
+            console.log('⬇️ Hiding header/footer');
           } else if (currentScrollY < lastScrollY) {
             setIsScrollingDown(false);
+            console.log('⬆️ Showing header/footer');
           }
 
           setLastScrollY(currentScrollY);
