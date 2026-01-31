@@ -13,6 +13,7 @@ interface ContractData {
   contractNumber: string;
   investorName: string;
   farmName: string;
+  farmLocation: string;
   treeTypes: string;
   treeCount: number;
   durationYears: number;
@@ -53,7 +54,8 @@ export default function InvestmentContract({
           tree_details,
           user_id,
           farms!fk_reservations_farm_id(
-            name_ar
+            name_ar,
+            location
           )
         `)
         .eq('id', reservationId)
@@ -83,6 +85,7 @@ export default function InvestmentContract({
         contractNumber: reservation.contract_name || reservation.id.slice(0, 8).toUpperCase(),
         investorName: investorName || userData?.full_name || userData?.email?.split('@')[0] || 'المستثمر',
         farmName: reservation.farms?.name_ar || 'المزرعة',
+        farmLocation: reservation.farms?.location || 'المملكة العربية السعودية',
         treeTypes: treeTypesText,
         treeCount: reservation.total_trees,
         durationYears: reservation.duration_years,
@@ -275,7 +278,7 @@ export default function InvestmentContract({
                     <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-3 bg-gradient-to-r from-cyan-600 via-cyan-700 to-cyan-600 bg-clip-text text-transparent" style={{
                       textShadow: '0 2px 10px rgba(6, 182, 212, 0.2)'
                     }}>
-                      شهادة استثمار
+                      شهادة استثمار زراعي
                     </h1>
                     <div className="h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent rounded-full"></div>
                   </div>
@@ -297,24 +300,105 @@ export default function InvestmentContract({
                 </div>
               </div>
 
-              <div className="text-center mb-8 sm:mb-10 px-4">
-                <div className="inline-block bg-white/80 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-lg border-2 border-cyan-200">
-                  <p className="text-base sm:text-xl md:text-2xl text-gray-700 font-bold mb-4 text-cyan-700">تقديراً لاستثماره المتميز في</p>
-                  <p className="text-sm sm:text-base md:text-lg text-gray-600 leading-relaxed max-w-3xl mx-auto">
-                    <span className="font-bold text-cyan-700 text-lg sm:text-xl">{contract.treeCount}</span> شجرة من نوع{' '}
-                    <span className="font-bold text-gray-800">{contract.treeTypes}</span>
-                    <br className="sm:hidden" /> في{' '}
-                    <span className="font-bold text-gray-800">{contract.farmName}</span>
-                    <br /><br />
-                    بقيمة استثمارية إجمالية قدرها{' '}
-                    <span className="font-bold text-cyan-700 text-lg sm:text-xl">{contract.totalPrice.toLocaleString()}</span>{' '}
-                    <span className="font-bold text-gray-700">ريال سعودي</span>
-                    <br />
-                    لمدة <span className="font-bold text-cyan-700">{contract.durationYears} سنوات</span>
-                    <br /><br />
-                    <span className="text-gray-500 text-sm">من تاريخ</span> <span className="text-gray-700 font-semibold">{formatDate(contract.startDate)}</span>{' '}
-                    <span className="text-gray-500 text-sm">إلى</span> <span className="text-gray-700 font-semibold">{formatDate(contract.endDate)}</span>
-                  </p>
+              <div className="mb-8 sm:mb-10 px-2 sm:px-4">
+                <div className="text-center mb-6">
+                  <p className="text-base sm:text-xl md:text-2xl text-cyan-700 font-bold">تقديراً لاستثماره المتميز</p>
+                  <div className="h-1 w-32 bg-gradient-to-r from-transparent via-cyan-500 to-transparent mx-auto mt-2"></div>
+                </div>
+
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-cyan-200 overflow-hidden">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-right">
+                      <tbody>
+                        <tr className="border-b border-cyan-100">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                            نوع استثمار الأشجار
+                          </td>
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
+                            {contract.treeTypes} ({contract.treeCount} شجرة)
+                          </td>
+                        </tr>
+
+                        <tr className="border-b border-cyan-100">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                            مدة العقد الأساسية
+                          </td>
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
+                            {contract.durationYears} سنوات
+                          </td>
+                        </tr>
+
+                        <tr className="border-b border-cyan-100 bg-amber-50/50">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-amber-100 to-amber-200 font-bold text-amber-900 text-xs sm:text-sm md:text-base">
+                            <div className="flex flex-col gap-1">
+                              <span>السنوات المجانية</span>
+                              <span className="text-xs font-normal text-amber-700 italic">
+                                (مدة تشجيعية غير ملزمة)
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs sm:text-sm md:text-base">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-amber-800 font-bold">{contract.bonusYears} سنة</span>
+                              <span className="text-xs text-amber-600">
+                                عند حدوث أي عائق في الاستمرار
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+
+                        <tr className="border-b border-cyan-100">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                            موقع الاستثمار
+                          </td>
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
+                            {contract.farmLocation}
+                          </td>
+                        </tr>
+
+                        <tr className="border-b border-cyan-100">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                            اسم المزرعة
+                          </td>
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
+                            {contract.farmName}
+                          </td>
+                        </tr>
+
+                        <tr className="border-b border-cyan-100">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                            تاريخ بداية العقد
+                          </td>
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
+                            {formatDate(contract.startDate)}
+                          </td>
+                        </tr>
+
+                        <tr className="border-b border-cyan-100">
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                            تاريخ نهاية العقد
+                          </td>
+                          <td className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs sm:text-sm md:text-base">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-gray-800">{formatDate(contract.endDate)}</span>
+                              <span className="text-xs text-gray-600">
+                                (بعد {contract.totalYears} سنة شاملة المدة التشجيعية)
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+
+                        <tr className="bg-gradient-to-r from-cyan-100 to-cyan-200">
+                          <td className="py-4 sm:py-5 px-3 sm:px-6 font-bold text-cyan-900 text-sm sm:text-base md:text-lg whitespace-nowrap">
+                            القيمة الاستثمارية
+                          </td>
+                          <td className="py-4 sm:py-5 px-3 sm:px-6 font-bold text-cyan-800 text-base sm:text-lg md:text-xl">
+                            {contract.totalPrice.toLocaleString()} ريال سعودي
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
 
@@ -468,7 +552,7 @@ export default function InvestmentContract({
               </div>
 
               <div className="text-center pt-6 border-t-2 border-cyan-200">
-                <div className="inline-block bg-cyan-50 px-6 py-3 rounded-full">
+                <div className="inline-block bg-gradient-to-r from-cyan-50 via-cyan-100 to-cyan-50 px-6 py-3 rounded-full shadow-lg">
                   <p className="text-xs sm:text-sm text-cyan-800 font-semibold">
                     رقم الشهادة: <span className="font-bold text-cyan-900">{contract.contractNumber}</span>
                   </p>
