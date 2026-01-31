@@ -509,7 +509,10 @@ function App() {
 
               <div ref={scrollableRef} className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{ paddingBottom: '9rem' }}>
                 <div className="max-w-7xl mx-auto">
-                  <section className="px-3 lg:px-4 pt-16 pb-4 lg:pt-20 lg:pb-6">
+                  <section className="px-3 lg:px-4 pb-4 lg:pb-6" style={{
+                    paddingTop: showHeaderFooter ? '4rem' : '1rem',
+                    transition: 'padding-top 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}>
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-3 animate-fadeIn">
               <div className="relative">
