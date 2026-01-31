@@ -914,9 +914,9 @@ function App() {
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/20 pointer-events-none"></div>
             {appMode === 'agricultural' ? (
-              <Sprout className="w-4 h-4 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+              <Sprout className="w-6 h-6 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
             ) : (
-              <TrendingUp className="w-4 h-4 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+              <TrendingUp className="w-6 h-6 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
             )}
             <span className="text-sm font-black text-white relative z-10" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
               {appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}
@@ -1019,15 +1019,15 @@ function App() {
                   ? '0 10px 30px rgba(58,161,126,0.6), 0 6px 15px rgba(47,130,102,0.4), inset 0 2px 6px rgba(255,255,255,0.5)'
                   : '0 10px 30px rgba(212,175,55,0.6), 0 6px 15px rgba(184,148,47,0.4), inset 0 2px 6px rgba(255,255,255,0.5)',
                 border: '3px solid rgba(255,255,255,0.9)',
-                width: '2.25rem',
-                height: '2.25rem'
+                width: '2.75rem',
+                height: '2.75rem'
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/20 pointer-events-none"></div>
               {appMode === 'agricultural' ? (
-                <Sprout className="w-5 h-5 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
+                <Sprout className="w-7 h-7 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
               ) : (
-                <TrendingUp className="w-5 h-5 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
+                <TrendingUp className="w-7 h-7 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
               )}
             </div>
             <span className="text-[9px] font-black text-darkgreen mt-1">
