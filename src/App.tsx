@@ -351,13 +351,19 @@ function App() {
         {!selectedInvestmentFarm && (
           <>
             <div className="flex-1 flex flex-col overflow-hidden">
-              <div className="sticky top-16 lg:top-20 z-20 backdrop-blur-xl" style={{
-                background: 'linear-gradient(135deg, rgba(250, 252, 251, 0.98) 0%, rgba(245, 250, 247, 0.98) 50%, rgba(248, 252, 250, 0.98) 100%)',
-                boxShadow: '0 4px 16px rgba(58, 161, 126, 0.15)',
-                borderBottom: '1px solid rgba(58, 161, 126, 0.15)'
+              <div className="sticky top-16 lg:top-20 z-20 backdrop-blur-2xl relative" style={{
+                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 252, 250, 0.95) 50%, rgba(252, 254, 253, 0.95) 100%)',
+                boxShadow: '0 8px 32px rgba(58, 161, 126, 0.12), 0 2px 8px rgba(0, 0, 0, 0.05)',
+                borderBottom: '2px solid rgba(58, 161, 126, 0.2)'
               }}>
-                <section className="px-3 lg:px-6 py-3 lg:py-4">
-                  <div className="flex gap-1.5 lg:gap-4 justify-between lg:max-w-4xl lg:mx-auto">
+                <div className="absolute inset-0 pointer-events-none" style={{
+                  background: 'radial-gradient(ellipse at top, rgba(58, 161, 126, 0.05) 0%, transparent 70%)'
+                }}></div>
+                <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none" style={{
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(58, 161, 126, 0.3) 50%, transparent 100%)'
+                }}></div>
+                <section className="px-2 lg:px-6 py-2 lg:py-3">
+                  <div className="flex gap-1 lg:gap-3 justify-between lg:max-w-5xl lg:mx-auto">
                     {[
                       { icon: Calculator, label: 'حاسبة مزرعتك', color: '#2F5233', onClick: () => alert('قريباً: حاسبة المزرعة'), delay: '0ms' },
                       { icon: Video, label: 'فيديو تعريفي', color: '#3D6B42', onClick: () => setShowVideoIntro(true), delay: '100ms' },
@@ -366,70 +372,67 @@ function App() {
                       <button
                         key={idx}
                         onClick={action.onClick}
-                        className="rounded-lg lg:rounded-xl flex-1 h-10 lg:h-24 xl:h-28 flex flex-col items-center justify-center bg-white relative group overflow-hidden animate-fadeIn"
+                        className="rounded-xl lg:rounded-2xl flex-1 h-12 lg:h-20 xl:h-24 flex flex-col items-center justify-center bg-white relative group overflow-hidden animate-fadeIn"
                         style={{
-                          boxShadow: `
-                            0 6px 0 0 rgba(58,161,126,0.3),
-                            0 8px 20px rgba(58,161,126,0.3),
-                            inset 0 1px 0 rgba(255,255,255,0.9),
-                            inset 0 -1px 0 rgba(58,161,126,0.15)
-                          `,
-                          border: '2.5px solid #3AA17E',
-                          background: 'linear-gradient(145deg, #ffffff 0%, #f5fdf9 100%)',
+                          boxShadow: '0 4px 0 0 rgba(58,161,126,0.25), 0 6px 16px rgba(58,161,126,0.15), inset 0 1px 0 rgba(255,255,255,0.95)',
+                          border: '2px solid #3AA17E',
+                          background: 'linear-gradient(145deg, #ffffff 0%, #fafdfb 100%)',
                           transform: 'translateY(0)',
-                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                           animationDelay: action.delay
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
-                          e.currentTarget.style.boxShadow = `
-                            0 8px 0 0 rgba(58,161,126,0.4),
-                            0 16px 32px rgba(58,161,126,0.4),
-                            inset 0 2px 0 rgba(255,255,255,0.9),
-                            inset 0 -2px 0 rgba(58,161,126,0.2)
-                          `;
+                          e.currentTarget.style.transform = 'translateY(-3px) scale(1.03)';
+                          e.currentTarget.style.boxShadow = '0 6px 0 0 rgba(58,161,126,0.35), 0 12px 24px rgba(58,161,126,0.25), inset 0 2px 0 rgba(255,255,255,0.95)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                          e.currentTarget.style.boxShadow = `
-                            0 6px 0 0 rgba(58,161,126,0.3),
-                            0 8px 20px rgba(58,161,126,0.3),
-                            inset 0 1px 0 rgba(255,255,255,0.9),
-                            inset 0 -1px 0 rgba(58,161,126,0.15)
-                          `;
+                          e.currentTarget.style.boxShadow = '0 4px 0 0 rgba(58,161,126,0.25), 0 6px 16px rgba(58,161,126,0.15), inset 0 1px 0 rgba(255,255,255,0.95)';
                         }}
                         onMouseDown={(e) => {
-                          e.currentTarget.style.transform = 'translateY(2px) scale(0.98)';
+                          e.currentTarget.style.transform = 'translateY(1px) scale(0.98)';
                         }}
                         onMouseUp={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
+                          e.currentTarget.style.transform = 'translateY(-3px) scale(1.03)';
                         }}
                       >
-                        <div className="absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-br from-white/60 via-emerald-50/30 to-green-50/20 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 opacity-60"></div>
-                        <div className="absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-t from-emerald-100/0 to-emerald-50/0 group-hover:from-emerald-100/30 group-hover:to-emerald-50/10 pointer-events-none transition-all duration-300"></div>
+                        <div className="absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-br from-emerald-50/40 via-white/30 to-green-50/40 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 opacity-70"></div>
                         <action.icon
-                          className="w-4 h-4 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-darkgreen mb-0 lg:mb-2 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-700"
-                          style={{ filter: 'drop-shadow(0 2px 4px rgba(47,82,51,0.3))' }}
+                          className="w-5 h-5 lg:w-7 lg:h-7 xl:w-9 xl:h-9 text-darkgreen mb-1 lg:mb-1.5 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-600"
+                          style={{ filter: 'drop-shadow(0 2px 4px rgba(47,82,51,0.25))' }}
                         />
-                        <span className="text-[8px] lg:text-sm xl:text-base font-bold text-darkgreen relative z-10 text-center leading-tight px-1 transition-colors duration-300 group-hover:text-emerald-700">{action.label}</span>
+                        <span className="text-[9px] lg:text-xs xl:text-sm font-bold text-darkgreen relative z-10 text-center leading-tight px-1 transition-colors duration-300 group-hover:text-emerald-600">{action.label}</span>
                       </button>
                     ))}
                   </div>
                 </section>
 
-                <AppModeSelector
-                  activeMode={appMode}
-                  onModeChange={handleAppModeChange}
-                />
+                <div className="relative px-2 lg:px-6">
+                  <div className="absolute left-0 right-0 top-0 h-px" style={{
+                    background: 'linear-gradient(90deg, transparent 5%, rgba(58, 161, 126, 0.15) 50%, transparent 95%)'
+                  }}></div>
+                </div>
 
-                <section className="px-3 lg:px-6 py-2 lg:py-3">
-          <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-1 lg:mb-3 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
+                <div className="px-2 lg:px-6 py-2 lg:py-2.5">
+                  <AppModeSelector
+                    activeMode={appMode}
+                    onModeChange={handleAppModeChange}
+                  />
+                </div>
+
+                <div className="relative px-2 lg:px-6">
+                  <div className="absolute left-0 right-0 top-0 h-px" style={{
+                    background: 'linear-gradient(90deg, transparent 5%, rgba(58, 161, 126, 0.15) 50%, transparent 95%)'
+                  }}></div>
+                </div>
+
+                <section className="px-2 lg:px-6 pb-3 lg:pb-4 pt-2 lg:pt-3">
           {categories.length === 0 ? (
             <div className="text-center py-4 text-darkgreen/70 animate-pulse">
               <p className="text-sm">جاري تحميل الفئات...</p>
             </div>
           ) : (
-          <div className="flex gap-1.5 lg:gap-5 justify-between lg:max-w-4xl lg:mx-auto">
+          <div className="flex gap-1 lg:gap-4 justify-between lg:max-w-5xl lg:mx-auto">
             {[{ slug: 'all', name: 'الكل', icon: 'all' }, ...categories].map((category, idx) => {
               const Icon = iconMap[category.icon] || Leaf;
               const isActive = activeCategory === category.slug;
@@ -438,51 +441,51 @@ function App() {
               const textColor = appMode === 'agricultural' ? 'text-darkgreen' : 'text-[#B8942F]';
 
               return (
-                <div key={category.slug} className="flex-1 flex flex-col items-center gap-1 lg:gap-3 animate-fadeIn" style={{ animationDelay: `${idx * 100}ms` }}>
+                <div key={category.slug} className="flex-1 flex flex-col items-center gap-1 lg:gap-2 animate-fadeIn" style={{ animationDelay: `${idx * 80}ms` }}>
                   <button
                     onClick={() => handleCategoryChange(category.slug)}
-                    className="rounded-xl lg:rounded-2xl w-full aspect-square flex items-center justify-center bg-white transition-all duration-500 backdrop-blur-lg relative overflow-hidden group"
+                    className="rounded-xl lg:rounded-2xl w-full aspect-square flex items-center justify-center bg-white transition-all duration-400 backdrop-blur-lg relative overflow-hidden group"
                     style={{
                       boxShadow: isActive
-                        ? `0 4px 16px ${colors.shadow}, 0 8px 32px ${colors.shadow}, inset 0 2px 0 rgba(255,255,255,0.7), inset 0 -2px 0 rgba(0,0,0,0.05)`
-                        : '0 3px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)',
+                        ? `0 3px 12px ${colors.shadow}, 0 6px 24px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.8)`
+                        : '0 2px 6px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)',
                       background: isActive
                         ? colors.iconGradient
-                        : 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(250,252,251,0.9) 100%)',
-                      border: `2.5px solid ${isActive ? colors.border : 'rgba(58,161,126,0.3)'}`,
-                      backdropFilter: 'blur(16px)',
-                      WebkitBackdropFilter: 'blur(16px)',
-                      transform: isActive ? 'scale(0.63)' : 'scale(0.6)'
+                        : 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(252,254,253,0.95) 100%)',
+                      border: `2px solid ${isActive ? colors.border : 'rgba(58,161,126,0.25)'}`,
+                      backdropFilter: 'blur(12px)',
+                      WebkitBackdropFilter: 'blur(12px)',
+                      transform: isActive ? 'scale(1.08)' : 'scale(1)'
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.transform = 'scale(0.66) translateY(-4px)';
-                        e.currentTarget.style.boxShadow = `0 6px 20px ${colors.shadow}, 0 12px 40px ${colors.shadow}`;
+                        e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
+                        e.currentTarget.style.boxShadow = `0 4px 16px ${colors.shadow}, 0 8px 32px ${colors.shadow}`;
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.transform = 'scale(0.6) translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 3px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)';
+                        e.currentTarget.style.transform = 'scale(1) translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)';
                       }
                     }}
                   >
-                    <div className={`absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-br from-white/30 via-transparent to-emerald-50/20 pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'}`}></div>
+                    <div className={`absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-br from-white/40 via-transparent to-emerald-50/30 pointer-events-none transition-opacity duration-400 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-70'}`}></div>
                     <Icon
-                      className={`w-2 h-2 lg:w-5 lg:h-5 xl:w-6 xl:h-6 transition-all duration-500 ${isActive ? 'drop-shadow-lg scale-110' : 'group-hover:scale-125 group-hover:drop-shadow-md'}`}
+                      className={`w-4 h-4 lg:w-8 lg:h-8 xl:w-10 xl:h-10 transition-all duration-400 ${isActive ? 'drop-shadow-lg scale-100' : 'scale-90 group-hover:scale-100 group-hover:drop-shadow-md'}`}
                       style={{
-                        color: isActive ? iconColor : `${iconColor}60`,
-                        filter: isActive ? 'drop-shadow(0 2px 6px rgba(58,161,126,0.4))' : 'none'
+                        color: isActive ? iconColor : `${iconColor}70`,
+                        filter: isActive ? 'drop-shadow(0 2px 6px rgba(58,161,126,0.35))' : 'none'
                       }}
                     />
                     {isActive && (
                       <div className="absolute inset-0 rounded-xl lg:rounded-2xl animate-pulse" style={{
-                        background: `radial-gradient(circle at center, ${colors.shadow} 0%, transparent 70%)`,
-                        opacity: 0.3
+                        background: `radial-gradient(circle at center, ${colors.shadow} 0%, transparent 75%)`,
+                        opacity: 0.25
                       }}></div>
                     )}
                   </button>
-                  <span className={`text-[7px] lg:text-sm xl:text-base font-bold text-center leading-tight transition-all duration-500 ${isActive ? `${textColor} scale-105` : `${textColor}/60`}`}>
+                  <span className={`text-[8px] lg:text-xs xl:text-sm font-bold text-center leading-tight transition-all duration-400 ${isActive ? `${textColor} scale-100` : `${textColor}/70 scale-95`}`}>
                     {category.name}
                   </span>
                 </div>

@@ -30,56 +30,54 @@ export default function AppModeSelector({ activeMode, onModeChange }: AppModeSel
   ];
 
   return (
-    <section className="px-3 lg:px-6 py-2 lg:py-4 flex-shrink-0">
-      <div className="flex gap-3 lg:gap-6 justify-center lg:max-w-4xl lg:mx-auto">
-        {modes.map((mode) => {
-          const Icon = mode.icon;
-          const isActive = activeMode === mode.id;
+    <div className="flex gap-2 lg:gap-4 justify-center lg:max-w-5xl lg:mx-auto">
+      {modes.map((mode) => {
+        const Icon = mode.icon;
+        const isActive = activeMode === mode.id;
 
-          return (
-            <button
-              key={mode.id}
-              onClick={() => onModeChange(mode.id)}
-              className="flex-1 rounded-xl lg:rounded-2xl h-10 lg:h-16 xl:h-18 flex flex-col items-center justify-center bg-white transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-lg relative overflow-hidden"
-              style={{
-                boxShadow: isActive
-                  ? `0 6px 20px ${mode.shadow}, 0 10px 40px ${mode.shadow}, inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.05)`
-                  : '0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.5)',
-                background: isActive
-                  ? mode.gradient
-                  : mode.inactiveGradient,
-                border: `3px solid ${isActive ? mode.border : 'rgba(220,220,220,0.5)'}`,
-                backdropFilter: 'blur(12px)',
-                WebkitBackdropFilter: 'blur(12px)'
-              }}
+        return (
+          <button
+            key={mode.id}
+            onClick={() => onModeChange(mode.id)}
+            className="flex-1 rounded-xl lg:rounded-2xl h-12 lg:h-16 xl:h-18 flex flex-col items-center justify-center bg-white transition-all duration-300 hover:scale-[1.02] active:scale-95 backdrop-blur-lg relative overflow-hidden"
+            style={{
+              boxShadow: isActive
+                ? `0 4px 16px ${mode.shadow}, 0 8px 32px ${mode.shadow}, inset 0 1px 0 rgba(255,255,255,0.7)`
+                : '0 2px 6px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)',
+              background: isActive
+                ? mode.gradient
+                : mode.inactiveGradient,
+              border: `2px solid ${isActive ? mode.border : 'rgba(220,220,220,0.4)'}`,
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)'
+            }}
+          >
+            <Icon
+              className={`w-5 h-5 lg:w-7 lg:h-7 xl:w-8 xl:h-8 mb-0.5 lg:mb-1 ${
+                isActive ? 'text-white drop-shadow-lg' : 'text-darkgreen/60'
+              }`}
+              strokeWidth={2.5}
+              style={isActive ? { filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' } : {}}
+            />
+            <span
+              className={`text-[9px] lg:text-xs xl:text-sm font-black text-center leading-tight px-2 ${
+                isActive ? 'text-white drop-shadow-md' : 'text-darkgreen/60'
+              }`}
+              style={isActive ? { textShadow: '0 1px 2px rgba(0,0,0,0.2)' } : {}}
             >
-              <Icon
-                className={`w-4 h-4 lg:w-7 lg:h-7 xl:w-8 xl:h-8 mb-0.5 lg:mb-1 ${
-                  isActive ? 'text-white drop-shadow-lg' : 'text-darkgreen/60'
-                }`}
-                strokeWidth={2.5}
-                style={isActive ? { filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' } : {}}
+              {mode.label}
+            </span>
+            {isActive && (
+              <div
+                className="absolute inset-0 rounded-xl lg:rounded-2xl pointer-events-none"
+                style={{
+                  background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 70%)'
+                }}
               />
-              <span
-                className={`text-[10px] lg:text-sm xl:text-base font-black text-center leading-tight px-2 ${
-                  isActive ? 'text-white drop-shadow-md' : 'text-darkgreen/60'
-                }`}
-                style={isActive ? { textShadow: '0 1px 2px rgba(0,0,0,0.2)' } : {}}
-              >
-                {mode.label}
-              </span>
-              {isActive && (
-                <div
-                  className="absolute inset-0 rounded-2xl lg:rounded-3xl pointer-events-none"
-                  style={{
-                    background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 70%)'
-                  }}
-                />
-              )}
-            </button>
-          );
-        })}
-      </div>
-    </section>
+            )}
+          </button>
+        );
+      })}
+    </div>
   );
 }
