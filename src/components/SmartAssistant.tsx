@@ -457,7 +457,7 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
         <div
           className="overflow-y-auto flex-1 px-4 py-4"
           style={{
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 30px)',
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 100px)',
             WebkitOverflowScrolling: 'touch'
           }}
         >
