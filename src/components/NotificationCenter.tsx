@@ -63,7 +63,7 @@ export default function NotificationCenter({ unreadCount, onCountChange, onOpenC
   };
 
   const handleClose = () => {
-    handleClose();
+    setIsOpen(false);
     onOpenChange?.(false);
   };
 
