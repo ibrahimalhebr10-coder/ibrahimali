@@ -13,11 +13,91 @@ interface RequestBody {
   userId?: string;
 }
 
-interface KnowledgeItem {
-  topic: string;
-  content: string;
-  keywords: string[];
-  priority: number;
+interface ResponsePattern {
+  patterns: string[];
+  answer: string;
+  category: string;
+}
+
+const responses: ResponsePattern[] = [
+  {
+    patterns: ["كيف", "طريقة", "خطوات", "استثمر", "احجز"],
+    answer: "الاستثمار في منصتنا سهل وبسيط! كل ما عليك هو اختيار المزرعة المناسبة، حدد عدد الأشجار، واحجز حصتك. رح نتابع معك كل تفاصيل استثمارك وتحصل على تقارير دورية وصور من مزرعتك.",
+    category: "investment"
+  },
+  {
+    patterns: ["عائد", "ربح", "مكسب", "أرباح", "فائدة", "كم", "مقدار"],
+    answer: "العائد يختلف حسب نوع المزرعة والأشجار اللي تختارها. كل مزرعة لها تفاصيلها الخاصة. تقدر تشوف كل التفاصيل المالية والعوائد المتوقعة في صفحة المزرعة قبل ما تحجز.",
+    category: "investment"
+  },
+  {
+    patterns: ["ضمان", "أمان", "آمن", "موثوق", "ثقة"],
+    answer: "نعم! استثمارك معنا مضمون ومؤمّن. عندنا شركاء موثوقين ونتابع المزارع بشكل يومي. كمان تقدر تزور مزرعتك في أي وقت وتشوف أشجارك بنفسك.",
+    category: "worried"
+  },
+  {
+    patterns: ["مشكلة", "خطر", "خسارة", "مخاطر", "خطورة"],
+    answer: "الاستثمار الزراعي من أكثر الاستثمارات استقراراً. احنا نتابع المزارع بشكل مستمر ونتخذ كل إجراءات الحماية اللازمة. في حال أي طارئ، فيه تأمين وضمانات تحمي استثمارك.",
+    category: "worried"
+  },
+  {
+    patterns: ["مدة", "متى", "وقت", "فترة", "موعد"],
+    answer: "مدة الاستثمار تعتمد على نوع الأشجار. في أنواع تبدأ تنتج بعد سنة، وفي أنواع تحتاج 3-5 سنوات. كل التفاصيل موجودة في صفحة المزرعة، وراح نوافيك بكل المستجدات.",
+    category: "curious"
+  },
+  {
+    patterns: ["صيانة", "رعاية", "اهتمام", "خدمة", "متابعة"],
+    answer: "لا تشيل هم! كل الصيانة والرعاية من مسؤوليتنا. عندنا فريق مختص يهتم بالمزارع 24/7، ويرسل لك تحديثات وصور دورية عن حالة أشجارك.",
+    category: "curious"
+  },
+  {
+    patterns: ["دفع", "تسديد", "مبلغ", "قسط", "تكلفة", "سعر"],
+    answer: "طرق الدفع متنوعة وسهلة! تقدر تدفع كامل المبلغ، أو على دفعات حسب راحتك. ندعم جميع وسائل الدفع الإلكترونية والتحويل البنكي.",
+    category: "investment"
+  },
+  {
+    patterns: ["موقع", "مكان", "أين", "وين", "منطقة"],
+    answer: "مزارعنا موزعة في مناطق زراعية متميزة في المملكة. كل مزرعة لها موقعها وخصائصها. تقدر تشوف تفاصيل الموقع في صفحة المزرعة، وطبعاً مرحب فيك تزورها!",
+    category: "curious"
+  },
+  {
+    patterns: ["زيارة", "أزور", "أشوف", "معاينة"],
+    answer: "أكيد! تقدر تزور مزرعتك في أي وقت وتشوف أشجارك بعينك. بس ننصحك تنسق معنا قبل الزيارة علشان نسهل لك الوصول ونرتب لك جولة مميزة.",
+    category: "curious"
+  },
+  {
+    patterns: ["بيع", "أبيع", "تنازل", "نقل"],
+    answer: "نعم، تقدر تبيع حصتك أو تنقلها لشخص آخر. عندنا إجراءات واضحة وسهلة للنقل والبيع. تواصل معنا وراح نساعدك في كل الخطوات.",
+    category: "investment"
+  },
+  {
+    patterns: ["مرحبا", "السلام", "هلا", "هاي", "أهلا"],
+    answer: "أهلاً وسهلاً! سعداء بوجودك معنا في منصة الاستثمار الزراعي. كيف أقدر أساعدك اليوم؟",
+    category: "greeting"
+  },
+  {
+    patterns: ["شكرا", "ممتاز", "رائع", "جميل"],
+    answer: "العفو! دايماً في الخدمة. إذا عندك أي سؤال ثاني، لا تتردد تسأل!",
+    category: "positive"
+  }
+];
+
+function generateAnswer(question: string): { answer: string; category: string } {
+  const lowerQuestion = question.toLowerCase();
+
+  for (const response of responses) {
+    if (response.patterns.some(pattern => lowerQuestion.includes(pattern))) {
+      return {
+        answer: response.answer,
+        category: response.category
+      };
+    }
+  }
+
+  return {
+    answer: "شكراً على سؤالك! للحصول على إجابة دقيقة ومفصلة، أنصحك تتواصل مع فريق الدعم عبر واتساب. فريقنا جاهز يساعدك في أي وقت ويجاوب على كل استفساراتك.",
+    category: "general"
+  };
 }
 
 Deno.serve(async (req: Request) => {
@@ -31,12 +111,6 @@ Deno.serve(async (req: Request) => {
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const openaiKey = Deno.env.get("OPENAI_API_KEY");
-
-    if (!openaiKey) {
-      throw new Error("OPENAI_API_KEY is not configured");
-    }
-
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { question, sessionId, userId }: RequestBody = await req.json();
@@ -51,72 +125,7 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const knowledgeBase = await supabase
-      .from("assistant_knowledge_base")
-      .select("*")
-      .order("priority", { ascending: false });
-
-    const recentConversations = await supabase
-      .from("assistant_conversations")
-      .select("question, answer, category")
-      .order("created_at", { ascending: false })
-      .limit(20);
-
-    const learningContext = recentConversations.data
-      ?.map((conv) => `س: ${conv.question}\nج: ${conv.answer}`)
-      .join("\n\n") || "";
-
-    const knowledgeContext = knowledgeBase.data
-      ?.map((kb: KnowledgeItem) => `[${kb.topic}]: ${kb.content}`)
-      .join("\n\n") || "";
-
-    const systemPrompt = `أنت مساعد ذكي لمنصة استثمار زراعي سعودية. دورك هو الإجابة على أسئلة المستخدمين بطريقة ودية، واضحة، ومطمئنة.
-
-قواعد مهمة:
-1. استخدم اللغة العربية السعودية البسيطة والودية
-2. كن موجزاً - الإجابة المثالية 2-4 أسطر
-3. لا تبيع أو تضغط على المستخدم
-4. طمئن المستخدم إذا كان السؤال يحمل قلقاً
-5. كن إيجابياً لكن واقعياً
-6. لا تذكر أرقام أو تفاصيل غير موجودة في قاعدة المعرفة
-7. إذا لم تعرف الإجابة، قل ذلك بصراحة واقترح التواصل مع الدعم
-
-قاعدة المعرفة:
-${knowledgeContext}
-
-أمثلة من محادثات سابقة للتعلم منها:
-${learningContext}
-
-اجب على السؤال التالي بأسلوب ودي ومطمئن:`;
-
-    const openaiResponse = await fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${openaiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: question },
-          ],
-          temperature: 0.7,
-          max_tokens: 250,
-        }),
-      }
-    );
-
-    if (!openaiResponse.ok) {
-      throw new Error("OpenAI API request failed");
-    }
-
-    const openaiData = await openaiResponse.json();
-    const answer = openaiData.choices[0]?.message?.content || "عذراً، لم أستطع معالجة سؤالك. حاول مرة أخرى.";
-
-    const category = detectCategory(question);
+    const { answer, category } = generateAnswer(question);
     const sentiment = detectSentiment(question);
 
     await supabase.from("assistant_conversations").insert({
