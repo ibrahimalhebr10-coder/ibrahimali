@@ -69,11 +69,6 @@
   }
 
   @supports (-webkit-touch-callout: none) {
-    body {
-      padding-bottom: constant(safe-area-inset-bottom);
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-
     nav[style*="bottom: 0"] {
       position: fixed !important;
       bottom: 0 !important;
@@ -82,8 +77,8 @@
       z-index: 99999 !important;
       -webkit-transform: translate3d(0, 0, 0) !important;
       transform: translate3d(0, 0, 0) !important;
-      padding-bottom: calc(0.75rem + constant(safe-area-inset-bottom, 2rem)) !important;
-      padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 2rem)) !important;
+      min-height: calc(4.5rem + constant(safe-area-inset-bottom, 1rem)) !important;
+      min-height: calc(4.5rem + env(safe-area-inset-bottom, 1rem)) !important;
     }
   }
 
@@ -99,7 +94,7 @@
 
   @media (max-width: 1024px) {
     body {
-      padding-bottom: calc(6rem + env(safe-area-inset-bottom, 2rem));
+      padding-bottom: 0;
     }
   }
 }
