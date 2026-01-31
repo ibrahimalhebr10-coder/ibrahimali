@@ -11,6 +11,7 @@ import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
 import InvestmentFarmPage from './components/InvestmentFarmPage';
+import AgriculturalFarmPage from './components/AgriculturalFarmPage';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
 import { useAuth } from './contexts/AuthContext';
@@ -540,11 +541,9 @@ function App() {
                         <div key={farm.id} className="w-full flex-shrink-0 px-0.5">
                           <div
                             onClick={() => {
-                              if (appMode === 'investment') {
-                                setSelectedInvestmentFarm(farm);
-                              }
+                              setSelectedInvestmentFarm(farm);
                             }}
-                            className={`w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative ${appMode === 'investment' ? 'cursor-pointer active:scale-95' : ''} transition-transform duration-200`}
+                            className="w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer active:scale-95 transition-transform duration-200"
                             style={{
                               background: activeColors.cardGradient,
                               boxShadow: `0 8px 24px ${activeColors.shadow}, 0 4px 12px ${activeColors.shadow}, inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.03)`,
@@ -669,11 +668,9 @@ function App() {
                 <div
                   key={farm.id}
                   onClick={() => {
-                    if (appMode === 'investment') {
-                      setSelectedInvestmentFarm(farm);
-                    }
+                    setSelectedInvestmentFarm(farm);
                   }}
-                  className={`w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative ${appMode === 'investment' ? 'cursor-pointer hover:scale-105 active:scale-95' : ''} transition-transform duration-200`}
+                  className="w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200"
                   style={{
                     background: activeColors.cardGradient,
                     boxShadow: `0 8px 24px ${activeColors.shadow}, 0 4px 12px ${activeColors.shadow}, inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.03)`,
@@ -941,12 +938,22 @@ function App() {
         }}
       />
 
-      {selectedInvestmentFarm && appMode === 'investment' && (
-        <InvestmentFarmPage
-          farm={selectedInvestmentFarm}
-          onClose={() => setSelectedInvestmentFarm(null)}
-          onGoToAccount={() => setShowAccountProfile(true)}
-        />
+      {selectedInvestmentFarm && (
+        <>
+          {appMode === 'investment' ? (
+            <InvestmentFarmPage
+              farm={selectedInvestmentFarm}
+              onClose={() => setSelectedInvestmentFarm(null)}
+              onGoToAccount={() => setShowAccountProfile(true)}
+            />
+          ) : (
+            <AgriculturalFarmPage
+              farm={selectedInvestmentFarm}
+              onClose={() => setSelectedInvestmentFarm(null)}
+              onGoToAccount={() => setShowAccountProfile(true)}
+            />
+          )}
+        </>
       )}
       </div>
     </ErrorBoundary>
