@@ -441,7 +441,7 @@ function App() {
               const textColor = appMode === 'agricultural' ? 'text-darkgreen' : 'text-[#B8942F]';
 
               return (
-                <div key={category.slug} className="flex-1 flex flex-col items-center gap-0.5 lg:gap-1 animate-fadeIn" style={{ animationDelay: `${idx * 70}ms` }}>
+                <div key={category.slug} className="flex-1 flex flex-col items-center gap-0.5 lg:gap-1 animate-fadeIn" style={{ animationDelay: `${idx * 70}ms`, transform: 'scale(0.5)' }}>
                   <button
                     onClick={() => handleCategoryChange(category.slug)}
                     className="rounded-lg lg:rounded-xl w-full aspect-square flex items-center justify-center bg-white transition-all duration-300 backdrop-blur-lg relative overflow-hidden group"
@@ -472,7 +472,7 @@ function App() {
                   >
                     <div className={`absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-br from-white/40 via-transparent to-emerald-50/30 pointer-events-none transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-70'}`}></div>
                     <Icon
-                      className={`w-2 h-2 transition-all duration-300 ${isActive ? 'drop-shadow-md' : 'opacity-80 group-hover:opacity-100 group-hover:drop-shadow-sm'}`}
+                      className={`w-3.5 h-3.5 transition-all duration-300 ${isActive ? 'drop-shadow-md' : 'opacity-80 group-hover:opacity-100 group-hover:drop-shadow-sm'}`}
                       style={{
                         color: isActive ? iconColor : `${iconColor}70`,
                         filter: isActive ? 'drop-shadow(0 1px 2px rgba(58,161,126,0.3))' : 'none'
