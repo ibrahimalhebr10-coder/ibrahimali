@@ -416,8 +416,8 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
         dir="rtl"
         style={{
           animation: 'slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          maxHeight: '85vh',
-          height: '85vh',
+          maxHeight: '75vh',
+          height: '75vh',
           paddingBottom: 'max(env(safe-area-inset-bottom, 20px), 20px)',
           zIndex: 9999999,
           WebkitOverflowScrolling: 'touch'
@@ -457,7 +457,7 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
         <div
           className="overflow-y-auto flex-1 px-4 py-4"
           style={{
-            paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 20px)',
+            paddingBottom: 'calc(env(safe-area-inset-bottom, 20px) + 30px)',
             WebkitOverflowScrolling: 'touch'
           }}
         >
