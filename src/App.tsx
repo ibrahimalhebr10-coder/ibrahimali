@@ -498,7 +498,7 @@ function App() {
 
               <div className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{ paddingBottom: '9rem' }}>
                 <div className="max-w-7xl mx-auto">
-                  <section className="px-3 lg:px-4 pt-8 pb-4 lg:py-3">
+                  <section className="px-3 lg:px-4 pt-16 pb-4 lg:pt-20 lg:pb-6">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-3 animate-fadeIn">
               <div className="relative">
