@@ -5,6 +5,7 @@ export interface InvestorInvestment {
   farmName: string;
   farmImage?: string;
   treeCount: number;
+  treeTypes: string;
   durationYears: number;
   bonusYears: number;
   totalPrice: number;
@@ -29,6 +30,7 @@ export const investorAccountService = {
         .select(`
           id,
           total_trees,
+          tree_types,
           duration_years,
           bonus_years,
           total_price,
@@ -60,6 +62,7 @@ export const investorAccountService = {
         farmName: reservation.farms?.name_ar || 'مزرعة غير محددة',
         farmImage: reservation.farms?.hero_image,
         treeCount: reservation.total_trees,
+        treeTypes: reservation.tree_types || 'أشجار مختلفة',
         durationYears: reservation.duration_years,
         bonusYears: reservation.bonus_years || 0,
         totalPrice: reservation.total_price,

@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import WhatsAppButton from './WhatsAppButton';
 import InvestmentContract from './InvestmentContract';
+import InvestorVirtualFarm from './InvestorVirtualFarm';
 import { investorAccountService, type InvestorStats, type InvestorInvestment } from '../services/investorAccountService';
 
 interface AccountProfileProps {
@@ -169,77 +170,14 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenRese
                 )}
               </div>
 
-              {/* Investment Cards */}
+              {/* Investor Virtual Farm */}
               {investments.length > 0 && (
-                <div className="space-y-4">
-                  <h3 className="text-xl font-bold text-green-800 text-right">محصولي الاستثماري</h3>
-                  {investments.map((investment) => (
-                    <div
-                      key={investment.id}
-                      className="bg-white rounded-2xl p-6 shadow-xl border-2 border-green-200 space-y-4"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 text-right space-y-2">
-                          <h4 className="text-lg font-bold text-gray-800">{investment.farmName}</h4>
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
-                            <div className="flex items-center gap-1">
-                              <TreePine className="w-4 h-4" />
-                              <span>{investment.treeCount} شجرة</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span>{investment.durationYears} سنوات</span>
-                              {investment.bonusYears > 0 && (
-                                <span className="text-green-600 text-xs">+ {investment.bonusYears} مجانًا</span>
-                              )}
-                            </div>
-                          </div>
-                          <p className="text-xs text-gray-500">رقم الاستثمار: #{investment.investmentNumber}</p>
-                        </div>
-                        {investment.status === 'confirmed' ? (
-                          <div className="flex items-center gap-1 bg-green-100 px-3 py-1 rounded-full">
-                            <CheckCircle className="w-4 h-4 text-green-600" />
-                            <span className="text-xs font-bold text-green-700">مؤكد</span>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-1 bg-yellow-100 px-3 py-1 rounded-full">
-                            <Sparkles className="w-4 h-4 text-yellow-600" />
-                            <span className="text-xs font-bold text-yellow-700">معلق</span>
-                          </div>
-                        )}
-                      </div>
-
-                      <button
-                        onClick={() => alert('قريبًا: صفحة تفاصيل الاستثمار')}
-                        className="w-full py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
-                      >
-                        <span>ادخل إلى استثمار أشجارك</span>
-                        <ArrowLeft className="w-5 h-5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {/* Investment Contract Section */}
-              {investments.length > 0 && (
-                <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-[#D4AF37]/50">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-[#D4AF37] to-[#B8942F] rounded-full flex items-center justify-center shadow-lg">
-                      <FileText className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="text-xl font-bold text-[#B8942F]">عقد الاستثمار الرسمي</h3>
-                  </div>
-                  <p className="text-gray-700 text-right mb-4 leading-relaxed">
-                    عقدك الرسمي محفوظ ومتاح للعرض والتحميل والطباعة في أي وقت
-                  </p>
-                  <button
-                    onClick={() => handleViewCertificate(investments[0].id)}
-                    className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#B8942F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
-                  >
-                    <FileText className="w-5 h-5" />
-                    <span>عرض العقد الرسمي</span>
-                  </button>
-                </div>
+                <InvestorVirtualFarm
+                  investorName={user.user_metadata?.full_name || user.email?.split('@')[0] || 'مستثمر'}
+                  investments={investments}
+                  onViewContract={handleViewCertificate}
+                  onInvestMore={onClose}
+                />
               )}
 
               {/* Additional Benefits Section */}
@@ -309,19 +247,6 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenRese
                   </button>
                 </div>
               </div>
-
-              {/* Growth Message */}
-              {investments.length > 0 && (
-                <div className="bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl p-6 text-center border-2 border-green-300">
-                  <TreePine className="w-12 h-12 text-green-700 mx-auto mb-3" />
-                  <p className="text-lg font-bold text-green-800">
-                    استثمار أشجارك ينمو الآن
-                  </p>
-                  <p className="text-sm text-green-700 mt-2">
-                    نحن نعتني بأشجارك ونعمل على تحقيق أفضل عوائد لك
-                  </p>
-                </div>
-              )}
 
               {/* WhatsApp Support */}
               <WhatsAppButton

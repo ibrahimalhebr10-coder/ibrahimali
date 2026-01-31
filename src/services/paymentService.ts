@@ -245,12 +245,28 @@ export const paymentService = {
 
     const { error: reservationError } = await supabase
       .from('reservations')
-      .update({ status: 'paid' })
+      .update({
+        status: 'confirmed',
+        investment_status: 'active',
+        journey_state: 'active_investment'
+      })
       .eq('id', payment.reservation_id);
 
     if (reservationError) {
       console.error('Error updating reservation status:', reservationError);
       throw new Error('Failed to update reservation status');
+    }
+
+    const { error: accountError } = await supabase
+      .from('investor_accounts')
+      .update({
+        status: 'active',
+        journey_state: 'active_investment'
+      })
+      .eq('user_id', payment.user_id);
+
+    if (accountError) {
+      console.error('Error updating investor account:', accountError);
     }
 
     return updatedPayment;
