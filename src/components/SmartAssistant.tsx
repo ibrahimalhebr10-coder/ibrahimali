@@ -416,8 +416,8 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
         dir="rtl"
         style={{
           animation: 'slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          maxHeight: '75vh',
-          height: '75vh',
+          maxHeight: '65vh',
+          height: '65vh',
           paddingBottom: 'max(env(safe-area-inset-bottom, 20px), 20px)',
           zIndex: 9999999,
           WebkitOverflowScrolling: 'touch'
