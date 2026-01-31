@@ -351,79 +351,78 @@ function App() {
         {!selectedInvestmentFarm && (
           <>
             <div className="flex-1 flex flex-col overflow-hidden">
-              <div className="flex-1 overflow-y-auto lg:pb-4 pt-16 lg:pt-20" style={{ paddingBottom: '12rem' }}>
-                <div className="max-w-7xl mx-auto">
-        <section className="px-3 lg:px-6 py-3 lg:py-6 flex-shrink-0">
-          <div className="flex gap-1.5 lg:gap-4 justify-between lg:max-w-4xl lg:mx-auto">
-            {[
-              { icon: Calculator, label: 'حاسبة مزرعتك', color: '#2F5233', onClick: () => alert('قريباً: حاسبة المزرعة'), delay: '0ms' },
-              { icon: Video, label: 'فيديو تعريفي', color: '#3D6B42', onClick: () => setShowVideoIntro(true), delay: '100ms' },
-              { icon: HelpCircle, label: 'كيف تبدأ؟', color: '#2F5233', onClick: () => setShowHowToStart(true), delay: '200ms' }
-            ].map((action, idx) => (
-              <button
-                key={idx}
-                onClick={action.onClick}
-                className="rounded-lg lg:rounded-xl flex-1 h-10 lg:h-24 xl:h-28 flex flex-col items-center justify-center bg-white relative group overflow-hidden animate-fadeIn"
-                style={{
-                  boxShadow: `
-                    0 6px 0 0 rgba(58,161,126,0.3),
-                    0 8px 20px rgba(58,161,126,0.3),
-                    inset 0 1px 0 rgba(255,255,255,0.9),
-                    inset 0 -1px 0 rgba(58,161,126,0.15)
-                  `,
-                  border: '2.5px solid #3AA17E',
-                  background: 'linear-gradient(145deg, #ffffff 0%, #f5fdf9 100%)',
-                  transform: 'translateY(0)',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  animationDelay: action.delay
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
-                  e.currentTarget.style.boxShadow = `
-                    0 8px 0 0 rgba(58,161,126,0.4),
-                    0 16px 32px rgba(58,161,126,0.4),
-                    inset 0 2px 0 rgba(255,255,255,0.9),
-                    inset 0 -2px 0 rgba(58,161,126,0.2)
-                  `;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.boxShadow = `
-                    0 6px 0 0 rgba(58,161,126,0.3),
-                    0 8px 20px rgba(58,161,126,0.3),
-                    inset 0 1px 0 rgba(255,255,255,0.9),
-                    inset 0 -1px 0 rgba(58,161,126,0.15)
-                  `;
-                }}
-                onMouseDown={(e) => {
-                  e.currentTarget.style.transform = 'translateY(2px) scale(0.98)';
-                }}
-                onMouseUp={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
-                }}
-              >
-                <div className="absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-br from-white/60 via-emerald-50/30 to-green-50/20 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 opacity-60"></div>
-                <div className="absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-t from-emerald-100/0 to-emerald-50/0 group-hover:from-emerald-100/30 group-hover:to-emerald-50/10 pointer-events-none transition-all duration-300"></div>
-                <action.icon
-                  className="w-4 h-4 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-darkgreen mb-0 lg:mb-2 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-700"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(47,82,51,0.3))' }}
+              <div className="sticky top-16 lg:top-20 z-20 backdrop-blur-xl" style={{
+                background: 'linear-gradient(135deg, rgba(250, 252, 251, 0.98) 0%, rgba(245, 250, 247, 0.98) 50%, rgba(248, 252, 250, 0.98) 100%)',
+                boxShadow: '0 4px 16px rgba(58, 161, 126, 0.15)',
+                borderBottom: '1px solid rgba(58, 161, 126, 0.15)'
+              }}>
+                <section className="px-3 lg:px-6 py-3 lg:py-4">
+                  <div className="flex gap-1.5 lg:gap-4 justify-between lg:max-w-4xl lg:mx-auto">
+                    {[
+                      { icon: Calculator, label: 'حاسبة مزرعتك', color: '#2F5233', onClick: () => alert('قريباً: حاسبة المزرعة'), delay: '0ms' },
+                      { icon: Video, label: 'فيديو تعريفي', color: '#3D6B42', onClick: () => setShowVideoIntro(true), delay: '100ms' },
+                      { icon: HelpCircle, label: 'كيف تبدأ؟', color: '#2F5233', onClick: () => setShowHowToStart(true), delay: '200ms' }
+                    ].map((action, idx) => (
+                      <button
+                        key={idx}
+                        onClick={action.onClick}
+                        className="rounded-lg lg:rounded-xl flex-1 h-10 lg:h-24 xl:h-28 flex flex-col items-center justify-center bg-white relative group overflow-hidden animate-fadeIn"
+                        style={{
+                          boxShadow: `
+                            0 6px 0 0 rgba(58,161,126,0.3),
+                            0 8px 20px rgba(58,161,126,0.3),
+                            inset 0 1px 0 rgba(255,255,255,0.9),
+                            inset 0 -1px 0 rgba(58,161,126,0.15)
+                          `,
+                          border: '2.5px solid #3AA17E',
+                          background: 'linear-gradient(145deg, #ffffff 0%, #f5fdf9 100%)',
+                          transform: 'translateY(0)',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          animationDelay: action.delay
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
+                          e.currentTarget.style.boxShadow = `
+                            0 8px 0 0 rgba(58,161,126,0.4),
+                            0 16px 32px rgba(58,161,126,0.4),
+                            inset 0 2px 0 rgba(255,255,255,0.9),
+                            inset 0 -2px 0 rgba(58,161,126,0.2)
+                          `;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                          e.currentTarget.style.boxShadow = `
+                            0 6px 0 0 rgba(58,161,126,0.3),
+                            0 8px 20px rgba(58,161,126,0.3),
+                            inset 0 1px 0 rgba(255,255,255,0.9),
+                            inset 0 -1px 0 rgba(58,161,126,0.15)
+                          `;
+                        }}
+                        onMouseDown={(e) => {
+                          e.currentTarget.style.transform = 'translateY(2px) scale(0.98)';
+                        }}
+                        onMouseUp={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
+                        }}
+                      >
+                        <div className="absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-br from-white/60 via-emerald-50/30 to-green-50/20 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 opacity-60"></div>
+                        <div className="absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-t from-emerald-100/0 to-emerald-50/0 group-hover:from-emerald-100/30 group-hover:to-emerald-50/10 pointer-events-none transition-all duration-300"></div>
+                        <action.icon
+                          className="w-4 h-4 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-darkgreen mb-0 lg:mb-2 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-700"
+                          style={{ filter: 'drop-shadow(0 2px 4px rgba(47,82,51,0.3))' }}
+                        />
+                        <span className="text-[8px] lg:text-sm xl:text-base font-bold text-darkgreen relative z-10 text-center leading-tight px-1 transition-colors duration-300 group-hover:text-emerald-700">{action.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </section>
+
+                <AppModeSelector
+                  activeMode={appMode}
+                  onModeChange={handleAppModeChange}
                 />
-                <span className="text-[8px] lg:text-sm xl:text-base font-bold text-darkgreen relative z-10 text-center leading-tight px-1 transition-colors duration-300 group-hover:text-emerald-700">{action.label}</span>
-              </button>
-            ))}
-          </div>
-        </section>
 
-        <AppModeSelector
-          activeMode={appMode}
-          onModeChange={handleAppModeChange}
-        />
-
-        <section className="sticky top-16 lg:top-20 z-20 px-3 lg:px-6 py-2 lg:py-3 backdrop-blur-xl" style={{
-          background: 'linear-gradient(135deg, rgba(250, 252, 251, 0.98) 0%, rgba(245, 250, 247, 0.98) 50%, rgba(248, 252, 250, 0.98) 100%)',
-          boxShadow: '0 4px 16px rgba(58, 161, 126, 0.1)',
-          borderBottom: '1px solid rgba(58, 161, 126, 0.1)'
-        }}>
+                <section className="px-3 lg:px-6 py-2 lg:py-3">
           <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-1 lg:mb-3 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
           {categories.length === 0 ? (
             <div className="text-center py-4 text-darkgreen/70 animate-pulse">
@@ -491,9 +490,12 @@ function App() {
             })}
           </div>
           )}
-        </section>
+                </section>
+              </div>
 
-        <section className="px-3 lg:px-6 py-2 lg:py-4 flex-shrink-0 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto" style={{ paddingBottom: '12rem' }}>
+                <div className="max-w-7xl mx-auto">
+                  <section className="px-3 lg:px-6 py-2 lg:py-4">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4 animate-fadeIn">
               <div className="relative">
@@ -617,7 +619,7 @@ function App() {
               })}
             </div>
           )}
-        </section>
+                  </section>
                 </div>
               </div>
             </div>
