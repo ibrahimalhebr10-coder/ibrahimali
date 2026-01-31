@@ -385,14 +385,11 @@ function App() {
         {!selectedInvestmentFarm && <Header />}
 
         {!selectedInvestmentFarm && (
-          <div
-            className="flex-1 overflow-y-auto lg:pb-4 pt-14 lg:pt-16"
-            style={{
-              paddingBottom: '12rem'
-            }}
-          >
-            <div className="max-w-7xl mx-auto">
-        <section className="px-3 lg:px-6 pt-1 lg:pt-4 pb-0.5 lg:pb-2 flex-shrink-0 animate-fadeIn">
+          <>
+            <div className="flex-1 flex flex-col overflow-hidden">
+              <div className="flex-1 overflow-y-auto lg:pb-4 pt-14 lg:pt-16" style={{ paddingBottom: '12rem' }}>
+                <div className="max-w-7xl mx-auto">
+                  <section className="px-3 lg:px-6 pt-1 lg:pt-4 pb-0.5 lg:pb-2 flex-shrink-0 animate-fadeIn">
           <div className="relative w-full h-14 lg:h-64 xl:h-72 overflow-hidden rounded-xl lg:rounded-3xl shadow-2xl group" style={{ border: '3px solid #3AA17E' }}>
             <div className="absolute inset-0">
               <img
@@ -530,8 +527,12 @@ function App() {
           activeMode={appMode}
           onModeChange={handleAppModeChange}
         />
+                </div>
+              </div>
 
-        <section className="sticky top-0 px-3 lg:px-6 py-2 lg:py-3 flex-shrink-0 bg-white/95 backdrop-blur-md z-30 shadow-sm">
+              <div className="flex-shrink-0 bg-white/95 backdrop-blur-md z-20 shadow-sm pt-2 pb-2">
+                <div className="max-w-7xl mx-auto">
+        <section className="px-3 lg:px-6">
           <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-1 lg:mb-3 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
           {categories.length === 0 ? (
             <div className="text-center py-4 text-darkgreen/70 animate-pulse">
@@ -600,8 +601,12 @@ function App() {
           </div>
           )}
         </section>
+                </div>
+              </div>
 
-        <section className="px-3 lg:px-6 py-0.5 lg:py-4 flex-shrink-0">
+              <div className="flex-1 overflow-y-auto">
+                <div className="max-w-7xl mx-auto" style={{ paddingBottom: '12rem' }}>
+        <section className="px-3 lg:px-6 py-2 lg:py-4 flex-shrink-0">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4 animate-fadeIn">
               <div className="relative">
@@ -866,8 +871,10 @@ function App() {
             </>
           )}
         </section>
-        </div>
-          </div>
+                </div>
+              </div>
+            </div>
+          </>
         )}
 
       {!selectedInvestmentFarm && (
