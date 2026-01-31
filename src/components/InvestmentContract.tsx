@@ -197,16 +197,17 @@ export default function InvestmentContract({
             )}
           </div>
 
-          <div className="relative bg-gradient-to-br from-white via-cyan-50/30 to-white shadow-2xl" style={{
-            border: '4px solid',
-            borderImage: 'linear-gradient(135deg, #06b6d4, #0891b2, #0e7490, #0891b2, #06b6d4) 1',
-            borderRadius: '12px'
+          <div className="relative bg-white shadow-2xl" style={{
+            border: '6px solid',
+            borderImage: 'linear-gradient(135deg, #0891b2, #0e7490, #06b6d4, #0e7490, #0891b2) 1',
+            borderRadius: '16px',
+            background: 'linear-gradient(to bottom, #ffffff 0%, #f0f9ff 50%, #ffffff 100%)'
           }}>
-            <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ borderRadius: '12px' }}>
+            <div className="absolute inset-0 pointer-events-none overflow-hidden" style={{ borderRadius: '16px' }}>
               <div className="absolute inset-0" style={{
-                border: '2px dashed #cbd5e1',
-                borderRadius: '12px',
-                margin: '12px'
+                border: '3px double #d1d5db',
+                borderRadius: '16px',
+                margin: '16px'
               }}></div>
 
               <Sparkles className="absolute top-6 left-6 w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 opacity-60 animate-pulse" />
@@ -286,101 +287,104 @@ export default function InvestmentContract({
                 </div>
               </div>
 
-              <div className="text-center mb-8 bg-gradient-to-r from-transparent via-cyan-50 to-transparent py-6 rounded-lg">
-                <p className="text-sm sm:text-base text-gray-600 mb-4 font-semibold">مُنحت هذه الشهادة إلى</p>
-                <div className="relative inline-block">
+              <div className="text-center mb-8 bg-gradient-to-r from-cyan-50 via-cyan-100 to-cyan-50 py-8 rounded-2xl shadow-lg border-2 border-cyan-200 mx-4">
+                <p className="text-sm sm:text-base text-gray-700 mb-6 font-bold uppercase tracking-wide">مُنحت هذه الشهادة إلى</p>
+                <div className="relative inline-block bg-white px-8 py-4 rounded-xl shadow-md border-2 border-cyan-300">
                   <h2 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-2 px-4" style={{
                     color: '#0891b2',
                     fontFamily: 'cursive',
-                    textShadow: '2px 2px 4px rgba(6, 182, 212, 0.1)'
+                    textShadow: '3px 3px 6px rgba(8, 145, 178, 0.2)'
                   }}>
                     {contract.investorName}
                   </h2>
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent"></div>
+                  <div className="absolute -bottom-2 left-0 right-0 h-2 bg-gradient-to-r from-cyan-400 via-cyan-600 to-cyan-400 rounded-full"></div>
                 </div>
               </div>
 
               <div className="mb-8 sm:mb-10 px-2 sm:px-4">
-                <div className="text-center mb-6">
-                  <p className="text-base sm:text-xl md:text-2xl text-cyan-700 font-bold">تقديراً لاستثماره المتميز</p>
-                  <div className="h-1 w-32 bg-gradient-to-r from-transparent via-cyan-500 to-transparent mx-auto mt-2"></div>
+                <div className="text-center mb-8">
+                  <div className="inline-block bg-gradient-to-r from-cyan-100 via-cyan-200 to-cyan-100 px-8 py-4 rounded-xl shadow-lg border-2 border-cyan-300">
+                    <p className="text-lg sm:text-2xl md:text-3xl text-cyan-900 font-extrabold">تقديراً لاستثماره المتميز</p>
+                  </div>
                 </div>
 
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl border-2 border-cyan-200 overflow-hidden">
+                <div className="bg-white rounded-2xl shadow-2xl border-4 border-cyan-300 overflow-hidden" style={{
+                  boxShadow: '0 10px 40px rgba(8, 145, 178, 0.15), 0 0 0 1px rgba(8, 145, 178, 0.1)'
+                }}>
                   <div className="overflow-x-auto">
                     <table className="w-full text-right">
                       <tbody>
-                        <tr className="border-b border-cyan-100">
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                        <tr className="border-b-2 border-cyan-200 hover:bg-cyan-50 transition-colors">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-gradient-to-r from-cyan-100 to-cyan-200 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap border-l-2 border-cyan-300">
                             نوع استثمار الأشجار
                           </td>
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-white text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
                             {contract.treeTypes} ({contract.treeCount} شجرة)
                           </td>
                         </tr>
 
-                        <tr className="border-b border-cyan-100">
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                        <tr className="border-b-2 border-cyan-200 hover:bg-cyan-50 transition-colors">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-gradient-to-r from-cyan-100 to-cyan-200 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap border-l-2 border-cyan-300">
                             مدة العقد الأساسية
                           </td>
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-white text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
                             {contract.durationYears} سنوات
                           </td>
                         </tr>
 
-                        <tr className="border-b border-cyan-100 bg-amber-50/50">
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-amber-100 to-amber-200 font-bold text-amber-900 text-xs sm:text-sm md:text-base">
+                        <tr className="border-b-2 border-amber-300 hover:bg-amber-100 transition-colors">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-gradient-to-r from-amber-200 to-amber-300 font-bold text-amber-900 text-xs sm:text-sm md:text-base border-l-2 border-amber-400">
                             <div className="flex flex-col gap-1">
                               <span>السنوات المجانية</span>
-                              <span className="text-xs font-normal text-amber-700 italic">
+                              <span className="text-xs font-normal text-amber-800 italic">
                                 (مدة تشجيعية غير ملزمة)
                               </span>
                             </div>
                           </td>
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs sm:text-sm md:text-base">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-amber-50 font-semibold text-xs sm:text-sm md:text-base">
                             <div className="flex flex-col gap-1">
-                              <span className="text-amber-800 font-bold">{contract.bonusYears} سنة</span>
-                              <span className="text-xs text-amber-600">
+                              <span className="text-amber-900 font-bold text-lg">{contract.bonusYears} سنة</span>
+                              <span className="text-xs text-amber-700">
                                 عند حدوث أي عائق في الاستمرار
                               </span>
                             </div>
                           </td>
                         </tr>
 
-                        <tr className="border-b border-cyan-100">
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                        <tr className="border-b-2 border-cyan-200 hover:bg-cyan-50 transition-colors">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-gradient-to-r from-cyan-100 to-cyan-200 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap border-l-2 border-cyan-300">
                             موقع الاستثمار
                           </td>
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-white text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
                             {contract.farmLocation}
                           </td>
                         </tr>
 
-                        <tr className="border-b border-cyan-100">
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                        <tr className="border-b-2 border-cyan-200 hover:bg-cyan-50 transition-colors">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-gradient-to-r from-cyan-100 to-cyan-200 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap border-l-2 border-cyan-300">
                             اسم المزرعة
                           </td>
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-white text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
                             {contract.farmName}
                           </td>
                         </tr>
 
-                        <tr className="border-b border-cyan-100">
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                        <tr className="border-b-2 border-cyan-200 hover:bg-cyan-50 transition-colors">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-gradient-to-r from-cyan-100 to-cyan-200 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap border-l-2 border-cyan-300">
                             تاريخ بداية العقد
                           </td>
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-white text-gray-800 font-semibold text-xs sm:text-sm md:text-base">
                             {formatDate(contract.startDate)}
                           </td>
                         </tr>
 
-                        <tr className="border-b border-cyan-100">
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 bg-gradient-to-r from-cyan-50 to-cyan-100 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                        <tr className="border-b-2 border-cyan-200 hover:bg-cyan-50 transition-colors">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-gradient-to-r from-cyan-100 to-cyan-200 font-bold text-cyan-900 text-xs sm:text-sm md:text-base whitespace-nowrap border-l-2 border-cyan-300">
                             تاريخ نهاية العقد
                           </td>
-                          <td className="py-3 sm:py-4 px-3 sm:px-6 font-semibold text-xs sm:text-sm md:text-base">
+                          <td className="py-4 sm:py-5 px-4 sm:px-6 bg-white font-semibold text-xs sm:text-sm md:text-base">
                             <div className="flex flex-col gap-1">
-                              <span className="text-gray-800">{formatDate(contract.endDate)}</span>
+                              <span className="text-gray-800 font-bold">{formatDate(contract.endDate)}</span>
                               <span className="text-xs text-gray-600">
                                 (بعد {contract.totalYears} سنة شاملة المدة التشجيعية)
                               </span>
@@ -388,11 +392,11 @@ export default function InvestmentContract({
                           </td>
                         </tr>
 
-                        <tr className="bg-gradient-to-r from-cyan-100 to-cyan-200">
-                          <td className="py-4 sm:py-5 px-3 sm:px-6 font-bold text-cyan-900 text-sm sm:text-base md:text-lg whitespace-nowrap">
+                        <tr className="bg-gradient-to-r from-cyan-200 via-cyan-300 to-cyan-200 hover:from-cyan-300 hover:via-cyan-400 hover:to-cyan-300 transition-colors">
+                          <td className="py-5 sm:py-6 px-4 sm:px-6 font-bold text-cyan-950 text-sm sm:text-base md:text-lg whitespace-nowrap border-l-4 border-cyan-500">
                             القيمة الاستثمارية
                           </td>
-                          <td className="py-4 sm:py-5 px-3 sm:px-6 font-bold text-cyan-800 text-base sm:text-lg md:text-xl">
+                          <td className="py-5 sm:py-6 px-4 sm:px-6 font-bold text-cyan-950 text-base sm:text-lg md:text-2xl">
                             {contract.totalPrice.toLocaleString()} ريال سعودي
                           </td>
                         </tr>
@@ -467,26 +471,26 @@ export default function InvestmentContract({
                 </svg>
               </div>
 
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-8 sm:gap-12 px-4 sm:px-12 mb-8">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-8 sm:gap-12 px-4 sm:px-12 mb-10 bg-gradient-to-r from-cyan-50 via-white to-cyan-50 py-8 rounded-2xl border-2 border-cyan-200 shadow-lg mx-4">
                 <div className="text-center flex-1">
-                  <div className="mb-4">
+                  <div className="mb-4 bg-white rounded-xl p-4 shadow-md border-2 border-cyan-200">
                     <svg className="w-32 h-20 sm:w-40 sm:h-24 mx-auto" viewBox="0 0 160 80">
                       <path
                         d="M 10,50 Q 30,20 50,40 T 90,35 Q 110,25 130,45 T 150,40"
                         stroke="#0891b2"
-                        strokeWidth="2.5"
+                        strokeWidth="3"
                         fill="none"
                         strokeLinecap="round"
-                        opacity="0.8"
+                        opacity="0.9"
                       />
                     </svg>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-600 font-semibold">المدير التنفيذي</p>
-                  <p className="text-xs text-gray-500 mt-1">{formatDate(contract.createdAt)}</p>
+                  <p className="text-sm sm:text-base text-cyan-900 font-bold">المدير التنفيذي</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-2 font-semibold">{formatDate(contract.createdAt)}</p>
                 </div>
 
                 <div className="flex-shrink-0">
-                  <div className="relative w-32 h-32 sm:w-40 sm:h-40">
+                  <div className="relative w-36 h-36 sm:w-44 sm:h-44 bg-white rounded-full p-2 shadow-2xl border-4 border-cyan-300">
                     <svg viewBox="0 0 120 120" className="w-full h-full">
                       <defs>
                         <linearGradient id="stamp-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -499,9 +503,9 @@ export default function InvestmentContract({
                         </filter>
                       </defs>
 
-                      <circle cx="60" cy="60" r="55" fill="none" stroke="url(#stamp-gradient)" strokeWidth="8" opacity="0.3" filter="url(#stamp-shadow)"/>
-                      <circle cx="60" cy="60" r="50" fill="none" stroke="url(#stamp-gradient)" strokeWidth="6" opacity="0.5"/>
-                      <circle cx="60" cy="60" r="45" fill="none" stroke="url(#stamp-gradient)" strokeWidth="4" opacity="0.7"/>
+                      <circle cx="60" cy="60" r="55" fill="none" stroke="url(#stamp-gradient)" strokeWidth="10" opacity="0.4" filter="url(#stamp-shadow)"/>
+                      <circle cx="60" cy="60" r="50" fill="none" stroke="url(#stamp-gradient)" strokeWidth="8" opacity="0.6"/>
+                      <circle cx="60" cy="60" r="45" fill="none" stroke="url(#stamp-gradient)" strokeWidth="6" opacity="0.8"/>
 
                       {[...Array(24)].map((_, i) => {
                         const angle = (i * 15) * Math.PI / 180;
@@ -517,53 +521,56 @@ export default function InvestmentContract({
                             x2={x2}
                             y2={y2}
                             stroke="#0891b2"
-                            strokeWidth="2"
-                            opacity="0.6"
+                            strokeWidth="3"
+                            opacity="0.7"
                           />
                         );
                       })}
 
-                      <circle cx="60" cy="60" r="38" fill="url(#stamp-gradient)" opacity="0.1"/>
+                      <circle cx="60" cy="60" r="38" fill="url(#stamp-gradient)" opacity="0.15"/>
 
-                      <text x="60" y="52" textAnchor="middle" fill="#0891b2" fontSize="14" fontWeight="bold">حصص</text>
-                      <text x="60" y="70" textAnchor="middle" fill="#0891b2" fontSize="14" fontWeight="bold">زراعية</text>
+                      <text x="60" y="52" textAnchor="middle" fill="#0891b2" fontSize="16" fontWeight="bold">حصص</text>
+                      <text x="60" y="72" textAnchor="middle" fill="#0891b2" fontSize="16" fontWeight="bold">زراعية</text>
 
-                      <circle cx="60" cy="60" r="33" fill="none" stroke="#0891b2" strokeWidth="1" strokeDasharray="2,2" opacity="0.4"/>
+                      <circle cx="60" cy="60" r="33" fill="none" stroke="#0891b2" strokeWidth="1.5" strokeDasharray="3,3" opacity="0.5"/>
                     </svg>
                   </div>
                 </div>
 
                 <div className="text-center flex-1">
-                  <div className="mb-4">
+                  <div className="mb-4 bg-white rounded-xl p-4 shadow-md border-2 border-cyan-200">
                     <svg className="w-32 h-20 sm:w-40 sm:h-24 mx-auto" viewBox="0 0 160 80">
                       <path
                         d="M 10,40 Q 25,25 40,38 T 70,42 Q 90,30 110,45 T 150,35"
                         stroke="#0891b2"
-                        strokeWidth="2.5"
+                        strokeWidth="3"
                         fill="none"
                         strokeLinecap="round"
-                        opacity="0.8"
+                        opacity="0.9"
                       />
                     </svg>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-600 font-semibold">المدير المالي</p>
-                  <p className="text-xs text-gray-500 mt-1">{formatDate(contract.createdAt)}</p>
+                  <p className="text-sm sm:text-base text-cyan-900 font-bold">المدير المالي</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mt-2 font-semibold">{formatDate(contract.createdAt)}</p>
                 </div>
               </div>
 
-              <div className="text-center pt-6 border-t-2 border-cyan-200">
-                <div className="inline-block bg-gradient-to-r from-cyan-50 via-cyan-100 to-cyan-50 px-6 py-3 rounded-full shadow-lg">
-                  <p className="text-xs sm:text-sm text-cyan-800 font-semibold">
-                    رقم الشهادة: <span className="font-bold text-cyan-900">{contract.contractNumber}</span>
+              <div className="text-center pt-8 border-t-4 border-cyan-300">
+                <div className="inline-block bg-gradient-to-r from-cyan-100 via-cyan-200 to-cyan-100 px-8 py-4 rounded-2xl shadow-xl border-2 border-cyan-300">
+                  <p className="text-sm sm:text-base text-cyan-900 font-bold">
+                    رقم الشهادة: <span className="font-extrabold text-cyan-950">{contract.contractNumber}</span>
                   </p>
-                  <p className="text-xs text-cyan-600 mt-1">
+                  <p className="text-xs sm:text-sm text-cyan-800 mt-2 font-semibold">
                     تاريخ الإصدار: {formatDate(contract.createdAt)}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className="h-2 bg-gradient-to-r from-cyan-500 via-cyan-600 to-cyan-500"></div>
+            <div className="h-4 bg-gradient-to-r from-cyan-500 via-cyan-600 to-cyan-500" style={{
+              borderBottomLeftRadius: '12px',
+              borderBottomRightRadius: '12px'
+            }}></div>
           </div>
         </div>
       </div>
