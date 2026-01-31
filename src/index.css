@@ -59,4 +59,14 @@
   .safe-area-top {
     padding-top: env(safe-area-inset-top);
   }
+
+  @supports (-webkit-touch-callout: none) {
+    nav[style*="bottom: 0"] {
+      position: fixed !important;
+      bottom: 0 !important;
+      z-index: 99999 !important;
+      -webkit-transform: translate3d(0, 0, 0) !important;
+      transform: translate3d(0, 0, 0) !important;
+    }
+  }
 }
