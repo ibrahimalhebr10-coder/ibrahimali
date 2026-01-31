@@ -350,13 +350,20 @@ function App() {
   return (
     <ErrorBoundary>
       <div
-        className="h-screen flex flex-col overflow-hidden"
+        className="h-screen flex flex-col overflow-hidden relative"
         style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(254, 254, 254, 0.95) 100%)',
+          background: 'linear-gradient(135deg, rgba(250, 252, 251, 1) 0%, rgba(245, 250, 247, 1) 50%, rgba(248, 252, 250, 1) 100%)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)'
         }}
       >
+        <div className="absolute inset-0 opacity-30 pointer-events-none" style={{
+          backgroundImage: `
+            radial-gradient(circle at 20% 30%, rgba(58,161,126,0.05) 0%, transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(58,161,126,0.05) 0%, transparent 50%),
+            radial-gradient(circle at 50% 50%, rgba(212,175,55,0.03) 0%, transparent 50%)
+          `
+        }}></div>
         <Header />
 
         <div
@@ -366,70 +373,75 @@ function App() {
           }}
         >
           <div className="max-w-7xl mx-auto">
-        <section className="px-3 lg:px-6 pt-1 lg:pt-4 pb-0.5 lg:pb-2 flex-shrink-0">
-          <div className="relative w-full h-14 lg:h-64 xl:h-72 overflow-hidden rounded-xl lg:rounded-3xl" style={{ border: '2px solid #3AA17E' }}>
+        <section className="px-3 lg:px-6 pt-1 lg:pt-4 pb-0.5 lg:pb-2 flex-shrink-0 animate-fadeIn">
+          <div className="relative w-full h-14 lg:h-64 xl:h-72 overflow-hidden rounded-xl lg:rounded-3xl shadow-2xl group" style={{ border: '3px solid #3AA17E' }}>
             <div className="absolute inset-0">
               <img
                 src="https://images.pexels.com/photos/2132250/pexels-photo-2132250.jpeg?auto=compress&cs=tinysrgb&w=1200"
                 alt="مزرعة"
-                className="w-full h-full object-cover transform transition-transform duration-700 hover:scale-105"
+                className="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-110"
               />
             </div>
 
             <div
-              className="absolute inset-0 pointer-events-none"
+              className="absolute inset-0 pointer-events-none transition-opacity duration-700 group-hover:opacity-80"
               style={{
                 background: `
-                  linear-gradient(135deg, rgba(47,82,51,0.15) 0%, transparent 20%),
-                  linear-gradient(225deg, rgba(58,161,126,0.15) 0%, transparent 20%),
-                  linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.7) 100%)
+                  linear-gradient(135deg, rgba(47,82,51,0.2) 0%, transparent 25%),
+                  linear-gradient(225deg, rgba(58,161,126,0.2) 0%, transparent 25%),
+                  linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.75) 100%)
                 `,
-                boxShadow: 'inset 0 0 30px rgba(47,82,51,0.3)'
+                boxShadow: 'inset 0 0 50px rgba(47,82,51,0.4)'
               }}
             />
 
             <div
-              className="absolute inset-0 opacity-10 pointer-events-none"
+              className="absolute inset-0 opacity-20 pointer-events-none animate-pulse"
               style={{
-                backgroundImage: `radial-gradient(circle at 20% 50%, rgba(255,255,255,0.8) 0%, transparent 50%),
-                                  radial-gradient(circle at 80% 50%, rgba(255,255,255,0.6) 0%, transparent 50%)`
+                backgroundImage: `radial-gradient(circle at 20% 50%, rgba(255,255,255,0.9) 0%, transparent 50%),
+                                  radial-gradient(circle at 80% 50%, rgba(255,255,255,0.7) 0%, transparent 50%)`
               }}
             />
 
-            <div className="absolute inset-0 flex flex-col items-center justify-center px-4 lg:px-8 text-center">
+            <div className="absolute inset-0 flex flex-col items-center justify-center px-4 lg:px-8 text-center animate-scaleIn">
               <div
-                className="relative px-4 py-2 lg:px-12 lg:py-6 rounded-xl lg:rounded-2xl backdrop-blur-sm"
+                className="relative px-4 py-2 lg:px-12 lg:py-6 rounded-xl lg:rounded-2xl backdrop-blur-md transition-all duration-500 group-hover:backdrop-blur-lg"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%)',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+                  background: 'linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%)',
+                  border: '2px solid rgba(255,255,255,0.4)',
+                  boxShadow: '0 12px 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.5)'
                 }}
               >
                 <h1
-                  className="text-xs lg:text-4xl xl:text-5xl font-bold text-white drop-shadow-2xl"
+                  className="text-xs lg:text-5xl xl:text-6xl font-black text-white drop-shadow-2xl"
                   style={{
-                    textShadow: '0 2px 10px rgba(0,0,0,0.5), 0 0 20px rgba(58,161,126,0.3)'
+                    textShadow: '0 4px 15px rgba(0,0,0,0.6), 0 0 30px rgba(58,161,126,0.5)',
+                    letterSpacing: '-0.02em'
                   }}
                 >
                   استثمر في مزارع حقيقية
                 </h1>
+                <p className="hidden lg:block text-white/90 text-lg mt-3 font-semibold" style={{ textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
+                  ازرع اليوم واحصد غداً
+                </p>
                 <div
-                  className="h-[2px] lg:h-1.5 mt-0.5 lg:mt-3 mx-auto rounded-full"
+                  className="h-[2px] lg:h-2 mt-0.5 lg:mt-4 mx-auto rounded-full animate-pulse"
                   style={{
-                    width: '60%',
-                    background: 'linear-gradient(90deg, transparent 0%, #3AA17E 50%, transparent 100%)'
+                    width: '70%',
+                    background: 'linear-gradient(90deg, transparent 0%, rgba(58,161,126,0.8) 20%, #3AA17E 50%, rgba(58,161,126,0.8) 80%, transparent 100%)',
+                    boxShadow: '0 0 20px rgba(58,161,126,0.6)'
                   }}
                 />
               </div>
             </div>
 
-            <div className="absolute top-0 left-0 w-8 h-8 lg:w-16 lg:h-16" style={{
-              background: 'linear-gradient(135deg, rgba(58,161,126,0.4) 0%, transparent 100%)',
-              borderTopLeftRadius: '12px'
+            <div className="absolute top-0 left-0 w-10 h-10 lg:w-20 lg:h-20" style={{
+              background: 'linear-gradient(135deg, rgba(58,161,126,0.5) 0%, transparent 100%)',
+              borderTopLeftRadius: '14px'
             }} />
-            <div className="absolute top-0 right-0 w-8 h-8 lg:w-16 lg:h-16" style={{
-              background: 'linear-gradient(225deg, rgba(58,161,126,0.4) 0%, transparent 100%)',
-              borderTopRightRadius: '12px'
+            <div className="absolute top-0 right-0 w-10 h-10 lg:w-20 lg:h-20" style={{
+              background: 'linear-gradient(225deg, rgba(58,161,126,0.5) 0%, transparent 100%)',
+              borderTopRightRadius: '14px'
             }} />
           </div>
         </section>
@@ -437,33 +449,59 @@ function App() {
         <section className="px-3 lg:px-6 py-0.5 lg:py-3 flex-shrink-0">
           <div className="flex gap-1.5 lg:gap-4 justify-between lg:max-w-4xl lg:mx-auto">
             {[
-              { icon: Calculator, label: 'حاسبة مزرعتك', color: '#2F5233', onClick: () => alert('قريباً: حاسبة المزرعة') },
-              { icon: Video, label: 'فيديو تعريفي', color: '#3D6B42', onClick: () => setShowVideoIntro(true) },
-              { icon: HelpCircle, label: 'كيف تبدأ؟', color: '#2F5233', onClick: () => setShowHowToStart(true) }
+              { icon: Calculator, label: 'حاسبة مزرعتك', color: '#2F5233', onClick: () => alert('قريباً: حاسبة المزرعة'), delay: '0ms' },
+              { icon: Video, label: 'فيديو تعريفي', color: '#3D6B42', onClick: () => setShowVideoIntro(true), delay: '100ms' },
+              { icon: HelpCircle, label: 'كيف تبدأ؟', color: '#2F5233', onClick: () => setShowHowToStart(true), delay: '200ms' }
             ].map((action, idx) => (
               <button
                 key={idx}
                 onClick={action.onClick}
-                className="rounded-lg lg:rounded-xl flex-1 h-10 lg:h-24 xl:h-28 flex flex-col items-center justify-center bg-white relative group hover:scale-105 active:scale-95"
+                className="rounded-lg lg:rounded-xl flex-1 h-10 lg:h-24 xl:h-28 flex flex-col items-center justify-center bg-white relative group overflow-hidden animate-fadeIn"
                 style={{
                   boxShadow: `
                     0 6px 0 0 rgba(58,161,126,0.3),
-                    0 8px 16px rgba(58,161,126,0.25),
-                    inset 0 1px 0 rgba(255,255,255,0.8),
-                    inset 0 -1px 0 rgba(58,161,126,0.1)
+                    0 8px 20px rgba(58,161,126,0.3),
+                    inset 0 1px 0 rgba(255,255,255,0.9),
+                    inset 0 -1px 0 rgba(58,161,126,0.15)
                   `,
-                  border: '2px solid #3AA17E',
-                  background: 'linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%)',
+                  border: '2.5px solid #3AA17E',
+                  background: 'linear-gradient(145deg, #ffffff 0%, #f5fdf9 100%)',
                   transform: 'translateY(0)',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  animationDelay: action.delay
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
+                  e.currentTarget.style.boxShadow = `
+                    0 8px 0 0 rgba(58,161,126,0.4),
+                    0 16px 32px rgba(58,161,126,0.4),
+                    inset 0 2px 0 rgba(255,255,255,0.9),
+                    inset 0 -2px 0 rgba(58,161,126,0.2)
+                  `;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.boxShadow = `
+                    0 6px 0 0 rgba(58,161,126,0.3),
+                    0 8px 20px rgba(58,161,126,0.3),
+                    inset 0 1px 0 rgba(255,255,255,0.9),
+                    inset 0 -1px 0 rgba(58,161,126,0.15)
+                  `;
+                }}
+                onMouseDown={(e) => {
+                  e.currentTarget.style.transform = 'translateY(2px) scale(0.98)';
+                }}
+                onMouseUp={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.05)';
                 }}
               >
-                <div className="absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-br from-white/40 via-transparent to-black/5 pointer-events-none"></div>
+                <div className="absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-br from-white/60 via-emerald-50/30 to-green-50/20 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 opacity-60"></div>
+                <div className="absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-t from-emerald-100/0 to-emerald-50/0 group-hover:from-emerald-100/30 group-hover:to-emerald-50/10 pointer-events-none transition-all duration-300"></div>
                 <action.icon
-                  className="w-4 h-4 lg:w-8 lg:h-8 xl:w-9 xl:h-9 text-darkgreen mb-0 lg:mb-2 relative z-10 drop-shadow-md"
-                  style={{ filter: 'drop-shadow(0 2px 3px rgba(47,82,51,0.3))' }}
+                  className="w-4 h-4 lg:w-8 lg:h-8 xl:w-10 xl:h-10 text-darkgreen mb-0 lg:mb-2 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-700"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(47,82,51,0.3))' }}
                 />
-                <span className="text-[8px] lg:text-sm xl:text-base font-bold text-darkgreen relative z-10 text-center leading-tight px-1">{action.label}</span>
+                <span className="text-[8px] lg:text-sm xl:text-base font-bold text-darkgreen relative z-10 text-center leading-tight px-1 transition-colors duration-300 group-hover:text-emerald-700">{action.label}</span>
               </button>
             ))}
           </div>
@@ -474,15 +512,15 @@ function App() {
           onModeChange={handleAppModeChange}
         />
 
-        <section className="px-3 lg:px-6 py-0.5 lg:py-3 flex-shrink-0">
-          <h3 className="text-[11px] lg:text-2xl xl:text-3xl font-bold mb-1 lg:mb-4 text-darkgreen text-center lg:text-right">المزارع المتاحة</h3>
+        <section className="px-3 lg:px-6 py-1 lg:py-4 flex-shrink-0">
+          <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-2 lg:mb-6 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
           {categories.length === 0 ? (
-            <div className="text-center py-4 text-darkgreen/70">
+            <div className="text-center py-4 text-darkgreen/70 animate-pulse">
               <p className="text-sm">جاري تحميل الفئات...</p>
             </div>
           ) : (
-          <div className="flex gap-1 lg:gap-4 justify-between lg:max-w-3xl lg:mx-auto">
-            {categories.map((category) => {
+          <div className="flex gap-1.5 lg:gap-5 justify-between lg:max-w-4xl lg:mx-auto">
+            {categories.map((category, idx) => {
               const Icon = iconMap[category.icon] || Leaf;
               const isActive = activeCategory === category.slug;
               const colors = getColorForIcon(category.icon, appMode);
@@ -490,28 +528,51 @@ function App() {
               const textColor = appMode === 'agricultural' ? 'text-darkgreen' : 'text-[#B8942F]';
 
               return (
-                <div key={category.slug} className="flex-1 flex flex-col items-center gap-0.5 lg:gap-2">
+                <div key={category.slug} className="flex-1 flex flex-col items-center gap-1 lg:gap-3 animate-fadeIn" style={{ animationDelay: `${idx * 100}ms` }}>
                   <button
                     onClick={() => handleCategoryChange(category.slug)}
-                    className="rounded-lg lg:rounded-2xl w-full aspect-square flex items-center justify-center bg-white transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-lg relative overflow-hidden"
+                    className="rounded-xl lg:rounded-2xl w-full aspect-square flex items-center justify-center bg-white transition-all duration-500 backdrop-blur-lg relative overflow-hidden group"
                     style={{
                       boxShadow: isActive
-                        ? `0 3px 12px ${colors.shadow}, 0 6px 24px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.05)`
-                        : '0 2px 6px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.5)',
+                        ? `0 4px 16px ${colors.shadow}, 0 8px 32px ${colors.shadow}, inset 0 2px 0 rgba(255,255,255,0.7), inset 0 -2px 0 rgba(0,0,0,0.05)`
+                        : '0 3px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)',
                       background: isActive
                         ? colors.iconGradient
-                        : 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(249,249,249,0.8) 100%)',
-                      border: `1.5px solid ${isActive ? colors.border : 'rgba(220,220,220,0.5)'}`,
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)'
+                        : 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(250,252,251,0.9) 100%)',
+                      border: `2.5px solid ${isActive ? colors.border : 'rgba(58,161,126,0.3)'}`,
+                      backdropFilter: 'blur(16px)',
+                      WebkitBackdropFilter: 'blur(16px)',
+                      transform: isActive ? 'scale(1.05)' : 'scale(1)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.transform = 'scale(1.1) translateY(-4px)';
+                        e.currentTarget.style.boxShadow = `0 6px 20px ${colors.shadow}, 0 12px 40px ${colors.shadow}`;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.transform = 'scale(1) translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 3px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)';
+                      }
                     }}
                   >
+                    <div className={`absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-br from-white/30 via-transparent to-emerald-50/20 pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'}`}></div>
                     <Icon
-                      className={`w-4 h-4 lg:w-9 lg:h-9 xl:w-11 xl:h-11 transition-colors duration-300 ${isActive ? 'drop-shadow-sm' : ''}`}
-                      style={{ color: isActive ? iconColor : `${iconColor}60` }}
+                      className={`w-4 h-4 lg:w-10 lg:h-10 xl:w-12 xl:h-12 transition-all duration-500 ${isActive ? 'drop-shadow-lg scale-110' : 'group-hover:scale-125 group-hover:drop-shadow-md'}`}
+                      style={{
+                        color: isActive ? iconColor : `${iconColor}60`,
+                        filter: isActive ? 'drop-shadow(0 2px 6px rgba(58,161,126,0.4))' : 'none'
+                      }}
                     />
+                    {isActive && (
+                      <div className="absolute inset-0 rounded-xl lg:rounded-2xl animate-pulse" style={{
+                        background: `radial-gradient(circle at center, ${colors.shadow} 0%, transparent 70%)`,
+                        opacity: 0.3
+                      }}></div>
+                    )}
                   </button>
-                  <span className={`text-[7px] lg:text-sm xl:text-base font-bold text-center leading-tight transition-colors duration-300 ${isActive ? textColor : `${textColor}/60`}`}>
+                  <span className={`text-[7px] lg:text-sm xl:text-base font-bold text-center leading-tight transition-all duration-500 ${isActive ? `${textColor} scale-105` : `${textColor}/60`}`}>
                     {category.name}
                   </span>
                 </div>
@@ -523,14 +584,27 @@ function App() {
 
         <section className="px-3 lg:px-6 py-0.5 lg:py-4 flex-shrink-0">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-3">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-darkgreen"></div>
-              <p className="text-sm text-darkgreen/70">جاري تحميل المزارع...</p>
+            <div className="flex flex-col items-center justify-center py-20 gap-4 animate-fadeIn">
+              <div className="relative">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-emerald-200"></div>
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-darkgreen border-t-transparent absolute inset-0"></div>
+                <Sprout className="w-8 h-8 text-darkgreen absolute inset-0 m-auto animate-pulse" />
+              </div>
+              <p className="text-base text-darkgreen font-bold animate-pulse">جاري تحميل المزارع...</p>
+              <div className="flex gap-2">
+                <div className="w-2 h-2 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
             </div>
           ) : currentFarms.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-3">
-              <Sprout className="w-16 h-16 text-darkgreen/30" />
-              <p className="text-sm text-darkgreen/70 font-bold">لا توجد مزارع متاحة حالياً</p>
+            <div className="flex flex-col items-center justify-center py-20 gap-4 animate-scaleIn">
+              <div className="relative">
+                <div className="absolute inset-0 bg-emerald-100 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                <Sprout className="w-20 h-20 text-darkgreen/40 relative animate-float" />
+              </div>
+              <p className="text-lg text-darkgreen/80 font-bold">لا توجد مزارع متاحة حالياً</p>
+              <p className="text-sm text-darkgreen/60">تحقق مرة أخرى قريباً</p>
             </div>
           ) : (
             <>
@@ -550,75 +624,82 @@ function App() {
                       const reservationPercentage = (farm.reservedTrees / totalTrees) * 100;
 
                       return (
-                        <div key={farm.id} className="w-full flex-shrink-0 px-0.5">
+                        <div key={farm.id} className="w-full flex-shrink-0 px-0.5 animate-scaleIn">
                           <div
                             onClick={() => {
                               setSelectedInvestmentFarm(farm);
                             }}
-                            className="w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer active:scale-95 transition-transform duration-200"
+                            className="w-full rounded-2xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer transition-all duration-300 group"
                             style={{
                               background: activeColors.cardGradient,
-                              boxShadow: `0 8px 24px ${activeColors.shadow}, 0 4px 12px ${activeColors.shadow}, inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.03)`,
-                              border: `2px solid ${activeColors.border}`,
-                              backdropFilter: 'blur(20px)',
-                              WebkitBackdropFilter: 'blur(20px)'
+                              boxShadow: `0 10px 30px ${activeColors.shadow}, 0 6px 15px ${activeColors.shadow}, inset 0 2px 0 rgba(255,255,255,0.8), inset 0 -2px 0 rgba(0,0,0,0.05)`,
+                              border: `3px solid ${activeColors.border}`,
+                              backdropFilter: 'blur(24px)',
+                              WebkitBackdropFilter: 'blur(24px)'
+                            }}
+                            onTouchStart={(e) => {
+                              e.currentTarget.style.transform = 'scale(0.98)';
+                            }}
+                            onTouchEnd={(e) => {
+                              e.currentTarget.style.transform = 'scale(1)';
                             }}
                           >
-                            <div className="relative w-full h-16 overflow-hidden">
+                            <div className="relative w-full h-20 overflow-hidden">
                               <img
                                 src={farm.image}
                                 alt={farm.name}
-                                className="w-full h-full object-cover"
+                                className="w-full h-full object-cover transition-transform duration-700 group-active:scale-110"
                               />
                               <div
-                                className="absolute inset-0"
+                                className="absolute inset-0 transition-opacity duration-300 group-active:opacity-60"
                                 style={{
-                                  background: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 100%)'
+                                  background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%)'
                                 }}
                               />
-                              <div className="absolute top-1.5 right-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-1 shadow-lg">
-                                <span className="text-[9px] font-black text-darkgreen">{farm.name}</span>
+                              <div className="absolute top-2 right-2 bg-white/98 backdrop-blur-md rounded-xl px-2.5 py-1.5 shadow-xl border-2 border-emerald-200">
+                                <span className="text-[10px] font-black text-darkgreen">{farm.name}</span>
                               </div>
-                              <div className="absolute top-1.5 left-1.5 bg-gradient-to-r from-green-50 to-emerald-50 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 shadow-lg border border-green-200">
-                                <TrendingUp className="w-2.5 h-2.5 text-green-600" strokeWidth={2.5} />
-                                <span className="text-[9px] font-black text-green-700">{farm.returnRate}</span>
+                              <div className="absolute top-2 left-2 bg-gradient-to-r from-green-100 to-emerald-100 backdrop-blur-md rounded-full px-2.5 py-1.5 flex items-center gap-1 shadow-xl border-2 border-green-300 animate-pulse">
+                                <TrendingUp className="w-3 h-3 text-green-700" strokeWidth={3} />
+                                <span className="text-[10px] font-black text-green-800">{farm.returnRate}</span>
                               </div>
                             </div>
-                        <div className="p-2 space-y-1">
-                          <div className="flex items-center justify-center gap-1 py-1 px-2 rounded-lg bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border border-amber-200 shadow-sm">
-                            <Sparkles className="w-2 h-2 text-amber-500" strokeWidth={2.5} fill="currentColor" />
-                            <span className="text-[8px] font-black text-amber-800">قريباً</span>
+                        <div className="p-2.5 space-y-1.5">
+                          <div className="flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-xl bg-gradient-to-r from-amber-100 via-yellow-100 to-amber-100 border-2 border-amber-300 shadow-md">
+                            <Sparkles className="w-2.5 h-2.5 text-amber-600 animate-pulse" strokeWidth={3} fill="currentColor" />
+                            <span className="text-[9px] font-black text-amber-900">قريباً</span>
                           </div>
 
-                          <div className="flex items-center justify-between gap-1 text-[7px]">
-                            <div className="flex items-center gap-0.5 bg-green-50 rounded-md px-1.5 py-0.5 border border-green-200 shadow-sm flex-1">
-                              <CheckCircle2 className="w-2 h-2 text-green-600" strokeWidth={2.5} />
-                              <span className="font-black text-green-700 text-[8px]">{farm.availableTrees}</span>
-                              <span className="font-bold text-green-600">متاح</span>
+                          <div className="flex items-center justify-between gap-1.5 text-[7px]">
+                            <div className="flex items-center gap-1 bg-green-100 rounded-lg px-2 py-1 border-2 border-green-300 shadow-md flex-1">
+                              <CheckCircle2 className="w-2.5 h-2.5 text-green-700" strokeWidth={3} />
+                              <span className="font-black text-green-800 text-[9px]">{farm.availableTrees}</span>
+                              <span className="font-bold text-green-700">متاح</span>
                             </div>
-                            <div className="flex items-center gap-0.5 bg-amber-50 rounded-md px-1.5 py-0.5 border border-amber-200 shadow-sm flex-1">
-                              <Clock className="w-2 h-2 text-amber-600" strokeWidth={2.5} />
-                              <span className="font-black text-amber-700 text-[8px]">{farm.reservedTrees}</span>
-                              <span className="font-bold text-amber-600">محجوز</span>
+                            <div className="flex items-center gap-1 bg-amber-100 rounded-lg px-2 py-1 border-2 border-amber-300 shadow-md flex-1">
+                              <Clock className="w-2.5 h-2.5 text-amber-700" strokeWidth={3} />
+                              <span className="font-black text-amber-800 text-[9px]">{farm.reservedTrees}</span>
+                              <span className="font-bold text-amber-700">محجوز</span>
                             </div>
                           </div>
 
-                          <div className="space-y-0.5">
-                            <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                          <div className="space-y-1">
+                            <div className="h-2 w-full bg-gray-300 rounded-full overflow-hidden shadow-inner border border-gray-400">
                               <div
-                                className="h-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 transition-all duration-700"
+                                className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 transition-all duration-700 shadow-lg"
                                 style={{
                                   width: `${reservationPercentage}%`,
-                                  backgroundSize: '200% 100%'
+                                  backgroundSize: '200% 100%',
+                                  boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.5)'
                                 }}
                               />
                             </div>
-                            <p className="text-[7px] font-black text-amber-700 text-center">
+                            <p className="text-[8px] font-black text-amber-800 text-center">
                               نسبة الحجز: {reservationPercentage.toFixed(0)}%
                             </p>
                           </div>
 
-                          <p className="text-[7px] leading-relaxed line-clamp-2 font-bold text-darkgreen/80">
+                          <p className="text-[8px] leading-relaxed line-clamp-2 font-bold text-darkgreen/90 px-1">
                             {farm.description}
                           </p>
                         </div>
@@ -671,8 +752,8 @@ function App() {
             </div>
           )}
 
-          <div className="hidden md:grid md:grid-cols-2 xl:grid-cols-3 gap-4 lg:gap-6">
-            {currentFarms.map((farm) => {
+          <div className="hidden md:grid md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
+            {currentFarms.map((farm, idx) => {
               const totalTrees = farm.availableTrees + farm.reservedTrees;
               const reservationPercentage = (farm.reservedTrees / totalTrees) * 100;
 
@@ -682,70 +763,80 @@ function App() {
                   onClick={() => {
                     setSelectedInvestmentFarm(farm);
                   }}
-                  className="w-full rounded-xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer hover:scale-105 active:scale-95 transition-transform duration-200"
+                  className="w-full rounded-2xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer transition-all duration-500 group animate-fadeIn"
                   style={{
                     background: activeColors.cardGradient,
-                    boxShadow: `0 8px 24px ${activeColors.shadow}, 0 4px 12px ${activeColors.shadow}, inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.03)`,
-                    border: `2px solid ${activeColors.border}`,
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)'
+                    boxShadow: `0 10px 30px ${activeColors.shadow}, 0 6px 15px ${activeColors.shadow}, inset 0 2px 0 rgba(255,255,255,0.8), inset 0 -2px 0 rgba(0,0,0,0.05)`,
+                    border: `3px solid ${activeColors.border}`,
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)',
+                    animationDelay: `${idx * 100}ms`
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-8px) scale(1.03)';
+                    e.currentTarget.style.boxShadow = `0 20px 50px ${activeColors.shadow}, 0 12px 25px ${activeColors.shadow}`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                    e.currentTarget.style.boxShadow = `0 10px 30px ${activeColors.shadow}, 0 6px 15px ${activeColors.shadow}`;
                   }}
                 >
-                  <div className="relative w-full h-16 overflow-hidden">
+                  <div className="relative w-full h-48 overflow-hidden">
                     <img
                       src={farm.image}
                       alt={farm.name}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div
-                      className="absolute inset-0"
+                      className="absolute inset-0 transition-opacity duration-500 group-hover:opacity-60"
                       style={{
-                        background: 'linear-gradient(180deg, rgba(0,0,0,0.35) 0%, transparent 100%)'
+                        background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%)'
                       }}
                     />
-                    <div className="absolute top-1.5 right-1.5 bg-white/95 backdrop-blur-sm rounded-lg px-2 py-1 shadow-lg">
-                      <span className="text-[9px] font-black text-darkgreen">{farm.name}</span>
+                    <div className="absolute top-4 right-4 bg-white/98 backdrop-blur-md rounded-xl px-4 py-2 shadow-2xl border-2 border-emerald-200">
+                      <span className="text-base font-black text-darkgreen">{farm.name}</span>
                     </div>
-                    <div className="absolute top-1.5 left-1.5 bg-gradient-to-r from-green-50 to-emerald-50 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 shadow-lg border border-green-200">
-                      <TrendingUp className="w-2.5 h-2.5 text-green-600" strokeWidth={2.5} />
-                      <span className="text-[9px] font-black text-green-700">{farm.returnRate}</span>
+                    <div className="absolute top-4 left-4 bg-gradient-to-r from-green-100 to-emerald-100 backdrop-blur-md rounded-full px-4 py-2 flex items-center gap-2 shadow-2xl border-2 border-green-300 animate-pulse">
+                      <TrendingUp className="w-5 h-5 text-green-700" strokeWidth={3} />
+                      <span className="text-base font-black text-green-800">{farm.returnRate}</span>
                     </div>
                   </div>
-                  <div className="p-2 space-y-1">
-                    <div className="flex items-center justify-center gap-1 py-1 px-2 rounded-lg bg-gradient-to-r from-amber-50 via-yellow-50 to-amber-50 border border-amber-200 shadow-sm">
-                      <Sparkles className="w-2 h-2 text-amber-500" strokeWidth={2.5} fill="currentColor" />
-                      <span className="text-[8px] font-black text-amber-800">قريباً</span>
+                  <div className="p-5 space-y-3">
+                    <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-gradient-to-r from-amber-100 via-yellow-100 to-amber-100 border-2 border-amber-300 shadow-md">
+                      <Sparkles className="w-4 h-4 text-amber-600 animate-pulse" strokeWidth={3} fill="currentColor" />
+                      <span className="text-sm font-black text-amber-900">قريباً</span>
                     </div>
 
-                    <div className="flex items-center justify-between gap-1 text-[7px]">
-                      <div className="flex items-center gap-0.5 bg-green-50 rounded-md px-1.5 py-0.5 border border-green-200 shadow-sm flex-1">
-                        <CheckCircle2 className="w-2 h-2 text-green-600" strokeWidth={2.5} />
-                        <span className="font-black text-green-700 text-[8px]">{farm.availableTrees}</span>
-                        <span className="font-bold text-green-600">متاح</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 bg-green-100 rounded-lg px-3 py-2 border-2 border-green-300 shadow-md flex-1">
+                        <CheckCircle2 className="w-4 h-4 text-green-700" strokeWidth={3} />
+                        <span className="font-black text-green-800 text-base">{farm.availableTrees}</span>
+                        <span className="font-bold text-green-700 text-sm">متاح</span>
                       </div>
-                      <div className="flex items-center gap-0.5 bg-amber-50 rounded-md px-1.5 py-0.5 border border-amber-200 shadow-sm flex-1">
-                        <Clock className="w-2 h-2 text-amber-600" strokeWidth={2.5} />
-                        <span className="font-black text-amber-700 text-[8px]">{farm.reservedTrees}</span>
-                        <span className="font-bold text-amber-600">محجوز</span>
+                      <div className="flex items-center gap-2 bg-amber-100 rounded-lg px-3 py-2 border-2 border-amber-300 shadow-md flex-1">
+                        <Clock className="w-4 h-4 text-amber-700" strokeWidth={3} />
+                        <span className="font-black text-amber-800 text-base">{farm.reservedTrees}</span>
+                        <span className="font-bold text-amber-700 text-sm">محجوز</span>
                       </div>
                     </div>
 
-                    <div className="space-y-0.5">
-                      <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden shadow-inner">
+                    <div className="space-y-2">
+                      <div className="h-3 w-full bg-gray-300 rounded-full overflow-hidden shadow-inner border border-gray-400">
                         <div
-                          className="h-full bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-400 transition-all duration-700"
+                          className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 transition-all duration-700 shadow-lg"
                           style={{
                             width: `${reservationPercentage}%`,
-                            backgroundSize: '200% 100%'
+                            backgroundSize: '200% 100%',
+                            boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.5)'
                           }}
                         />
                       </div>
-                      <p className="text-[7px] font-black text-amber-700 text-center">
+                      <p className="text-sm font-black text-amber-800 text-center">
                         نسبة الحجز: {reservationPercentage.toFixed(0)}%
                       </p>
                     </div>
 
-                    <p className="text-[7px] leading-relaxed line-clamp-2 font-bold text-darkgreen/80">
+                    <p className="text-sm leading-relaxed line-clamp-2 font-bold text-darkgreen/90">
                       {farm.description}
                     </p>
                   </div>
@@ -760,49 +851,70 @@ function App() {
       </div>
 
       <nav
-        className="hidden lg:flex fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl"
+        className="hidden lg:flex fixed bottom-0 left-0 right-0 z-50 backdrop-blur-2xl"
         style={{
-          background: 'linear-gradient(180deg, rgba(230, 232, 235, 0.85) 0%, rgba(238, 239, 241, 0.80) 100%)',
-          borderTop: '2px solid rgba(58,161,126,0.3)',
-          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)'
+          background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.95) 0%, rgba(242, 247, 244, 0.92) 100%)',
+          borderTop: '3px solid rgba(58,161,126,0.4)',
+          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)'
         }}
       >
-        <div className="max-w-7xl mx-auto w-full px-6 py-4 pb-8 flex items-center justify-around">
-          <button className="flex flex-col items-center gap-2 px-6 py-2 rounded-xl transition-all hover:bg-darkgreen/5">
-            <Home className="w-6 h-6 text-darkgreen" />
-            <span className="text-sm font-bold text-darkgreen">الرئيسية</span>
+        <div className="max-w-7xl mx-auto w-full px-8 py-5 pb-8 flex items-center justify-around">
+          <button className="flex flex-col items-center gap-2 px-8 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.08) 0%, rgba(58,161,126,0.12) 100%)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <Home className="w-7 h-7 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
+            <span className="text-base font-bold text-darkgreen">الرئيسية</span>
           </button>
 
           <button
             onClick={() => setShowAssistant(true)}
-            className="flex flex-col items-center gap-2 px-6 py-2 rounded-xl transition-all hover:bg-darkgreen/5 relative"
+            className="flex flex-col items-center gap-2 px-8 py-3 rounded-2xl transition-all duration-300 hover:scale-105 relative group"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.08) 0%, rgba(58,161,126,0.12) 100%)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
-            <Sparkles className="w-6 h-6 text-darkgreen" />
-            <span className="text-sm font-bold text-darkgreen">المساعد الذكي</span>
-            <div className="absolute top-1 right-1 w-3 h-3 rounded-full bg-gold"></div>
+            <Sparkles className="w-7 h-7 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
+            <span className="text-base font-bold text-darkgreen">المساعد الذكي</span>
+            <div className="absolute top-2 right-2 w-3 h-3 rounded-full animate-pulse" style={{
+              background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
+              boxShadow: '0 0 10px rgba(212,175,55,0.6)'
+            }}></div>
           </button>
 
           <button
             onClick={() => alert(`قريباً: ${appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}`)}
-            className="flex items-center gap-3 px-8 py-3 rounded-2xl transition-all hover:scale-105"
+            className="flex items-center gap-4 px-10 py-4 rounded-3xl transition-all duration-300 hover:scale-110 hover:shadow-2xl relative overflow-hidden group"
             style={{
               background: appMode === 'agricultural'
                 ? 'linear-gradient(145deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)'
                 : 'linear-gradient(145deg, #F4E4B8 0%, #D4AF37 50%, #B8942F 100%)',
               boxShadow: appMode === 'agricultural'
-                ? '0 4px 16px rgba(58,161,126,0.4)'
-                : '0 4px 16px rgba(212,175,55,0.4)',
-              border: '2px solid #3AA17E'
+                ? '0 6px 24px rgba(58,161,126,0.5), inset 0 2px 4px rgba(255,255,255,0.4)'
+                : '0 6px 24px rgba(212,175,55,0.5), inset 0 2px 4px rgba(255,255,255,0.4)',
+              border: '3px solid rgba(255,255,255,0.8)'
             }}
           >
+            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/20 pointer-events-none"></div>
             {appMode === 'agricultural' ? (
-              <Sprout className="w-7 h-7 text-white" />
+              <Sprout className="w-8 h-8 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
             ) : (
-              <TrendingUp className="w-7 h-7 text-white" />
+              <TrendingUp className="w-8 h-8 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
             )}
-            <span className="text-base font-bold text-white">
+            <span className="text-lg font-black text-white relative z-10" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
               {appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}
             </span>
           </button>
@@ -814,24 +926,32 @@ function App() {
 
           <button
             onClick={handleMyAccountClick}
-            className="flex flex-col items-center gap-2 px-6 py-2 rounded-xl transition-all hover:bg-darkgreen/5"
+            className="flex flex-col items-center gap-2 px-8 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.08) 0%, rgba(58,161,126,0.12) 100%)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
           >
-            <User className="w-6 h-6 text-darkgreen" />
-            <span className="text-sm font-bold text-darkgreen">حسابي</span>
+            <User className="w-7 h-7 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
+            <span className="text-base font-bold text-darkgreen">حسابي</span>
           </button>
         </div>
       </nav>
 
       <nav
-        className="fixed left-0 right-0 lg:hidden backdrop-blur-xl"
+        className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
         style={{
           bottom: 0,
-          background: 'linear-gradient(180deg, rgba(230, 232, 235, 0.95) 0%, rgba(238, 239, 241, 0.90) 100%)',
-          borderTop: '2px solid rgba(58,161,126,0.3)',
-          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          paddingTop: '1rem',
+          background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.98) 0%, rgba(242, 247, 244, 0.95) 100%)',
+          borderTop: '3px solid rgba(58,161,126,0.4)',
+          boxShadow: '0 -12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.8)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          paddingTop: '1.25rem',
           paddingBottom: '5.5rem',
           zIndex: 99999,
           position: 'fixed',
@@ -841,64 +961,70 @@ function App() {
         }}
       >
         <div className="flex items-center justify-around px-3 relative" style={{ height: '4.5rem' }}>
-          <button className="flex flex-col items-center justify-center gap-1 relative group">
+          <button className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform">
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300"
+              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
               style={{
-                background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.1), inset 0 1px 2px rgba(255,255,255,0.8)',
-                border: '2px solid #3AA17E'
+                background: 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,252,250,0.9) 100%)',
+                boxShadow: '0 6px 12px rgba(58,161,126,0.2), inset 0 2px 4px rgba(255,255,255,0.9)',
+                border: '2.5px solid #3AA17E'
               }}
             >
-              <Home className="w-6 h-6 text-darkgreen/70" />
+              <Home className="w-6 h-6 text-darkgreen transition-all duration-300 group-active:scale-110" />
             </div>
-            <span className="text-[10px] font-semibold text-gray-600">الرئيسية</span>
+            <span className="text-[10px] font-bold text-darkgreen/80">الرئيسية</span>
           </button>
 
           <button
             onClick={() => setShowAssistant(true)}
-            className="flex flex-col items-center justify-center gap-1 relative group"
+            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
           >
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 relative"
+              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 relative group-active:scale-90 overflow-hidden"
               style={{
-                background: 'linear-gradient(145deg, #ffffff 0%, #f5f5f5 100%)',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.1), inset 0 1px 2px rgba(255,255,255,0.8)',
-                border: '2px solid #3AA17E'
+                background: 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,252,250,0.9) 100%)',
+                boxShadow: '0 6px 12px rgba(58,161,126,0.2), inset 0 2px 4px rgba(255,255,255,0.9)',
+                border: '2.5px solid #3AA17E'
               }}
             >
-              <Sparkles className="w-6 h-6 text-darkgreen/70" />
+              <Sparkles className="w-6 h-6 text-darkgreen transition-all duration-300 group-active:scale-110" />
               <div
-                className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full"
-                style={{ background: '#D4AF37' }}
+                className="absolute -top-1 -right-1 w-3 h-3 rounded-full animate-pulse"
+                style={{
+                  background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
+                  boxShadow: '0 0 8px rgba(212,175,55,0.6)'
+                }}
               />
             </div>
-            <span className="text-[10px] font-semibold text-gray-600">المساعد</span>
+            <span className="text-[10px] font-bold text-darkgreen/80">المساعد</span>
           </button>
 
           <button
             onClick={() => alert(`قريباً: ${appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}`)}
-            className="flex flex-col items-center justify-center gap-1 relative -mt-4"
+            className="flex flex-col items-center justify-center gap-1 relative -mt-5 active:scale-95 transition-all duration-300"
           >
             <div
-              className="w-16 h-16 rounded-3xl flex items-center justify-center transition-all duration-300 active:scale-95"
+              className="w-18 h-18 rounded-3xl flex items-center justify-center transition-all duration-300 relative overflow-hidden group"
               style={{
                 background: appMode === 'agricultural'
                   ? 'linear-gradient(145deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)'
                   : 'linear-gradient(145deg, #F4E4B8 0%, #D4AF37 50%, #B8942F 100%)',
                 boxShadow: appMode === 'agricultural'
-                  ? '0 8px 24px rgba(58,161,126,0.5), 0 4px 12px rgba(47,130,102,0.3), inset 0 2px 4px rgba(255,255,255,0.4)'
-                  : '0 8px 24px rgba(212,175,55,0.5), 0 4px 12px rgba(184,148,47,0.3), inset 0 2px 4px rgba(255,255,255,0.4)',
-                border: '2.5px solid #3AA17E'
+                  ? '0 10px 30px rgba(58,161,126,0.6), 0 6px 15px rgba(47,130,102,0.4), inset 0 2px 6px rgba(255,255,255,0.5)'
+                  : '0 10px 30px rgba(212,175,55,0.6), 0 6px 15px rgba(184,148,47,0.4), inset 0 2px 6px rgba(255,255,255,0.5)',
+                border: '3px solid rgba(255,255,255,0.9)',
+                width: '4.5rem',
+                height: '4.5rem'
               }}
             >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/20 pointer-events-none"></div>
               {appMode === 'agricultural' ? (
-                <Sprout className="w-8 h-8 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+                <Sprout className="w-9 h-9 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
               ) : (
-                <TrendingUp className="w-8 h-8 text-white drop-shadow-lg" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+                <TrendingUp className="w-9 h-9 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
               )}
             </div>
-            <span className="text-[11px] font-bold text-darkgreen">
+            <span className="text-[11px] font-black text-darkgreen mt-1">
               {appMode === 'agricultural' ? 'زراعي' : 'استثماري'}
             </span>
           </button>
@@ -910,19 +1036,19 @@ function App() {
 
           <button
             onClick={handleMyAccountClick}
-            className="flex flex-col items-center justify-center gap-1 relative group"
+            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
           >
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300"
+              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
               style={{
-                background: 'linear-gradient(145deg, #f0f4f0 0%, #e8ede8 100%)',
-                boxShadow: '0 4px 8px rgba(0,0,0,0.12), inset 0 1px 2px rgba(255,255,255,0.8)',
-                border: '2px solid #3AA17E'
+                background: 'linear-gradient(145deg, rgba(240,248,244,0.95) 0%, rgba(232,242,237,0.9) 100%)',
+                boxShadow: '0 6px 12px rgba(58,161,126,0.25), inset 0 2px 4px rgba(255,255,255,0.9)',
+                border: '2.5px solid #3AA17E'
               }}
             >
-              <User className="w-6 h-6 text-darkgreen" />
+              <User className="w-6 h-6 text-darkgreen transition-all duration-300 group-active:scale-110" />
             </div>
-            <span className="text-[10px] font-bold text-darkgreen/80">حسابي</span>
+            <span className="text-[10px] font-black text-darkgreen/90">حسابي</span>
           </button>
         </div>
       </nav>

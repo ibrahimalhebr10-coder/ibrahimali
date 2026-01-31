@@ -8,41 +8,43 @@ interface HeaderProps {
 export default function Header({ onBack, showBackButton = false }: HeaderProps) {
   return (
     <header
-      className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between z-50 backdrop-blur-xl flex-shrink-0 fixed top-0 left-0 right-0"
+      className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between z-50 backdrop-blur-2xl flex-shrink-0 fixed top-0 left-0 right-0 animate-slideInRight"
       style={{
-        background: 'linear-gradient(135deg, rgba(230, 232, 235, 0.85) 0%, rgba(238, 239, 241, 0.80) 100%)',
-        borderBottom: '2px solid rgba(58,161,126,0.3)',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)'
+        background: 'linear-gradient(135deg, rgba(248, 250, 249, 0.95) 0%, rgba(242, 247, 244, 0.92) 100%)',
+        borderBottom: '3px solid rgba(58,161,126,0.4)',
+        boxShadow: '0 6px 24px rgba(0, 0, 0, 0.1), inset 0 -1px 0 rgba(255,255,255,0.8)',
+        backdropFilter: 'blur(24px)',
+        WebkitBackdropFilter: 'blur(24px)'
       }}
     >
-      {/* Logo & Brand - Top Right Corner */}
       <button
         onClick={() => window.location.href = '/'}
-        className="flex items-center gap-2 lg:gap-4 transition-all duration-300 hover:scale-105 active:scale-95"
+        className="flex items-center gap-2 lg:gap-4 transition-all duration-300 hover:scale-105 active:scale-95 group"
       >
         <div
-          className="relative w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center overflow-hidden"
+          className="relative w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:shadow-xl"
           style={{
-            background: 'linear-gradient(135deg, #2F5233 0%, #3D6B42 50%, #2F5233 100%)',
-            boxShadow: '0 2px 8px rgba(47,82,51,0.3)'
+            background: 'linear-gradient(145deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)',
+            boxShadow: '0 4px 12px rgba(58,161,126,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
+            border: '2px solid rgba(255,255,255,0.3)'
           }}
         >
-          <Sprout className="w-5 h-5 lg:w-6 lg:h-6 text-white drop-shadow-lg" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/20 pointer-events-none"></div>
+          <Sprout className="w-5 h-5 lg:w-7 lg:h-7 text-white drop-shadow-2xl relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
         </div>
         <div className="flex flex-col leading-none">
           <h1
-            className="text-sm lg:text-xl font-black"
+            className="text-sm lg:text-2xl font-black transition-all duration-300 group-hover:scale-105"
             style={{
-              background: 'linear-gradient(135deg, #2F5233 0%, #3D6B42 50%, #2F5233 100%)',
+              background: 'linear-gradient(135deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)',
               WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
+              WebkitTextFillColor: 'transparent',
+              letterSpacing: '-0.01em'
             }}
           >
             حصص زراعية
           </h1>
-          <p className="text-[8px] lg:text-xs text-darkgreen/60 font-semibold">
+          <p className="text-[8px] lg:text-sm text-darkgreen/70 font-bold mt-0.5">
             استثمر واربح
           </p>
         </div>
@@ -50,16 +52,23 @@ export default function Header({ onBack, showBackButton = false }: HeaderProps) 
 
       <div className="flex-1" />
 
-      {/* Back Button - Left Side */}
       {showBackButton && (
         <button
           onClick={onBack}
-          className="w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-300 hover:bg-darkgreen/10 active:scale-95"
+          className="w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 group"
           style={{
-            border: '2px solid #3AA17E'
+            background: 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,252,250,0.9) 100%)',
+            border: '2.5px solid #3AA17E',
+            boxShadow: '0 4px 12px rgba(58,161,126,0.2), inset 0 1px 2px rgba(255,255,255,0.8)'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = '0 6px 16px rgba(58,161,126,0.3), inset 0 1px 2px rgba(255,255,255,0.8)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2), inset 0 1px 2px rgba(255,255,255,0.8)';
           }}
         >
-          <ArrowRight className="w-5 h-5 text-darkgreen" />
+          <ArrowRight className="w-5 h-5 lg:w-6 lg:h-6 text-darkgreen transition-transform duration-300 group-hover:translate-x-1" />
         </button>
       )}
     </header>
