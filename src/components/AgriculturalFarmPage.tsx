@@ -39,31 +39,43 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   }, [farm.contracts]);
 
   useEffect(() => {
+    console.log('🔄 Agricultural Farm Page mounted - Setting up scroll detection');
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) {
-      console.log('❌ Scroll container not found');
+      console.error('❌ ERROR: Scroll container not found - ref is null');
       return;
     }
 
-    console.log('✅ Scroll container found, adding listener');
+    console.log('✅ SUCCESS: Scroll container found');
+    console.log('📦 Container details:', {
+      scrollHeight: scrollContainer.scrollHeight,
+      clientHeight: scrollContainer.clientHeight,
+      scrollable: scrollContainer.scrollHeight > scrollContainer.clientHeight
+    });
+
     let ticking = false;
 
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
           const currentScrollY = scrollContainer.scrollTop;
-          console.log('📜 Scroll detected:', {
-            currentScrollY,
-            lastScrollY,
-            isScrollingDown: currentScrollY > lastScrollY && currentScrollY > 80
+          const direction = currentScrollY > lastScrollY ? 'DOWN ⬇️' : 'UP ⬆️';
+          const shouldHide = currentScrollY > lastScrollY && currentScrollY > 80;
+
+          console.log(`📜 SCROLL ${direction}`, {
+            currentScrollY: Math.round(currentScrollY),
+            lastScrollY: Math.round(lastScrollY),
+            threshold: 80,
+            shouldHide,
+            currentState: isScrollingDown ? 'HIDDEN' : 'VISIBLE'
           });
 
           if (currentScrollY > lastScrollY && currentScrollY > 80) {
             setIsScrollingDown(true);
-            console.log('⬇️ Hiding header/footer');
+            console.log('🔒 HIDING header/footer');
           } else if (currentScrollY < lastScrollY) {
             setIsScrollingDown(false);
-            console.log('⬆️ Showing header/footer');
+            console.log('🔓 SHOWING header/footer');
           }
 
           setLastScrollY(currentScrollY);
@@ -74,7 +86,12 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     };
 
     scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
-    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+    console.log('👂 Scroll listener attached successfully');
+
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleScroll);
+      console.log('🗑️ Scroll listener removed');
+    };
   }, [lastScrollY]);
 
   const maxTrees = farm.availableTrees || 0;
@@ -196,30 +213,32 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   };
 
   return (
-    <div
-      ref={scrollContainerRef}
-      className="fixed inset-0 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 z-50 overflow-y-auto"
-    >
-      <div className="min-h-screen pb-32">
-        {/* Header with Back Button */}
-        <div
-          className={`sticky top-0 z-10 bg-white/80 backdrop-blur-lg border-b border-green-200/50 transition-transform duration-300 ${
-            isScrollingDown ? '-translate-y-full' : 'translate-y-0'
-          }`}
-        >
-          <div className="flex items-center justify-between p-4">
-            <button
-              onClick={onClose}
-              className="p-2 rounded-xl bg-white/80 hover:bg-white shadow-sm transition-all hover:scale-105 active:scale-95"
-            >
-              <ArrowLeft className="w-5 h-5 text-darkgreen" />
-            </button>
-            <h1 className="text-lg font-bold text-darkgreen">محصولي الزراعي</h1>
-            <div className="w-9 h-9"></div>
-          </div>
+    <>
+      {/* Header - Fixed to viewport */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-[60] bg-white/80 backdrop-blur-lg border-b border-green-200/50 transition-transform duration-300 ${
+          isScrollingDown ? '-translate-y-full' : 'translate-y-0'
+        }`}
+      >
+        <div className="flex items-center justify-between p-4">
+          <button
+            onClick={onClose}
+            className="p-2 rounded-xl bg-white/80 hover:bg-white shadow-sm transition-all hover:scale-105 active:scale-95"
+          >
+            <ArrowLeft className="w-5 h-5 text-darkgreen" />
+          </button>
+          <h1 className="text-lg font-bold text-darkgreen">محصولي الزراعي</h1>
+          <div className="w-9 h-9"></div>
         </div>
+      </div>
 
-        {/* Hero Image 3D */}
+      {/* Main Content */}
+      <div
+        ref={scrollContainerRef}
+        className="fixed inset-0 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 z-50 overflow-y-auto pt-[73px]"
+      >
+        <div className="min-h-screen pb-32">
+          {/* Hero Image 3D */}
         <div className="w-full h-48 bg-gradient-to-br from-green-100 to-emerald-100 relative overflow-hidden">
           {farm.heroImage || farm.image ? (
             <img
@@ -371,13 +390,16 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           </div>
         </div>
 
-        {/* Purchase Summary - Fixed Bottom */}
-        {treeCount > 0 && selectedContract && (
-          <div
-            className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-4 z-20 transition-transform duration-300 ${
-              isScrollingDown ? 'translate-y-full' : 'translate-y-0'
-            }`}
-          >
+        </div>
+      </div>
+
+      {/* Purchase Summary - Fixed Bottom */}
+      {treeCount > 0 && selectedContract && (
+        <div
+          className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-4 z-[70] transition-transform duration-300 ${
+            isScrollingDown ? 'translate-y-full' : 'translate-y-0'
+          }`}
+        >
             <div className="max-w-lg mx-auto space-y-3">
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="bg-green-50/50 rounded-lg p-2">
@@ -433,8 +455,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               </div>
             </div>
           </div>
-        )}
-      </div>
+        )
+      }
 
       {/* Video Modal */}
       {showVideoModal && farm.video && (
@@ -606,6 +628,6 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           border: 3px solid white;
         }
       `}</style>
-    </div>
+    </>
   );
 }
