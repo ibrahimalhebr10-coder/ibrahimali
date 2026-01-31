@@ -11,9 +11,10 @@ interface AccountProfileProps {
   onClose: () => void;
   onOpenAuth: () => void;
   onOpenReservations: () => void;
+  onStartInvestment?: () => void;
 }
 
-export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenReservations }: AccountProfileProps) {
+export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenReservations, onStartInvestment }: AccountProfileProps) {
   const { user, signOut, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<InvestorStats | null>(null);
@@ -162,10 +163,22 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenRese
                     </div>
                   </div>
                 ) : (
-                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 text-center border-2 border-gray-200">
-                    <TreePine className="w-16 h-16 text-gray-400 mx-auto mb-3" />
-                    <p className="text-gray-600">لا توجد استثمارات حتى الآن</p>
-                    <p className="text-sm text-gray-500 mt-2">ابدأ رحلتك الاستثمارية الآن</p>
+                  <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 text-center border-2 border-green-200">
+                    <div className="bg-white rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <TreePine className="w-10 h-10 text-green-600" />
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-800 mb-2">لم تبدأ استثمارك بعد</h3>
+                    <p className="text-sm text-gray-600 mb-6">انضم الآن لآلاف المستثمرين واستثمر في أشجارك</p>
+                    <button
+                      onClick={() => {
+                        onClose();
+                        onStartInvestment?.();
+                      }}
+                      className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 flex items-center justify-center gap-2"
+                    >
+                      <Sparkles className="w-5 h-5" />
+                      ابدأ استثمار أشجارك الآن
+                    </button>
                   </div>
                 )}
               </div>

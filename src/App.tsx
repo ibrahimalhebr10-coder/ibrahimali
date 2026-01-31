@@ -7,6 +7,7 @@ import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
+import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
@@ -35,6 +36,7 @@ function App() {
   const [showHowToStart, setShowHowToStart] = useState(false);
   const [showAssistant, setShowAssistant] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
+  const [showStandaloneRegistration, setShowStandaloneRegistration] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
@@ -344,6 +346,19 @@ function App() {
     setShowAdminDashboard(true);
   };
 
+  const handleMyAccountClick = () => {
+    if (user) {
+      setShowAccountProfile(true);
+    } else {
+      setShowStandaloneRegistration(true);
+    }
+  };
+
+  const handleRegistrationSuccess = () => {
+    setShowStandaloneRegistration(false);
+    setShowAccountProfile(true);
+  };
+
   useEffect(() => {
     if (isAdminAuthenticated && !isAdminLoading) {
       setShowAdminDashboard(true);
@@ -358,6 +373,7 @@ function App() {
         <Header
           onAdminAccess={handleAdminAccess}
           onOpenAdminDashboard={() => setShowAdminDashboard(true)}
+          onMyAccountClick={handleMyAccountClick}
         />
 
         <div className="flex-1 overflow-y-auto pb-20 lg:pb-4 pt-14 lg:pt-16">
@@ -926,11 +942,21 @@ function App() {
         onClose={() => setShowAssistant(false)}
       />
 
+      {showStandaloneRegistration && (
+        <StandaloneAccountRegistration
+          onSuccess={handleRegistrationSuccess}
+          onBack={() => setShowStandaloneRegistration(false)}
+        />
+      )}
+
       <AccountProfile
         isOpen={showAccountProfile}
         onClose={() => setShowAccountProfile(false)}
         onOpenAuth={() => alert('قريباً: تسجيل الدخول')}
         onOpenReservations={() => alert('قريباً: حجوزاتي')}
+        onStartInvestment={() => {
+          setShowAccountProfile(false);
+        }}
       />
 
       {showAdminLogin && (

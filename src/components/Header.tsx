@@ -1,16 +1,19 @@
-import { Sprout, ArrowRight, Crown, ShieldCheck } from 'lucide-react';
+import { Sprout, ArrowRight, Crown, ShieldCheck, User } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useAdmin } from '../contexts/AdminContext';
+import { useAuth } from '../contexts/AuthContext';
 
 interface HeaderProps {
   onBack?: () => void;
   showBackButton?: boolean;
   onAdminAccess?: () => void;
   onOpenAdminDashboard?: () => void;
+  onMyAccountClick?: () => void;
 }
 
-export default function Header({ onBack, showBackButton = false, onAdminAccess, onOpenAdminDashboard }: HeaderProps) {
+export default function Header({ onBack, showBackButton = false, onAdminAccess, onOpenAdminDashboard, onMyAccountClick }: HeaderProps) {
   const { isAdminAuthenticated, admin } = useAdmin();
+  const { user } = useAuth();
   const [clickCount, setClickCount] = useState(0);
   const [pulseLevel, setPulseLevel] = useState(0);
 
@@ -76,6 +79,30 @@ export default function Header({ onBack, showBackButton = false, onAdminAccess, 
       </button>
 
       <div className="flex-1" />
+
+      {/* My Account Button - Always visible */}
+      {onMyAccountClick && (
+        <button
+          onClick={onMyAccountClick}
+          className="px-3 lg:px-4 py-2 rounded-xl flex items-center gap-2 transition-all duration-300 mr-3 hover:scale-105 active:scale-95"
+          style={{
+            background: user
+              ? 'linear-gradient(145deg, #3AA17E, #2F8B6B)'
+              : 'linear-gradient(145deg, #f0f0f0, #e0e0e0)',
+            boxShadow: user
+              ? '0 4px 12px rgba(58, 161, 126, 0.3)'
+              : '0 2px 8px rgba(0, 0, 0, 0.1)',
+            border: user
+              ? '2px solid rgba(255, 255, 255, 0.2)'
+              : '2px solid rgba(0, 0, 0, 0.1)'
+          }}
+        >
+          <User className={`w-4 h-4 ${user ? 'text-white' : 'text-gray-600'}`} />
+          <span className={`font-bold text-sm hidden lg:block ${user ? 'text-white' : 'text-gray-700'}`}>
+            حسابي
+          </span>
+        </button>
+      )}
 
       {/* Admin Dashboard Button - Only visible when admin is logged in */}
       {isAdminAuthenticated && onOpenAdminDashboard && (
