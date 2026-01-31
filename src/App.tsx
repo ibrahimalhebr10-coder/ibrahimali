@@ -432,7 +432,7 @@ function App() {
               <p className="text-sm">جاري تحميل الفئات...</p>
             </div>
           ) : (
-          <div className="flex gap-0.5 lg:gap-2 justify-between lg:max-w-5xl lg:mx-auto">
+          <div className="flex gap-2 lg:gap-3 justify-between lg:max-w-5xl lg:mx-auto">
             {[{ slug: 'all', name: 'الكل', icon: 'all' }, ...categories].map((category, idx) => {
               const Icon = iconMap[category.icon] || Leaf;
               const isActive = activeCategory === category.slug;
@@ -441,10 +441,10 @@ function App() {
               const textColor = appMode === 'agricultural' ? 'text-darkgreen' : 'text-[#B8942F]';
 
               return (
-                <div key={category.slug} className="flex-1 flex flex-col items-center gap-0.5 lg:gap-1 animate-fadeIn" style={{ animationDelay: `${idx * 70}ms`, transform: 'scale(0.5)' }}>
+                <div key={category.slug} className="flex-1 flex flex-col items-center gap-1.5 lg:gap-2 animate-fadeIn" style={{ animationDelay: `${idx * 70}ms` }}>
                   <button
                     onClick={() => handleCategoryChange(category.slug)}
-                    className="rounded-lg lg:rounded-xl w-full aspect-square flex items-center justify-center bg-white transition-all duration-300 backdrop-blur-lg relative overflow-hidden group"
+                    className="rounded-lg lg:rounded-xl w-11 h-11 lg:w-14 lg:h-14 flex items-center justify-center bg-white transition-all duration-300 backdrop-blur-lg relative overflow-hidden group"
                     style={{
                       boxShadow: isActive
                         ? `0 2px 8px ${colors.shadow}, 0 4px 16px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.8)`
@@ -472,7 +472,7 @@ function App() {
                   >
                     <div className={`absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-br from-white/40 via-transparent to-emerald-50/30 pointer-events-none transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-70'}`}></div>
                     <Icon
-                      className={`w-3.5 h-3.5 transition-all duration-300 ${isActive ? 'drop-shadow-md' : 'opacity-80 group-hover:opacity-100 group-hover:drop-shadow-sm'}`}
+                      className={`w-5 h-5 lg:w-6 lg:h-6 transition-all duration-300 ${isActive ? 'drop-shadow-md' : 'opacity-80 group-hover:opacity-100 group-hover:drop-shadow-sm'}`}
                       style={{
                         color: isActive ? iconColor : `${iconColor}70`,
                         filter: isActive ? 'drop-shadow(0 1px 2px rgba(58,161,126,0.3))' : 'none'
@@ -485,7 +485,7 @@ function App() {
                       }}></div>
                     )}
                   </button>
-                  <span className={`text-[7px] lg:text-[9px] font-bold text-center leading-tight transition-all duration-300 ${isActive ? `${textColor} scale-100` : `${textColor}/70 scale-95`}`}>
+                  <span className={`text-[11px] lg:text-sm font-bold text-center leading-tight transition-all duration-300 ${isActive ? `${textColor} scale-100` : `${textColor}/70 scale-95`}`}>
                     {category.name}
                   </span>
                 </div>
