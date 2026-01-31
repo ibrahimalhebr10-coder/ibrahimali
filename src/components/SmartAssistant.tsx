@@ -404,7 +404,7 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
   );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center pb-16 lg:pb-20" dir="rtl">
+    <div className="fixed inset-0 z-[100] flex items-end justify-center pb-24 lg:pb-32" dir="rtl">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"
         onClick={handleClose}
