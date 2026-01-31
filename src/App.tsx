@@ -420,7 +420,73 @@ function App() {
         />
 
         <section className="px-3 lg:px-6 py-2 lg:py-3">
-          <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-3 lg:mb-4 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
+          <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-1 lg:mb-3 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
+          {categories.length === 0 ? (
+            <div className="text-center py-4 text-darkgreen/70 animate-pulse">
+              <p className="text-sm">جاري تحميل الفئات...</p>
+            </div>
+          ) : (
+          <div className="flex gap-1.5 lg:gap-5 justify-between lg:max-w-4xl lg:mx-auto">
+            {[{ slug: 'all', name: 'الكل', icon: 'all' }, ...categories].map((category, idx) => {
+              const Icon = iconMap[category.icon] || Leaf;
+              const isActive = activeCategory === category.slug;
+              const colors = getColorForIcon(category.icon, appMode);
+              const iconColor = appMode === 'agricultural' ? '#3AA17E' : '#D4AF37';
+              const textColor = appMode === 'agricultural' ? 'text-darkgreen' : 'text-[#B8942F]';
+
+              return (
+                <div key={category.slug} className="flex-1 flex flex-col items-center gap-1 lg:gap-3 animate-fadeIn" style={{ animationDelay: `${idx * 100}ms` }}>
+                  <button
+                    onClick={() => handleCategoryChange(category.slug)}
+                    className="rounded-xl lg:rounded-2xl w-full aspect-square flex items-center justify-center bg-white transition-all duration-500 backdrop-blur-lg relative overflow-hidden group"
+                    style={{
+                      boxShadow: isActive
+                        ? `0 4px 16px ${colors.shadow}, 0 8px 32px ${colors.shadow}, inset 0 2px 0 rgba(255,255,255,0.7), inset 0 -2px 0 rgba(0,0,0,0.05)`
+                        : '0 3px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)',
+                      background: isActive
+                        ? colors.iconGradient
+                        : 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(250,252,251,0.9) 100%)',
+                      border: `2.5px solid ${isActive ? colors.border : 'rgba(58,161,126,0.3)'}`,
+                      backdropFilter: 'blur(16px)',
+                      WebkitBackdropFilter: 'blur(16px)',
+                      transform: isActive ? 'scale(0.63)' : 'scale(0.6)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.transform = 'scale(0.66) translateY(-4px)';
+                        e.currentTarget.style.boxShadow = `0 6px 20px ${colors.shadow}, 0 12px 40px ${colors.shadow}`;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.transform = 'scale(0.6) translateY(0)';
+                        e.currentTarget.style.boxShadow = '0 3px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)';
+                      }
+                    }}
+                  >
+                    <div className={`absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-br from-white/30 via-transparent to-emerald-50/20 pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'}`}></div>
+                    <Icon
+                      className={`w-2 h-2 lg:w-5 lg:h-5 xl:w-6 xl:h-6 transition-all duration-500 ${isActive ? 'drop-shadow-lg scale-110' : 'group-hover:scale-125 group-hover:drop-shadow-md'}`}
+                      style={{
+                        color: isActive ? iconColor : `${iconColor}60`,
+                        filter: isActive ? 'drop-shadow(0 2px 6px rgba(58,161,126,0.4))' : 'none'
+                      }}
+                    />
+                    {isActive && (
+                      <div className="absolute inset-0 rounded-xl lg:rounded-2xl animate-pulse" style={{
+                        background: `radial-gradient(circle at center, ${colors.shadow} 0%, transparent 70%)`,
+                        opacity: 0.3
+                      }}></div>
+                    )}
+                  </button>
+                  <span className={`text-[7px] lg:text-sm xl:text-base font-bold text-center leading-tight transition-all duration-500 ${isActive ? `${textColor} scale-105` : `${textColor}/60`}`}>
+                    {category.name}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          )}
         </section>
 
         <section className="px-3 lg:px-6 py-2 lg:py-4 flex-shrink-0">
