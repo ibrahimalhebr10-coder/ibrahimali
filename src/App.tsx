@@ -419,7 +419,11 @@ function App() {
           onModeChange={handleAppModeChange}
         />
 
-        <section className="px-3 lg:px-6 py-2 lg:py-3">
+        <section className="sticky top-16 lg:top-20 z-20 px-3 lg:px-6 py-2 lg:py-3 backdrop-blur-xl" style={{
+          background: 'linear-gradient(135deg, rgba(250, 252, 251, 0.98) 0%, rgba(245, 250, 247, 0.98) 50%, rgba(248, 252, 250, 0.98) 100%)',
+          boxShadow: '0 4px 16px rgba(58, 161, 126, 0.1)',
+          borderBottom: '1px solid rgba(58, 161, 126, 0.1)'
+        }}>
           <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-1 lg:mb-3 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
           {categories.length === 0 ? (
             <div className="text-center py-4 text-darkgreen/70 animate-pulse">
@@ -489,7 +493,7 @@ function App() {
           )}
         </section>
 
-        <section className="px-3 lg:px-6 py-2 lg:py-4 flex-shrink-0">
+        <section className="px-3 lg:px-6 py-2 lg:py-4 flex-shrink-0 overflow-y-auto">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20 gap-4 animate-fadeIn">
               <div className="relative">
