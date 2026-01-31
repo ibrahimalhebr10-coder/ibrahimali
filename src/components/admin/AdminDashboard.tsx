@@ -6,7 +6,6 @@ import Breadcrumb from './Breadcrumb';
 import AdminNavigation, { AdminPage } from './AdminNavigation';
 import FarmManagement from './FarmManagement';
 import VideoIntroManagement from './VideoIntroManagement';
-import ReservationsManagement from './ReservationsManagement';
 import FinanceManagement from './FinanceManagement';
 import PermissionsManagement from './PermissionsManagement';
 import PaymentMethodsSettings from './PaymentMethodsSettings';
@@ -88,7 +87,6 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
     const labels: Record<AdminPage, string> = {
       dashboard: 'لوحة التحكم',
       farms: 'إدارة المزارع',
-      reservations: 'إدارة الحجوزات',
       finance: 'الإدارة المالية',
       messages: 'إدارة الرسائل',
       messaging: 'مراسلة المستثمرين',
@@ -145,10 +143,6 @@ export default function AdminDashboard({ onClose }: AdminDashboardProps) {
 
     if (currentPage === 'video') {
       return <VideoIntroManagement />;
-    }
-
-    if (currentPage === 'reservations') {
-      return <ReservationsManagement onBack={() => setCurrentPage('dashboard')} />;
     }
 
     if (currentPage === 'finance') {
