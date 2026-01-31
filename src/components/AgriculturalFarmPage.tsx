@@ -28,12 +28,39 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [reservationData, setReservationData] = useState<any>(null);
   const [registeredUserName, setRegisteredUserName] = useState<string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mada' | 'bank_transfer' | null>(null);
+  const [isScrollingDown, setIsScrollingDown] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
     if (farm.contracts && farm.contracts.length > 0) {
       setSelectedContract(farm.contracts[0]);
     }
   }, [farm.contracts]);
+
+  useEffect(() => {
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+
+          if (currentScrollY > lastScrollY && currentScrollY > 80) {
+            setIsScrollingDown(true);
+          } else if (currentScrollY < lastScrollY) {
+            setIsScrollingDown(false);
+          }
+
+          setLastScrollY(currentScrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const maxTrees = farm.availableTrees || 0;
 
@@ -157,7 +184,11 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     <div className="fixed inset-0 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 z-50 overflow-y-auto">
       <div className="min-h-screen pb-32">
         {/* Header with Back Button */}
-        <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-lg border-b border-green-200/50">
+        <div
+          className={`sticky top-0 z-10 bg-white/80 backdrop-blur-lg border-b border-green-200/50 transition-transform duration-300 ${
+            isScrollingDown ? '-translate-y-full' : 'translate-y-0'
+          }`}
+        >
           <div className="flex items-center justify-between p-4">
             <button
               onClick={onClose}
@@ -324,7 +355,11 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
         {/* Purchase Summary - Fixed Bottom */}
         {treeCount > 0 && selectedContract && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-4 z-20">
+          <div
+            className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-4 z-20 transition-transform duration-300 ${
+              isScrollingDown ? 'translate-y-full' : 'translate-y-0'
+            }`}
+          >
             <div className="max-w-lg mx-auto space-y-3">
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="bg-green-50/50 rounded-lg p-2">
