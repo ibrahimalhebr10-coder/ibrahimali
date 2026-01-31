@@ -561,7 +561,7 @@ function App() {
                   >
                     <div className={`absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-br from-white/30 via-transparent to-emerald-50/20 pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'}`}></div>
                     <Icon
-                      className={`w-4 h-4 lg:w-10 lg:h-10 xl:w-12 xl:h-12 transition-all duration-500 ${isActive ? 'drop-shadow-lg scale-110' : 'group-hover:scale-125 group-hover:drop-shadow-md'}`}
+                      className={`w-2 h-2 lg:w-5 lg:h-5 xl:w-6 xl:h-6 transition-all duration-500 ${isActive ? 'drop-shadow-lg scale-110' : 'group-hover:scale-125 group-hover:drop-shadow-md'}`}
                       style={{
                         color: isActive ? iconColor : `${iconColor}60`,
                         filter: isActive ? 'drop-shadow(0 2px 6px rgba(58,161,126,0.4))' : 'none'
@@ -901,7 +901,7 @@ function App() {
 
           <button
             onClick={() => alert(`قريباً: ${appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}`)}
-            className="flex items-center gap-4 px-10 py-4 rounded-3xl transition-all duration-300 hover:scale-110 hover:shadow-2xl relative overflow-hidden group"
+            className="flex items-center gap-2 px-5 py-2 rounded-2xl transition-all duration-300 hover:scale-110 hover:shadow-2xl relative overflow-hidden group"
             style={{
               background: appMode === 'agricultural'
                 ? 'linear-gradient(145deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)'
@@ -914,11 +914,11 @@ function App() {
           >
             <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/20 pointer-events-none"></div>
             {appMode === 'agricultural' ? (
-              <Sprout className="w-8 h-8 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+              <Sprout className="w-4 h-4 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
             ) : (
-              <TrendingUp className="w-8 h-8 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
+              <TrendingUp className="w-4 h-4 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
             )}
-            <span className="text-lg font-black text-white relative z-10" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+            <span className="text-sm font-black text-white relative z-10" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
               {appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}
             </span>
           </button>
@@ -1010,7 +1010,7 @@ function App() {
             className="flex flex-col items-center justify-center gap-1 relative -mt-5 active:scale-95 transition-all duration-300"
           >
             <div
-              className="w-18 h-18 rounded-3xl flex items-center justify-center transition-all duration-300 relative overflow-hidden group"
+              className="w-18 h-18 rounded-2xl flex items-center justify-center transition-all duration-300 relative overflow-hidden group"
               style={{
                 background: appMode === 'agricultural'
                   ? 'linear-gradient(145deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)'
@@ -1019,18 +1019,18 @@ function App() {
                   ? '0 10px 30px rgba(58,161,126,0.6), 0 6px 15px rgba(47,130,102,0.4), inset 0 2px 6px rgba(255,255,255,0.5)'
                   : '0 10px 30px rgba(212,175,55,0.6), 0 6px 15px rgba(184,148,47,0.4), inset 0 2px 6px rgba(255,255,255,0.5)',
                 border: '3px solid rgba(255,255,255,0.9)',
-                width: '4.5rem',
-                height: '4.5rem'
+                width: '2.25rem',
+                height: '2.25rem'
               }}
             >
               <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/20 pointer-events-none"></div>
               {appMode === 'agricultural' ? (
-                <Sprout className="w-9 h-9 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
+                <Sprout className="w-5 h-5 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
               ) : (
-                <TrendingUp className="w-9 h-9 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
+                <TrendingUp className="w-5 h-5 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
               )}
             </div>
-            <span className="text-[11px] font-black text-darkgreen mt-1">
+            <span className="text-[9px] font-black text-darkgreen mt-1">
               {appMode === 'agricultural' ? 'زراعي' : 'استثماري'}
             </span>
           </button>
