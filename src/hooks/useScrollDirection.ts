@@ -29,52 +29,55 @@ export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
 
     let lastY = getScrollY();
     setLastScrollY(lastY);
-    let ticking = false;
-    let rafId: number | null = null;
+    let timeoutId: NodeJS.Timeout | null = null;
 
     const updateScrollDirection = () => {
       const currentScrollY = getScrollY();
       const difference = currentScrollY - lastY;
 
+      console.log('[ScrollDirection] Y:', currentScrollY, 'Diff:', difference, 'Threshold:', threshold);
+
       if (Math.abs(difference) < threshold) {
-        ticking = false;
-        rafId = null;
         return;
       }
 
       if (currentScrollY < 30) {
+        console.log('[ScrollDirection] At top - showing header/footer');
         setScrollDirection('none');
         setShowHeaderFooter(true);
       } else if (difference > 0) {
+        console.log('[ScrollDirection] Scrolling down - hiding header/footer');
         setScrollDirection('down');
         setShowHeaderFooter(false);
       } else {
+        console.log('[ScrollDirection] Scrolling up - showing header/footer');
         setScrollDirection('up');
         setShowHeaderFooter(true);
       }
 
       lastY = currentScrollY;
       setLastScrollY(currentScrollY);
-      ticking = false;
-      rafId = null;
     };
 
     const handleScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        if (rafId !== null) {
-          cancelAnimationFrame(rafId);
-        }
-        rafId = requestAnimationFrame(updateScrollDirection);
+      console.log('[ScrollDirection] Scroll event triggered');
+
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
       }
+
+      timeoutId = setTimeout(() => {
+        updateScrollDirection();
+        timeoutId = null;
+      }, 10);
     };
 
     scrollElement.addEventListener('scroll', handleScroll, { passive: true } as any);
 
     return () => {
       scrollElement.removeEventListener('scroll', handleScroll);
-      if (rafId !== null) {
-        cancelAnimationFrame(rafId);
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId);
       }
     };
   }, [threshold, scrollableRef?.current, getScrollY]);
