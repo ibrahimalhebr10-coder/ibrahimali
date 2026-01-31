@@ -24,9 +24,6 @@ function App() {
     return (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
   });
   const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
-  const [touchStart, setTouchStart] = useState(0);
-  const [touchEnd, setTouchEnd] = useState(0);
   const [categories, setCategories] = useState<FarmCategory[]>([]);
   const [farmProjects, setFarmProjects] = useState<Record<string, FarmProject[]>>({});
   const [loading, setLoading] = useState(true);
@@ -42,7 +39,6 @@ function App() {
   const handleAppModeChange = (mode: AppMode) => {
     setAppMode(mode);
     localStorage.setItem('appMode', mode);
-    setCurrentSlideIndex(0);
   };
 
   useEffect(() => {
@@ -297,7 +293,6 @@ function App() {
 
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
-    setCurrentSlideIndex(0);
   };
 
   const currentFarms = activeCategory === 'all'
@@ -305,37 +300,6 @@ function App() {
     : farmProjects[activeCategory] || [];
   const activeIconName = activeCategory === 'all' ? 'all' : categories.find(cat => cat.slug === activeCategory)?.icon || 'leaf';
   const activeColors = getColorForIcon(activeIconName, appMode);
-
-  const handlePrevSlide = () => {
-    setCurrentSlideIndex((prev) =>
-      prev === 0 ? currentFarms.length - 1 : prev - 1
-    );
-  };
-
-  const handleNextSlide = () => {
-    setCurrentSlideIndex((prev) =>
-      prev === currentFarms.length - 1 ? 0 : prev + 1
-    );
-  };
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setTouchStart(e.targetTouches[0].clientX);
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd(e.targetTouches[0].clientX);
-  };
-
-  const handleTouchEnd = () => {
-    if (touchStart - touchEnd > 75) {
-      handleNextSlide();
-    }
-
-    if (touchStart - touchEnd < -75) {
-      handlePrevSlide();
-    }
-  };
 
   const handleUnreadCountChange = async () => {
     try {
@@ -456,73 +420,7 @@ function App() {
         />
 
         <section className="px-3 lg:px-6 py-2 lg:py-3">
-          <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-1 lg:mb-3 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
-          {categories.length === 0 ? (
-            <div className="text-center py-4 text-darkgreen/70 animate-pulse">
-              <p className="text-sm">جاري تحميل الفئات...</p>
-            </div>
-          ) : (
-          <div className="flex gap-1.5 lg:gap-5 justify-between lg:max-w-4xl lg:mx-auto">
-            {[{ slug: 'all', name: 'الكل', icon: 'all' }, ...categories].map((category, idx) => {
-              const Icon = iconMap[category.icon] || Leaf;
-              const isActive = activeCategory === category.slug;
-              const colors = getColorForIcon(category.icon, appMode);
-              const iconColor = appMode === 'agricultural' ? '#3AA17E' : '#D4AF37';
-              const textColor = appMode === 'agricultural' ? 'text-darkgreen' : 'text-[#B8942F]';
-
-              return (
-                <div key={category.slug} className="flex-1 flex flex-col items-center gap-1 lg:gap-3 animate-fadeIn" style={{ animationDelay: `${idx * 100}ms` }}>
-                  <button
-                    onClick={() => handleCategoryChange(category.slug)}
-                    className="rounded-xl lg:rounded-2xl w-full aspect-square flex items-center justify-center bg-white transition-all duration-500 backdrop-blur-lg relative overflow-hidden group"
-                    style={{
-                      boxShadow: isActive
-                        ? `0 4px 16px ${colors.shadow}, 0 8px 32px ${colors.shadow}, inset 0 2px 0 rgba(255,255,255,0.7), inset 0 -2px 0 rgba(0,0,0,0.05)`
-                        : '0 3px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)',
-                      background: isActive
-                        ? colors.iconGradient
-                        : 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(250,252,251,0.9) 100%)',
-                      border: `2.5px solid ${isActive ? colors.border : 'rgba(58,161,126,0.3)'}`,
-                      backdropFilter: 'blur(16px)',
-                      WebkitBackdropFilter: 'blur(16px)',
-                      transform: isActive ? 'scale(0.63)' : 'scale(0.6)'
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.transform = 'scale(0.66) translateY(-4px)';
-                        e.currentTarget.style.boxShadow = `0 6px 20px ${colors.shadow}, 0 12px 40px ${colors.shadow}`;
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!isActive) {
-                        e.currentTarget.style.transform = 'scale(0.6) translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 3px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.6)';
-                      }
-                    }}
-                  >
-                    <div className={`absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-br from-white/30 via-transparent to-emerald-50/20 pointer-events-none transition-opacity duration-500 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-60'}`}></div>
-                    <Icon
-                      className={`w-2 h-2 lg:w-5 lg:h-5 xl:w-6 xl:h-6 transition-all duration-500 ${isActive ? 'drop-shadow-lg scale-110' : 'group-hover:scale-125 group-hover:drop-shadow-md'}`}
-                      style={{
-                        color: isActive ? iconColor : `${iconColor}60`,
-                        filter: isActive ? 'drop-shadow(0 2px 6px rgba(58,161,126,0.4))' : 'none'
-                      }}
-                    />
-                    {isActive && (
-                      <div className="absolute inset-0 rounded-xl lg:rounded-2xl animate-pulse" style={{
-                        background: `radial-gradient(circle at center, ${colors.shadow} 0%, transparent 70%)`,
-                        opacity: 0.3
-                      }}></div>
-                    )}
-                  </button>
-                  <span className={`text-[7px] lg:text-sm xl:text-base font-bold text-center leading-tight transition-all duration-500 ${isActive ? `${textColor} scale-105` : `${textColor}/60`}`}>
-                    {category.name}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-          )}
+          <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-3 lg:mb-4 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
         </section>
 
         <section className="px-3 lg:px-6 py-2 lg:py-4 flex-shrink-0">
@@ -550,244 +448,104 @@ function App() {
               <p className="text-sm text-darkgreen/60">تحقق مرة أخرى قريباً</p>
             </div>
           ) : (
-            <>
-              <div className="relative md:hidden">
-                <div
-                  className="overflow-hidden"
-                  onTouchStart={handleTouchStart}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                >
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+              {currentFarms.map((farm, idx) => {
+                const totalTrees = farm.availableTrees + farm.reservedTrees;
+                const reservationPercentage = (farm.reservedTrees / totalTrees) * 100;
+
+                return (
                   <div
-                    className="flex transition-transform duration-500 ease-out"
-                    style={{ transform: `translateX(${currentSlideIndex * -100}%)` }}
+                    key={farm.id}
+                    onClick={() => {
+                      setSelectedInvestmentFarm(farm);
+                    }}
+                    className="w-full rounded-2xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer transition-all duration-500 group animate-fadeIn"
+                    style={{
+                      background: activeColors.cardGradient,
+                      boxShadow: `0 10px 30px ${activeColors.shadow}, 0 6px 15px ${activeColors.shadow}, inset 0 2px 0 rgba(255,255,255,0.8), inset 0 -2px 0 rgba(0,0,0,0.05)`,
+                      border: `3px solid ${activeColors.border}`,
+                      backdropFilter: 'blur(24px)',
+                      WebkitBackdropFilter: 'blur(24px)',
+                      animationDelay: `${idx * 100}ms`
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-8px) scale(1.03)';
+                      e.currentTarget.style.boxShadow = `0 20px 50px ${activeColors.shadow}, 0 12px 25px ${activeColors.shadow}`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                      e.currentTarget.style.boxShadow = `0 10px 30px ${activeColors.shadow}, 0 6px 15px ${activeColors.shadow}`;
+                    }}
+                    onTouchStart={(e) => {
+                      e.currentTarget.style.transform = 'scale(0.98)';
+                    }}
+                    onTouchEnd={(e) => {
+                      e.currentTarget.style.transform = 'scale(1)';
+                    }}
                   >
-                    {currentFarms.map((farm) => {
-                      const totalTrees = farm.availableTrees + farm.reservedTrees;
-                      const reservationPercentage = (farm.reservedTrees / totalTrees) * 100;
+                    <div className="relative w-full h-32 md:h-48 overflow-hidden">
+                      <img
+                        src={farm.image}
+                        alt={farm.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-active:scale-110"
+                      />
+                      <div
+                        className="absolute inset-0 transition-opacity duration-500 group-hover:opacity-60 group-active:opacity-60"
+                        style={{
+                          background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%)'
+                        }}
+                      />
+                      <div className="absolute top-2 md:top-4 right-2 md:right-4 bg-white/98 backdrop-blur-md rounded-xl px-2.5 md:px-4 py-1.5 md:py-2 shadow-xl md:shadow-2xl border-2 border-emerald-200">
+                        <span className="text-[10px] md:text-base font-black text-darkgreen">{farm.name}</span>
+                      </div>
+                      <div className="absolute top-2 md:top-4 left-2 md:left-4 bg-gradient-to-r from-green-100 to-emerald-100 backdrop-blur-md rounded-full px-2.5 md:px-4 py-1.5 md:py-2 flex items-center gap-1 md:gap-2 shadow-xl md:shadow-2xl border-2 border-green-300 animate-pulse">
+                        <TrendingUp className="w-3 md:w-5 h-3 md:h-5 text-green-700" strokeWidth={3} />
+                        <span className="text-[10px] md:text-base font-black text-green-800">{farm.returnRate}</span>
+                      </div>
+                    </div>
+                    <div className="p-2.5 md:p-5 space-y-1.5 md:space-y-3">
+                      <div className="flex items-center justify-center gap-1.5 md:gap-2 py-1.5 md:py-2 px-2.5 md:px-4 rounded-xl bg-gradient-to-r from-amber-100 via-yellow-100 to-amber-100 border-2 border-amber-300 shadow-md">
+                        <Sparkles className="w-2.5 md:w-4 h-2.5 md:h-4 text-amber-600 animate-pulse" strokeWidth={3} fill="currentColor" />
+                        <span className="text-[9px] md:text-sm font-black text-amber-900">قريباً</span>
+                      </div>
 
-                      return (
-                        <div key={farm.id} className="w-full flex-shrink-0 px-0.5 animate-scaleIn">
-                          <div
-                            onClick={() => {
-                              setSelectedInvestmentFarm(farm);
-                            }}
-                            className="w-full rounded-2xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer transition-all duration-300 group"
-                            style={{
-                              background: activeColors.cardGradient,
-                              boxShadow: `0 10px 30px ${activeColors.shadow}, 0 6px 15px ${activeColors.shadow}, inset 0 2px 0 rgba(255,255,255,0.8), inset 0 -2px 0 rgba(0,0,0,0.05)`,
-                              border: `3px solid ${activeColors.border}`,
-                              backdropFilter: 'blur(24px)',
-                              WebkitBackdropFilter: 'blur(24px)'
-                            }}
-                            onTouchStart={(e) => {
-                              e.currentTarget.style.transform = 'scale(0.98)';
-                            }}
-                            onTouchEnd={(e) => {
-                              e.currentTarget.style.transform = 'scale(1)';
-                            }}
-                          >
-                            <div className="relative w-full h-20 overflow-hidden">
-                              <img
-                                src={farm.image}
-                                alt={farm.name}
-                                className="w-full h-full object-cover transition-transform duration-700 group-active:scale-110"
-                              />
-                              <div
-                                className="absolute inset-0 transition-opacity duration-300 group-active:opacity-60"
-                                style={{
-                                  background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%)'
-                                }}
-                              />
-                              <div className="absolute top-2 right-2 bg-white/98 backdrop-blur-md rounded-xl px-2.5 py-1.5 shadow-xl border-2 border-emerald-200">
-                                <span className="text-[10px] font-black text-darkgreen">{farm.name}</span>
-                              </div>
-                              <div className="absolute top-2 left-2 bg-gradient-to-r from-green-100 to-emerald-100 backdrop-blur-md rounded-full px-2.5 py-1.5 flex items-center gap-1 shadow-xl border-2 border-green-300 animate-pulse">
-                                <TrendingUp className="w-3 h-3 text-green-700" strokeWidth={3} />
-                                <span className="text-[10px] font-black text-green-800">{farm.returnRate}</span>
-                              </div>
-                            </div>
-                        <div className="p-2.5 space-y-1.5">
-                          <div className="flex items-center justify-center gap-1.5 py-1.5 px-2.5 rounded-xl bg-gradient-to-r from-amber-100 via-yellow-100 to-amber-100 border-2 border-amber-300 shadow-md">
-                            <Sparkles className="w-2.5 h-2.5 text-amber-600 animate-pulse" strokeWidth={3} fill="currentColor" />
-                            <span className="text-[9px] font-black text-amber-900">قريباً</span>
-                          </div>
-
-                          <div className="flex items-center justify-between gap-1.5 text-[7px]">
-                            <div className="flex items-center gap-1 bg-green-100 rounded-lg px-2 py-1 border-2 border-green-300 shadow-md flex-1">
-                              <CheckCircle2 className="w-2.5 h-2.5 text-green-700" strokeWidth={3} />
-                              <span className="font-black text-green-800 text-[9px]">{farm.availableTrees}</span>
-                              <span className="font-bold text-green-700">متاح</span>
-                            </div>
-                            <div className="flex items-center gap-1 bg-amber-100 rounded-lg px-2 py-1 border-2 border-amber-300 shadow-md flex-1">
-                              <Clock className="w-2.5 h-2.5 text-amber-700" strokeWidth={3} />
-                              <span className="font-black text-amber-800 text-[9px]">{farm.reservedTrees}</span>
-                              <span className="font-bold text-amber-700">محجوز</span>
-                            </div>
-                          </div>
-
-                          <div className="space-y-1">
-                            <div className="h-2 w-full bg-gray-300 rounded-full overflow-hidden shadow-inner border border-gray-400">
-                              <div
-                                className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 transition-all duration-700 shadow-lg"
-                                style={{
-                                  width: `${reservationPercentage}%`,
-                                  backgroundSize: '200% 100%',
-                                  boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.5)'
-                                }}
-                              />
-                            </div>
-                            <p className="text-[8px] font-black text-amber-800 text-center">
-                              نسبة الحجز: {reservationPercentage.toFixed(0)}%
-                            </p>
-                          </div>
-
-                          <p className="text-[8px] leading-relaxed line-clamp-2 font-bold text-darkgreen/90 px-1">
-                            {farm.description}
-                          </p>
+                      <div className="flex items-center justify-between gap-1.5 md:gap-2">
+                        <div className="flex items-center gap-1 md:gap-2 bg-green-100 rounded-lg px-2 md:px-3 py-1 md:py-2 border-2 border-green-300 shadow-md flex-1">
+                          <CheckCircle2 className="w-2.5 md:w-4 h-2.5 md:h-4 text-green-700" strokeWidth={3} />
+                          <span className="font-black text-green-800 text-[9px] md:text-base">{farm.availableTrees}</span>
+                          <span className="font-bold text-green-700 text-[7px] md:text-sm">متاح</span>
+                        </div>
+                        <div className="flex items-center gap-1 md:gap-2 bg-amber-100 rounded-lg px-2 md:px-3 py-1 md:py-2 border-2 border-amber-300 shadow-md flex-1">
+                          <Clock className="w-2.5 md:w-4 h-2.5 md:h-4 text-amber-700" strokeWidth={3} />
+                          <span className="font-black text-amber-800 text-[9px] md:text-base">{farm.reservedTrees}</span>
+                          <span className="font-bold text-amber-700 text-[7px] md:text-sm">محجوز</span>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
 
-            {currentFarms.length > 1 && (
-              <>
-                <button
-                  onClick={handlePrevSlide}
-                  className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 w-6 h-6 bg-white/95 rounded-full flex items-center justify-center z-10 transition-all duration-300"
-                  style={{
-                    boxShadow: '0 2px 6px rgba(58,161,126,0.25)',
-                    border: '1.5px solid #3AA17E'
-                  }}
-                >
-                  <span className="text-darkgreen font-bold text-xs">→</span>
-                </button>
-                <button
-                  onClick={handleNextSlide}
-                  className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 w-6 h-6 bg-white/95 rounded-full flex items-center justify-center z-10 transition-all duration-300"
-                  style={{
-                    boxShadow: '0 2px 6px rgba(58,161,126,0.25)',
-                    border: '1.5px solid #3AA17E'
-                  }}
-                >
-                  <span className="text-darkgreen font-bold text-xs">←</span>
-                </button>
-              </>
-            )}
-          </div>
-
-          {currentFarms.length > 1 && (
-            <div className="flex justify-center gap-1 mt-1.5">
-              {currentFarms.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentSlideIndex(index)}
-                  className={`rounded-full transition-all ${
-                    index === currentSlideIndex
-                      ? 'bg-darkgreen w-4 h-1'
-                      : 'bg-darkgreen/30 w-1 h-1'
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-
-          <div className="hidden md:grid md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8">
-            {currentFarms.map((farm, idx) => {
-              const totalTrees = farm.availableTrees + farm.reservedTrees;
-              const reservationPercentage = (farm.reservedTrees / totalTrees) * 100;
-
-              return (
-                <div
-                  key={farm.id}
-                  onClick={() => {
-                    setSelectedInvestmentFarm(farm);
-                  }}
-                  className="w-full rounded-2xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer transition-all duration-500 group animate-fadeIn"
-                  style={{
-                    background: activeColors.cardGradient,
-                    boxShadow: `0 10px 30px ${activeColors.shadow}, 0 6px 15px ${activeColors.shadow}, inset 0 2px 0 rgba(255,255,255,0.8), inset 0 -2px 0 rgba(0,0,0,0.05)`,
-                    border: `3px solid ${activeColors.border}`,
-                    backdropFilter: 'blur(24px)',
-                    WebkitBackdropFilter: 'blur(24px)',
-                    animationDelay: `${idx * 100}ms`
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-8px) scale(1.03)';
-                    e.currentTarget.style.boxShadow = `0 20px 50px ${activeColors.shadow}, 0 12px 25px ${activeColors.shadow}`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                    e.currentTarget.style.boxShadow = `0 10px 30px ${activeColors.shadow}, 0 6px 15px ${activeColors.shadow}`;
-                  }}
-                >
-                  <div className="relative w-full h-48 overflow-hidden">
-                    <img
-                      src={farm.image}
-                      alt={farm.name}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div
-                      className="absolute inset-0 transition-opacity duration-500 group-hover:opacity-60"
-                      style={{
-                        background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%)'
-                      }}
-                    />
-                    <div className="absolute top-4 right-4 bg-white/98 backdrop-blur-md rounded-xl px-4 py-2 shadow-2xl border-2 border-emerald-200">
-                      <span className="text-base font-black text-darkgreen">{farm.name}</span>
-                    </div>
-                    <div className="absolute top-4 left-4 bg-gradient-to-r from-green-100 to-emerald-100 backdrop-blur-md rounded-full px-4 py-2 flex items-center gap-2 shadow-2xl border-2 border-green-300 animate-pulse">
-                      <TrendingUp className="w-5 h-5 text-green-700" strokeWidth={3} />
-                      <span className="text-base font-black text-green-800">{farm.returnRate}</span>
-                    </div>
-                  </div>
-                  <div className="p-5 space-y-3">
-                    <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-gradient-to-r from-amber-100 via-yellow-100 to-amber-100 border-2 border-amber-300 shadow-md">
-                      <Sparkles className="w-4 h-4 text-amber-600 animate-pulse" strokeWidth={3} fill="currentColor" />
-                      <span className="text-sm font-black text-amber-900">قريباً</span>
-                    </div>
-
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 bg-green-100 rounded-lg px-3 py-2 border-2 border-green-300 shadow-md flex-1">
-                        <CheckCircle2 className="w-4 h-4 text-green-700" strokeWidth={3} />
-                        <span className="font-black text-green-800 text-base">{farm.availableTrees}</span>
-                        <span className="font-bold text-green-700 text-sm">متاح</span>
+                      <div className="space-y-1 md:space-y-2">
+                        <div className="h-2 md:h-3 w-full bg-gray-300 rounded-full overflow-hidden shadow-inner border border-gray-400">
+                          <div
+                            className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 transition-all duration-700 shadow-lg"
+                            style={{
+                              width: `${reservationPercentage}%`,
+                              backgroundSize: '200% 100%',
+                              boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.5)'
+                            }}
+                          />
+                        </div>
+                        <p className="text-[8px] md:text-sm font-black text-amber-800 text-center">
+                          نسبة الحجز: {reservationPercentage.toFixed(0)}%
+                        </p>
                       </div>
-                      <div className="flex items-center gap-2 bg-amber-100 rounded-lg px-3 py-2 border-2 border-amber-300 shadow-md flex-1">
-                        <Clock className="w-4 h-4 text-amber-700" strokeWidth={3} />
-                        <span className="font-black text-amber-800 text-base">{farm.reservedTrees}</span>
-                        <span className="font-bold text-amber-700 text-sm">محجوز</span>
-                      </div>
-                    </div>
 
-                    <div className="space-y-2">
-                      <div className="h-3 w-full bg-gray-300 rounded-full overflow-hidden shadow-inner border border-gray-400">
-                        <div
-                          className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 transition-all duration-700 shadow-lg"
-                          style={{
-                            width: `${reservationPercentage}%`,
-                            backgroundSize: '200% 100%',
-                            boxShadow: 'inset 0 1px 2px rgba(255,255,255,0.5)'
-                          }}
-                        />
-                      </div>
-                      <p className="text-sm font-black text-amber-800 text-center">
-                        نسبة الحجز: {reservationPercentage.toFixed(0)}%
+                      <p className="text-[8px] md:text-sm leading-relaxed line-clamp-2 font-bold text-darkgreen/90 px-1 md:px-0">
+                        {farm.description}
                       </p>
                     </div>
-
-                    <p className="text-sm leading-relaxed line-clamp-2 font-bold text-darkgreen/90">
-                      {farm.description}
-                    </p>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-            </>
+                );
+              })}
+            </div>
           )}
         </section>
                 </div>
