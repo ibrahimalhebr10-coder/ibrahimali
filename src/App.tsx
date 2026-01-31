@@ -362,7 +362,7 @@ function App() {
                 <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none" style={{
                   background: 'linear-gradient(90deg, transparent 0%, rgba(58, 161, 126, 0.3) 50%, transparent 100%)'
                 }}></div>
-                <section className="px-2 lg:px-6 py-2 lg:py-3">
+                <section className="px-2 lg:px-6 py-1.5 lg:py-2">
                   <div className="flex gap-1 lg:gap-3 justify-between lg:max-w-5xl lg:mx-auto">
                     {[
                       { icon: Calculator, label: 'حاسبة مزرعتك', color: '#2F5233', onClick: () => alert('قريباً: حاسبة المزرعة'), delay: '0ms' },
@@ -413,7 +413,7 @@ function App() {
                   }}></div>
                 </div>
 
-                <div className="px-2 lg:px-6 py-2 lg:py-2.5">
+                <div className="px-2 lg:px-6 py-1.5 lg:py-2">
                   <AppModeSelector
                     activeMode={appMode}
                     onModeChange={handleAppModeChange}
@@ -426,13 +426,13 @@ function App() {
                   }}></div>
                 </div>
 
-                <section className="px-2 lg:px-6 pb-3 lg:pb-4 pt-2 lg:pt-3">
+                <section className="px-2 lg:px-6 pb-2 lg:pb-3 pt-1.5 lg:pt-2">
           {categories.length === 0 ? (
             <div className="text-center py-4 text-darkgreen/70 animate-pulse">
               <p className="text-sm">جاري تحميل الفئات...</p>
             </div>
           ) : (
-          <div className="flex gap-1 lg:gap-4 justify-between lg:max-w-5xl lg:mx-auto">
+          <div className="flex gap-0.5 lg:gap-3 justify-between lg:max-w-5xl lg:mx-auto">
             {[{ slug: 'all', name: 'الكل', icon: 'all' }, ...categories].map((category, idx) => {
               const Icon = iconMap[category.icon] || Leaf;
               const isActive = activeCategory === category.slug;
@@ -441,51 +441,51 @@ function App() {
               const textColor = appMode === 'agricultural' ? 'text-darkgreen' : 'text-[#B8942F]';
 
               return (
-                <div key={category.slug} className="flex-1 flex flex-col items-center gap-1 lg:gap-2 animate-fadeIn" style={{ animationDelay: `${idx * 80}ms` }}>
+                <div key={category.slug} className="flex-1 flex flex-col items-center gap-0.5 lg:gap-1.5 animate-fadeIn" style={{ animationDelay: `${idx * 70}ms` }}>
                   <button
                     onClick={() => handleCategoryChange(category.slug)}
-                    className="rounded-xl lg:rounded-2xl w-full aspect-square flex items-center justify-center bg-white transition-all duration-400 backdrop-blur-lg relative overflow-hidden group"
+                    className="rounded-lg lg:rounded-xl w-full aspect-square flex items-center justify-center bg-white transition-all duration-300 backdrop-blur-lg relative overflow-hidden group"
                     style={{
                       boxShadow: isActive
-                        ? `0 3px 12px ${colors.shadow}, 0 6px 24px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.8)`
-                        : '0 2px 6px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)',
+                        ? `0 2px 10px ${colors.shadow}, 0 4px 20px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.8)`
+                        : '0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.7)',
                       background: isActive
                         ? colors.iconGradient
                         : 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(252,254,253,0.95) 100%)',
-                      border: `2px solid ${isActive ? colors.border : 'rgba(58,161,126,0.25)'}`,
-                      backdropFilter: 'blur(12px)',
-                      WebkitBackdropFilter: 'blur(12px)',
-                      transform: isActive ? 'scale(1.08)' : 'scale(1)'
+                      border: `1.5px solid ${isActive ? colors.border : 'rgba(58,161,126,0.2)'}`,
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)',
+                      transform: isActive ? 'scale(1.05)' : 'scale(1)'
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.transform = 'scale(1.05) translateY(-2px)';
-                        e.currentTarget.style.boxShadow = `0 4px 16px ${colors.shadow}, 0 8px 32px ${colors.shadow}`;
+                        e.currentTarget.style.transform = 'scale(1.03) translateY(-1px)';
+                        e.currentTarget.style.boxShadow = `0 3px 12px ${colors.shadow}, 0 6px 24px ${colors.shadow}`;
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isActive) {
                         e.currentTarget.style.transform = 'scale(1) translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.7)';
+                        e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.7)';
                       }
                     }}
                   >
-                    <div className={`absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-br from-white/40 via-transparent to-emerald-50/30 pointer-events-none transition-opacity duration-400 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-70'}`}></div>
+                    <div className={`absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-br from-white/40 via-transparent to-emerald-50/30 pointer-events-none transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-70'}`}></div>
                     <Icon
-                      className={`w-4 h-4 lg:w-8 lg:h-8 xl:w-10 xl:h-10 transition-all duration-400 ${isActive ? 'drop-shadow-lg scale-100' : 'scale-90 group-hover:scale-100 group-hover:drop-shadow-md'}`}
+                      className={`w-3 h-3 lg:w-5 lg:h-5 xl:w-6 xl:h-6 transition-all duration-300 ${isActive ? 'drop-shadow-md scale-100' : 'scale-90 group-hover:scale-100 group-hover:drop-shadow-sm'}`}
                       style={{
                         color: isActive ? iconColor : `${iconColor}70`,
-                        filter: isActive ? 'drop-shadow(0 2px 6px rgba(58,161,126,0.35))' : 'none'
+                        filter: isActive ? 'drop-shadow(0 1px 4px rgba(58,161,126,0.3))' : 'none'
                       }}
                     />
                     {isActive && (
-                      <div className="absolute inset-0 rounded-xl lg:rounded-2xl animate-pulse" style={{
+                      <div className="absolute inset-0 rounded-lg lg:rounded-xl animate-pulse" style={{
                         background: `radial-gradient(circle at center, ${colors.shadow} 0%, transparent 75%)`,
-                        opacity: 0.25
+                        opacity: 0.2
                       }}></div>
                     )}
                   </button>
-                  <span className={`text-[8px] lg:text-xs xl:text-sm font-bold text-center leading-tight transition-all duration-400 ${isActive ? `${textColor} scale-100` : `${textColor}/70 scale-95`}`}>
+                  <span className={`text-[7px] lg:text-[10px] xl:text-xs font-bold text-center leading-tight transition-all duration-300 ${isActive ? `${textColor} scale-100` : `${textColor}/70 scale-95`}`}>
                     {category.name}
                   </span>
                 </div>
