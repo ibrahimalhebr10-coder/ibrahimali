@@ -39,7 +39,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
   const calculateTotal = () => {
     if (!selectedContract || treeCount === 0) return 0;
-    return treeCount * selectedContract.farmer_price;
+    const price = selectedContract.farmer_price || selectedContract.investor_price || 0;
+    return treeCount * price;
   };
 
   const handleTreeCountChange = (delta: number) => {
@@ -250,7 +251,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                     )}
 
                     <div className="text-lg font-bold text-darkgreen">
-                      {contract.farmer_price.toLocaleString()} ر.س
+                      {(contract.farmer_price || contract.investor_price || 0).toLocaleString()} ر.س
                     </div>
                     <div className="text-[10px] text-gray-500">للشجرة الواحدة</div>
                   </div>
@@ -481,7 +482,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           bonusYears={selectedContract.bonus_years}
           treeCount={treeCount}
           totalPrice={calculateTotal()}
-          pricePerTree={selectedContract.farmer_price}
+          pricePerTree={selectedContract.farmer_price || selectedContract.investor_price || 0}
           onConfirm={handleConfirmReview}
           onBack={() => setShowReviewScreen(false)}
         />
