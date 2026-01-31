@@ -157,7 +157,7 @@ export default function NotificationCenter({ unreadCount, onCountChange, onOpenC
           <div
             className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm transition-opacity duration-300"
             onClick={() => handleClose()}
-            style={{ animation: 'fadeIn 0.3s ease-out', zIndex: 60 }}
+            style={{ animation: 'fadeIn 0.3s ease-out', zIndex: 999999 }}
           />
 
           <div
@@ -166,7 +166,7 @@ export default function NotificationCenter({ unreadCount, onCountChange, onOpenC
               animation: 'slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
               maxHeight: 'calc(100vh - 80px)',
               paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
-              zIndex: 70
+              zIndex: 1000000
             }}
           >
             {/* Drag Handle */}

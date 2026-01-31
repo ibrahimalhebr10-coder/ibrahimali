@@ -630,7 +630,7 @@ function App() {
           </>
         )}
 
-      {!selectedInvestmentFarm && !showAssistant && !showNotifications && (
+      {!selectedInvestmentFarm && !showAssistant && (
         <nav
           className="hidden lg:flex fixed bottom-0 left-0 right-0 z-50 backdrop-blur-2xl transition-all duration-500 ease-out"
           style={{
@@ -726,7 +726,7 @@ function App() {
       </nav>
       )}
 
-      {!selectedInvestmentFarm && !showAssistant && !showNotifications && (
+      {!selectedInvestmentFarm && !showAssistant && (
         <nav
           className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl transition-all duration-500 ease-out"
         style={{
