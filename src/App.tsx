@@ -362,7 +362,7 @@ function App() {
         <div
           className="flex-1 overflow-y-auto lg:pb-4 pt-14 lg:pt-16"
           style={{
-            paddingBottom: '15rem'
+            paddingBottom: '12rem'
           }}
         >
           <div className="max-w-7xl mx-auto">
@@ -769,7 +769,7 @@ function App() {
           WebkitBackdropFilter: 'blur(20px)'
         }}
       >
-        <div className="max-w-7xl mx-auto w-full px-6 py-5 pb-10 flex items-center justify-around">
+        <div className="max-w-7xl mx-auto w-full px-6 py-4 pb-8 flex items-center justify-around">
           <button className="flex flex-col items-center gap-2 px-6 py-2 rounded-xl transition-all hover:bg-darkgreen/5">
             <Home className="w-6 h-6 text-darkgreen" />
             <span className="text-sm font-bold text-darkgreen">الرئيسية</span>
