@@ -1,4 +1,4 @@
-import { Award, Calendar, Trees, Clock, DollarSign, FileText, Download, Printer, X, Shield, Stamp } from 'lucide-react';
+import { Calendar, Trees, Clock, DollarSign, FileText, Download, Printer, X, Shield, Stamp, Leaf, Wheat } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -72,7 +72,7 @@ export default function InvestmentContract({
       const endDate = new Date(startDate);
       endDate.setFullYear(endDate.getFullYear() + totalYears);
 
-      let treeTypesText = 'أشجار مثمرة';
+      let treeTypesText = 'أشجار زيتون';
       if (reservation.tree_details && Array.isArray(reservation.tree_details)) {
         const types = reservation.tree_details.map((td: any) => td.variety_name_ar || td.name);
         treeTypesText = types.join(' و ');
@@ -148,10 +148,9 @@ export default function InvestmentContract({
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 z-50 overflow-y-auto">
-      <div className="min-h-screen p-4 md:p-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Action Buttons */}
+    <div className="fixed inset-0 z-50 overflow-y-auto" style={{ backgroundColor: '#8B7355' }}>
+      <div className="min-h-screen p-4 md:p-8 flex items-center justify-center">
+        <div className="max-w-4xl w-full">
           <div className="flex items-center justify-between mb-6 print:hidden">
             <div className="flex gap-2">
               <button
@@ -174,174 +173,196 @@ export default function InvestmentContract({
                 onClick={onClose}
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-white shadow-lg hover:bg-gray-50 transition-colors"
               >
-                <X className="w-5 h-5 text-gray-600" />
+                <X className="w-5 h-5 text-gray-700" />
               </button>
             )}
           </div>
 
-          {/* Contract Document */}
-          <div className="bg-white rounded-2xl shadow-2xl overflow-hidden border-4 border-[#D4AF37]">
-            {/* Golden Header Bar */}
-            <div className="h-4 bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37]"></div>
-
-            <div className="p-8 md:p-12">
-              {/* Logo & Header */}
-              <div className="text-center mb-8 pb-6 border-b-2 border-[#D4AF37]/30">
-                <div className="flex justify-center mb-4">
-                  <div className="relative">
-                    <div className="w-24 h-24 bg-gradient-to-br from-[#D4AF37] to-[#B8942F] rounded-full flex items-center justify-center shadow-xl">
-                      <Trees className="w-12 h-12 text-white" />
-                    </div>
-                    <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br from-green-600 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
-                      <Shield className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
-                </div>
-
-                <h1 className="text-3xl md:text-4xl font-bold text-[#B8942F] mb-2">
-                  عقد استثمار أشجار مثمرة
-                </h1>
-                <div className="flex items-center justify-center gap-2 mt-3">
-                  <Stamp className="w-5 h-5 text-[#D4AF37]" />
-                  <p className="text-sm text-gray-600">عقد استثماري رسمي ومصدّق</p>
-                </div>
+          <div className="relative bg-gradient-to-br from-[#F5F1E8] via-[#F8F5ED] to-[#F5F1E8] shadow-2xl" style={{
+            backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\' /%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noise)\' opacity=\'0.03\' /%3E%3C/svg%3E")',
+          }}>
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none overflow-hidden">
+              <div className="absolute top-8 left-8 opacity-40">
+                <Trees className="w-32 h-32 text-green-800" strokeWidth={0.5} />
               </div>
-
-              {/* Contract Number */}
-              <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#B8942F]/10 rounded-xl p-4 mb-8 border-2 border-[#D4AF37]/30">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-5 h-5 text-[#D4AF37]" />
-                    <span className="text-sm font-semibold text-gray-700">رقم العقد</span>
-                  </div>
-                  <span className="text-xl font-bold text-[#B8942F] tracking-wider">{contract.contractNumber}</span>
-                </div>
+              <div className="absolute top-8 right-8 opacity-40">
+                <Trees className="w-32 h-32 text-green-800" strokeWidth={0.5} />
               </div>
-
-              {/* Contract Details Grid */}
-              <div className="grid md:grid-cols-2 gap-6 mb-8">
-                {/* Investor Name */}
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-5 border-2 border-blue-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Award className="w-5 h-5 text-blue-600" />
-                    <span className="text-xs font-semibold text-gray-600">اسم المستثمر</span>
-                  </div>
-                  <p className="text-lg font-bold text-blue-900">{contract.investorName}</p>
-                </div>
-
-                {/* Farm Name */}
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-5 border-2 border-green-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Trees className="w-5 h-5 text-green-600" />
-                    <span className="text-xs font-semibold text-gray-600">اسم المزرعة</span>
-                  </div>
-                  <p className="text-lg font-bold text-green-900">{contract.farmName}</p>
-                </div>
-
-                {/* Tree Types */}
-                <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-5 border-2 border-amber-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Trees className="w-5 h-5 text-amber-600" />
-                    <span className="text-xs font-semibold text-gray-600">نوع الأشجار</span>
-                  </div>
-                  <p className="text-lg font-bold text-amber-900">{contract.treeTypes}</p>
-                </div>
-
-                {/* Tree Count */}
-                <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-5 border-2 border-emerald-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Trees className="w-5 h-5 text-emerald-600" />
-                    <span className="text-xs font-semibold text-gray-600">عدد الأشجار المستثمر فيها</span>
-                  </div>
-                  <p className="text-2xl font-bold text-emerald-900">{contract.treeCount} شجرة</p>
-                </div>
-
-                {/* Duration */}
-                <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-5 border-2 border-purple-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Clock className="w-5 h-5 text-purple-600" />
-                    <span className="text-xs font-semibold text-gray-600">مدة الاستثمار</span>
-                  </div>
-                  <div className="flex items-baseline gap-2">
-                    <p className="text-2xl font-bold text-purple-900">{contract.durationYears} سنوات</p>
-                    {contract.bonusYears > 0 && (
-                      <span className="text-sm font-bold text-green-600">+ {contract.bonusYears} سنوات مجانية</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Total Amount */}
-                <div className="bg-gradient-to-br from-[#D4AF37]/20 to-[#B8942F]/20 rounded-xl p-5 border-2 border-[#D4AF37]">
-                  <div className="flex items-center gap-2 mb-2">
-                    <DollarSign className="w-5 h-5 text-[#B8942F]" />
-                    <span className="text-xs font-semibold text-gray-600">المبلغ المدفوع</span>
-                  </div>
-                  <p className="text-2xl font-bold text-[#B8942F]">{contract.totalPrice.toLocaleString()} ريال</p>
-                </div>
+              <div className="absolute top-1/4 left-4 opacity-30">
+                <Leaf className="w-20 h-20 text-green-700" strokeWidth={0.5} />
               </div>
-
-              {/* Dates Section */}
-              <div className="bg-gradient-to-br from-gray-50 to-slate-50 rounded-xl p-6 mb-8 border-2 border-gray-200">
-                <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-gray-600" />
-                  <span>تواريخ العقد</span>
-                </h3>
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">تاريخ التفعيل</p>
-                    <p className="text-sm font-bold text-gray-800">{formatDate(contract.createdAt)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">تاريخ بدء العقد</p>
-                    <p className="text-sm font-bold text-gray-800">{formatDate(contract.startDate)}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-600 mb-1">تاريخ انتهاء العقد</p>
-                    <p className="text-sm font-bold text-gray-800">{formatDate(contract.endDate)}</p>
-                  </div>
-                </div>
+              <div className="absolute top-1/4 right-4 opacity-30">
+                <Wheat className="w-20 h-20 text-amber-700" strokeWidth={0.5} />
               </div>
-
-              {/* Legal Text */}
-              <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-xl p-6 border-2 border-slate-200">
-                <p className="text-xs text-center text-gray-700 leading-relaxed">
-                  هذا عقد استثمار أشجار مثمرة صادر من المنصة ويثبت مشاركة المستثمر في الاستثمار الزراعي.
-                  <br />
-                  العقد ساري المفعول ومصدّق إلكترونياً من تاريخ التفعيل وحتى تاريخ انتهاء المدة المحددة.
-                </p>
+              <div className="absolute bottom-32 left-4 opacity-30">
+                <Wheat className="w-24 h-24 text-amber-700" strokeWidth={0.5} />
               </div>
-
-              {/* Digital Stamp & Signature */}
-              <div className="mt-8 pt-6 border-t-2 border-[#D4AF37]/30">
-                <div className="flex items-center justify-between">
-                  <div className="text-center">
-                    <div className="w-20 h-20 bg-gradient-to-br from-[#D4AF37] to-[#B8942F] rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
-                      <Stamp className="w-10 h-10 text-white" />
-                    </div>
-                    <p className="text-xs text-gray-600">ختم المنصة الإلكتروني</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
-                      <Shield className="w-10 h-10 text-white" />
-                    </div>
-                    <p className="text-xs text-gray-600">التوقيع الرقمي</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer */}
-              <div className="mt-6 text-center">
-                <p className="text-xs text-gray-500">
-                  تم إصدار هذا العقد بتاريخ {formatDate(contract.createdAt)}
-                </p>
+              <div className="absolute bottom-32 right-4 opacity-30">
+                <Leaf className="w-24 h-24 text-green-700" strokeWidth={0.5} />
               </div>
             </div>
 
-            {/* Golden Footer Bar */}
-            <div className="h-4 bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37]"></div>
+            <div className="relative border-8 border-[#D4AF37]" style={{ borderImage: 'linear-gradient(135deg, #D4AF37, #B8942F, #D4AF37) 1' }}>
+              <div className="bg-gradient-to-r from-green-900 via-green-800 to-green-900 py-6 px-8">
+                <h1 className="text-3xl md:text-4xl font-bold text-white text-center tracking-wide">
+                  عقد استثمار أشجار مثمرة
+                </h1>
+              </div>
+
+              <div className="p-8 md:p-12 relative">
+                <div className="text-center mb-8">
+                  <div className="flex justify-center mb-4">
+                    <div className="w-24 h-24 bg-gradient-to-br from-green-700 to-green-900 rounded-full flex items-center justify-center shadow-xl relative">
+                      <Trees className="w-14 h-14 text-white" />
+                      <div className="absolute inset-0 rounded-full border-4 border-[#D4AF37] opacity-50"></div>
+                    </div>
+                  </div>
+                  <p className="text-lg text-green-800 font-semibold mb-2">استثمر أشجارك</p>
+                  <div className="w-32 h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mb-6"></div>
+                  <h2 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: '#B8942F' }}>
+                    شهادة استثمار رسمية
+                  </h2>
+                  <p className="text-base text-gray-700 mb-2">هذا العقد صادر باسم:</p>
+                  <h3 className="text-4xl md:text-5xl font-bold" style={{ color: '#8B4513' }}>
+                    {contract.investorName}
+                  </h3>
+                </div>
+
+                <div className="w-24 h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent mx-auto mb-8"></div>
+
+                <div className="bg-white/60 backdrop-blur-sm rounded-lg border-4 border-[#D4AF37] overflow-hidden mb-8 shadow-lg">
+                  <div className="divide-y-2 divide-[#D4AF37]/30">
+                    <div className="grid grid-cols-2">
+                      <div className="p-4 text-right bg-gradient-to-l from-amber-50/50 to-transparent">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-sm font-semibold text-gray-700">رقم العقد</span>
+                          <Leaf className="w-5 h-5 text-green-700" />
+                        </div>
+                      </div>
+                      <div className="p-4 text-left border-r-2 border-[#D4AF37]/30">
+                        <p className="text-lg font-bold" style={{ color: '#B8942F' }}>{contract.contractNumber}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2">
+                      <div className="p-4 text-right bg-gradient-to-l from-amber-50/50 to-transparent">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-sm font-semibold text-gray-700">نوع الأشجار</span>
+                          <Leaf className="w-5 h-5 text-green-700" />
+                        </div>
+                      </div>
+                      <div className="p-4 text-left border-r-2 border-[#D4AF37]/30">
+                        <p className="text-lg font-bold text-gray-800">{contract.treeTypes}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2">
+                      <div className="p-4 text-right bg-gradient-to-l from-amber-50/50 to-transparent">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-sm font-semibold text-gray-700">عدد الأشجار</span>
+                          <Leaf className="w-5 h-5 text-green-700" />
+                        </div>
+                      </div>
+                      <div className="p-4 text-left border-r-2 border-[#D4AF37]/30">
+                        <p className="text-lg font-bold text-gray-800">{contract.farmName}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2">
+                      <div className="p-4 text-right bg-gradient-to-l from-amber-50/50 to-transparent">
+                        <span className="text-sm font-semibold text-gray-700">مدة الاستثمار :</span>
+                      </div>
+                      <div className="p-4 text-left border-r-2 border-[#D4AF37]/30">
+                        <p className="text-lg font-bold text-gray-800">
+                          {contract.durationYears} سنوات
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2">
+                      <div className="p-4 text-right bg-gradient-to-l from-amber-50/50 to-transparent">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-sm font-semibold text-gray-700">تاريخ {formatDate(contract.endDate)}</span>
+                        </div>
+                      </div>
+                      <div className="p-4 text-left border-r-2 border-[#D4AF37]/30">
+                        <p className="text-base font-bold text-gray-800">{formatDate(contract.startDate)}</p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2">
+                      <div className="p-4 text-right bg-gradient-to-l from-[#D4AF37]/20 to-transparent">
+                        <div className="flex items-center justify-end gap-2">
+                          <span className="text-base font-bold text-gray-800">المبلغ المدفوع :</span>
+                        </div>
+                      </div>
+                      <div className="p-4 text-left border-r-2 border-[#D4AF37]/30 bg-gradient-to-r from-[#D4AF37]/10 to-transparent">
+                        <p className="text-2xl font-bold" style={{ color: '#B8942F' }}>
+                          {contract.totalPrice.toLocaleString()} ريال
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="text-center mb-10">
+                  <p className="text-sm text-gray-800 leading-relaxed max-w-2xl mx-auto">
+                    هذا عقد استثمار أشجار مثمرة صادر من المنصة ويثبت مشاركة المستثمر في الاستثمار الزراعي
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between mb-8">
+                  <div className="text-center flex-1">
+                    <div className="mb-3">
+                      <div className="w-32 h-16 mx-auto border-b-2 border-gray-400"></div>
+                    </div>
+                    <p className="text-sm text-gray-700 font-semibold">المدير التنفيذي</p>
+                  </div>
+
+                  <div className="flex-shrink-0 mx-4">
+                    <div className="relative w-28 h-28">
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37] to-[#B8942F] rounded-full"></div>
+                      <div className="absolute inset-1 bg-gradient-to-br from-[#F5F1E8] to-[#F8F5ED] rounded-full flex items-center justify-center">
+                        <div className="text-center">
+                          <Trees className="w-10 h-10 mx-auto mb-1 text-green-800" />
+                          <p className="text-xs font-bold text-green-900">استثمر أشجارك</p>
+                        </div>
+                      </div>
+                      <Stamp className="absolute -bottom-2 -right-2 w-10 h-10 text-red-600 opacity-80" />
+                    </div>
+                  </div>
+
+                  <div className="text-center flex-1">
+                    <div className="mb-3">
+                      <div className="w-32 h-16 mx-auto border-b-2 border-gray-400"></div>
+                    </div>
+                    <p className="text-sm text-gray-700 font-semibold">المدير الشرعي</p>
+                  </div>
+                </div>
+
+                <div className="text-center pt-6 border-t-2 border-[#D4AF37]/30">
+                  <p className="text-xs text-gray-600">
+                    صدر بتاريخ {formatDate(contract.createdAt)}
+                  </p>
+                </div>
+              </div>
+
+              <div className="h-3 bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-[#D4AF37]"></div>
+            </div>
           </div>
         </div>
       </div>
+
+      <style>{`
+        @media print {
+          body {
+            background-color: white !important;
+          }
+          .print\\:hidden {
+            display: none !important;
+          }
+        }
+      `}</style>
     </div>
   );
 }
