@@ -53,6 +53,10 @@ class ReservationService {
     data: CreateReservationData
   ): Promise<{ reservation: Reservation; items: ReservationItem[] } | null> {
     try {
+      const treeTypes = Array.from(
+        new Set(Object.values(data.cart).map(item => item.typeName))
+      ).join('، ');
+
       const { data: reservation, error: reservationError } = await supabase
         .from('reservations')
         .insert({
@@ -66,6 +70,7 @@ class ReservationService {
           duration_years: data.durationYears || 1,
           bonus_years: data.bonusYears || 0,
           tree_details: data.treeDetails || [],
+          tree_types: treeTypes,
           status: 'pending'
         })
         .select()
