@@ -25,10 +25,6 @@ function App() {
     threshold: 5,
     scrollableRef
   });
-
-  useEffect(() => {
-    console.log('[App] Mounted, scrollableRef.current:', scrollableRef.current);
-  }, []);
   const [appMode, setAppMode] = useState<AppMode>(() => {
     const savedMode = localStorage.getItem('appMode');
     return (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';

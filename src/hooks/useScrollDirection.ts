@@ -17,25 +17,16 @@ export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
     const element = scrollableRef?.current;
 
     if (!element) {
-      console.log('[ScrollDirection] No scroll element found');
       return;
     }
 
-    console.log('[ScrollDirection] Element found:', {
-      scrollHeight: element.scrollHeight,
-      clientHeight: element.clientHeight,
-      scrollTop: element.scrollTop,
-      overflow: window.getComputedStyle(element).overflow,
-      overflowY: window.getComputedStyle(element).overflowY
-    });
-
     let lastY = element.scrollTop;
+    let touchStartY = 0;
+    let lastTouchY = 0;
 
     const handleScroll = () => {
       const currentY = element.scrollTop;
       const diff = currentY - lastY;
-
-      console.log('[Scroll] Current:', currentY, 'Last:', lastY, 'Diff:', diff);
 
       if (Math.abs(diff) < threshold) {
         lastY = currentY;
@@ -43,15 +34,12 @@ export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
       }
 
       if (currentY < 50) {
-        console.log('[Scroll] Near top - SHOW');
         setScrollDirection('none');
         setShowHeaderFooter(true);
       } else if (diff > 0) {
-        console.log('[Scroll] Scrolling DOWN - HIDE');
         setScrollDirection('down');
         setShowHeaderFooter(false);
       } else {
-        console.log('[Scroll] Scrolling UP - SHOW');
         setScrollDirection('up');
         setShowHeaderFooter(true);
       }
@@ -60,12 +48,44 @@ export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
       setLastScrollY(currentY);
     };
 
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartY = e.touches[0].clientY;
+      lastTouchY = touchStartY;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const currentTouchY = e.touches[0].clientY;
+      const diff = lastTouchY - currentTouchY;
+      lastTouchY = currentTouchY;
+
+      const currentScrollY = element.scrollTop;
+
+      if (Math.abs(diff) < threshold) {
+        return;
+      }
+
+      if (currentScrollY < 50) {
+        setScrollDirection('none');
+        setShowHeaderFooter(true);
+      } else if (diff > 0) {
+        setScrollDirection('down');
+        setShowHeaderFooter(false);
+      } else {
+        setScrollDirection('up');
+        setShowHeaderFooter(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
     element.addEventListener('scroll', handleScroll, { passive: true });
-    console.log('[ScrollDirection] Listener attached to element');
+    element.addEventListener('touchstart', handleTouchStart, { passive: true });
+    element.addEventListener('touchmove', handleTouchMove, { passive: true });
 
     return () => {
       element.removeEventListener('scroll', handleScroll);
-      console.log('[ScrollDirection] Listener removed');
+      element.removeEventListener('touchstart', handleTouchStart);
+      element.removeEventListener('touchmove', handleTouchMove);
     };
   }, [threshold, scrollableRef]);
 
