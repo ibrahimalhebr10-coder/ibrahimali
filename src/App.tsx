@@ -359,7 +359,12 @@ function App() {
       >
         <Header />
 
-        <div className="flex-1 overflow-y-auto pb-24 lg:pb-4 pt-14 lg:pt-16">
+        <div
+          className="flex-1 overflow-y-auto lg:pb-4 pt-14 lg:pt-16"
+          style={{
+            paddingBottom: 'max(7rem, calc(4.5rem + env(safe-area-inset-bottom) + 0.5rem))'
+          }}
+        >
           <div className="max-w-7xl mx-auto">
         <section className="px-3 lg:px-6 pt-1 lg:pt-4 pb-0.5 lg:pb-2 flex-shrink-0">
           <div className="relative w-full h-14 lg:h-64 xl:h-72 overflow-hidden rounded-xl lg:rounded-3xl" style={{ border: '2px solid #3AA17E' }}>
@@ -818,15 +823,18 @@ function App() {
       </nav>
 
       <nav
-        className="fixed bottom-0 left-0 right-0 lg:hidden z-50 backdrop-blur-xl"
+        className="fixed bottom-0 left-0 right-0 lg:hidden backdrop-blur-xl"
         style={{
           background: 'linear-gradient(180deg, rgba(230, 232, 235, 0.85) 0%, rgba(238, 239, 241, 0.80) 100%)',
           borderTop: '2px solid rgba(58,161,126,0.3)',
           boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-          height: 'calc(4.5rem + env(safe-area-inset-bottom))'
+          paddingBottom: 'max(0.5rem, env(safe-area-inset-bottom))',
+          minHeight: 'calc(4.5rem + env(safe-area-inset-bottom))',
+          zIndex: 9999,
+          willChange: 'transform',
+          transform: 'translateZ(0)'
         }}
       >
         <div className="h-[4.5rem] flex items-center justify-around px-3 relative">
