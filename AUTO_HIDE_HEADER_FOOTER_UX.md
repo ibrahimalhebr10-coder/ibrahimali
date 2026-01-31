@@ -30,16 +30,25 @@ const [isScrollingDown, setIsScrollingDown] = useState(false);
 const [lastScrollY, setLastScrollY] = useState(0);
 ```
 
-### 2. مراقبة التمرير مع requestAnimationFrame
+### 2. إضافة useRef للحاوية الرئيسية
+
+```typescript
+const scrollContainerRef = useRef<HTMLDivElement>(null);
+```
+
+### 3. مراقبة التمرير داخل الحاوية مع requestAnimationFrame
 
 ```typescript
 useEffect(() => {
+  const scrollContainer = scrollContainerRef.current;
+  if (!scrollContainer) return;
+
   let ticking = false;
 
   const handleScroll = () => {
     if (!ticking) {
       window.requestAnimationFrame(() => {
-        const currentScrollY = window.scrollY;
+        const currentScrollY = scrollContainer.scrollTop;
 
         // عند التمرير للأسفل بعد 80px من الأعلى
         if (currentScrollY > lastScrollY && currentScrollY > 80) {
@@ -57,12 +66,21 @@ useEffect(() => {
     }
   };
 
-  window.addEventListener('scroll', handleScroll, { passive: true });
-  return () => window.removeEventListener('scroll', handleScroll);
+  scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+  return () => scrollContainer.removeEventListener('scroll', handleScroll);
 }, [lastScrollY]);
 ```
 
-### 3. تطبيق Transitions على الهيدر
+### 4. ربط الـ ref مع الحاوية الرئيسية
+
+```typescript
+<div
+  ref={scrollContainerRef}
+  className="fixed inset-0 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 z-50 overflow-y-auto"
+>
+```
+
+### 5. تطبيق Transitions على الهيدر
 
 ```typescript
 <div
@@ -72,7 +90,7 @@ useEffect(() => {
 >
 ```
 
-### 4. تطبيق Transitions على الفوتر
+### 6. تطبيق Transitions على الفوتر
 
 ```typescript
 <div
@@ -82,6 +100,16 @@ useEffect(() => {
 >
 ```
 
+## الإصلاح الحرج
+
+تم اكتشاف أن الكود الأولي كان يستخدم `window.scrollY` بينما التمرير يحدث داخل `<div>` وليس في window. تم إصلاح هذا عن طريق:
+
+1. إضافة `useRef` للإشارة إلى الحاوية الرئيسية
+2. استخدام `scrollContainer.scrollTop` بدلاً من `window.scrollY`
+3. إضافة event listener على الحاوية نفسها بدلاً من window
+
+هذا الإصلاح حيوي لضمان عمل الميزة بشكل صحيح.
+
 ## المميزات
 
 ✅ **أداء ممتاز**: استخدام `requestAnimationFrame` لتمرير سلس
@@ -90,6 +118,7 @@ useEffect(() => {
 ✅ **انتقالات سلسة**: `transition-transform duration-300` لحركة طبيعية
 ✅ **تجربة مألوفة**: نفس السلوك المستخدم في Instagram وTwitter
 ✅ **استجابة فورية**: يظهر الهيدر والفوتر فوراً عند التمرير للأعلى
+✅ **يعمل مع Fixed Containers**: مصمم للعمل مع الحاويات ذات `overflow-y-auto`
 
 ## الفوائد للمستخدم
 

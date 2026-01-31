@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Video, HelpCircle, MapPin, Minus, Plus, Sprout, Clock, Gift, ShoppingCart, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -30,6 +30,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mada' | 'bank_transfer' | null>(null);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (farm.contracts && farm.contracts.length > 0) {
@@ -38,12 +39,15 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   }, [farm.contracts]);
 
   useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
     let ticking = false;
 
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
+          const currentScrollY = scrollContainer.scrollTop;
 
           if (currentScrollY > lastScrollY && currentScrollY > 80) {
             setIsScrollingDown(true);
@@ -58,8 +62,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       }
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
   }, [lastScrollY]);
 
   const maxTrees = farm.availableTrees || 0;
@@ -181,7 +185,10 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 z-50 overflow-y-auto">
+    <div
+      ref={scrollContainerRef}
+      className="fixed inset-0 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 z-50 overflow-y-auto"
+    >
       <div className="min-h-screen pb-32">
         {/* Header with Back Button */}
         <div
