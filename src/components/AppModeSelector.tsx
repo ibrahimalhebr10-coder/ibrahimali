@@ -40,7 +40,7 @@ export default function AppModeSelector({ activeMode, onModeChange }: AppModeSel
             <button
               key={mode.id}
               onClick={() => onModeChange(mode.id)}
-              className="flex-1 rounded-2xl lg:rounded-3xl h-20 lg:h-32 xl:h-36 flex flex-col items-center justify-center bg-white transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-lg relative overflow-hidden"
+              className="flex-1 rounded-xl lg:rounded-2xl h-10 lg:h-16 xl:h-18 flex flex-col items-center justify-center bg-white transition-all duration-300 hover:scale-105 active:scale-95 backdrop-blur-lg relative overflow-hidden"
               style={{
                 boxShadow: isActive
                   ? `0 6px 20px ${mode.shadow}, 0 10px 40px ${mode.shadow}, inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.05)`
@@ -54,14 +54,14 @@ export default function AppModeSelector({ activeMode, onModeChange }: AppModeSel
               }}
             >
               <Icon
-                className={`w-8 h-8 lg:w-14 lg:h-14 xl:w-16 xl:h-16 mb-1 lg:mb-2 ${
+                className={`w-4 h-4 lg:w-7 lg:h-7 xl:w-8 xl:h-8 mb-0.5 lg:mb-1 ${
                   isActive ? 'text-white drop-shadow-lg' : 'text-darkgreen/60'
                 }`}
                 strokeWidth={2.5}
                 style={isActive ? { filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' } : {}}
               />
               <span
-                className={`text-xs lg:text-lg xl:text-xl font-black text-center leading-tight px-2 ${
+                className={`text-[10px] lg:text-sm xl:text-base font-black text-center leading-tight px-2 ${
                   isActive ? 'text-white drop-shadow-md' : 'text-darkgreen/60'
                 }`}
                 style={isActive ? { textShadow: '0 1px 2px rgba(0,0,0,0.2)' } : {}}
