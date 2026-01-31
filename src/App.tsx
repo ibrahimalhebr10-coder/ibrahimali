@@ -364,15 +364,17 @@ function App() {
             radial-gradient(circle at 50% 50%, rgba(212,175,55,0.03) 0%, transparent 50%)
           `
         }}></div>
-        <Header />
 
-        <div
-          className="flex-1 overflow-y-auto lg:pb-4 pt-14 lg:pt-16"
-          style={{
-            paddingBottom: '12rem'
-          }}
-        >
-          <div className="max-w-7xl mx-auto">
+        {!selectedInvestmentFarm && <Header />}
+
+        {!selectedInvestmentFarm && (
+          <div
+            className="flex-1 overflow-y-auto lg:pb-4 pt-14 lg:pt-16"
+            style={{
+              paddingBottom: '12rem'
+            }}
+          >
+            <div className="max-w-7xl mx-auto">
         <section className="px-3 lg:px-6 pt-1 lg:pt-4 pb-0.5 lg:pb-2 flex-shrink-0 animate-fadeIn">
           <div className="relative w-full h-14 lg:h-64 xl:h-72 overflow-hidden rounded-xl lg:rounded-3xl shadow-2xl group" style={{ border: '3px solid #3AA17E' }}>
             <div className="absolute inset-0">
@@ -848,18 +850,20 @@ function App() {
           )}
         </section>
         </div>
-      </div>
+          </div>
+        )}
 
-      <nav
-        className="hidden lg:flex fixed bottom-0 left-0 right-0 z-50 backdrop-blur-2xl"
-        style={{
-          background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.95) 0%, rgba(242, 247, 244, 0.92) 100%)',
-          borderTop: '3px solid rgba(58,161,126,0.4)',
-          boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)'
-        }}
-      >
+      {!selectedInvestmentFarm && (
+        <nav
+          className="hidden lg:flex fixed bottom-0 left-0 right-0 z-50 backdrop-blur-2xl"
+          style={{
+            background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.95) 0%, rgba(242, 247, 244, 0.92) 100%)',
+            borderTop: '3px solid rgba(58,161,126,0.4)',
+            boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
+            backdropFilter: 'blur(24px)',
+            WebkitBackdropFilter: 'blur(24px)'
+          }}
+        >
         <div className="max-w-7xl mx-auto w-full px-8 py-5 pb-8 flex items-center justify-around">
           <button className="flex flex-col items-center gap-2 px-8 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
             onMouseEnter={(e) => {
@@ -941,9 +945,11 @@ function App() {
           </button>
         </div>
       </nav>
+      )}
 
-      <nav
-        className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
+      {!selectedInvestmentFarm && (
+        <nav
+          className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
         style={{
           bottom: 0,
           background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.98) 0%, rgba(242, 247, 244, 0.95) 100%)',
@@ -1052,6 +1058,7 @@ function App() {
           </button>
         </div>
       </nav>
+      )}
 
       <VideoIntro
         isOpen={showVideoIntro}
