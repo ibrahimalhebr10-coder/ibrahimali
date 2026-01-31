@@ -8,11 +8,13 @@ interface HeaderProps {
 export default function Header({ onBack, showBackButton = false }: HeaderProps) {
   return (
     <header
-      className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between z-50 backdrop-blur-lg flex-shrink-0 fixed top-0 left-0 right-0"
+      className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between z-50 backdrop-blur-xl flex-shrink-0 fixed top-0 left-0 right-0"
       style={{
-        background: 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(248,247,243,0.95) 100%)',
-        borderBottom: '2px solid #3AA17E',
-        boxShadow: '0 4px 16px rgba(58,161,126,0.12)'
+        background: 'linear-gradient(135deg, rgba(240, 242, 245, 0.85) 0%, rgba(248, 249, 251, 0.80) 100%)',
+        borderBottom: '2px solid rgba(58,161,126,0.3)',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)'
       }}
     >
       {/* Logo & Brand - Top Right Corner */}

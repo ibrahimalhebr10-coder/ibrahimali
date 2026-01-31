@@ -747,7 +747,16 @@ function App() {
         </div>
       </div>
 
-      <nav className="hidden lg:flex fixed bottom-0 left-0 right-0 bg-white z-50 border-t-2 border-darkgreen/20">
+      <nav
+        className="hidden lg:flex fixed bottom-0 left-0 right-0 z-50 backdrop-blur-xl"
+        style={{
+          background: 'linear-gradient(180deg, rgba(240, 242, 245, 0.85) 0%, rgba(248, 249, 251, 0.80) 100%)',
+          borderTop: '2px solid rgba(58,161,126,0.3)',
+          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)'
+        }}
+      >
         <div className="max-w-7xl mx-auto w-full px-6 py-4 flex items-center justify-around">
           <button className="flex flex-col items-center gap-2 px-6 py-2 rounded-xl transition-all hover:bg-darkgreen/5">
             <Home className="w-6 h-6 text-darkgreen" />
@@ -802,10 +811,13 @@ function App() {
       </nav>
 
       <nav
-        className="fixed bottom-0 left-0 right-0 bg-white lg:hidden z-50"
+        className="fixed bottom-0 left-0 right-0 lg:hidden z-50 backdrop-blur-xl"
         style={{
-          boxShadow: '0 -4px 20px rgba(0,0,0,0.08)',
-          background: 'linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%)',
+          background: 'linear-gradient(180deg, rgba(240, 242, 245, 0.85) 0%, rgba(248, 249, 251, 0.80) 100%)',
+          borderTop: '2px solid rgba(58,161,126,0.3)',
+          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
           paddingBottom: 'env(safe-area-inset-bottom)',
           height: 'calc(4.5rem + env(safe-area-inset-bottom))'
         }}
