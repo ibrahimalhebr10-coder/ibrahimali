@@ -362,8 +362,8 @@ function App() {
                 <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none" style={{
                   background: 'linear-gradient(90deg, transparent 0%, rgba(58, 161, 126, 0.3) 50%, transparent 100%)'
                 }}></div>
-                <section className="px-2 lg:px-6 py-1.5 lg:py-2">
-                  <div className="flex gap-1 lg:gap-3 justify-between lg:max-w-5xl lg:mx-auto">
+                <section className="px-2 lg:px-6 py-1 lg:py-1.5">
+                  <div className="flex gap-0.5 lg:gap-2 justify-between lg:max-w-5xl lg:mx-auto">
                     {[
                       { icon: Calculator, label: 'حاسبة مزرعتك', color: '#2F5233', onClick: () => alert('قريباً: حاسبة المزرعة'), delay: '0ms' },
                       { icon: Video, label: 'فيديو تعريفي', color: '#3D6B42', onClick: () => setShowVideoIntro(true), delay: '100ms' },
@@ -372,36 +372,36 @@ function App() {
                       <button
                         key={idx}
                         onClick={action.onClick}
-                        className="rounded-xl lg:rounded-2xl flex-1 h-12 lg:h-20 xl:h-24 flex flex-col items-center justify-center bg-white relative group overflow-hidden animate-fadeIn"
+                        className="rounded-lg lg:rounded-xl flex-1 h-9 lg:h-14 xl:h-16 flex flex-col items-center justify-center bg-white relative group overflow-hidden animate-fadeIn"
                         style={{
-                          boxShadow: '0 4px 0 0 rgba(58,161,126,0.25), 0 6px 16px rgba(58,161,126,0.15), inset 0 1px 0 rgba(255,255,255,0.95)',
-                          border: '2px solid #3AA17E',
+                          boxShadow: '0 2px 0 0 rgba(58,161,126,0.25), 0 3px 8px rgba(58,161,126,0.12), inset 0 1px 0 rgba(255,255,255,0.95)',
+                          border: '1px solid #3AA17E',
                           background: 'linear-gradient(145deg, #ffffff 0%, #fafdfb 100%)',
                           transform: 'translateY(0)',
                           transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
                           animationDelay: action.delay
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-3px) scale(1.03)';
-                          e.currentTarget.style.boxShadow = '0 6px 0 0 rgba(58,161,126,0.35), 0 12px 24px rgba(58,161,126,0.25), inset 0 2px 0 rgba(255,255,255,0.95)';
+                          e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)';
+                          e.currentTarget.style.boxShadow = '0 4px 0 0 rgba(58,161,126,0.3), 0 6px 16px rgba(58,161,126,0.18), inset 0 2px 0 rgba(255,255,255,0.95)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                          e.currentTarget.style.boxShadow = '0 4px 0 0 rgba(58,161,126,0.25), 0 6px 16px rgba(58,161,126,0.15), inset 0 1px 0 rgba(255,255,255,0.95)';
+                          e.currentTarget.style.boxShadow = '0 2px 0 0 rgba(58,161,126,0.25), 0 3px 8px rgba(58,161,126,0.12), inset 0 1px 0 rgba(255,255,255,0.95)';
                         }}
                         onMouseDown={(e) => {
                           e.currentTarget.style.transform = 'translateY(1px) scale(0.98)';
                         }}
                         onMouseUp={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-3px) scale(1.03)';
+                          e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)';
                         }}
                       >
-                        <div className="absolute inset-0 rounded-xl lg:rounded-2xl bg-gradient-to-br from-emerald-50/40 via-white/30 to-green-50/40 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 opacity-70"></div>
+                        <div className="absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-br from-emerald-50/40 via-white/30 to-green-50/40 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 opacity-70"></div>
                         <action.icon
-                          className="w-5 h-5 lg:w-7 lg:h-7 xl:w-9 xl:h-9 text-darkgreen mb-1 lg:mb-1.5 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-600"
-                          style={{ filter: 'drop-shadow(0 2px 4px rgba(47,82,51,0.25))' }}
+                          className="w-6 h-6 text-darkgreen mb-0.5 relative z-10 transition-all duration-300 group-hover:scale-105 group-hover:text-emerald-600"
+                          style={{ filter: 'drop-shadow(0 1px 3px rgba(47,82,51,0.2))' }}
                         />
-                        <span className="text-[9px] lg:text-xs xl:text-sm font-bold text-darkgreen relative z-10 text-center leading-tight px-1 transition-colors duration-300 group-hover:text-emerald-600">{action.label}</span>
+                        <span className="text-[7px] lg:text-[9px] font-bold text-darkgreen relative z-10 text-center leading-tight px-1 transition-colors duration-300 group-hover:text-emerald-600">{action.label}</span>
                       </button>
                     ))}
                   </div>
@@ -413,7 +413,7 @@ function App() {
                   }}></div>
                 </div>
 
-                <div className="px-2 lg:px-6 py-1.5 lg:py-2">
+                <div className="px-2 lg:px-6 py-1 lg:py-1.5">
                   <AppModeSelector
                     activeMode={appMode}
                     onModeChange={handleAppModeChange}
@@ -426,13 +426,13 @@ function App() {
                   }}></div>
                 </div>
 
-                <section className="px-2 lg:px-6 pb-2 lg:pb-3 pt-1.5 lg:pt-2">
+                <section className="px-2 lg:px-6 pb-1.5 lg:pb-2 pt-1 lg:pt-1.5">
           {categories.length === 0 ? (
             <div className="text-center py-4 text-darkgreen/70 animate-pulse">
               <p className="text-sm">جاري تحميل الفئات...</p>
             </div>
           ) : (
-          <div className="flex gap-0.5 lg:gap-3 justify-between lg:max-w-5xl lg:mx-auto">
+          <div className="flex gap-0.5 lg:gap-2 justify-between lg:max-w-5xl lg:mx-auto">
             {[{ slug: 'all', name: 'الكل', icon: 'all' }, ...categories].map((category, idx) => {
               const Icon = iconMap[category.icon] || Leaf;
               const isActive = activeCategory === category.slug;
@@ -441,51 +441,51 @@ function App() {
               const textColor = appMode === 'agricultural' ? 'text-darkgreen' : 'text-[#B8942F]';
 
               return (
-                <div key={category.slug} className="flex-1 flex flex-col items-center gap-0.5 lg:gap-1.5 animate-fadeIn" style={{ animationDelay: `${idx * 70}ms` }}>
+                <div key={category.slug} className="flex-1 flex flex-col items-center gap-0.5 lg:gap-1 animate-fadeIn" style={{ animationDelay: `${idx * 70}ms` }}>
                   <button
                     onClick={() => handleCategoryChange(category.slug)}
                     className="rounded-lg lg:rounded-xl w-full aspect-square flex items-center justify-center bg-white transition-all duration-300 backdrop-blur-lg relative overflow-hidden group"
                     style={{
                       boxShadow: isActive
-                        ? `0 2px 10px ${colors.shadow}, 0 4px 20px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.8)`
-                        : '0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.7)',
+                        ? `0 2px 8px ${colors.shadow}, 0 4px 16px ${colors.shadow}, inset 0 1px 0 rgba(255,255,255,0.8)`
+                        : '0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.7)',
                       background: isActive
                         ? colors.iconGradient
                         : 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(252,254,253,0.95) 100%)',
-                      border: `1.5px solid ${isActive ? colors.border : 'rgba(58,161,126,0.2)'}`,
-                      backdropFilter: 'blur(10px)',
-                      WebkitBackdropFilter: 'blur(10px)',
-                      transform: isActive ? 'scale(1.05)' : 'scale(1)'
+                      border: `1px solid ${isActive ? colors.border : 'rgba(58,161,126,0.2)'}`,
+                      backdropFilter: 'blur(8px)',
+                      WebkitBackdropFilter: 'blur(8px)',
+                      transform: isActive ? 'scale(1.03)' : 'scale(1)'
                     }}
                     onMouseEnter={(e) => {
                       if (!isActive) {
-                        e.currentTarget.style.transform = 'scale(1.03) translateY(-1px)';
-                        e.currentTarget.style.boxShadow = `0 3px 12px ${colors.shadow}, 0 6px 24px ${colors.shadow}`;
+                        e.currentTarget.style.transform = 'scale(1.02) translateY(-1px)';
+                        e.currentTarget.style.boxShadow = `0 3px 10px ${colors.shadow}, 0 5px 20px ${colors.shadow}`;
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (!isActive) {
                         e.currentTarget.style.transform = 'scale(1) translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 1px 4px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.7)';
+                        e.currentTarget.style.boxShadow = '0 1px 3px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.7)';
                       }
                     }}
                   >
                     <div className={`absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-br from-white/40 via-transparent to-emerald-50/30 pointer-events-none transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0 group-hover:opacity-70'}`}></div>
                     <Icon
-                      className={`w-3 h-3 lg:w-5 lg:h-5 xl:w-6 xl:h-6 transition-all duration-300 ${isActive ? 'drop-shadow-md scale-100' : 'scale-90 group-hover:scale-100 group-hover:drop-shadow-sm'}`}
+                      className={`w-6 h-6 transition-all duration-300 ${isActive ? 'drop-shadow-md scale-100' : 'scale-90 group-hover:scale-100 group-hover:drop-shadow-sm'}`}
                       style={{
                         color: isActive ? iconColor : `${iconColor}70`,
-                        filter: isActive ? 'drop-shadow(0 1px 4px rgba(58,161,126,0.3))' : 'none'
+                        filter: isActive ? 'drop-shadow(0 1px 3px rgba(58,161,126,0.3))' : 'none'
                       }}
                     />
                     {isActive && (
                       <div className="absolute inset-0 rounded-lg lg:rounded-xl animate-pulse" style={{
                         background: `radial-gradient(circle at center, ${colors.shadow} 0%, transparent 75%)`,
-                        opacity: 0.2
+                        opacity: 0.15
                       }}></div>
                     )}
                   </button>
-                  <span className={`text-[7px] lg:text-[10px] xl:text-xs font-bold text-center leading-tight transition-all duration-300 ${isActive ? `${textColor} scale-100` : `${textColor}/70 scale-95`}`}>
+                  <span className={`text-[7px] lg:text-[9px] font-bold text-center leading-tight transition-all duration-300 ${isActive ? `${textColor} scale-100` : `${textColor}/70 scale-95`}`}>
                     {category.name}
                   </span>
                 </div>
@@ -498,32 +498,32 @@ function App() {
 
               <div className="flex-1 overflow-y-auto" style={{ paddingBottom: '12rem' }}>
                 <div className="max-w-7xl mx-auto">
-                  <section className="px-3 lg:px-6 py-2 lg:py-4">
+                  <section className="px-2 lg:px-4 py-1.5 lg:py-2">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-4 animate-fadeIn">
+            <div className="flex flex-col items-center justify-center py-12 gap-3 animate-fadeIn">
               <div className="relative">
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-emerald-200"></div>
-                <div className="animate-spin rounded-full h-16 w-16 border-4 border-darkgreen border-t-transparent absolute inset-0"></div>
-                <Sprout className="w-8 h-8 text-darkgreen absolute inset-0 m-auto animate-pulse" />
+                <div className="animate-spin rounded-full h-12 w-12 border-3 border-emerald-200"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-3 border-darkgreen border-t-transparent absolute inset-0"></div>
+                <Sprout className="w-6 h-6 text-darkgreen absolute inset-0 m-auto animate-pulse" />
               </div>
-              <p className="text-base text-darkgreen font-bold animate-pulse">جاري تحميل المزارع...</p>
-              <div className="flex gap-2">
-                <div className="w-2 h-2 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              <p className="text-sm text-darkgreen font-bold animate-pulse">جاري تحميل المزارع...</p>
+              <div className="flex gap-1.5">
+                <div className="w-1.5 h-1.5 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-1.5 h-1.5 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-1.5 h-1.5 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
               </div>
             </div>
           ) : currentFarms.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 gap-4 animate-scaleIn">
+            <div className="flex flex-col items-center justify-center py-12 gap-3 animate-scaleIn">
               <div className="relative">
                 <div className="absolute inset-0 bg-emerald-100 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                <Sprout className="w-20 h-20 text-darkgreen/40 relative animate-float" />
+                <Sprout className="w-16 h-16 text-darkgreen/40 relative animate-float" />
               </div>
-              <p className="text-lg text-darkgreen/80 font-bold">لا توجد مزارع متاحة حالياً</p>
-              <p className="text-sm text-darkgreen/60">تحقق مرة أخرى قريباً</p>
+              <p className="text-base text-darkgreen/80 font-bold">لا توجد مزارع متاحة حالياً</p>
+              <p className="text-xs text-darkgreen/60">تحقق مرة أخرى قريباً</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-5">
               {currentFarms.map((farm, idx) => {
                 const totalTrees = farm.availableTrees + farm.reservedTrees;
                 const reservationPercentage = (farm.reservedTrees / totalTrees) * 100;
