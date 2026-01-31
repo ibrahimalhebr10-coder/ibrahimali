@@ -4,6 +4,7 @@ import InvestmentContract from './InvestmentContract';
 import InvestorRegistrationForm from './InvestorRegistrationForm';
 import InvestorWelcomeScreen from './InvestorWelcomeScreen';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 interface BookingSuccessScreenProps {
   reservation: {
@@ -27,14 +28,14 @@ export default function BookingSuccessScreen({
   onRegistrationComplete,
   onClose
 }: BookingSuccessScreenProps) {
+  const { user } = useAuth();
   const [showRegistration, setShowRegistration] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [investorName, setInvestorName] = useState('');
 
   const handleRegistrationSuccess = async (userId: string) => {
-    const { data } = await supabase.auth.getUser();
-    if (data.user) {
-      const fullName = data.user.user_metadata?.full_name || 'المستثمر';
+    if (user) {
+      const fullName = user.user_metadata?.full_name || 'المستثمر';
       setInvestorName(fullName);
       setShowRegistration(false);
       setShowWelcome(true);

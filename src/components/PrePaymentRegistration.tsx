@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { User, Phone, Lock, AlertCircle, CheckCircle2, Sparkles, Shield, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 
 interface PrePaymentRegistrationProps {
   farmName: string;
@@ -15,6 +16,7 @@ export default function PrePaymentRegistration({
   onSuccess,
   onBack
 }: PrePaymentRegistrationProps) {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
@@ -23,6 +25,10 @@ export default function PrePaymentRegistration({
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (user) {
+    return null;
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

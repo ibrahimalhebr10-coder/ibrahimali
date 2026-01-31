@@ -84,8 +84,6 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
     setIsCreatingReservation(true);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-
       if (!user) {
         alert('الرجاء تسجيل الدخول أولاً');
         setIsCreatingReservation(false);
