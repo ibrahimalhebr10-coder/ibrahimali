@@ -180,7 +180,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <Sprout className="w-16 h-16 text-darkgreen/30" />
+              <Sprout className="w-10 h-10 text-darkgreen/30" />
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
@@ -191,7 +191,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           <h2 className="text-xl font-bold text-darkgreen mb-2">{farm.name}</h2>
           {farm.location && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <MapPin className="w-4 h-4 text-darkgreen" />
+              <MapPin className="w-2.5 h-2.5 text-darkgreen" />
               <span>{farm.location}</span>
             </div>
           )}
@@ -205,7 +205,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               disabled={!farm.video}
               className="flex items-center justify-center gap-2 p-4 bg-gradient-to-br from-green-100/50 to-emerald-100/50 rounded-xl border-2 border-darkgreen/30 hover:border-darkgreen/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
             >
-              <Video className="w-5 h-5 text-darkgreen" />
+              <Video className="w-3 h-3 text-darkgreen" />
               <span className="text-sm font-bold text-darkgreen">عرض فيديو</span>
             </button>
 
@@ -213,7 +213,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               onClick={() => setShowInfoModal(true)}
               className="flex items-center justify-center gap-2 p-4 bg-gradient-to-br from-green-100/50 to-emerald-100/50 rounded-xl border-2 border-darkgreen/30 hover:border-darkgreen/50 transition-all active:scale-95"
             >
-              <HelpCircle className="w-5 h-5 text-darkgreen" />
+              <HelpCircle className="w-3 h-3 text-darkgreen" />
               <span className="text-sm font-bold text-darkgreen">اعرف المزرعة</span>
             </button>
           </div>
@@ -239,13 +239,13 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                     <h4 className="font-bold text-darkgreen text-sm">{contract.contract_name}</h4>
 
                     <div className="flex items-center justify-center gap-1 text-xs text-gray-600">
-                      <Clock className="w-3 h-3" />
+                      <Clock className="w-2 h-2" />
                       <span>{contract.duration_years} سنوات</span>
                     </div>
 
                     {contract.bonus_years > 0 && (
                       <div className="flex items-center justify-center gap-1 text-xs text-green-600 bg-green-50 rounded-lg py-1 px-2">
-                        <Gift className="w-3 h-3" />
+                        <Gift className="w-2 h-2" />
                         <span>+{contract.bonus_years} مجاني</span>
                       </div>
                     )}
@@ -424,7 +424,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             <div className="p-6 space-y-4">
               <div className="bg-green-50 rounded-xl p-4 border border-green-200">
                 <h4 className="font-bold text-darkgreen mb-2 flex items-center gap-2">
-                  <Sprout className="w-5 h-5 text-darkgreen" />
+                  <Sprout className="w-3 h-3 text-darkgreen" />
                   ما هو محصولي الزراعي؟
                 </h4>
                 <p className="text-sm text-gray-700 leading-relaxed">

@@ -179,7 +179,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <TrendingUp className="w-16 h-16 text-[#D4AF37]/30" />
+              <TrendingUp className="w-10 h-10 text-[#D4AF37]/30" />
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
@@ -190,7 +190,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           <h2 className="text-xl font-bold text-[#B8942F] mb-2">{farm.name}</h2>
           {farm.location && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <MapPin className="w-4 h-4 text-[#D4AF37]" />
+              <MapPin className="w-2.5 h-2.5 text-[#D4AF37]" />
               <span>{farm.location}</span>
             </div>
           )}
@@ -204,7 +204,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
               disabled={!farm.video}
               className="flex items-center justify-center gap-2 p-4 bg-gradient-to-br from-[#D4AF37]/10 to-[#B8942F]/5 rounded-xl border-2 border-[#D4AF37]/30 hover:border-[#D4AF37]/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
             >
-              <Video className="w-5 h-5 text-[#D4AF37]" />
+              <Video className="w-3 h-3 text-[#D4AF37]" />
               <span className="text-sm font-bold text-[#B8942F]">عرض فيديو</span>
             </button>
 
@@ -212,7 +212,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
               onClick={() => setShowInfoModal(true)}
               className="flex items-center justify-center gap-2 p-4 bg-gradient-to-br from-[#D4AF37]/10 to-[#B8942F]/5 rounded-xl border-2 border-[#D4AF37]/30 hover:border-[#D4AF37]/50 transition-all active:scale-95"
             >
-              <HelpCircle className="w-5 h-5 text-[#D4AF37]" />
+              <HelpCircle className="w-3 h-3 text-[#D4AF37]" />
               <span className="text-sm font-bold text-[#B8942F]">اعرف الاستثمار</span>
             </button>
           </div>
@@ -238,13 +238,13 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
                     <h4 className="font-bold text-[#B8942F] text-sm">{contract.contract_name}</h4>
 
                     <div className="flex items-center justify-center gap-1 text-xs text-gray-600">
-                      <Clock className="w-3 h-3" />
+                      <Clock className="w-2 h-2" />
                       <span>{contract.duration_years} سنوات</span>
                     </div>
 
                     {contract.bonus_years > 0 && (
                       <div className="flex items-center justify-center gap-1 text-xs text-green-600 bg-green-50 rounded-lg py-1 px-2">
-                        <Gift className="w-3 h-3" />
+                        <Gift className="w-2 h-2" />
                         <span>+{contract.bonus_years} مجاني</span>
                       </div>
                     )}
@@ -423,7 +423,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
             <div className="p-6 space-y-4">
               <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
                 <h4 className="font-bold text-[#B8942F] mb-2 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-[#D4AF37]" />
+                  <TrendingUp className="w-3 h-3 text-[#D4AF37]" />
                   ما هو الاستثمار الزراعي؟
                 </h4>
                 <p className="text-sm text-gray-700 leading-relaxed">
