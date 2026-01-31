@@ -1,4 +1,4 @@
-import { Sprout, ArrowLeft, UserPlus, TrendingUp, Shield } from 'lucide-react';
+import { Sprout, ArrowLeft, UserPlus, TrendingUp, Shield, X } from 'lucide-react';
 
 interface WelcomeToAccountScreenProps {
   onStartNow: () => void;
@@ -10,7 +10,14 @@ export default function WelcomeToAccountScreen({ onStartNow, onClose }: WelcomeT
     <div className="fixed inset-0 z-50 overflow-y-auto" style={{ background: 'linear-gradient(135deg, #f8f9fa 0%, #e9f5f0 100%)' }}>
       <div className="min-h-screen p-4 flex items-center justify-center">
         <div className="max-w-lg w-full space-y-6">
-          <div className="bg-white rounded-3xl p-8 shadow-2xl border-3" style={{ borderColor: '#3AA17E' }}>
+          <div className="bg-white rounded-3xl p-8 shadow-2xl border-3 relative" style={{ borderColor: '#3AA17E' }}>
+            <button
+              onClick={onClose}
+              className="absolute top-4 left-4 w-10 h-10 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-all active:scale-95 z-10"
+              aria-label="إغلاق"
+            >
+              <X className="w-5 h-5 text-gray-600" />
+            </button>
             <div className="text-center space-y-6">
               <div className="flex justify-center">
                 <div
@@ -97,10 +104,11 @@ export default function WelcomeToAccountScreen({ onStartNow, onClose }: WelcomeT
 
               <button
                 onClick={onClose}
-                className="w-full py-3 rounded-2xl font-bold text-base transition-all active:scale-95"
+                className="w-full py-3 rounded-2xl font-bold text-base transition-all active:scale-95 hover:bg-gray-200"
                 style={{
                   color: '#666',
-                  background: '#f5f5f5'
+                  background: '#f5f5f5',
+                  border: '2px solid #e0e0e0'
                 }}
               >
                 إغلاق
