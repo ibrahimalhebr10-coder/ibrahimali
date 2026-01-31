@@ -3,7 +3,7 @@ import { X, Video, HelpCircle, MapPin, Minus, Plus, Sprout, Clock, Gift, Shoppin
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import type { FarmProject, FarmContract } from '../services/farmService';
-import InvestmentReviewScreen from './InvestmentReviewScreen';
+import AgriculturalReviewScreen from './AgriculturalReviewScreen';
 import PaymentMethodSelector from './PaymentMethodSelector';
 import PrePaymentRegistration from './PrePaymentRegistration';
 import PaymentSuccessScreen from './PaymentSuccessScreen';
@@ -474,7 +474,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
       {/* Review Screen */}
       {showReviewScreen && selectedContract && (
-        <InvestmentReviewScreen
+        <AgriculturalReviewScreen
           farmName={farm.name}
           farmLocation={farm.location}
           contractName={selectedContract.contract_name}
