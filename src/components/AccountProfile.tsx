@@ -24,7 +24,14 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenRese
 
   useEffect(() => {
     if (isOpen && user) {
+      setLoading(true);
       loadInvestorData();
+    } else if (isOpen && !user) {
+      setLoading(false);
+    } else if (!isOpen) {
+      setLoading(true);
+      setStats(null);
+      setInvestments([]);
     }
   }, [isOpen, user]);
 

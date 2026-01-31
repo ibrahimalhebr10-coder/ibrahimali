@@ -77,8 +77,12 @@ export default function StandaloneAccountRegistration({ onSuccess, onBack }: Sta
       }
 
       if (signUpData?.user) {
-        await signIn(email, formData.password);
-        onSuccess();
+        const { error: signInError } = await signIn(email, formData.password);
+        if (!signInError) {
+          onSuccess();
+        } else {
+          setError('حدث خطأ أثناء تسجيل الدخول التلقائي');
+        }
       }
     } catch (err) {
       console.error('Registration error:', err);
@@ -98,9 +102,9 @@ export default function StandaloneAccountRegistration({ onSuccess, onBack }: Sta
 
     try {
       const email = `${formData.phoneNumber}@investor.harvest.local`;
-      const success = await signIn(email, formData.password);
+      const { error: signInError } = await signIn(email, formData.password);
 
-      if (success) {
+      if (!signInError) {
         onSuccess();
       } else {
         setError('رقم الجوال أو كلمة المرور غير صحيحة');
@@ -114,11 +118,11 @@ export default function StandaloneAccountRegistration({ onSuccess, onBack }: Sta
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-gradient-to-br from-green-50 via-white to-green-50 z-50 overflow-y-auto flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <button
           onClick={onBack}
-          className="mb-6 text-green-700 hover:text-green-800 font-medium flex items-center gap-2"
+          className="mb-6 text-green-700 hover:text-green-800 font-medium flex items-center gap-2 transition-colors"
         >
           ← العودة للرئيسية
         </button>
