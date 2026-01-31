@@ -404,7 +404,7 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
   );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center" dir="rtl">
+    <div className="fixed inset-0 z-[100] flex items-end justify-center pb-16 lg:pb-20" dir="rtl">
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"
         onClick={handleClose}
@@ -414,7 +414,7 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
         className="relative w-full max-w-md bg-white rounded-t-3xl overflow-hidden animate-slide-up"
         style={{
           boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.15)',
-          maxHeight: '85vh'
+          maxHeight: '70vh'
         }}
       >
         <div className="flex justify-center pt-3 pb-2">
@@ -449,7 +449,7 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
           </button>
         </div>
 
-        <div className="p-5 overflow-y-auto" style={{ maxHeight: 'calc(85vh - 100px)' }}>
+        <div className="p-5 overflow-y-auto" style={{ maxHeight: 'calc(70vh - 100px)' }}>
           {messages.length > 0 ? renderConversation() : showCustomInput ? renderCustomInput() : renderWelcomeScreen()}
         </div>
 
