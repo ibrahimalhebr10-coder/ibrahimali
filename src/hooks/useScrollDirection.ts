@@ -1,25 +1,33 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, RefObject } from 'react';
 
 export type ScrollDirection = 'up' | 'down' | 'none';
 
 interface UseScrollDirectionOptions {
   threshold?: number;
   debounceMs?: number;
+  scrollableRef?: RefObject<HTMLElement>;
 }
 
 export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
-  const { threshold = 10, debounceMs = 50 } = options;
+  const { threshold = 10, debounceMs = 50, scrollableRef } = options;
   const [scrollDirection, setScrollDirection] = useState<ScrollDirection>('none');
   const [lastScrollY, setLastScrollY] = useState(0);
   const [showHeaderFooter, setShowHeaderFooter] = useState(true);
 
+  const getScrollY = useCallback(() => {
+    if (scrollableRef?.current) {
+      return scrollableRef.current.scrollTop;
+    }
+    return window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+  }, [scrollableRef]);
+
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
-    let lastY = window.scrollY;
+    let lastY = getScrollY();
     setLastScrollY(lastY);
 
     const updateScrollDirection = () => {
-      const currentScrollY = window.scrollY;
+      const currentScrollY = getScrollY();
       const difference = currentScrollY - lastY;
 
       if (Math.abs(difference) < threshold) {
@@ -49,13 +57,15 @@ export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
       timeoutId = setTimeout(updateScrollDirection, debounceMs);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    const scrollElement = scrollableRef?.current || window;
+
+    scrollElement.addEventListener('scroll', handleScroll, { passive: true } as any);
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      scrollElement.removeEventListener('scroll', handleScroll);
       clearTimeout(timeoutId);
     };
-  }, [threshold, debounceMs]);
+  }, [threshold, debounceMs, scrollableRef, getScrollY]);
 
   return { scrollDirection, showHeaderFooter, lastScrollY };
 }

@@ -1,5 +1,5 @@
 import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock, Layers } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
 import SmartAssistant from './components/SmartAssistant';
@@ -20,7 +20,12 @@ import { useScrollDirection } from './hooks/useScrollDirection';
 
 function App() {
   const { user } = useAuth();
-  const { showHeaderFooter } = useScrollDirection({ threshold: 10, debounceMs: 50 });
+  const scrollableRef = useRef<HTMLDivElement>(null);
+  const { showHeaderFooter } = useScrollDirection({
+    threshold: 10,
+    debounceMs: 50,
+    scrollableRef
+  });
   const [appMode, setAppMode] = useState<AppMode>(() => {
     const savedMode = localStorage.getItem('appMode');
     return (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
@@ -499,7 +504,7 @@ function App() {
                 </section>
               </div>
 
-              <div className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{ paddingBottom: '9rem' }}>
+              <div ref={scrollableRef} className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{ paddingBottom: '9rem' }}>
                 <div className="max-w-7xl mx-auto">
                   <section className="px-3 lg:px-4 pt-16 pb-4 lg:pt-20 lg:pb-6">
           {loading ? (
