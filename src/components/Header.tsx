@@ -1,40 +1,11 @@
-import { Sprout, ArrowRight, Crown, ShieldCheck } from 'lucide-react';
-import { useState, useEffect } from 'react';
-import { useAdmin } from '../contexts/AdminContext';
+import { Sprout, ArrowRight } from 'lucide-react';
 
 interface HeaderProps {
   onBack?: () => void;
   showBackButton?: boolean;
-  onAdminAccess?: () => void;
-  onOpenAdminDashboard?: () => void;
 }
 
-export default function Header({ onBack, showBackButton = false, onAdminAccess, onOpenAdminDashboard }: HeaderProps) {
-  const { isAdminAuthenticated, admin } = useAdmin();
-  const [clickCount, setClickCount] = useState(0);
-  const [pulseLevel, setPulseLevel] = useState(0);
-
-  useEffect(() => {
-    if (clickCount > 0 && clickCount < 4) {
-      const timer = setTimeout(() => {
-        setClickCount(0);
-        setPulseLevel(0);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [clickCount]);
-
-  const handleCrownClick = () => {
-    const newCount = clickCount + 1;
-    setClickCount(newCount);
-    setPulseLevel(newCount);
-
-    if (newCount === 4) {
-      setClickCount(0);
-      setPulseLevel(0);
-      onAdminAccess?.();
-    }
-  };
+export default function Header({ onBack, showBackButton = false }: HeaderProps) {
   return (
     <header
       className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between z-50 backdrop-blur-lg flex-shrink-0 fixed top-0 left-0 right-0"
@@ -76,46 +47,6 @@ export default function Header({ onBack, showBackButton = false, onAdminAccess, 
       </button>
 
       <div className="flex-1" />
-
-      {/* Admin Dashboard Button - Only visible when admin is logged in */}
-      {isAdminAuthenticated && onOpenAdminDashboard && (
-        <button
-          onClick={onOpenAdminDashboard}
-          className="px-4 py-2 rounded-xl flex items-center gap-2 transition-all duration-300 mr-3 hover:scale-105 active:scale-95"
-          style={{
-            background: 'linear-gradient(145deg, #2F5233, #3D6B42)',
-            boxShadow: '0 4px 12px rgba(47, 82, 51, 0.4)',
-            border: '2px solid rgba(255, 215, 0, 0.3)'
-          }}
-        >
-          <ShieldCheck className="w-5 h-5 text-yellow-400" />
-          <span className="text-white font-bold text-sm hidden lg:block">لوحة التحكم</span>
-        </button>
-      )}
-
-      {/* Hidden Crown - Admin Access */}
-      {!isAdminAuthenticated && (
-        <button
-          onClick={handleCrownClick}
-          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 mr-3"
-          style={{
-            opacity: pulseLevel > 0 ? 0.3 + (pulseLevel * 0.2) : 0.15,
-            background: pulseLevel > 0
-              ? `rgba(255, 215, 0, ${0.1 + (pulseLevel * 0.1)})`
-              : 'transparent',
-            transform: pulseLevel > 0 ? 'scale(1.1)' : 'scale(1)',
-            animation: pulseLevel > 0 ? 'pulse 0.3s ease-in-out' : 'none'
-          }}
-        >
-          <Crown
-            className="w-4 h-4"
-            style={{
-              color: pulseLevel > 0 ? '#FFD700' : '#888',
-              filter: pulseLevel > 0 ? `drop-shadow(0 0 ${pulseLevel * 2}px rgba(255, 215, 0, 0.8))` : 'none'
-            }}
-          />
-        </button>
-      )}
 
       {/* Back Button - Left Side */}
       {showBackButton && (

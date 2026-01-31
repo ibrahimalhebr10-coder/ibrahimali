@@ -5,8 +5,6 @@ import HowToStart from './components/HowToStart';
 import SmartAssistant from './components/SmartAssistant';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
-import AdminDashboard from './components/admin/AdminDashboard';
-import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
 import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
 import Header from './components/Header';
@@ -15,12 +13,10 @@ import AppModeSelector, { type AppMode } from './components/AppModeSelector';
 import InvestmentFarmPage from './components/InvestmentFarmPage';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
-import { useAdmin } from './contexts/AdminContext';
 import { useAuth } from './contexts/AuthContext';
 import { initializeSupabase } from './lib/supabase';
 
 function App() {
-  const { isAdminAuthenticated, isLoading: isAdminLoading, checkAdminSession } = useAdmin();
   const { user } = useAuth();
   const [appMode, setAppMode] = useState<AppMode>(() => {
     const savedMode = localStorage.getItem('appMode');
@@ -40,8 +36,6 @@ function App() {
   const [showStandaloneRegistration, setShowStandaloneRegistration] = useState(false);
   const [showWelcomeToAccount, setShowWelcomeToAccount] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
-  const [showAdminLogin, setShowAdminLogin] = useState(false);
-  const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [selectedInvestmentFarm, setSelectedInvestmentFarm] = useState<FarmProject | null>(null);
 
   const handleAppModeChange = (mode: AppMode) => {
@@ -155,7 +149,7 @@ function App() {
     let mounted = true;
 
     async function loadUnreadCount() {
-      if (isAdminAuthenticated || !mounted) {
+      if (!mounted) {
         return;
       }
 
@@ -188,7 +182,7 @@ function App() {
         clearInterval(interval);
       }
     };
-  }, [isAdminAuthenticated]);
+  }, []);
 
   const iconMap: Record<string, any> = {
     leaf: Leaf,
@@ -326,26 +320,12 @@ function App() {
   };
 
   const handleUnreadCountChange = async () => {
-    if (isAdminAuthenticated) {
-      return;
-    }
-
     try {
       const count = await getUnreadCount();
       setUnreadMessagesCount(count);
     } catch (error) {
       console.error('Error updating unread count:', error);
     }
-  };
-
-  const handleAdminAccess = () => {
-    setShowAdminLogin(true);
-  };
-
-  const handleAdminLoginSuccess = async () => {
-    setShowAdminLogin(false);
-    await checkAdminSession();
-    setShowAdminDashboard(true);
   };
 
   const handleMyAccountClick = () => {
@@ -366,21 +346,10 @@ function App() {
     setShowAccountProfile(true);
   };
 
-  useEffect(() => {
-    if (isAdminAuthenticated && !isAdminLoading) {
-      setShowAdminDashboard(true);
-    } else {
-      setShowAdminDashboard(false);
-    }
-  }, [isAdminAuthenticated, isAdminLoading]);
-
   return (
     <ErrorBoundary>
       <div className="h-screen bg-pearl flex flex-col overflow-hidden">
-        <Header
-          onAdminAccess={handleAdminAccess}
-          onOpenAdminDashboard={() => setShowAdminDashboard(true)}
-        />
+        <Header />
 
         <div className="flex-1 overflow-y-auto pb-20 lg:pb-4 pt-14 lg:pt-16">
           <div className="max-w-7xl mx-auto">
@@ -971,17 +940,6 @@ function App() {
           setShowAccountProfile(false);
         }}
       />
-
-      {showAdminLogin && (
-        <SmartAdminLoginGate
-          onSuccess={handleAdminLoginSuccess}
-          onClose={() => setShowAdminLogin(false)}
-        />
-      )}
-
-      {showAdminDashboard && (
-        <AdminDashboard onClose={() => setShowAdminDashboard(false)} />
-      )}
 
       {selectedInvestmentFarm && appMode === 'investment' && (
         <InvestmentFarmPage
