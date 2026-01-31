@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Video, HelpCircle, MapPin, Minus, Plus, TrendingUp, Clock, Gift, DollarSign, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
 import type { FarmProject, FarmContract } from '../services/farmService';
 import InvestmentReviewScreen from './InvestmentReviewScreen';
 import PaymentMethodSelector from './PaymentMethodSelector';
@@ -14,6 +15,7 @@ interface InvestmentFarmPageProps {
 }
 
 export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: InvestmentFarmPageProps) {
+  const { user } = useAuth();
   const [selectedContract, setSelectedContract] = useState<FarmContract | null>(null);
   const [treeCount, setTreeCount] = useState(0);
   const [showVideoModal, setShowVideoModal] = useState(false);
@@ -59,7 +61,12 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
 
   const handleConfirmReview = () => {
     setShowReviewScreen(false);
-    setShowPrePaymentRegistration(true);
+
+    if (user) {
+      setShowPaymentSelector(true);
+    } else {
+      setShowPrePaymentRegistration(true);
+    }
   };
 
   const handleRegistrationSuccess = (userId: string, userName: string) => {
