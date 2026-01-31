@@ -362,7 +362,10 @@ function App() {
               <div className="sticky top-16 lg:top-20 z-20 backdrop-blur-2xl relative" style={{
                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 252, 250, 0.95) 50%, rgba(252, 254, 253, 0.95) 100%)',
                 boxShadow: '0 8px 32px rgba(58, 161, 126, 0.12), 0 2px 8px rgba(0, 0, 0, 0.05)',
-                borderBottom: '2px solid rgba(58, 161, 126, 0.2)'
+                borderBottom: '2px solid rgba(58, 161, 126, 0.2)',
+                transform: showHeaderFooter ? 'translateY(0)' : 'translateY(-100%)',
+                transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                willChange: 'transform'
               }}>
                 <div className="absolute inset-0 pointer-events-none" style={{
                   background: 'radial-gradient(ellipse at top, rgba(58, 161, 126, 0.05) 0%, transparent 70%)'
