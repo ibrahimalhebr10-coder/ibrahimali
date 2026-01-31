@@ -496,9 +496,9 @@ function App() {
                 </section>
               </div>
 
-              <div className="flex-1 overflow-y-auto" style={{ paddingBottom: '12rem' }}>
+              <div className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{ paddingBottom: '9rem' }}>
                 <div className="max-w-7xl mx-auto">
-                  <section className="px-2 lg:px-4 py-1.5 lg:py-2">
+                  <section className="px-3 lg:px-4 pt-3 pb-4 lg:py-3">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-3 animate-fadeIn">
               <div className="relative">
@@ -523,7 +523,7 @@ function App() {
               <p className="text-xs text-darkgreen/60">تحقق مرة أخرى قريباً</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 md:gap-4 lg:gap-5">
+            <div className="flex flex-col md:grid md:grid-cols-2 xl:grid-cols-3 gap-4 md:gap-4 lg:gap-5">
               {currentFarms.map((farm, idx) => {
                 const totalTrees = farm.availableTrees + farm.reservedTrees;
                 const reservationPercentage = (farm.reservedTrees / totalTrees) * 100;
@@ -534,31 +534,31 @@ function App() {
                     onClick={() => {
                       setSelectedInvestmentFarm(farm);
                     }}
-                    className="w-full rounded-2xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer transition-all duration-500 group animate-fadeIn"
+                    className="w-full rounded-2xl lg:rounded-3xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer transition-all duration-500 group animate-fadeIn"
                     style={{
                       background: activeColors.cardGradient,
-                      boxShadow: `0 10px 30px ${activeColors.shadow}, 0 6px 15px ${activeColors.shadow}, inset 0 2px 0 rgba(255,255,255,0.8), inset 0 -2px 0 rgba(0,0,0,0.05)`,
+                      boxShadow: `0 12px 35px ${activeColors.shadow}, 0 8px 20px ${activeColors.shadow}, inset 0 2px 0 rgba(255,255,255,0.8), inset 0 -2px 0 rgba(0,0,0,0.05)`,
                       border: `3px solid ${activeColors.border}`,
                       backdropFilter: 'blur(24px)',
                       WebkitBackdropFilter: 'blur(24px)',
                       animationDelay: `${idx * 100}ms`
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-8px) scale(1.03)';
+                      e.currentTarget.style.transform = 'translateY(-8px) scale(1.02)';
                       e.currentTarget.style.boxShadow = `0 20px 50px ${activeColors.shadow}, 0 12px 25px ${activeColors.shadow}`;
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                      e.currentTarget.style.boxShadow = `0 10px 30px ${activeColors.shadow}, 0 6px 15px ${activeColors.shadow}`;
+                      e.currentTarget.style.boxShadow = `0 12px 35px ${activeColors.shadow}, 0 8px 20px ${activeColors.shadow}`;
                     }}
                     onTouchStart={(e) => {
-                      e.currentTarget.style.transform = 'scale(0.98)';
+                      e.currentTarget.style.transform = 'scale(0.97)';
                     }}
                     onTouchEnd={(e) => {
                       e.currentTarget.style.transform = 'scale(1)';
                     }}
                   >
-                    <div className="relative w-full h-32 md:h-48 overflow-hidden">
+                    <div className="relative w-full h-44 md:h-48 lg:h-56 overflow-hidden">
                       <img
                         src={farm.image}
                         alt={farm.name}
@@ -570,35 +570,35 @@ function App() {
                           background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, transparent 100%)'
                         }}
                       />
-                      <div className="absolute top-2 md:top-4 right-2 md:right-4 bg-white/98 backdrop-blur-md rounded-xl px-2.5 md:px-4 py-1.5 md:py-2 shadow-xl md:shadow-2xl border-2 border-emerald-200">
-                        <span className="text-[10px] md:text-base font-black text-darkgreen">{farm.name}</span>
+                      <div className="absolute top-3 md:top-4 right-3 md:right-4 bg-white/98 backdrop-blur-md rounded-xl px-3 md:px-4 py-2 md:py-2 shadow-xl md:shadow-2xl border-2 border-emerald-200">
+                        <span className="text-xs md:text-base font-black text-darkgreen">{farm.name}</span>
                       </div>
-                      <div className="absolute top-2 md:top-4 left-2 md:left-4 bg-gradient-to-r from-green-100 to-emerald-100 backdrop-blur-md rounded-full px-2.5 md:px-4 py-1.5 md:py-2 flex items-center gap-1 md:gap-2 shadow-xl md:shadow-2xl border-2 border-green-300 animate-pulse">
-                        <TrendingUp className="w-3 md:w-5 h-3 md:h-5 text-green-700" strokeWidth={3} />
-                        <span className="text-[10px] md:text-base font-black text-green-800">{farm.returnRate}</span>
+                      <div className="absolute top-3 md:top-4 left-3 md:left-4 bg-gradient-to-r from-green-100 to-emerald-100 backdrop-blur-md rounded-full px-3 md:px-4 py-2 md:py-2 flex items-center gap-1.5 md:gap-2 shadow-xl md:shadow-2xl border-2 border-green-300 animate-pulse">
+                        <TrendingUp className="w-4 md:w-5 h-4 md:h-5 text-green-700" strokeWidth={3} />
+                        <span className="text-xs md:text-base font-black text-green-800">{farm.returnRate}</span>
                       </div>
                     </div>
-                    <div className="p-2.5 md:p-5 space-y-1.5 md:space-y-3">
-                      <div className="flex items-center justify-center gap-1.5 md:gap-2 py-1.5 md:py-2 px-2.5 md:px-4 rounded-xl bg-gradient-to-r from-amber-100 via-yellow-100 to-amber-100 border-2 border-amber-300 shadow-md">
-                        <Sparkles className="w-2.5 md:w-4 h-2.5 md:h-4 text-amber-600 animate-pulse" strokeWidth={3} fill="currentColor" />
-                        <span className="text-[9px] md:text-sm font-black text-amber-900">قريباً</span>
+                    <div className="p-3 md:p-5 space-y-2 md:space-y-3">
+                      <div className="flex items-center justify-center gap-1.5 md:gap-2 py-2 md:py-2 px-3 md:px-4 rounded-xl bg-gradient-to-r from-amber-100 via-yellow-100 to-amber-100 border-2 border-amber-300 shadow-md">
+                        <Sparkles className="w-3.5 md:w-4 h-3.5 md:h-4 text-amber-600 animate-pulse" strokeWidth={3} fill="currentColor" />
+                        <span className="text-xs md:text-sm font-black text-amber-900">قريباً</span>
                       </div>
 
-                      <div className="flex items-center justify-between gap-1.5 md:gap-2">
-                        <div className="flex items-center gap-1 md:gap-2 bg-green-100 rounded-lg px-2 md:px-3 py-1 md:py-2 border-2 border-green-300 shadow-md flex-1">
-                          <CheckCircle2 className="w-2.5 md:w-4 h-2.5 md:h-4 text-green-700" strokeWidth={3} />
-                          <span className="font-black text-green-800 text-[9px] md:text-base">{farm.availableTrees}</span>
-                          <span className="font-bold text-green-700 text-[7px] md:text-sm">متاح</span>
+                      <div className="flex items-center justify-between gap-2 md:gap-2">
+                        <div className="flex items-center gap-1.5 md:gap-2 bg-green-100 rounded-lg px-2.5 md:px-3 py-1.5 md:py-2 border-2 border-green-300 shadow-md flex-1">
+                          <CheckCircle2 className="w-3.5 md:w-4 h-3.5 md:h-4 text-green-700" strokeWidth={3} />
+                          <span className="font-black text-green-800 text-xs md:text-base">{farm.availableTrees}</span>
+                          <span className="font-bold text-green-700 text-[10px] md:text-sm">متاح</span>
                         </div>
-                        <div className="flex items-center gap-1 md:gap-2 bg-amber-100 rounded-lg px-2 md:px-3 py-1 md:py-2 border-2 border-amber-300 shadow-md flex-1">
-                          <Clock className="w-2.5 md:w-4 h-2.5 md:h-4 text-amber-700" strokeWidth={3} />
-                          <span className="font-black text-amber-800 text-[9px] md:text-base">{farm.reservedTrees}</span>
-                          <span className="font-bold text-amber-700 text-[7px] md:text-sm">محجوز</span>
+                        <div className="flex items-center gap-1.5 md:gap-2 bg-amber-100 rounded-lg px-2.5 md:px-3 py-1.5 md:py-2 border-2 border-amber-300 shadow-md flex-1">
+                          <Clock className="w-3.5 md:w-4 h-3.5 md:h-4 text-amber-700" strokeWidth={3} />
+                          <span className="font-black text-amber-800 text-xs md:text-base">{farm.reservedTrees}</span>
+                          <span className="font-bold text-amber-700 text-[10px] md:text-sm">محجوز</span>
                         </div>
                       </div>
 
-                      <div className="space-y-1 md:space-y-2">
-                        <div className="h-2 md:h-3 w-full bg-gray-300 rounded-full overflow-hidden shadow-inner border border-gray-400">
+                      <div className="space-y-1.5 md:space-y-2">
+                        <div className="h-2.5 md:h-3 w-full bg-gray-300 rounded-full overflow-hidden shadow-inner border border-gray-400">
                           <div
                             className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 transition-all duration-700 shadow-lg"
                             style={{
@@ -608,12 +608,12 @@ function App() {
                             }}
                           />
                         </div>
-                        <p className="text-[8px] md:text-sm font-black text-amber-800 text-center">
+                        <p className="text-[11px] md:text-sm font-black text-amber-800 text-center">
                           نسبة الحجز: {reservationPercentage.toFixed(0)}%
                         </p>
                       </div>
 
-                      <p className="text-[8px] md:text-sm leading-relaxed line-clamp-2 font-bold text-darkgreen/90 px-1 md:px-0">
+                      <p className="text-[11px] md:text-sm leading-relaxed line-clamp-2 font-bold text-darkgreen/90">
                         {farm.description}
                       </p>
                     </div>
