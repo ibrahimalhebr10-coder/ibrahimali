@@ -1,9 +1,15 @@
-import { X, User, TreePine, TrendingUp, CheckCircle, FileText, DollarSign, MessageCircle, Bell, LogOut, Sparkles, ArrowLeft, Flame, Leaf, Droplets, Recycle } from 'lucide-react';
+import { X, User, TreePine, TrendingUp, CheckCircle, FileText, DollarSign, MessageCircle, Bell, LogOut, Sparkles, ArrowLeft, Flame, Leaf, Droplets, Recycle, BarChart3, Trophy, Camera, Calendar as CalendarIcon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import WhatsAppButton from './WhatsAppButton';
 import InvestmentContract from './InvestmentContract';
 import InvestorVirtualFarm from './InvestorVirtualFarm';
+import InvestmentAnalyticsDashboard from './InvestmentAnalyticsDashboard';
+import InvestmentJourneyTimeline from './InvestmentJourneyTimeline';
+import AchievementsRewards from './AchievementsRewards';
+import SmartPhotoGallery from './SmartPhotoGallery';
+import LoyaltyPointsRewards from './LoyaltyPointsRewards';
+import InteractiveFarmCalendar from './InteractiveFarmCalendar';
 import { investorAccountService, type InvestorStats, type InvestorInvestment } from '../services/investorAccountService';
 
 interface AccountProfileProps {
@@ -14,6 +20,8 @@ interface AccountProfileProps {
   onStartInvestment?: () => void;
 }
 
+type ActiveTab = 'overview' | 'analytics' | 'journey' | 'achievements' | 'gallery' | 'loyalty' | 'calendar';
+
 export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenReservations, onStartInvestment }: AccountProfileProps) {
   const { user, signOut, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
@@ -21,6 +29,7 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenRese
   const [investments, setInvestments] = useState<InvestorInvestment[]>([]);
   const [showCertificate, setShowCertificate] = useState(false);
   const [selectedInvestmentId, setSelectedInvestmentId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<ActiveTab>('overview');
 
   useEffect(() => {
     if (isOpen && user) {
@@ -190,14 +199,104 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenRese
                 )}
               </div>
 
-              {/* Investor Virtual Farm */}
-              {investments.length > 0 && (
-                <InvestorVirtualFarm
-                  investorName={user.user_metadata?.full_name || user.email?.split('@')[0] || 'مستثمر'}
-                  investments={investments}
-                  onViewContract={handleViewCertificate}
-                  onInvestMore={onClose}
-                />
+              {/* Navigation Tabs */}
+              {stats && stats.status !== 'none' && (
+                <div className="bg-white rounded-2xl p-2 shadow-lg sticky top-20 z-10">
+                  <div className="grid grid-cols-4 gap-2">
+                    <button
+                      onClick={() => setActiveTab('overview')}
+                      className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${
+                        activeTab === 'overview'
+                          ? 'bg-gradient-to-br from-green-600 to-emerald-600 text-white shadow-lg'
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <TreePine className="w-5 h-5" />
+                      <span className="text-xs font-bold">نظرة عامة</span>
+                    </button>
+
+                    <button
+                      onClick={() => setActiveTab('analytics')}
+                      className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${
+                        activeTab === 'analytics'
+                          ? 'bg-gradient-to-br from-blue-600 to-cyan-600 text-white shadow-lg'
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <BarChart3 className="w-5 h-5" />
+                      <span className="text-xs font-bold">التحليلات</span>
+                    </button>
+
+                    <button
+                      onClick={() => setActiveTab('achievements')}
+                      className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${
+                        activeTab === 'achievements'
+                          ? 'bg-gradient-to-br from-amber-600 to-orange-600 text-white shadow-lg'
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Trophy className="w-5 h-5" />
+                      <span className="text-xs font-bold">الإنجازات</span>
+                    </button>
+
+                    <button
+                      onClick={() => setActiveTab('gallery')}
+                      className={`flex flex-col items-center gap-1 p-3 rounded-xl transition-all ${
+                        activeTab === 'gallery'
+                          ? 'bg-gradient-to-br from-purple-600 to-pink-600 text-white shadow-lg'
+                          : 'text-gray-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      <Camera className="w-5 h-5" />
+                      <span className="text-xs font-bold">المعرض</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Tab Content */}
+              {stats && stats.status !== 'none' && (
+                <>
+                  {activeTab === 'overview' && (
+                    <>
+                      {/* Investor Virtual Farm */}
+                      {investments.length > 0 && (
+                        <InvestorVirtualFarm
+                          investorName={user.user_metadata?.full_name || user.email?.split('@')[0] || 'مستثمر'}
+                          investments={investments}
+                          onViewContract={handleViewCertificate}
+                          onInvestMore={onClose}
+                        />
+                      )}
+                    </>
+                  )}
+
+                  {activeTab === 'analytics' && (
+                    <InvestmentAnalyticsDashboard userId={user.id} />
+                  )}
+
+                  {activeTab === 'achievements' && (
+                    <>
+                      <AchievementsRewards
+                        totalTrees={stats.totalTrees}
+                        totalInvestment={stats.totalInvestmentValue}
+                        yearsActive={1}
+                      />
+                      <LoyaltyPointsRewards
+                        currentPoints={850}
+                        totalEarned={1200}
+                      />
+                    </>
+                  )}
+
+                  {activeTab === 'gallery' && (
+                    <>
+                      <SmartPhotoGallery farmName="مزرعة الخير" />
+                      <InteractiveFarmCalendar farmId="farm-1" />
+                      <InvestmentJourneyTimeline currentStage={3} />
+                    </>
+                  )}
+                </>
               )}
 
               {/* Additional Benefits Section */}
