@@ -1,4 +1,4 @@
-import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock } from 'lucide-react';
+import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock, Layers } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
@@ -23,7 +23,7 @@ function App() {
     const savedMode = localStorage.getItem('appMode');
     return (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
   });
-  const [activeCategory, setActiveCategory] = useState<string>('');
+  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
@@ -96,9 +96,8 @@ function App() {
         setCategories(cats);
 
         if (wasFirstLoad) {
-          const firstCategorySlug = cats[0].slug;
-          setActiveCategory(firstCategorySlug);
-          console.log('[App] Initial load: Setting active category to:', firstCategorySlug);
+          setActiveCategory('all');
+          console.log('[App] Initial load: Setting active category to: all');
           isFirstLoad = false;
         }
 
@@ -186,6 +185,7 @@ function App() {
   }, []);
 
   const iconMap: Record<string, any> = {
+    all: Layers,
     leaf: Leaf,
     wheat: Wheat,
     grape: Grape,
@@ -194,7 +194,8 @@ function App() {
     Leaf: Leaf,
     Wheat: Wheat,
     Grape: Grape,
-    Apple: Apple
+    Apple: Apple,
+    Layers: Layers
   };
 
   const colorScheme: Record<string, Record<AppMode, {
@@ -203,6 +204,20 @@ function App() {
     border: string;
     shadow: string;
   }>> = {
+    all: {
+      agricultural: {
+        iconGradient: 'linear-gradient(145deg, rgba(175, 245, 205, 0.95) 0%, rgba(195, 255, 220, 0.90) 50%, rgba(185, 250, 212, 0.95) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(185, 250, 212, 0.85) 0%, rgba(205, 255, 225, 0.80) 50%, rgba(195, 252, 218, 0.85) 100%)',
+        border: 'rgba(58, 161, 126, 0.75)',
+        shadow: 'rgba(58, 161, 126, 0.50)'
+      },
+      investment: {
+        iconGradient: 'linear-gradient(145deg, rgba(255, 238, 185, 0.95) 0%, rgba(255, 245, 210, 0.90) 50%, rgba(255, 242, 198, 0.95) 100%)',
+        cardGradient: 'linear-gradient(135deg, rgba(255, 242, 198, 0.85) 0%, rgba(255, 250, 225, 0.80) 50%, rgba(255, 246, 212, 0.85) 100%)',
+        border: 'rgba(212, 175, 55, 0.75)',
+        shadow: 'rgba(212, 175, 55, 0.50)'
+      }
+    },
     leaf: {
       agricultural: {
         iconGradient: 'linear-gradient(145deg, rgba(180, 240, 180, 0.95) 0%, rgba(200, 255, 200, 0.90) 50%, rgba(180, 240, 180, 0.95) 100%)',
@@ -285,8 +300,10 @@ function App() {
     setCurrentSlideIndex(0);
   };
 
-  const currentFarms = farmProjects[activeCategory] || [];
-  const activeIconName = categories.find(cat => cat.slug === activeCategory)?.icon || 'leaf';
+  const currentFarms = activeCategory === 'all'
+    ? Object.values(farmProjects).flat()
+    : farmProjects[activeCategory] || [];
+  const activeIconName = activeCategory === 'all' ? 'all' : categories.find(cat => cat.slug === activeCategory)?.icon || 'leaf';
   const activeColors = getColorForIcon(activeIconName, appMode);
 
   const handlePrevSlide = () => {
@@ -522,7 +539,7 @@ function App() {
             </div>
           ) : (
           <div className="flex gap-1.5 lg:gap-5 justify-between lg:max-w-4xl lg:mx-auto">
-            {categories.map((category, idx) => {
+            {[{ slug: 'all', name: 'الكل', icon: 'all' }, ...categories].map((category, idx) => {
               const Icon = iconMap[category.icon] || Leaf;
               const isActive = activeCategory === category.slug;
               const colors = getColorForIcon(category.icon, appMode);
