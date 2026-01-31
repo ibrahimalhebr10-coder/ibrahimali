@@ -22,8 +22,7 @@ function App() {
   const { user } = useAuth();
   const scrollableRef = useRef<HTMLDivElement>(null);
   const { showHeaderFooter } = useScrollDirection({
-    threshold: 10,
-    debounceMs: 50,
+    threshold: 5,
     scrollableRef
   });
   const [appMode, setAppMode] = useState<AppMode>(() => {
@@ -364,8 +363,10 @@ function App() {
                 boxShadow: '0 8px 32px rgba(58, 161, 126, 0.12), 0 2px 8px rgba(0, 0, 0, 0.05)',
                 borderBottom: '2px solid rgba(58, 161, 126, 0.2)',
                 transform: showHeaderFooter ? 'translateY(0)' : 'translateY(-100%)',
-                transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-                willChange: 'transform'
+                transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
+                willChange: 'transform',
+                WebkitTransform: showHeaderFooter ? 'translateY(0)' : 'translateY(-100%)',
+                WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
               }}>
                 <div className="absolute inset-0 pointer-events-none" style={{
                   background: 'radial-gradient(ellipse at top, rgba(58, 161, 126, 0.05) 0%, transparent 70%)'
@@ -507,11 +508,15 @@ function App() {
                 </section>
               </div>
 
-              <div ref={scrollableRef} className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{ paddingBottom: '9rem' }}>
+              <div ref={scrollableRef} className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{
+                paddingBottom: '9rem',
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehavior: 'contain'
+              }}>
                 <div className="max-w-7xl mx-auto">
                   <section className="px-3 lg:px-4 pb-4 lg:pb-6" style={{
-                    paddingTop: showHeaderFooter ? '4rem' : '1rem',
-                    transition: 'padding-top 0.4s cubic-bezier(0.4, 0, 0.2, 1)'
+                    paddingTop: showHeaderFooter ? '4rem' : '0.5rem',
+                    transition: 'padding-top 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
                   }}>
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-3 animate-fadeIn">
@@ -652,9 +657,12 @@ function App() {
             boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            bottom: showHeaderFooter ? '0' : '-100%',
-            transition: 'bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-            willChange: 'bottom'
+            bottom: 0,
+            transform: showHeaderFooter ? 'translateY(0)' : 'translateY(100%)',
+            transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
+            willChange: 'transform',
+            WebkitTransform: showHeaderFooter ? 'translateY(0)' : 'translateY(100%)',
+            WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
           }}
         >
         <div className="max-w-7xl mx-auto w-full px-8 py-5 pb-8 flex items-center justify-around">
@@ -745,7 +753,8 @@ function App() {
         <nav
           className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
         style={{
-          bottom: showHeaderFooter ? '0' : 'calc(-100% - 2rem)',
+          transform: showHeaderFooter ? 'translateY(0)' : 'translateY(100%)',
+          bottom: 0,
           background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.98) 0%, rgba(242, 247, 244, 0.95) 100%)',
           borderTop: '3px solid rgba(58,161,126,0.4)',
           boxShadow: '0 -12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.8)',
@@ -755,8 +764,10 @@ function App() {
           paddingBottom: '5.5rem',
           zIndex: 99999,
           position: 'fixed',
-          transition: 'bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          willChange: 'bottom'
+          transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
+          willChange: 'transform',
+          WebkitTransform: showHeaderFooter ? 'translateY(0)' : 'translateY(100%)',
+          WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
         }}
       >
         <div className="flex items-center justify-around px-3 relative" style={{ height: '4.5rem' }}>

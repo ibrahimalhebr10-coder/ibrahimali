@@ -17,8 +17,10 @@ export default function Header({ onBack, showBackButton = false, isVisible = tru
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
         transform: isVisible ? 'translateY(0)' : 'translateY(-100%)',
-        transition: 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-        willChange: 'transform'
+        transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
+        willChange: 'transform',
+        WebkitTransform: isVisible ? 'translateY(0)' : 'translateY(-100%)',
+        WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
       }}
     >
       <button
