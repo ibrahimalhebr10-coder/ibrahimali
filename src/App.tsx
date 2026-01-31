@@ -531,8 +531,8 @@ function App() {
           onModeChange={handleAppModeChange}
         />
 
-        <section className="px-3 lg:px-6 py-1 lg:py-4 flex-shrink-0">
-          <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-2 lg:mb-6 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
+        <section className="px-3 lg:px-6 py-0.5 lg:py-2 flex-shrink-0">
+          <h3 className="text-[11px] lg:text-3xl xl:text-4xl font-black mb-1 lg:mb-3 text-darkgreen text-center lg:text-right animate-slideInRight" style={{ letterSpacing: '-0.01em' }}>المزارع المتاحة</h3>
           {categories.length === 0 ? (
             <div className="text-center py-4 text-darkgreen/70 animate-pulse">
               <p className="text-sm">جاري تحميل الفئات...</p>
