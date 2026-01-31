@@ -826,7 +826,7 @@ function App() {
           />
 
           <button
-            onClick={() => setShowAccountProfile(true)}
+            onClick={handleMyAccountClick}
             className="flex flex-col items-center gap-2 px-6 py-2 rounded-xl transition-all hover:bg-darkgreen/5"
           >
             <User className="w-6 h-6 text-darkgreen" />
@@ -913,7 +913,7 @@ function App() {
           />
 
           <button
-            onClick={() => setShowAccountProfile(true)}
+            onClick={handleMyAccountClick}
             className="flex flex-col items-center justify-center gap-1 relative group"
           >
             <div
