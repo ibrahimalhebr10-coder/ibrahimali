@@ -63,12 +63,6 @@ export default function InvestmentContract({
 
       if (error) throw error;
 
-      const { data: userData } = await supabase
-        .from('users')
-        .select('full_name, email')
-        .eq('id', reservation.user_id)
-        .single();
-
       const totalYears = reservation.duration_years + (reservation.bonus_years || 0);
       const startDate = new Date(reservation.created_at);
       const endDate = new Date(startDate);
@@ -83,7 +77,7 @@ export default function InvestmentContract({
       setContract({
         id: reservation.id,
         contractNumber: reservation.contract_name || reservation.id.slice(0, 8).toUpperCase(),
-        investorName: investorName || userData?.full_name || userData?.email?.split('@')[0] || 'المستثمر',
+        investorName: investorName || 'المستثمر',
         farmName: reservation.farms?.name_ar || 'المزرعة',
         farmLocation: reservation.farms?.location || 'المملكة العربية السعودية',
         treeTypes: treeTypesText,
