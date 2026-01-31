@@ -8,6 +8,7 @@ import AccountProfile from './components/AccountProfile';
 import AdminDashboard from './components/admin/AdminDashboard';
 import SmartAdminLoginGate from './components/admin/SmartAdminLoginGate';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
+import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
@@ -37,6 +38,7 @@ function App() {
   const [showAssistant, setShowAssistant] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showStandaloneRegistration, setShowStandaloneRegistration] = useState(false);
+  const [showWelcomeToAccount, setShowWelcomeToAccount] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
@@ -350,8 +352,13 @@ function App() {
     if (user) {
       setShowAccountProfile(true);
     } else {
-      setShowStandaloneRegistration(true);
+      setShowWelcomeToAccount(true);
     }
+  };
+
+  const handleWelcomeStartNow = () => {
+    setShowWelcomeToAccount(false);
+    setShowStandaloneRegistration(true);
   };
 
   const handleRegistrationSuccess = () => {
@@ -373,7 +380,6 @@ function App() {
         <Header
           onAdminAccess={handleAdminAccess}
           onOpenAdminDashboard={() => setShowAdminDashboard(true)}
-          onMyAccountClick={handleMyAccountClick}
         />
 
         <div className="flex-1 overflow-y-auto pb-20 lg:pb-4 pt-14 lg:pt-16">
@@ -941,6 +947,13 @@ function App() {
         isOpen={showAssistant}
         onClose={() => setShowAssistant(false)}
       />
+
+      {showWelcomeToAccount && (
+        <WelcomeToAccountScreen
+          onStartNow={handleWelcomeStartNow}
+          onClose={() => setShowWelcomeToAccount(false)}
+        />
+      )}
 
       {showStandaloneRegistration && (
         <StandaloneAccountRegistration
