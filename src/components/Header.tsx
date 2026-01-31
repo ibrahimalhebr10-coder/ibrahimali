@@ -3,18 +3,22 @@ import { Sprout, ArrowRight } from 'lucide-react';
 interface HeaderProps {
   onBack?: () => void;
   showBackButton?: boolean;
+  isVisible?: boolean;
 }
 
-export default function Header({ onBack, showBackButton = false }: HeaderProps) {
+export default function Header({ onBack, showBackButton = false, isVisible = true }: HeaderProps) {
   return (
     <header
-      className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between z-50 backdrop-blur-2xl flex-shrink-0 fixed top-0 left-0 right-0 animate-slideInRight"
+      className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between z-50 backdrop-blur-2xl flex-shrink-0 fixed left-0 right-0"
       style={{
         background: 'linear-gradient(135deg, rgba(248, 250, 249, 0.95) 0%, rgba(242, 247, 244, 0.92) 100%)',
         borderBottom: '3px solid rgba(58,161,126,0.4)',
         boxShadow: '0 6px 24px rgba(0, 0, 0, 0.1), inset 0 -1px 0 rgba(255,255,255,0.8)',
         backdropFilter: 'blur(24px)',
-        WebkitBackdropFilter: 'blur(24px)'
+        WebkitBackdropFilter: 'blur(24px)',
+        top: isVisible ? '0' : '-100%',
+        transition: 'top 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+        willChange: 'top'
       }}
     >
       <button

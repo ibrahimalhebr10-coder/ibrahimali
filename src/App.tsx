@@ -16,9 +16,11 @@ import { farmService, type FarmCategory, type FarmProject } from './services/far
 import { getUnreadCount } from './services/messagesService';
 import { useAuth } from './contexts/AuthContext';
 import { initializeSupabase } from './lib/supabase';
+import { useScrollDirection } from './hooks/useScrollDirection';
 
 function App() {
   const { user } = useAuth();
+  const { showHeaderFooter } = useScrollDirection({ threshold: 10, debounceMs: 50 });
   const [appMode, setAppMode] = useState<AppMode>(() => {
     const savedMode = localStorage.getItem('appMode');
     return (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
@@ -347,7 +349,7 @@ function App() {
           `
         }}></div>
 
-        {!selectedInvestmentFarm && <Header />}
+        {!selectedInvestmentFarm && <Header isVisible={showHeaderFooter} />}
 
         {!selectedInvestmentFarm && (
           <>
@@ -632,14 +634,16 @@ function App() {
 
       {!selectedInvestmentFarm && !showAssistant && (
         <nav
-          className="hidden lg:flex fixed bottom-0 left-0 right-0 z-50 backdrop-blur-2xl transition-all duration-500 ease-out"
+          className="hidden lg:flex fixed left-0 right-0 z-50 backdrop-blur-2xl"
           style={{
             background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.95) 0%, rgba(242, 247, 244, 0.92) 100%)',
             borderTop: '3px solid rgba(58,161,126,0.4)',
             boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
-            animation: 'slideUpFade 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+            bottom: showHeaderFooter ? '0' : '-100%',
+            transition: 'bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+            willChange: 'bottom'
           }}
         >
         <div className="max-w-7xl mx-auto w-full px-8 py-5 pb-8 flex items-center justify-around">
@@ -728,9 +732,9 @@ function App() {
 
       {!selectedInvestmentFarm && !showAssistant && (
         <nav
-          className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl transition-all duration-500 ease-out"
+          className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
         style={{
-          bottom: 0,
+          bottom: showHeaderFooter ? '0' : 'calc(-100% - 2rem)',
           background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.98) 0%, rgba(242, 247, 244, 0.95) 100%)',
           borderTop: '3px solid rgba(58,161,126,0.4)',
           boxShadow: '0 -12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.8)',
@@ -740,10 +744,8 @@ function App() {
           paddingBottom: '5.5rem',
           zIndex: 99999,
           position: 'fixed',
-          willChange: 'transform',
-          transform: 'translate3d(0, 0, 0)',
-          WebkitTransform: 'translate3d(0, 0, 0)',
-          animation: 'slideUpFade 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)'
+          transition: 'bottom 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+          willChange: 'bottom'
         }}
       >
         <div className="flex items-center justify-around px-3 relative" style={{ height: '4.5rem' }}>
