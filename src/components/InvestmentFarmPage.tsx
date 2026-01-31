@@ -218,8 +218,8 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           </div>
         </div>
 
-        {/* Investment Packages Slider */}
-        <div className="px-4 py-3">
+        {/* Investment Packages Slider - Fixed Position */}
+        <div className="sticky top-[73px] z-20 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 backdrop-blur-xl border-y border-amber-200/50 shadow-lg px-4 py-3">
           <h3 className="text-base font-bold text-[#B8942F] mb-3">اختر باقة الاستثمار</h3>
           <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
             {farm.contracts?.map((contract) => {
