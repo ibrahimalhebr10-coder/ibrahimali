@@ -108,9 +108,9 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           total_price: totalPrice,
           status: 'pending',
           payment_method: method
-        })
+        } as any)
         .select()
-        .single();
+        .single() as any;
 
       if (reservationError) {
         console.error('Reservation error:', reservationError);

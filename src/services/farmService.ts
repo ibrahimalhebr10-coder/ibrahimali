@@ -23,6 +23,7 @@ export interface FarmContract {
   contract_name: string
   duration_years: number
   investor_price: number
+  farmer_price?: number
   bonus_years: number
   has_bonus_years?: boolean
   is_active: boolean
