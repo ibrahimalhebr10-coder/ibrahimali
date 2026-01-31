@@ -406,18 +406,19 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
   return (
     <>
       <div
-        className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-40 transition-opacity duration-300"
+        className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm transition-opacity duration-300"
+        style={{ animation: 'fadeIn 0.3s ease-out', zIndex: 60 }}
         onClick={handleClose}
-        style={{ animation: 'fadeIn 0.3s ease-out' }}
       />
 
       <div
-        className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 overflow-hidden rounded-t-3xl flex flex-col"
+        className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl overflow-hidden rounded-t-3xl flex flex-col"
         dir="rtl"
         style={{
           animation: 'slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
           maxHeight: 'calc(100vh - 80px)',
-          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)'
+          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)',
+          zIndex: 70
         }}
       >
         <div className="flex justify-center pt-3 pb-2 bg-white rounded-t-3xl flex-shrink-0">
