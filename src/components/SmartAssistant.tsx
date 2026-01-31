@@ -404,85 +404,75 @@ export default function SmartAssistant({ isOpen, onClose }: SmartAssistantProps)
   );
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center pb-24 lg:pb-32" dir="rtl">
+    <>
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm animate-fade-in"
+        className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm z-40 transition-opacity duration-300"
         onClick={handleClose}
+        style={{ animation: 'fadeIn 0.3s ease-out' }}
       />
 
       <div
-        className="relative w-full max-w-md bg-white rounded-t-3xl overflow-hidden animate-slide-up"
+        className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl z-50 overflow-hidden rounded-t-3xl flex flex-col"
+        dir="rtl"
         style={{
-          boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.15)',
-          maxHeight: '70vh'
+          animation: 'slideUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+          maxHeight: 'calc(100vh - 80px)',
+          paddingBottom: 'max(env(safe-area-inset-bottom), 16px)'
         }}
       >
-        <div className="flex justify-center pt-3 pb-2">
-          <button
-            onClick={handleClose}
-            className="w-12 h-1.5 rounded-full bg-gray-300 hover:bg-gray-400 transition-colors"
-          />
-        </div>
-
-        <div className="flex items-center justify-between px-5 pb-3 border-b border-gray-100">
-          <div className="flex items-center gap-2.5">
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center relative"
-              style={{
-                background: 'linear-gradient(135deg, #2F5233 0%, #3D6B42 100%)'
-              }}
-            >
-              <Sparkles className="w-4.5 h-4.5 text-white" />
-              <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-400 border-2 border-white" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-gray-800">المساعد الذكي</h3>
-              <p className="text-[10px] text-gray-400">مدعوم بالذكاء الصناعي</p>
-            </div>
-          </div>
-
-          <button
-            onClick={handleClose}
-            className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
-          >
-            <X className="w-4 h-4 text-gray-500" />
-          </button>
-        </div>
-
-        <div className="p-5 overflow-y-auto" style={{ maxHeight: 'calc(70vh - 100px)' }}>
-          {messages.length > 0 ? renderConversation() : showCustomInput ? renderCustomInput() : renderWelcomeScreen()}
+        <div className="flex justify-center pt-3 pb-2 bg-white rounded-t-3xl flex-shrink-0">
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
         <div
-          className="absolute bottom-0 left-0 right-0 h-8 pointer-events-none"
+          className="flex-shrink-0 px-6 py-5"
           style={{
-            background: 'linear-gradient(to top, white 0%, transparent 100%)'
+            background: 'linear-gradient(135deg, #2F5233 0%, #3D6B42 100%)',
+            boxShadow: '0 6px 20px rgba(47, 82, 51, 0.3)'
           }}
-        />
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center shadow-lg">
+                <Sparkles className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-white">المساعد الذكي</h2>
+                <p className="text-sm text-white/90 font-semibold mt-0.5">مدعوم بالذكاء الصناعي</p>
+              </div>
+            </div>
+
+            <button
+              onClick={handleClose}
+              className="w-11 h-11 rounded-xl bg-white/15 hover:bg-white/25 flex items-center justify-center transition-all duration-200 backdrop-blur-sm active:scale-95"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+          </div>
+        </div>
+
+        <div className="overflow-y-auto flex-1 px-4 py-4">
+          {messages.length > 0 ? renderConversation() : showCustomInput ? renderCustomInput() : renderWelcomeScreen()}
+        </div>
       </div>
 
       <style>{`
-        @keyframes fade-in {
+        @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
         }
-        @keyframes slide-up {
+
+        @keyframes slideUp {
           from {
-            opacity: 0;
             transform: translateY(100%);
+            opacity: 0;
           }
           to {
-            opacity: 1;
             transform: translateY(0);
+            opacity: 1;
           }
         }
-        .animate-fade-in {
-          animation: fade-in 0.2s ease-out;
-        }
-        .animate-slide-up {
-          animation: slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-        }
       `}</style>
-    </div>
+    </>
   );
 }
