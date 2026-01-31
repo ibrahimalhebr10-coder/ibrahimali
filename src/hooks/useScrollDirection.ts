@@ -30,6 +30,7 @@ export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
     let lastY = getScrollY();
     setLastScrollY(lastY);
     let ticking = false;
+    let rafId: number | null = null;
 
     const updateScrollDirection = () => {
       const currentScrollY = getScrollY();
@@ -37,6 +38,7 @@ export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
 
       if (Math.abs(difference) < threshold) {
         ticking = false;
+        rafId = null;
         return;
       }
 
@@ -54,12 +56,16 @@ export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
       lastY = currentScrollY;
       setLastScrollY(currentScrollY);
       ticking = false;
+      rafId = null;
     };
 
     const handleScroll = () => {
       if (!ticking) {
-        requestAnimationFrame(updateScrollDirection);
         ticking = true;
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+        }
+        rafId = requestAnimationFrame(updateScrollDirection);
       }
     };
 
@@ -67,6 +73,9 @@ export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
 
     return () => {
       scrollElement.removeEventListener('scroll', handleScroll);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+      }
     };
   }, [threshold, scrollableRef?.current, getScrollY]);
 

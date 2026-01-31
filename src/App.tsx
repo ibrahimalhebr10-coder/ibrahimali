@@ -58,12 +58,7 @@ function App() {
       const wasFirstLoad = isFirstLoad;
 
       if (!isRetry && wasFirstLoad) {
-        console.log('[App] Initial load: Starting to load farm data...')
         setLoading(true);
-      } else if (isRetry) {
-        console.log(`[App] Retrying to load farm data... (Attempt ${retryCount + 1}/${MAX_RETRIES})`)
-      } else {
-        console.log('[App] Background refresh: Updating farm data...')
       }
 
       try {
@@ -72,15 +67,11 @@ function App() {
           farmService.getAllDisplayProjects()
         ]);
 
-        console.log('[App] Loaded categories:', cats?.length || 0)
-        console.log('[App] Loaded projects:', Object.keys(allProjects).length)
-
         if (!cats || cats.length === 0) {
           console.warn('[App] No categories found');
           if (retryCount < MAX_RETRIES) {
             retryCount++;
             const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000);
-            console.log(`[App] Retrying in ${retryDelay}ms...`);
             setTimeout(() => loadData(true), retryDelay);
             return;
           }
@@ -100,20 +91,16 @@ function App() {
 
         if (wasFirstLoad) {
           setActiveCategory('all');
-          console.log('[App] Initial load: Setting active category to: all');
           isFirstLoad = false;
         }
 
         setFarmProjects(allProjects);
-        console.log('[App] Farm data loaded successfully')
-        console.log('[App] Available farm categories:', Object.keys(allProjects))
       } catch (error) {
         console.error('[App] Error loading farm data:', error);
 
         if (retryCount < MAX_RETRIES) {
           retryCount++;
           const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000);
-          console.log(`[App] Retrying in ${retryDelay}ms...`);
           setTimeout(() => loadData(true), retryDelay);
           return;
         }
@@ -128,7 +115,6 @@ function App() {
       } finally {
         if (wasFirstLoad || !isRetry) {
           setLoading(false);
-          console.log('[App] Loading state set to false')
         }
       }
     }
@@ -136,7 +122,6 @@ function App() {
     loadData();
 
     refreshInterval = setInterval(() => {
-      console.log('[App] Auto-refreshing farm data...');
       loadData(false);
     }, 120000);
 
@@ -508,11 +493,17 @@ function App() {
                 </section>
               </div>
 
-              <div ref={scrollableRef} className="flex-1 overflow-y-auto overflow-x-hidden scroll-smooth" style={{
-                paddingBottom: '9rem',
-                WebkitOverflowScrolling: 'touch',
-                overscrollBehavior: 'contain'
-              }}>
+              <div
+                ref={scrollableRef}
+                className="flex-1 overflow-y-auto overflow-x-hidden"
+                style={{
+                  paddingBottom: '9rem',
+                  WebkitOverflowScrolling: 'touch',
+                  overscrollBehavior: 'contain',
+                  scrollBehavior: 'auto',
+                  touchAction: 'pan-y'
+                }}
+              >
                 <div className="max-w-7xl mx-auto">
                   <section className="px-3 lg:px-4 pb-4 lg:pb-6" style={{
                     paddingTop: showHeaderFooter ? '4rem' : '0.5rem',
