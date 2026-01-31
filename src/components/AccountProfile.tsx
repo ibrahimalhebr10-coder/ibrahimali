@@ -2,7 +2,7 @@ import { X, User, TreePine, TrendingUp, CheckCircle, FileText, DollarSign, Messa
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import WhatsAppButton from './WhatsAppButton';
-import TemporaryCertificate from './TemporaryCertificate';
+import InvestmentContract from './InvestmentContract';
 import { investorAccountService, type InvestorStats, type InvestorInvestment } from '../services/investorAccountService';
 
 interface AccountProfileProps {
@@ -59,8 +59,9 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenRese
 
   if (showCertificate && selectedInvestmentId) {
     return (
-      <TemporaryCertificate
+      <InvestmentContract
         reservationId={selectedInvestmentId}
+        investorName={user?.user_metadata?.full_name || user?.email?.split('@')[0]}
         onClose={() => {
           setShowCertificate(false);
           setSelectedInvestmentId(null);
@@ -219,24 +220,24 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onOpenRese
                 </div>
               )}
 
-              {/* Certificate Section */}
+              {/* Investment Contract Section */}
               {investments.length > 0 && (
-                <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-amber-300/50">
+                <div className="bg-white rounded-2xl p-6 shadow-xl border-2 border-[#D4AF37]/50">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg">
+                    <div className="w-12 h-12 bg-gradient-to-br from-[#D4AF37] to-[#B8942F] rounded-full flex items-center justify-center shadow-lg">
                       <FileText className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-amber-800">شهادة الاستثمار</h3>
+                    <h3 className="text-xl font-bold text-[#B8942F]">عقد الاستثمار الرسمي</h3>
                   </div>
                   <p className="text-gray-700 text-right mb-4 leading-relaxed">
-                    شهادتك الرسمية محفوظة ومتاحة للعرض والتحميل في أي وقت
+                    عقدك الرسمي محفوظ ومتاح للعرض والتحميل والطباعة في أي وقت
                   </p>
                   <button
                     onClick={() => handleViewCertificate(investments[0].id)}
-                    className="w-full py-4 bg-gradient-to-r from-amber-500 to-yellow-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+                    className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#B8942F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
                   >
                     <FileText className="w-5 h-5" />
-                    <span>عرض الشهادة</span>
+                    <span>عرض العقد الرسمي</span>
                   </button>
                 </div>
               )}

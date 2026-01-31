@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle2, Award, ArrowRight, X } from 'lucide-react';
-import TemporaryCertificate from './TemporaryCertificate';
+import { CheckCircle2, Award, ArrowRight, X, FileText } from 'lucide-react';
+import InvestmentContract from './InvestmentContract';
 import InvestorRegistrationForm from './InvestorRegistrationForm';
 import InvestorWelcomeScreen from './InvestorWelcomeScreen';
 import { supabase } from '../lib/supabase';
@@ -27,7 +27,6 @@ export default function BookingSuccessScreen({
   onRegistrationComplete,
   onClose
 }: BookingSuccessScreenProps) {
-  const [showCertificate, setShowCertificate] = useState(false);
   const [showRegistration, setShowRegistration] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [investorName, setInvestorName] = useState('');
@@ -52,40 +51,6 @@ export default function BookingSuccessScreen({
         investorName={investorName}
         onGoToAccount={handleGoToAccount}
       />
-    );
-  }
-
-  if (showCertificate && !showRegistration) {
-    return (
-      <div className="fixed inset-0 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 z-50 overflow-y-auto">
-        <div className="min-h-screen p-4 flex items-center justify-center">
-          <div className="max-w-2xl w-full space-y-4">
-            <button
-              onClick={() => setShowCertificate(false)}
-              className="mb-4 p-3 bg-white/80 rounded-xl shadow-lg hover:bg-white transition-colors flex items-center gap-2 font-bold text-[#B8942F]"
-            >
-              <ArrowRight className="w-5 h-5" />
-              <span>رجوع</span>
-            </button>
-
-            <TemporaryCertificate
-              farmName={reservation.farmName}
-              treeCount={reservation.treeCount}
-              durationYears={reservation.durationYears}
-              bonusYears={reservation.bonusYears}
-              reservationId={reservation.id}
-              createdAt={reservation.createdAt}
-            />
-
-            <div className="bg-white/80 rounded-xl p-4 shadow-lg">
-              <p className="text-sm text-center text-gray-700 leading-relaxed">
-                <span className="font-bold">ملاحظة:</span> هذه الشهادة للعرض فقط ولا يمكن تحميلها أو طباعتها حالياً.
-                سيتم إصدار شهادة رسمية بعد إتمام التسجيل والسداد.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
     );
   }
 
@@ -184,37 +149,34 @@ export default function BookingSuccessScreen({
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200 space-y-4">
+            <div className="bg-gradient-to-br from-[#D4AF37]/10 to-[#B8942F]/10 rounded-xl p-6 border-2 border-[#D4AF37] space-y-4">
               <div className="flex items-center gap-3 justify-center">
-                <Award className="w-8 h-8 text-[#D4AF37]" />
-                <h3 className="text-lg font-bold text-[#B8942F]">شهادة استثمار مؤقتة</h3>
+                <FileText className="w-8 h-8 text-[#D4AF37]" />
+                <h3 className="text-lg font-bold text-[#B8942F]">عقدك الرسمي</h3>
               </div>
 
               <p className="text-sm text-center text-gray-700 leading-relaxed">
-                يمكنك الآن عرض شهادتك المؤقتة داخل التطبيق
+                سيتم إصدار عقد الاستثمار الرسمي مباشرة بعد إتمام التسجيل والدفع
               </p>
 
-              <button
-                onClick={() => setShowCertificate(true)}
-                className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#B8942F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
-              >
-                <Award className="w-5 h-5" />
-                <span>عرض الشهادة</span>
-              </button>
-
-              <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                <p className="text-xs text-amber-800 text-center font-semibold">
-                  ⚠ عرض فقط داخل التطبيق • لا تحميل • لا طباعة
+              <div className="bg-white/80 rounded-lg p-4 border-2 border-[#D4AF37]/30">
+                <p className="text-xs text-[#B8942F] text-center font-semibold leading-relaxed">
+                  عقد رسمي • قابل للطباعة • قابل للتحميل PDF
+                  <br />
+                  سيكون متاح في حسابك فوراً بعد الدفع
                 </p>
               </div>
             </div>
 
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200 space-y-4 text-center">
               <h3 className="text-lg font-bold text-green-800">
-                حتى تضم استثمارك إلى حسابك
+                الخطوة التالية
               </h3>
               <p className="text-base font-bold text-[#B8942F]">
-                أنشئ حساب المستثمر الآن
+                أنشئ حساب المستثمر وأكمل الدفع
+              </p>
+              <p className="text-sm text-gray-700">
+                بعد الدفع، سيصبح عقدك الرسمي جاهزاً للعرض والتحميل
               </p>
 
               <button
