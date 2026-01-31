@@ -16,15 +16,12 @@ import { farmService, type FarmCategory, type FarmProject } from './services/far
 import { getUnreadCount } from './services/messagesService';
 import { useAuth } from './contexts/AuthContext';
 import { initializeSupabase } from './lib/supabase';
-import { useScrollDirection } from './hooks/useScrollDirection';
 
 function App() {
   const { user } = useAuth();
-  const scrollableRef = useRef<HTMLDivElement>(null);
-  const { showHeaderFooter } = useScrollDirection({
-    threshold: 5,
-    scrollableRef
-  });
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isScrollingDown, setIsScrollingDown] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const [appMode, setAppMode] = useState<AppMode>(() => {
     const savedMode = localStorage.getItem('appMode');
     return (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
@@ -171,6 +168,34 @@ function App() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = scrollContainer.scrollTop;
+
+          if (currentScrollY > lastScrollY && currentScrollY > 80) {
+            setIsScrollingDown(true);
+          } else if (currentScrollY < lastScrollY) {
+            setIsScrollingDown(false);
+          }
+
+          setLastScrollY(currentScrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
+    return () => scrollContainer.removeEventListener('scroll', handleScroll);
+  }, [lastScrollY]);
 
   const iconMap: Record<string, any> = {
     all: Layers,
@@ -338,7 +363,7 @@ function App() {
           `
         }}></div>
 
-        {!selectedInvestmentFarm && <Header isVisible={showHeaderFooter} />}
+        {!selectedInvestmentFarm && <Header isVisible={!isScrollingDown} />}
 
         {!selectedInvestmentFarm && (
           <>
@@ -347,10 +372,10 @@ function App() {
                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 252, 250, 0.95) 50%, rgba(252, 254, 253, 0.95) 100%)',
                 boxShadow: '0 8px 32px rgba(58, 161, 126, 0.12), 0 2px 8px rgba(0, 0, 0, 0.05)',
                 borderBottom: '2px solid rgba(58, 161, 126, 0.2)',
-                transform: showHeaderFooter ? 'translateY(0)' : 'translateY(-100%)',
+                transform: !isScrollingDown ? 'translateY(0)' : 'translateY(-100%)',
                 transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
                 willChange: 'transform',
-                WebkitTransform: showHeaderFooter ? 'translateY(0)' : 'translateY(-100%)',
+                WebkitTransform: !isScrollingDown ? 'translateY(0)' : 'translateY(-100%)',
                 WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
               }}>
                 <div className="absolute inset-0 pointer-events-none" style={{
@@ -494,7 +519,7 @@ function App() {
               </div>
 
               <div
-                ref={scrollableRef}
+                ref={scrollContainerRef}
                 className="flex-1 overflow-y-auto overflow-x-hidden"
                 style={{
                   paddingBottom: '9rem',
@@ -506,7 +531,7 @@ function App() {
               >
                 <div className="max-w-7xl mx-auto">
                   <section className="px-3 lg:px-4 pb-4 lg:pb-6" style={{
-                    paddingTop: showHeaderFooter ? '4rem' : '0.5rem',
+                    paddingTop: !isScrollingDown ? '4rem' : '0.5rem',
                     transition: 'padding-top 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
                   }}>
           {loading ? (
@@ -649,10 +674,10 @@ function App() {
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             bottom: 0,
-            transform: showHeaderFooter ? 'translateY(0)' : 'translateY(100%)',
+            transform: !isScrollingDown ? 'translateY(0)' : 'translateY(100%)',
             transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
             willChange: 'transform',
-            WebkitTransform: showHeaderFooter ? 'translateY(0)' : 'translateY(100%)',
+            WebkitTransform: !isScrollingDown ? 'translateY(0)' : 'translateY(100%)',
             WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
           }}
         >
@@ -744,7 +769,7 @@ function App() {
         <nav
           className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
         style={{
-          transform: showHeaderFooter ? 'translateY(0)' : 'translateY(100%)',
+          transform: !isScrollingDown ? 'translateY(0)' : 'translateY(100%)',
           bottom: 0,
           background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.98) 0%, rgba(242, 247, 244, 0.95) 100%)',
           borderTop: '3px solid rgba(58,161,126,0.4)',
@@ -757,7 +782,7 @@ function App() {
           position: 'fixed',
           transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
           willChange: 'transform',
-          WebkitTransform: showHeaderFooter ? 'translateY(0)' : 'translateY(100%)',
+          WebkitTransform: !isScrollingDown ? 'translateY(0)' : 'translateY(100%)',
           WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
         }}
       >
