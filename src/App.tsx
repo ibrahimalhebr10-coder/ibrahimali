@@ -362,7 +362,7 @@ function App() {
         <div
           className="flex-1 overflow-y-auto lg:pb-4 pt-14 lg:pt-16"
           style={{
-            paddingBottom: 'max(8rem, calc(4.5rem + max(1rem, env(safe-area-inset-bottom)) + 2rem))'
+            paddingBottom: 'calc(6.5rem + env(safe-area-inset-bottom, 2rem))'
           }}
         >
           <div className="max-w-7xl mx-auto">
@@ -831,8 +831,8 @@ function App() {
           boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
-          minHeight: 'calc(4.5rem + max(1rem, env(safe-area-inset-bottom)))',
+          paddingTop: '0.75rem',
+          paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom, 2rem))',
           zIndex: 99999,
           position: 'fixed',
           willChange: 'transform',
@@ -840,7 +840,7 @@ function App() {
           WebkitTransform: 'translate3d(0, 0, 0)'
         }}
       >
-        <div className="h-[4.5rem] flex items-center justify-around px-3 relative">
+        <div className="h-[4.5rem] flex items-center justify-around px-3 relative" style={{ paddingBottom: '0.5rem' }}>
           <button className="flex flex-col items-center justify-center gap-1 relative group">
             <div
               className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300"
