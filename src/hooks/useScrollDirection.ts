@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, RefObject } from 'react';
+import { useState, useEffect, RefObject } from 'react';
 
 export type ScrollDirection = 'up' | 'down' | 'none';
 
@@ -8,79 +8,66 @@ interface UseScrollDirectionOptions {
 }
 
 export function useScrollDirection(options: UseScrollDirectionOptions = {}) {
-  const { threshold = 5, scrollableRef } = options;
+  const { threshold = 10, scrollableRef } = options;
   const [scrollDirection, setScrollDirection] = useState<ScrollDirection>('none');
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [showHeaderFooter, setShowHeaderFooter] = useState(true);
-
-  const getScrollY = useCallback(() => {
-    if (scrollableRef?.current) {
-      return scrollableRef.current.scrollTop;
-    }
-    return window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-  }, [scrollableRef]);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
-    const scrollElement = scrollableRef?.current || window;
+    const element = scrollableRef?.current;
 
-    if (!scrollElement) {
+    if (!element) {
+      console.log('[ScrollDirection] No scroll element found');
       return;
     }
 
-    let lastY = getScrollY();
-    setLastScrollY(lastY);
-    let timeoutId: NodeJS.Timeout | null = null;
+    console.log('[ScrollDirection] Element found:', {
+      scrollHeight: element.scrollHeight,
+      clientHeight: element.clientHeight,
+      scrollTop: element.scrollTop,
+      overflow: window.getComputedStyle(element).overflow,
+      overflowY: window.getComputedStyle(element).overflowY
+    });
 
-    const updateScrollDirection = () => {
-      const currentScrollY = getScrollY();
-      const difference = currentScrollY - lastY;
+    let lastY = element.scrollTop;
 
-      console.log('[ScrollDirection] Y:', currentScrollY, 'Diff:', difference, 'Threshold:', threshold);
+    const handleScroll = () => {
+      const currentY = element.scrollTop;
+      const diff = currentY - lastY;
 
-      if (Math.abs(difference) < threshold) {
+      console.log('[Scroll] Current:', currentY, 'Last:', lastY, 'Diff:', diff);
+
+      if (Math.abs(diff) < threshold) {
+        lastY = currentY;
         return;
       }
 
-      if (currentScrollY < 30) {
-        console.log('[ScrollDirection] At top - showing header/footer');
+      if (currentY < 50) {
+        console.log('[Scroll] Near top - SHOW');
         setScrollDirection('none');
         setShowHeaderFooter(true);
-      } else if (difference > 0) {
-        console.log('[ScrollDirection] Scrolling down - hiding header/footer');
+      } else if (diff > 0) {
+        console.log('[Scroll] Scrolling DOWN - HIDE');
         setScrollDirection('down');
         setShowHeaderFooter(false);
       } else {
-        console.log('[ScrollDirection] Scrolling up - showing header/footer');
+        console.log('[Scroll] Scrolling UP - SHOW');
         setScrollDirection('up');
         setShowHeaderFooter(true);
       }
 
-      lastY = currentScrollY;
-      setLastScrollY(currentScrollY);
+      lastY = currentY;
+      setLastScrollY(currentY);
     };
 
-    const handleScroll = () => {
-      console.log('[ScrollDirection] Scroll event triggered');
-
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId);
-      }
-
-      timeoutId = setTimeout(() => {
-        updateScrollDirection();
-        timeoutId = null;
-      }, 10);
-    };
-
-    scrollElement.addEventListener('scroll', handleScroll, { passive: true } as any);
+    element.addEventListener('scroll', handleScroll, { passive: true });
+    console.log('[ScrollDirection] Listener attached to element');
 
     return () => {
-      scrollElement.removeEventListener('scroll', handleScroll);
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId);
-      }
+      element.removeEventListener('scroll', handleScroll);
+      console.log('[ScrollDirection] Listener removed');
     };
-  }, [threshold, scrollableRef?.current, getScrollY]);
+  }, [threshold, scrollableRef]);
 
   return { scrollDirection, showHeaderFooter, lastScrollY };
 }
