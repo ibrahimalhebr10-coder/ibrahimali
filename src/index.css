@@ -77,8 +77,8 @@
       z-index: 99999 !important;
       -webkit-transform: translate3d(0, 0, 0) !important;
       transform: translate3d(0, 0, 0) !important;
-      min-height: calc(4.5rem + constant(safe-area-inset-bottom, 1rem)) !important;
-      min-height: calc(4.5rem + env(safe-area-inset-bottom, 1rem)) !important;
+      padding-bottom: calc(1.5rem + constant(safe-area-inset-bottom)) !important;
+      padding-bottom: calc(1.5rem + env(safe-area-inset-bottom)) !important;
     }
   }
 
