@@ -154,7 +154,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-amber-50/95 via-yellow-50/90 to-orange-50/95 z-50 overflow-y-auto">
-      <div className={`min-h-screen ${treeCount > 0 ? 'pb-48' : 'pb-32'}`}>
+      <div className={`min-h-screen ${treeCount > 0 ? 'pb-72' : 'pb-32'}`}>
         {/* Header with Back Button */}
         <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-lg border-b border-amber-200/50">
           <div className="flex items-center justify-between p-4">
@@ -323,17 +323,20 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
 
         {/* Investment Summary - Fixed Bottom */}
         {treeCount > 0 && selectedContract && (
-          <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-[#D4AF37]/30 shadow-2xl p-4 z-[100000]">
-            <div className="max-w-lg mx-auto space-y-3">
+          <div
+            className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-[#D4AF37]/30 shadow-2xl p-5 pb-safe z-[100000]"
+            style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
+          >
+            <div className="max-w-lg mx-auto space-y-4 py-2">
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-amber-50/50 rounded-lg p-2">
+                <div className="bg-amber-50/50 rounded-lg p-3">
                   <div className="text-gray-600 text-xs mb-1">عدد الأشجار</div>
-                  <div className="font-bold text-[#B8942F]">{treeCount} شجرة</div>
+                  <div className="font-bold text-[#B8942F] text-base">{treeCount} شجرة</div>
                 </div>
 
-                <div className="bg-amber-50/50 rounded-lg p-2">
+                <div className="bg-amber-50/50 rounded-lg p-3">
                   <div className="text-gray-600 text-xs mb-1">مدة الاستثمار</div>
-                  <div className="font-bold text-[#B8942F]">
+                  <div className="font-bold text-[#B8942F] text-base">
                     {selectedContract.duration_years} سنوات
                     {selectedContract.bonus_years > 0 && (
                       <span className="text-green-600 mr-1">+{selectedContract.bonus_years}</span>
@@ -342,7 +345,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
                 </div>
               </div>
 
-              <div className="text-center mb-2">
+              <div className="text-center py-2">
                 <p className="text-sm font-bold text-[#B8942F]">
                   أنت على بعد خطوة من امتلاك استثمارك الزراعي
                 </p>
@@ -351,7 +354,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
                 </p>
               </div>
 
-              <div className="flex items-center justify-between bg-gradient-to-r from-[#D4AF37]/20 to-[#B8942F]/10 rounded-xl p-4 border-2 border-[#D4AF37]/40">
+              <div className="flex items-center justify-between bg-gradient-to-r from-[#D4AF37]/20 to-[#B8942F]/10 rounded-xl p-4 border-2 border-[#D4AF37]/40 min-h-[80px]">
                 <div>
                   <div className="text-xs text-gray-600 mb-1">الإجمالي</div>
                   <div className="text-2xl font-bold text-[#D4AF37]">

@@ -237,7 +237,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         ref={scrollContainerRef}
         className="fixed inset-0 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 z-50 overflow-y-auto pt-[73px]"
       >
-        <div className={`min-h-screen ${treeCount > 0 ? 'pb-48' : 'pb-32'}`}>
+        <div className={`min-h-screen ${treeCount > 0 ? 'pb-72' : 'pb-32'}`}>
           {/* Hero Image 3D */}
         <div className="w-full h-48 bg-gradient-to-br from-green-100 to-emerald-100 relative overflow-hidden">
           {farm.heroImage || farm.image ? (
@@ -396,20 +396,21 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       {/* Purchase Summary - Fixed Bottom */}
       {treeCount > 0 && selectedContract && (
         <div
-          className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-4 z-[100000] transition-transform duration-300 ${
+          className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-5 pb-safe z-[100000] transition-transform duration-300 ${
             isScrollingDown ? 'translate-y-full' : 'translate-y-0'
           }`}
+          style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
         >
-            <div className="max-w-lg mx-auto space-y-3">
+            <div className="max-w-lg mx-auto space-y-4 py-2">
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-green-50/50 rounded-lg p-2">
+                <div className="bg-green-50/50 rounded-lg p-3">
                   <div className="text-gray-600 text-xs mb-1">عدد الأشجار</div>
-                  <div className="font-bold text-darkgreen">{treeCount} شجرة</div>
+                  <div className="font-bold text-darkgreen text-base">{treeCount} شجرة</div>
                 </div>
 
-                <div className="bg-green-50/50 rounded-lg p-2">
+                <div className="bg-green-50/50 rounded-lg p-3">
                   <div className="text-gray-600 text-xs mb-1">مدة العقد</div>
-                  <div className="font-bold text-darkgreen">
+                  <div className="font-bold text-darkgreen text-base">
                     {selectedContract.duration_years} سنوات
                     {selectedContract.bonus_years > 0 && (
                       <span className="text-green-600 mr-1">+{selectedContract.bonus_years}</span>
@@ -418,7 +419,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                 </div>
               </div>
 
-              <div className="text-center mb-2">
+              <div className="text-center py-2">
                 <p className="text-sm font-bold text-darkgreen">
                   أنت على بعد خطوة من امتلاك أشجارك الخاصة
                 </p>
@@ -427,7 +428,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                 </p>
               </div>
 
-              <div className="flex items-center justify-between bg-gradient-to-r from-green-100/60 to-emerald-100/50 rounded-xl p-4 border-2 border-darkgreen/40">
+              <div className="flex items-center justify-between bg-gradient-to-r from-green-100/60 to-emerald-100/50 rounded-xl p-4 border-2 border-darkgreen/40 min-h-[80px]">
                 <div>
                   <div className="text-xs text-gray-600 mb-1">الإجمالي</div>
                   <div className="text-2xl font-bold text-darkgreen">
