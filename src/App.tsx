@@ -171,8 +171,12 @@ function App() {
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) return;
+    if (!scrollContainer) {
+      console.log('❌ Scroll container not found');
+      return;
+    }
 
+    console.log('✅ Scroll container found, adding listener');
     let ticking = false;
 
     const handleScroll = () => {
@@ -180,9 +184,17 @@ function App() {
         window.requestAnimationFrame(() => {
           const currentScrollY = scrollContainer.scrollTop;
 
+          console.log('📜 Scroll:', {
+            current: currentScrollY,
+            last: lastScrollY,
+            isScrollingDown: currentScrollY > lastScrollY && currentScrollY > 80
+          });
+
           if (currentScrollY > lastScrollY && currentScrollY > 80) {
+            console.log('⬇️ Hiding header/footer');
             setIsScrollingDown(true);
           } else if (currentScrollY < lastScrollY) {
+            console.log('⬆️ Showing header/footer');
             setIsScrollingDown(false);
           }
 
