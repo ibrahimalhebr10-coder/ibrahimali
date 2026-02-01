@@ -46,7 +46,7 @@ export default function AgriculturalReviewScreen({
                 <TreePine className="w-9 h-9 text-white" />
               </div>
               <h1 className="text-2xl font-bold text-green-800">
-                ملخص امتلاك أشجارك
+                ملخص الانتفاع بالأشجار
               </h1>
               <p className="text-sm text-gray-600">
                 راجع تفاصيل أشجارك الزراعية قبل التأكيد
@@ -118,7 +118,7 @@ export default function AgriculturalReviewScreen({
                 </div>
                 <div className="flex items-center gap-2 text-sm text-amber-800">
                   <Calendar className="w-3.5 h-3.5 text-green-600" />
-                  <span>يمكنك حصاد محصولك بنفسك أو من خلال المزرعة</span>
+                  <span>يمكنك متابعة محصولك عن طريق تشغيل المنصة</span>
                 </div>
               </div>
             </div>
@@ -129,7 +129,7 @@ export default function AgriculturalReviewScreen({
                 <span className="font-bold">ملاحظة مهمة:</span>
               </div>
               <p className="text-sm text-green-700 leading-relaxed">
-                بعد تأكيد الامتلاك والدفع، ستصبح مالكاً رسمياً لأشجارك وستبدأ رحلتك الزراعية معنا. ستحصل على محصول أشجارك بالكامل.
+                بعد تأكيدك طلب اشجارك، ستصبح مالكاً رسمياً لأشجارك وستبدأ رحلتك الزراعية معنا. ستحصل على محصول أشجارك بالكامل.
               </p>
             </div>
 
@@ -146,7 +146,7 @@ export default function AgriculturalReviewScreen({
               ) : (
                 <>
                   <Sprout className="w-5 h-5" />
-                  <span>تأكيد امتلاك أشجارك والدفع</span>
+                  <span>تأكيد ضم أشجارك الى مزرعتك الآن</span>
                 </>
               )}
             </button>
