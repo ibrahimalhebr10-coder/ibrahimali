@@ -154,7 +154,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
 
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-amber-50/95 via-yellow-50/90 to-orange-50/95 z-50 overflow-y-auto">
-      <div className={`min-h-screen ${treeCount > 0 ? 'pb-72' : 'pb-32'}`}>
+      <div className={`min-h-screen ${treeCount > 0 ? 'pb-96' : 'pb-32'}`}>
         {/* Header with Back Button */}
         <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-lg border-b border-amber-200/50">
           <div className="flex items-center justify-between p-4">
