@@ -28,8 +28,6 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [reservationData, setReservationData] = useState<any>(null);
   const [registeredUserName, setRegisteredUserName] = useState<string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mada' | 'bank_transfer' | null>(null);
-  const [isScrollingDown, setIsScrollingDown] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,62 +35,6 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       setSelectedContract(farm.contracts[0]);
     }
   }, [farm.contracts]);
-
-  useEffect(() => {
-    console.log('🔄 Agricultural Farm Page mounted - Setting up scroll detection');
-    const scrollContainer = scrollContainerRef.current;
-    if (!scrollContainer) {
-      console.error('❌ ERROR: Scroll container not found - ref is null');
-      return;
-    }
-
-    console.log('✅ SUCCESS: Scroll container found');
-    console.log('📦 Container details:', {
-      scrollHeight: scrollContainer.scrollHeight,
-      clientHeight: scrollContainer.clientHeight,
-      scrollable: scrollContainer.scrollHeight > scrollContainer.clientHeight
-    });
-
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentScrollY = scrollContainer.scrollTop;
-          const direction = currentScrollY > lastScrollY ? 'DOWN ⬇️' : 'UP ⬆️';
-          const shouldHide = currentScrollY > lastScrollY && currentScrollY > 80;
-
-          console.log(`📜 SCROLL ${direction}`, {
-            currentScrollY: Math.round(currentScrollY),
-            lastScrollY: Math.round(lastScrollY),
-            threshold: 80,
-            shouldHide,
-            currentState: isScrollingDown ? 'HIDDEN' : 'VISIBLE'
-          });
-
-          if (currentScrollY > lastScrollY && currentScrollY > 80) {
-            setIsScrollingDown(true);
-            console.log('🔒 HIDING header/footer');
-          } else if (currentScrollY < lastScrollY) {
-            setIsScrollingDown(false);
-            console.log('🔓 SHOWING header/footer');
-          }
-
-          setLastScrollY(currentScrollY);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
-    console.log('👂 Scroll listener attached successfully');
-
-    return () => {
-      scrollContainer.removeEventListener('scroll', handleScroll);
-      console.log('🗑️ Scroll listener removed');
-    };
-  }, [lastScrollY]);
 
   const maxTrees = farm.availableTrees || 0;
 
@@ -215,11 +157,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   return (
     <>
       {/* Header - Fixed to viewport */}
-      <div
-        className={`fixed top-0 left-0 right-0 z-[60] bg-white/80 backdrop-blur-lg border-b border-green-200/50 transition-transform duration-300 ${
-          isScrollingDown ? '-translate-y-full' : 'translate-y-0'
-        }`}
-      >
+      <div className="fixed top-0 left-0 right-0 z-[60] bg-white/80 backdrop-blur-lg border-b border-green-200/50">
         <div className="flex items-center justify-between p-4">
           <button
             onClick={onClose}
@@ -396,9 +334,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       {/* Purchase Summary - Fixed Bottom */}
       {treeCount > 0 && selectedContract && (
         <div
-          className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-5 pb-safe z-[100000] transition-transform duration-300 ${
-            isScrollingDown ? 'translate-y-full' : 'translate-y-0'
-          }`}
+          className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-5 pb-safe z-[100000]"
           style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
         >
             <div className="max-w-lg mx-auto space-y-4 py-2">
