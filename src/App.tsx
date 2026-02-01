@@ -795,7 +795,7 @@ function App() {
           WebkitBackdropFilter: 'blur(24px)',
           paddingTop: '1.25rem',
           paddingBottom: '5.5rem',
-          zIndex: 99999,
+          zIndex: 50000,
           position: 'fixed',
           transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
           willChange: 'transform',

@@ -237,7 +237,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         ref={scrollContainerRef}
         className="fixed inset-0 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 z-50 overflow-y-auto pt-[73px]"
       >
-        <div className="min-h-screen pb-32">
+        <div className={`min-h-screen ${treeCount > 0 ? 'pb-48' : 'pb-32'}`}>
           {/* Hero Image 3D */}
         <div className="w-full h-48 bg-gradient-to-br from-green-100 to-emerald-100 relative overflow-hidden">
           {farm.heroImage || farm.image ? (
@@ -396,7 +396,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       {/* Purchase Summary - Fixed Bottom */}
       {treeCount > 0 && selectedContract && (
         <div
-          className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-4 z-[70] transition-transform duration-300 ${
+          className={`fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-4 z-[100000] transition-transform duration-300 ${
             isScrollingDown ? 'translate-y-full' : 'translate-y-0'
           }`}
         >
