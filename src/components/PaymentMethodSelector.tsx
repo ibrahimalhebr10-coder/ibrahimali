@@ -129,7 +129,7 @@ export default function PaymentMethodSelector({
 
             <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
               <p className="text-sm text-center text-amber-800 font-semibold">
-                استثمارك يتم تفعيله بعد تأكيد الدفع
+                حجزك يتم تفعيله بعد تأكيد الدفع
               </p>
             </div>
 

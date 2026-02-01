@@ -23,7 +23,7 @@ export default function PaymentSuccessScreen({
 }: PaymentSuccessScreenProps) {
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 overflow-y-auto" style={{ zIndex: 60000 }}>
       <div className="min-h-screen flex items-center justify-center p-4">
         <div className="max-w-2xl w-full space-y-6">
           {/* Success Header */}
@@ -41,12 +41,12 @@ export default function PaymentSuccessScreen({
 
               <div className="space-y-3">
                 <h1 className="text-3xl md:text-4xl font-bold text-green-800">
-                  تم تفعيل استثمار أشجارك بنجاح 🎉
+                  تم تفعيل حجز أشجارك بنجاح 🎉
                 </h1>
                 <p className="text-xl text-gray-800 leading-relaxed">
-                  استثمارك أصبح نشطًا ومُفعّل رسميًا في نظامنا
+                  حجزك أصبح نشطًا ومُفعّل رسميًا في نظامنا
                   <br />
-                  وتم ربطه بحسابك الاستثماري
+                  وتم ربطه في حسابك الشخصي
                 </p>
               </div>
             </div>
@@ -54,7 +54,7 @@ export default function PaymentSuccessScreen({
             {/* Investment Summary */}
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200 space-y-4">
               <h2 className="text-xl font-bold text-green-800 text-center mb-4">
-                ملخص استثمارك
+                ملخص حجزك
               </h2>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -91,7 +91,7 @@ export default function PaymentSuccessScreen({
                       <Calendar className="w-6 h-6 text-blue-600" />
                     </div>
                     <div className="flex-1 text-right">
-                      <p className="text-sm text-gray-600">مدة الاستثمار</p>
+                      <p className="text-sm text-gray-600">مدة الحجز</p>
                       <p className="text-lg font-bold text-gray-800">
                         {durationYears} سنوات
                         {bonusYears > 0 && (
@@ -111,7 +111,7 @@ export default function PaymentSuccessScreen({
                       <FileText className="w-6 h-6 text-purple-600" />
                     </div>
                     <div className="flex-1 text-right">
-                      <p className="text-sm text-gray-600">رقم الاستثمار</p>
+                      <p className="text-sm text-gray-600">رقم الحجز</p>
                       <p className="text-sm font-bold text-gray-800 font-mono">
                         #{investmentNumber}
                       </p>
@@ -141,7 +141,7 @@ export default function PaymentSuccessScreen({
               </div>
               <div className="space-y-2">
                 <h3 className="text-xl font-bold text-[#B8942F]">
-                  تم إنشاء شهادة استثمار رقمية خاصة بك
+                  تم إنشاء شهادة انتفاع رقمية خاصة بك
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
                   يمكنك الاطلاع عليها في صفحة حسابك في أي وقت
@@ -152,9 +152,9 @@ export default function PaymentSuccessScreen({
             {/* Welcome Message */}
             <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200 text-center">
               <p className="text-lg text-gray-800 leading-relaxed">
-                <span className="font-bold text-green-700">مرحبًا بك مستثمرًا زراعيًا معنا</span>
+                <span className="font-bold text-green-700">مرحبًا بك معنا في رحلتك مع مزرعتك الجديدة</span>
                 <br />
-                <span className="text-green-600">استثمارك بدأ رحلته الآن</span>
+                <span className="text-green-600">حجزك بدأ رحلته الآن</span>
               </p>
             </div>
 
@@ -163,14 +163,14 @@ export default function PaymentSuccessScreen({
               onClick={onGoToAccount}
               className="w-full py-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
             >
-              <span>الآن تفضل إلى صفحة حسابك الاستثماري</span>
+              <span>الآن تفضل إلى صفحة حسابك الزراعي</span>
               <ArrowLeft className="w-6 h-6" />
             </button>
 
             {/* Footer Message */}
             <div className="text-center pt-4 border-t border-gray-200">
               <p className="text-sm text-gray-600 leading-relaxed">
-                ✔ استلمت استثمار رسمي • ✔ لديك شهادة محفوظة • ✔ الحساب أصبح مركز الإدارة
+                ✔ استلمت حجز رسمي • ✔ لديك شهادة محفوظة • ✔ الحساب أصبح مركز الإدارة
               </p>
               <p className="text-xs text-green-600 mt-2 font-bold">
                 لا يوجد انتظار • العملية انتهت بنجاح
@@ -183,7 +183,7 @@ export default function PaymentSuccessScreen({
             <p className="text-center text-gray-700 leading-relaxed">
               <span className="font-bold text-green-700 text-lg">مبروك!</span>
               <br />
-              <span className="text-sm">أصبحت الآن مستثمرًا زراعيًا معنا • استثمارك نشط ومُفعّل رسميًا</span>
+              <span className="text-sm">أصبحت الآن منتفعاً معنا • حجزك نشط ومُفعّل رسميًا</span>
             </p>
           </div>
         </div>
