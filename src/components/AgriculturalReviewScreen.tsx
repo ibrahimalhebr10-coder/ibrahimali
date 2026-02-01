@@ -129,7 +129,7 @@ export default function AgriculturalReviewScreen({
                 <span className="font-bold">ملاحظة مهمة:</span>
               </div>
               <p className="text-sm text-green-700 leading-relaxed">
-                بعد تأكيدك طلب اشجارك، ستصبح مالكاً رسمياً لأشجارك وستبدأ رحلتك الزراعية معنا. ستحصل على محصول أشجارك بالكامل.
+                بعد تأكيدك طلب اشجارك، ستصبح منتفعاً رسمياً لأشجارك وستبدأ رحلتك الزراعية معنا. ستحصل على محصول أشجارك بالكامل.
               </p>
             </div>
 
