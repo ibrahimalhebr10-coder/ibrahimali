@@ -21,7 +21,7 @@ function App() {
   const { user } = useAuth();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollYRef = useRef(0);
   const [appMode, setAppMode] = useState<AppMode>(() => {
     const savedMode = localStorage.getItem('appMode');
     return (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
@@ -186,19 +186,19 @@ function App() {
 
           console.log('📜 Scroll:', {
             current: currentScrollY,
-            last: lastScrollY,
-            isScrollingDown: currentScrollY > lastScrollY && currentScrollY > 80
+            last: lastScrollYRef.current,
+            isScrollingDown: currentScrollY > lastScrollYRef.current && currentScrollY > 80
           });
 
-          if (currentScrollY > lastScrollY && currentScrollY > 80) {
+          if (currentScrollY > lastScrollYRef.current && currentScrollY > 80) {
             console.log('⬇️ Hiding header/footer');
             setIsScrollingDown(true);
-          } else if (currentScrollY < lastScrollY) {
+          } else if (currentScrollY < lastScrollYRef.current) {
             console.log('⬆️ Showing header/footer');
             setIsScrollingDown(false);
           }
 
-          setLastScrollY(currentScrollY);
+          lastScrollYRef.current = currentScrollY;
           ticking = false;
         });
         ticking = true;
@@ -207,7 +207,7 @@ function App() {
 
     scrollContainer.addEventListener('scroll', handleScroll, { passive: true });
     return () => scrollContainer.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   const iconMap: Record<string, any> = {
     all: Layers,
@@ -692,6 +692,11 @@ function App() {
             WebkitTransform: !isScrollingDown ? 'translateY(0)' : 'translateY(100%)',
             WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
           }}
+          ref={(el) => {
+            if (el) {
+              console.log('🟢 Desktop Footer - isScrollingDown:', isScrollingDown, 'Transform:', el.style.transform);
+            }
+          }}
         >
         <div className="max-w-7xl mx-auto w-full px-8 py-5 pb-8 flex items-center justify-around">
           <button className="flex flex-col items-center gap-2 px-8 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
@@ -796,6 +801,11 @@ function App() {
           willChange: 'transform',
           WebkitTransform: !isScrollingDown ? 'translateY(0)' : 'translateY(100%)',
           WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
+        }}
+        ref={(el) => {
+          if (el) {
+            console.log('🔵 Mobile Footer - isScrollingDown:', isScrollingDown, 'Transform:', el.style.transform);
+          }
         }}
       >
         <div className="flex items-center justify-around px-3 relative" style={{ height: '4.5rem' }}>
