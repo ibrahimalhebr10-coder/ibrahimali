@@ -332,7 +332,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       </div>
 
       {/* Purchase Summary - Fixed Bottom */}
-      {treeCount > 0 && selectedContract && (
+      {treeCount > 0 && selectedContract && !showReviewScreen && !showPrePaymentRegistration && !showPaymentSelector && (
         <div
           className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-5 pb-safe z-[100000]"
           style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
