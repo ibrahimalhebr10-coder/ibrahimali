@@ -14,6 +14,7 @@ import InvestmentFarmPage from './components/InvestmentFarmPage';
 import AgriculturalFarmPage from './components/AgriculturalFarmPage';
 import AdminDashboard from './components/admin/AdminDashboard';
 import AdminLogin from './components/admin/AdminLogin';
+import MyTreesPage from './components/MyTreesPage';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
 import { useAuth } from './contexts/AuthContext';
@@ -48,6 +49,7 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [selectedInvestmentFarm, setSelectedInvestmentFarm] = useState<FarmProject | null>(null);
+  const [showMyTrees, setShowMyTrees] = useState(false);
 
   const handleAppModeChange = (mode: AppMode) => {
     setAppMode(mode);
@@ -934,7 +936,7 @@ function App() {
           </button>
 
           <button
-            onClick={() => alert('قريباً: متابعة أشجاري')}
+            onClick={() => setShowMyTrees(true)}
             className="flex items-center gap-2 px-5 py-2 rounded-2xl transition-all duration-300 hover:scale-110 hover:shadow-2xl relative overflow-hidden group"
             style={{
               background: appMode === 'agricultural'
@@ -1048,7 +1050,7 @@ function App() {
           </button>
 
           <button
-            onClick={() => alert('قريباً: متابعة أشجاري')}
+            onClick={() => setShowMyTrees(true)}
             className="flex flex-col items-center justify-center gap-1 relative -mt-5 active:scale-95 transition-all duration-300"
           >
             <div
@@ -1176,6 +1178,12 @@ function App() {
           )}
         </>
       )}
+
+      <MyTreesPage
+        isOpen={showMyTrees}
+        onClose={() => setShowMyTrees(false)}
+        onLogin={handleMyAccountClick}
+      />
       </div>
     </ErrorBoundary>
   );
