@@ -27,13 +27,43 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const checkAdminSession = async () => {
     try {
-      const adminData = sessionStorage.getItem('admin_session');
-      if (adminData) {
-        const parsedAdmin = JSON.parse(adminData);
-        setAdmin(parsedAdmin);
+      const { data: { session } } = await supabase.auth.getSession();
+
+      if (!session) {
+        sessionStorage.removeItem('admin_session');
+        setAdmin(null);
+        setIsLoading(false);
+        return;
       }
+
+      const { data: adminRecord, error: adminError } = await supabase
+        .from('admins')
+        .select('id, email, full_name, role')
+        .eq('user_id', session.user.id)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (adminError || !adminRecord) {
+        sessionStorage.removeItem('admin_session');
+        await supabase.auth.signOut();
+        setAdmin(null);
+        setIsLoading(false);
+        return;
+      }
+
+      const adminData: Admin = {
+        id: adminRecord.id,
+        email: adminRecord.email,
+        full_name: adminRecord.full_name,
+        role: adminRecord.role
+      };
+
+      sessionStorage.setItem('admin_session', JSON.stringify(adminData));
+      setAdmin(adminData);
     } catch (error) {
       console.error('Error checking admin session:', error);
+      sessionStorage.removeItem('admin_session');
+      setAdmin(null);
     } finally {
       setIsLoading(false);
     }

@@ -127,11 +127,15 @@ export const investmentPackagesService = {
       .update(input)
       .eq('id', packageId)
       .select()
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error('Error updating investment package:', error);
       throw error;
+    }
+
+    if (!data) {
+      throw new Error('Failed to update package or no permission to view result');
     }
 
     return data;
