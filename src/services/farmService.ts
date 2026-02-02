@@ -46,6 +46,7 @@ export interface FarmProject {
   availableTrees: number
   reservedTrees: number
   marketingMessage?: string
+  comingSoonLabel?: string
   firstYearMaintenanceFree?: boolean
   treeTypes: TreeType[]
   contracts?: FarmContract[]
@@ -239,6 +240,7 @@ export const farmService = {
           name: project.name_ar || project.name_en,
           description: project.description_ar,
           image: project.image_url,
+          heroImage: project.hero_image_url,
           video: project.video_url,
           location: project.location,
           mapUrl: project.map_url || '#',
@@ -246,6 +248,7 @@ export const farmService = {
           availableTrees: project.available_trees || 0,
           reservedTrees: project.reserved_trees || 0,
           marketingMessage: project.marketing_message,
+          comingSoonLabel: project.coming_soon_label,
           firstYearMaintenanceFree: project.first_year_maintenance_free ?? true,
           treeTypes: formattedTreeTypes,
           contracts: projectContracts
@@ -333,6 +336,7 @@ export const farmService = {
           name: project.name,
           description: project.description,
           image: project.image,
+          heroImage: project.hero_image,
           video: project.video,
           location: project.location,
           mapUrl: project.map_url,
@@ -340,6 +344,7 @@ export const farmService = {
           availableTrees: project.available_trees,
           reservedTrees: project.reserved_trees,
           marketingMessage: project.marketing_message,
+          comingSoonLabel: project.coming_soon_label,
           treeTypes
         }
       })

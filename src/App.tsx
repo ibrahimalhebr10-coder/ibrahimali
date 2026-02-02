@@ -796,10 +796,12 @@ function App() {
                         </div>
                       </div>
                       <div className="p-2 md:p-4 space-y-1.5 md:space-y-2.5">
-                        <div className="flex items-center justify-center gap-1 md:gap-2 py-1.5 md:py-2 px-2.5 md:px-4 rounded-lg bg-gradient-to-r from-amber-100 via-yellow-100 to-amber-100 border-2 border-amber-300 shadow-md">
-                          <Sparkles className="w-3 md:w-4 h-3 md:h-4 text-amber-600 animate-pulse" strokeWidth={3} fill="currentColor" />
-                          <span className="text-[10px] md:text-sm font-black text-amber-900">قريباً</span>
-                        </div>
+                        {farm.comingSoonLabel && (
+                          <div className="flex items-center justify-center gap-1 md:gap-2 py-1.5 md:py-2 px-2.5 md:px-4 rounded-lg bg-gradient-to-r from-amber-100 via-yellow-100 to-amber-100 border-2 border-amber-300 shadow-md">
+                            <Sparkles className="w-3 md:w-4 h-3 md:h-4 text-amber-600 animate-pulse" strokeWidth={3} fill="currentColor" />
+                            <span className="text-[10px] md:text-sm font-black text-amber-900">{farm.comingSoonLabel}</span>
+                          </div>
+                        )}
 
                         <div className="flex items-center justify-between gap-1.5 md:gap-2">
                           <div className="flex items-center gap-1 md:gap-2 bg-green-100 rounded-lg px-2 md:px-3 py-1 md:py-2 border border-green-300 shadow-sm flex-1">
