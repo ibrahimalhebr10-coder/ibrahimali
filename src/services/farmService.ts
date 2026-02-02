@@ -143,9 +143,9 @@ export const farmService = {
 
       const fetchPromise = supabase
         .from('farm_categories')
-        .select('name_ar, icon')
+        .select('name_ar, icon, display_order')
         .eq('active', true)
-        .order('name_ar');
+        .order('display_order', { ascending: true });
 
       const { data, error } = await Promise.race([fetchPromise, timeoutPromise]);
 
