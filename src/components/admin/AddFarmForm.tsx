@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Save, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 interface TreeType {
   name: string;
   count: number;
+}
+
+interface Category {
+  id: string;
+  name_ar: string;
+  icon: string;
 }
 
 interface AddFarmFormProps {
@@ -20,6 +26,8 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
   const [totalTrees, setTotalTrees] = useState('');
   const [comingSoonLabel, setComingSoonLabel] = useState('قريبًا');
   const [cardDescription, setCardDescription] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const [treeTypes, setTreeTypes] = useState<TreeType[]>([{ name: '', count: 0 }]);
 
@@ -28,6 +36,32 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
 
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
+
+  const loadCategories = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('farm_categories')
+        .select('id, name_ar, icon')
+        .eq('active', true)
+        .order('name_ar');
+
+      if (error) {
+        console.error('Error loading categories:', error);
+        return;
+      }
+
+      setCategories(data || []);
+      if (data && data.length > 0) {
+        setSelectedCategory(data[0].id);
+      }
+    } catch (err) {
+      console.error('Unexpected error loading categories:', err);
+    }
+  };
 
   const addTreeType = () => {
     setTreeTypes([...treeTypes, { name: '', count: 0 }]);
@@ -61,6 +95,11 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
 
     if (!location.trim()) {
       setError('يرجى إدخال موقع المزرعة');
+      return false;
+    }
+
+    if (!selectedCategory) {
+      setError('يرجى اختيار فئة المزرعة');
       return false;
     }
 
@@ -106,6 +145,7 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
         .from('farms')
         .insert([
           {
+            category_id: selectedCategory,
             name_ar: name,
             name_en: name,
             location: location,
@@ -117,7 +157,7 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
             tree_types: treeTypesJson,
             description_ar: cardDescription || name,
             image_url: 'https://images.pexels.com/photos/96715/pexels-photo-96715.jpeg',
-            annual_return_rate: 0,
+            annual_return_rate: 15,
             min_investment: 1000,
             max_investment: 100000,
             total_capacity: Number(totalTrees),
@@ -126,7 +166,9 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
             status: 'active',
             is_open_for_booking: true,
             available_trees: Number(totalTrees),
-            reserved_trees: 0
+            reserved_trees: 0,
+            return_rate_display: '15% سنوياً',
+            order_index: 0
           }
         ])
         .select();
@@ -229,6 +271,26 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
                     required
                   />
                   <p className="text-xs text-gray-500 mt-1">يظهر في بطاقة المزرعة وصفحتها</p>
+                </div>
+
+                {/* فئة المزرعة */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    فئة المزرعة <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkgreen text-right bg-white"
+                    required
+                  >
+                    {categories.map((cat) => (
+                      <option key={cat.id} value={cat.id}>
+                        {cat.icon} {cat.name_ar}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">يحدد تصنيف المزرعة في الواجهة الرئيسية</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
