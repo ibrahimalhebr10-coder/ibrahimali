@@ -103,11 +103,16 @@ export default function Header({ onBack, showBackButton = false, isVisible = tru
         </button>
       )}
 
-      {/* Hidden Admin Entry - Click 4 times */}
+      {/* Semi-Hidden Admin Entry - Click 4 times */}
       <div
         onClick={handleHiddenAreaClick}
-        className="absolute left-4 top-0 bottom-0 w-12 cursor-default"
-        style={{ opacity: 0, zIndex: 1 }}
+        className="absolute left-4 top-0 bottom-0 w-12 rounded-lg cursor-pointer transition-all duration-300 group/admin hover:bg-gray-100/20"
+        style={{
+          background: 'linear-gradient(145deg, rgba(59,130,246,0.03) 0%, rgba(37,99,235,0.05) 100%)',
+          border: '1px solid rgba(59,130,246,0.08)',
+          zIndex: 1
+        }}
+        title=""
       />
     </header>
   );
