@@ -388,7 +388,7 @@ function App() {
                 willChange: 'transform',
                 WebkitTransform: !isScrollingDown ? 'translateY(0)' : 'translateY(-100%)',
                 WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
-                paddingBottom: !isScrollingDown ? '1.5rem' : '0.25rem'
+                paddingBottom: !isScrollingDown ? '0.75rem' : '0rem'
               }}>
                 <div className="absolute inset-0 pointer-events-none" style={{
                   background: 'radial-gradient(ellipse at top, rgba(58, 161, 126, 0.05) 0%, transparent 70%)'
@@ -601,7 +601,7 @@ function App() {
               >
                 <div className="max-w-7xl mx-auto">
                   <section className="px-3 lg:px-4 pb-4 lg:pb-6" style={{
-                    paddingTop: !isScrollingDown ? '1.5rem' : '0.25rem',
+                    paddingTop: !isScrollingDown ? '0.5rem' : '0rem',
                     transition: 'padding-top 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
                   }}>
           {loading ? (
