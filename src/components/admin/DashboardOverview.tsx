@@ -23,7 +23,7 @@ const DashboardOverview: React.FC = () => {
     try {
       const [farmsResult, reservationsResult] = await Promise.all([
         supabase.from('farms').select('total_trees, is_open_for_booking'),
-        supabase.from('reservations').select('status, total_price'),
+        supabase.from('reservations').select('status, total_price, is_demo').eq('is_demo', false),
       ]);
 
       const totalTrees = farmsResult.data?.reduce((sum, farm) => sum + (farm.total_trees || 0), 0) || 0;

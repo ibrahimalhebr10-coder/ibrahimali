@@ -39,12 +39,14 @@ export const investorAccountService = {
           contract_id,
           farm_id,
           contract_name,
+          is_demo,
           farms!fk_reservations_farm_id(
             name_ar,
             hero_image
           )
         `)
         .eq('user_id', userId)
+        .eq('is_demo', false)
         .in('status', ['confirmed', 'pending'])
         .order('created_at', { ascending: false });
 

@@ -18,6 +18,7 @@ export interface CreateReservationData {
   durationYears?: number;
   bonusYears?: number;
   treeDetails?: any[];
+  isDemo?: boolean;
 }
 
 export interface Reservation {
@@ -33,6 +34,7 @@ export interface Reservation {
   durationYears?: number;
   bonusYears?: number;
   treeDetails?: any[];
+  isDemo?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -71,6 +73,7 @@ class ReservationService {
           bonus_years: data.bonusYears || 0,
           tree_details: data.treeDetails || [],
           tree_types: treeTypes,
+          is_demo: data.isDemo || false,
           status: 'pending'
         })
         .select()
@@ -316,6 +319,7 @@ class ReservationService {
       durationYears: data.duration_years,
       bonusYears: data.bonus_years,
       treeDetails: data.tree_details || [],
+      isDemo: data.is_demo || false,
       createdAt: data.created_at,
       updatedAt: data.updated_at
     };
