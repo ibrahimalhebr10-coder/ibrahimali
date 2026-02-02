@@ -34,12 +34,22 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [registeredUserName, setRegisteredUserName] = useState<string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mada' | 'bank_transfer' | null>(null);
   const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
+  const [isLoadingContract, setIsLoadingContract] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const packagesScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    console.log('🏢 عقود المزرعة المُحمّلة:', farm.contracts?.map(c => ({
+      name: c.contract_name,
+      duration: c.duration_years,
+      bonus: c.bonus_years,
+      id: c.id
+    })));
+
     if (farm.contracts && farm.contracts.length > 0) {
-      setSelectedContract(farm.contracts[0]);
+      const firstContract = farm.contracts[0];
+      setSelectedContract(firstContract);
+      console.log('📋 تم تعيين العقد الافتراضي:', firstContract.contract_name, firstContract.duration_years, 'سنوات');
     }
   }, [farm.contracts]);
 
@@ -47,6 +57,11 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     const loadPackages = async () => {
       try {
         const pkgs = await agriculturalPackagesService.getActivePackages();
+        console.log('📦 تم تحميل الباقات:', pkgs.map(p => ({
+          name: p.package_name,
+          contract_id: p.contract_id,
+          price: p.price_per_tree
+        })));
         setPackages(pkgs);
       } catch (error) {
         console.error('Error loading packages:', error);
@@ -54,6 +69,17 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     };
     loadPackages();
   }, []);
+
+  useEffect(() => {
+    if (selectedContract) {
+      console.log('🔄 selectedContract تم تحديثه:', {
+        name: selectedContract.contract_name,
+        duration: selectedContract.duration_years,
+        bonus: selectedContract.bonus_years,
+        id: selectedContract.id
+      });
+    }
+  }, [selectedContract]);
 
   const maxTrees = farm.availableTrees || 0;
 
@@ -83,12 +109,47 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     setShowPackageDetailsModal(true);
   };
 
-  const handleSelectPackage = (pkg: AgriculturalPackage) => {
+  const handleSelectPackage = async (pkg: AgriculturalPackage) => {
+    console.log('🎯 تم اختيار الباقة:', pkg.package_name, '- contract_id:', pkg.contract_id);
+
+    setIsLoadingContract(true);
     setSelectedPackage(pkg);
-    const contract = farm.contracts?.find(c => c.id === pkg.contract_id);
-    if (contract) {
-      setSelectedContract(contract);
+
+    try {
+      const { data: contract, error } = await supabase
+        .from('farm_contracts')
+        .select('*')
+        .eq('id', pkg.contract_id)
+        .maybeSingle();
+
+      if (contract && !error) {
+        console.log('✅ تم تحميل العقد من قاعدة البيانات:', {
+          name: contract.contract_name,
+          duration: contract.duration_years,
+          bonus: contract.bonus_years,
+          id: contract.id
+        });
+
+        setTimeout(() => {
+          setSelectedContract(contract);
+          setIsLoadingContract(false);
+          console.log('🔄 تم تحديث selectedContract في الـ state');
+        }, 0);
+      } else {
+        console.error('❌ خطأ في تحميل العقد:', error);
+        console.log('⚠️ البحث عن العقد في farm.contracts...');
+        const fallbackContract = farm.contracts?.find(c => c.id === pkg.contract_id);
+        if (fallbackContract) {
+          console.log('✅ تم العثور على العقد في farm.contracts:', fallbackContract);
+          setSelectedContract(fallbackContract);
+        }
+        setIsLoadingContract(false);
+      }
+    } catch (error) {
+      console.error('❌ خطأ في جلب العقد:', error);
+      setIsLoadingContract(false);
     }
+
     setShowPackageDetailsModal(false);
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: 'smooth' });
@@ -483,7 +544,14 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       </div>
 
       {/* Purchase Summary - Fixed Bottom - Compact Design */}
-      {treeCount > 0 && selectedContract && !showReviewScreen && !showPrePaymentRegistration && !showPaymentSelector && !showPaymentSuccess && (
+      {treeCount > 0 && selectedContract && !showReviewScreen && !showPrePaymentRegistration && !showPaymentSelector && !showPaymentSuccess && (() => {
+        console.log('📊 عرض الشريط السفلي - العقد المختار:', {
+          name: selectedContract.contract_name,
+          duration: selectedContract.duration_years,
+          bonus: selectedContract.bonus_years
+        });
+        return true;
+      })() && (
         <div
           className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-xl border-t-2 border-darkgreen/40 shadow-2xl z-[100000]"
           style={{ paddingBottom: 'max(4rem, env(safe-area-inset-bottom))' }}
@@ -499,9 +567,9 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full bg-green-500"></div>
                   <span className="text-gray-600">
-                    {selectedPackage?.contract_years || selectedContract.duration_years} سنوات
-                    {(selectedPackage?.bonus_years || selectedContract.bonus_years) > 0 && (
-                      <span className="text-green-600 font-bold"> +{selectedPackage?.bonus_years || selectedContract.bonus_years}</span>
+                    {selectedContract.duration_years} {selectedContract.duration_years === 1 ? 'سنة' : 'سنوات'}
+                    {selectedContract.bonus_years > 0 && (
+                      <span className="text-green-600 font-bold"> +{selectedContract.bonus_years}</span>
                     )}
                   </span>
                 </div>
@@ -644,8 +712,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           farmName={farm.name}
           farmLocation={farm.location}
           contractName={selectedPackage?.package_name || selectedContract.contract_name}
-          durationYears={selectedPackage?.contract_years || selectedContract.duration_years}
-          bonusYears={selectedPackage?.bonus_years || selectedContract.bonus_years}
+          durationYears={selectedContract.duration_years}
+          bonusYears={selectedContract.bonus_years}
           treeCount={treeCount}
           totalPrice={calculateTotal()}
           pricePerTree={selectedPackage?.price_per_tree || selectedContract.farmer_price || selectedContract.investor_price || 0}
