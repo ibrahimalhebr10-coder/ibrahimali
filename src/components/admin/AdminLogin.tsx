@@ -241,6 +241,65 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           </div>
         </div>
 
+        {/* Dev Credentials Info */}
+        <div className="mt-6 bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl shadow-lg border border-blue-200 p-5 md:p-6">
+          <div className="flex items-start gap-3 mb-4">
+            <div className="flex-shrink-0 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+              <Shield className="w-5 h-5 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-base md:text-lg font-bold text-gray-900 mb-1">
+                معلومات دخول المدير العام (للتطوير)
+              </h3>
+              <p className="text-xs md:text-sm text-gray-600">
+                استخدم هذه المعلومات لمتابعة التطوير واختبار النظام
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div className="bg-white rounded-lg p-3 md:p-4 border border-blue-100">
+              <p className="text-xs text-gray-600 mb-1">البريد الإلكتروني</p>
+              <div className="flex items-center justify-between gap-3">
+                <code className="text-sm md:text-base font-mono text-blue-700 font-semibold">
+                  admin@dev.com
+                </code>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText('admin@dev.com');
+                  }}
+                  className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                >
+                  نسخ
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg p-3 md:p-4 border border-blue-100">
+              <p className="text-xs text-gray-600 mb-1">كلمة المرور</p>
+              <div className="flex items-center justify-between gap-3">
+                <code className="text-sm md:text-base font-mono text-blue-700 font-semibold">
+                  Admin@123
+                </code>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText('Admin@123');
+                  }}
+                  className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                >
+                  نسخ
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 bg-amber-50 rounded-lg p-3 border border-amber-200">
+            <p className="text-xs text-amber-900 text-center">
+              هذه معلومات دخول للتطوير فقط. يجب تغييرها قبل النشر الفعلي.
+            </p>
+          </div>
+        </div>
+
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-xs md:text-sm text-gray-500">
