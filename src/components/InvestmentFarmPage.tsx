@@ -316,24 +316,24 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           </div>
         </div>
 
-        {/* Investment Packages Slider - Fixed Position */}
+        {/* Investment Packages Slider - Scrollable with Page */}
         {packages.length > 0 && (
-          <div className="sticky top-[73px] z-20 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 backdrop-blur-xl border-y border-amber-200/50 shadow-lg px-4 py-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="mt-3 bg-gradient-to-br from-amber-50/95 via-yellow-50/90 to-orange-50/95 rounded-2xl border border-amber-200/50 shadow-md py-4 mx-4">
+            <div className="px-4 mb-3 flex items-center justify-between">
               <h3 className="text-base font-bold text-[#B8942F]">باقات الاستثمار</h3>
               {packages.length > 1 && (
                 <div className="flex gap-2">
                   <button
                     onClick={() => scrollToPackage(Math.max(0, currentPackageIndex - 1))}
                     disabled={currentPackageIndex === 0}
-                    className="p-1.5 bg-white/80 rounded-lg border border-amber-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white transition-all"
+                    className="w-8 h-8 rounded-full bg-white/80 border-2 border-amber-200 flex items-center justify-center hover:border-[#D4AF37] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     <ChevronRight className="w-4 h-4 text-[#B8942F]" />
                   </button>
                   <button
                     onClick={() => scrollToPackage(Math.min(packages.length - 1, currentPackageIndex + 1))}
                     disabled={currentPackageIndex === packages.length - 1}
-                    className="p-1.5 bg-white/80 rounded-lg border border-amber-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white transition-all"
+                    className="w-8 h-8 rounded-full bg-white/80 border-2 border-amber-200 flex items-center justify-center hover:border-[#D4AF37] transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   >
                     <ChevronLeft className="w-4 h-4 text-[#B8942F]" />
                   </button>
