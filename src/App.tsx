@@ -397,45 +397,94 @@ function App() {
                   background: 'linear-gradient(90deg, transparent 0%, rgba(58, 161, 126, 0.3) 50%, transparent 100%)'
                 }}></div>
                 <section className="px-2 lg:px-6 py-1 lg:py-1.5">
-                  <div className="flex gap-0.5 lg:gap-2 justify-between lg:max-w-5xl lg:mx-auto">
+                  <div className="flex gap-1.5 lg:gap-3 justify-between lg:max-w-5xl lg:mx-auto">
                     {[
-                      { icon: Calculator, label: 'حاسبة مزرعتك', color: '#2F5233', onClick: () => alert('قريباً: حاسبة المزرعة'), delay: '0ms' },
-                      { icon: Video, label: 'فيديو تعريفي', color: '#3D6B42', onClick: () => setShowVideoIntro(true), delay: '100ms' },
-                      { icon: HelpCircle, label: 'كيف تبدأ؟', color: '#2F5233', onClick: () => setShowHowToStart(true), delay: '200ms' }
+                      {
+                        icon: Calculator,
+                        label: 'حاسبة مزرعتك',
+                        onClick: () => alert('قريباً: حاسبة المزرعة'),
+                        delay: '0ms',
+                        gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 25%, #06b6d4 50%, #0891b2 75%, #06b6d4 100%)',
+                        hoverGradient: 'linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #22d3ee 100%)',
+                        iconColor: '#ecfeff',
+                        border: 'rgba(6, 182, 212, 0.6)',
+                        shadow: 'rgba(6, 182, 212, 0.4)',
+                        glow: 'rgba(6, 182, 212, 0.5)'
+                      },
+                      {
+                        icon: Video,
+                        label: 'فيديو تعريفي',
+                        onClick: () => setShowVideoIntro(true),
+                        delay: '100ms',
+                        gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 25%, #ec4899 50%, #db2777 75%, #ec4899 100%)',
+                        hoverGradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #f472b6 100%)',
+                        iconColor: '#fdf2f8',
+                        border: 'rgba(236, 72, 153, 0.6)',
+                        shadow: 'rgba(236, 72, 153, 0.4)',
+                        glow: 'rgba(236, 72, 153, 0.5)'
+                      },
+                      {
+                        icon: HelpCircle,
+                        label: 'كيف تبدأ؟',
+                        onClick: () => setShowHowToStart(true),
+                        delay: '200ms',
+                        gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 25%, #f59e0b 50%, #d97706 75%, #f59e0b 100%)',
+                        hoverGradient: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fbbf24 100%)',
+                        iconColor: '#fffbeb',
+                        border: 'rgba(245, 158, 11, 0.6)',
+                        shadow: 'rgba(245, 158, 11, 0.4)',
+                        glow: 'rgba(245, 158, 11, 0.5)'
+                      }
                     ].map((action, idx) => (
                       <button
                         key={idx}
                         onClick={action.onClick}
-                        className="rounded-lg lg:rounded-xl flex-1 h-9 lg:h-14 xl:h-16 flex flex-col items-center justify-center bg-white relative group overflow-hidden animate-fadeIn"
+                        className="rounded-xl lg:rounded-2xl flex-1 h-11 lg:h-16 xl:h-18 flex flex-col items-center justify-center relative group overflow-hidden transition-all duration-300 hover:scale-[1.04] active:scale-[0.96]"
                         style={{
-                          boxShadow: '0 2px 0 0 rgba(58,161,126,0.25), 0 3px 8px rgba(58,161,126,0.12), inset 0 1px 0 rgba(255,255,255,0.95)',
-                          border: '1px solid #3AA17E',
-                          background: 'linear-gradient(145deg, #ffffff 0%, #fafdfb 100%)',
-                          transform: 'translateY(0)',
-                          transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                          boxShadow: `0 5px 15px ${action.shadow}, 0 8px 30px ${action.glow}, inset 0 2px 0 rgba(255,255,255,0.35), inset 0 -2px 0 rgba(0,0,0,0.1)`,
+                          border: `2.5px solid ${action.border}`,
+                          background: action.gradient,
+                          backdropFilter: 'blur(12px)',
+                          WebkitBackdropFilter: 'blur(12px)',
                           animationDelay: action.delay
                         }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)';
-                          e.currentTarget.style.boxShadow = '0 4px 0 0 rgba(58,161,126,0.3), 0 6px 16px rgba(58,161,126,0.18), inset 0 2px 0 rgba(255,255,255,0.95)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                          e.currentTarget.style.boxShadow = '0 2px 0 0 rgba(58,161,126,0.25), 0 3px 8px rgba(58,161,126,0.12), inset 0 1px 0 rgba(255,255,255,0.95)';
-                        }}
-                        onMouseDown={(e) => {
-                          e.currentTarget.style.transform = 'translateY(1px) scale(0.98)';
-                        }}
-                        onMouseUp={(e) => {
-                          e.currentTarget.style.transform = 'translateY(-2px) scale(1.01)';
-                        }}
                       >
-                        <div className="absolute inset-0 rounded-lg lg:rounded-xl bg-gradient-to-br from-emerald-50/40 via-white/30 to-green-50/40 pointer-events-none transition-opacity duration-300 group-hover:opacity-100 opacity-70"></div>
-                        <action.icon
-                          className="w-6 h-6 text-darkgreen mb-0.5 relative z-10 transition-all duration-300 group-hover:scale-105 group-hover:text-emerald-600"
-                          style={{ filter: 'drop-shadow(0 1px 3px rgba(47,82,51,0.2))' }}
+                        <div
+                          className="absolute inset-0 rounded-xl lg:rounded-2xl pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
+                          style={{
+                            background: action.hoverGradient
+                          }}
                         />
-                        <span className="text-[7px] lg:text-[9px] font-bold text-darkgreen relative z-10 text-center leading-tight px-1 transition-colors duration-300 group-hover:text-emerald-600">{action.label}</span>
+                        <div
+                          className="absolute inset-0 rounded-xl lg:rounded-2xl pointer-events-none"
+                          style={{
+                            background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.3) 0%, transparent 60%)'
+                          }}
+                        />
+                        <div
+                          className="absolute bottom-0 left-0 right-0 h-1/2 rounded-b-xl lg:rounded-b-2xl pointer-events-none"
+                          style={{
+                            background: 'linear-gradient(to top, rgba(0,0,0,0.08) 0%, transparent 100%)'
+                          }}
+                        />
+                        <action.icon
+                          className="w-5 h-5 lg:w-7 lg:h-7 xl:w-8 xl:h-8 mb-0.5 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
+                          style={{
+                            color: action.iconColor,
+                            filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.35))',
+                            strokeWidth: '2.5px'
+                          }}
+                        />
+                        <span
+                          className="text-[10px] lg:text-xs xl:text-sm font-black text-center leading-tight px-1.5 relative z-10 tracking-wide transition-all duration-300 group-hover:scale-105"
+                          style={{
+                            color: action.iconColor,
+                            textShadow: '0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
+                            letterSpacing: '0.2px'
+                          }}
+                        >
+                          {action.label}
+                        </span>
                       </button>
                     ))}
                   </div>
