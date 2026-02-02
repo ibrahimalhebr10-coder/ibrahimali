@@ -328,16 +328,19 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                       : 'bg-white/80 border-green-200 hover:border-green-400 hover:shadow-md'
                   }`}
                 >
-                  {/* Info Button - Top Right Corner */}
+                  {/* Info Button - Top Left Corner with Text */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       handlePackageDetailsClick(pkg);
                     }}
-                    className="absolute top-2 left-2 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm border-2 border-green-200 hover:border-darkgreen hover:bg-green-50 transition-all flex items-center justify-center shadow-sm active:scale-90 z-10"
+                    className="absolute top-2 left-2 bg-gradient-to-l from-white/95 via-white/90 to-white/80 backdrop-blur-sm border border-green-300/60 hover:border-darkgreen/80 hover:from-green-50/95 hover:via-green-50/90 hover:to-green-50/80 transition-all flex items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95 z-10 rounded-full px-3 py-1.5"
                     aria-label="اقرأ المزيد عن الباقة"
                   >
-                    <HelpCircle className="w-4 h-4 text-darkgreen" />
+                    <HelpCircle className="w-3.5 h-3.5 text-darkgreen" />
+                    <span className="text-[10px] font-semibold text-darkgreen/90 tracking-wide">
+                      اقرأ عن الباقة
+                    </span>
                   </button>
 
                   {/* Selected Badge - Top Left Corner */}
