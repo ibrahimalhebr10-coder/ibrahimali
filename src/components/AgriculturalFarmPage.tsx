@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Video, HelpCircle, MapPin, Minus, Plus, Sprout, Clock, Gift, ShoppingCart, ArrowLeft, FileText } from 'lucide-react';
+import { X, Video, HelpCircle, MapPin, Minus, Plus, Sprout, Clock, Gift, ShoppingCart, ArrowLeft, FileText, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import type { FarmProject, FarmContract } from '../services/farmService';
@@ -33,7 +33,9 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [reservationData, setReservationData] = useState<any>(null);
   const [registeredUserName, setRegisteredUserName] = useState<string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mada' | 'bank_transfer' | null>(null);
+  const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const packagesScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (farm.contracts && farm.contracts.length > 0) {
@@ -90,6 +92,24 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     setShowPackageDetailsModal(false);
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToPackage = (index: number) => {
+    if (packagesScrollRef.current) {
+      const scrollWidth = packagesScrollRef.current.scrollWidth;
+      const containerWidth = packagesScrollRef.current.clientWidth;
+      const scrollPosition = (scrollWidth / packages.length) * index;
+      packagesScrollRef.current.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+    }
+  };
+
+  const handlePackageScroll = () => {
+    if (packagesScrollRef.current && packages.length > 0) {
+      const scrollLeft = packagesScrollRef.current.scrollLeft;
+      const containerWidth = packagesScrollRef.current.clientWidth;
+      const index = Math.round(scrollLeft / containerWidth);
+      setCurrentPackageIndex(Math.min(index, packages.length - 1));
     }
   };
 
@@ -265,16 +285,43 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           </div>
         </div>
 
-        {/* Agricultural Packages - Fixed Position */}
-        <div className="sticky top-[73px] z-20 bg-gradient-to-br from-green-50/98 via-emerald-50/95 to-teal-50/98 backdrop-blur-xl border-y border-green-200/50 shadow-lg px-4 py-4">
-          <h3 className="text-base font-bold text-darkgreen mb-3">باقات محصولي الزراعي</h3>
-          <div className="grid grid-cols-2 gap-3">
+        {/* Agricultural Packages Slider - Fixed Position */}
+        <div className="sticky top-[73px] z-20 bg-gradient-to-br from-green-50/98 via-emerald-50/95 to-teal-50/98 backdrop-blur-xl border-y border-green-200/50 shadow-lg py-4">
+          <div className="px-4 mb-3 flex items-center justify-between">
+            <h3 className="text-base font-bold text-darkgreen">باقات محصولي الزراعي</h3>
+            {packages.length > 1 && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => scrollToPackage(Math.max(0, currentPackageIndex - 1))}
+                  disabled={currentPackageIndex === 0}
+                  className="w-8 h-8 rounded-full bg-white/80 border-2 border-green-200 flex items-center justify-center hover:border-darkgreen transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="w-4 h-4 text-darkgreen" />
+                </button>
+                <button
+                  onClick={() => scrollToPackage(Math.min(packages.length - 1, currentPackageIndex + 1))}
+                  disabled={currentPackageIndex === packages.length - 1}
+                  className="w-8 h-8 rounded-full bg-white/80 border-2 border-green-200 flex items-center justify-center hover:border-darkgreen transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-4 h-4 text-darkgreen" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Packages Slider */}
+          <div
+            ref={packagesScrollRef}
+            onScroll={handlePackageScroll}
+            className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4"
+            style={{ scrollPaddingLeft: '1rem' }}
+          >
             {packages.map((pkg) => {
               const isSelected = selectedPackage?.id === pkg.id;
               return (
                 <div
                   key={pkg.id}
-                  className={`relative p-4 rounded-xl border-2 transition-all ${
+                  className={`flex-shrink-0 w-[85%] snap-center p-4 rounded-xl border-2 transition-all ${
                     isSelected
                       ? 'bg-gradient-to-br from-green-100/60 to-emerald-100/50 border-darkgreen shadow-lg'
                       : 'bg-white/80 border-green-200'
@@ -306,6 +353,24 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               );
             })}
           </div>
+
+          {/* Dots Indicator */}
+          {packages.length > 1 && (
+            <div className="flex justify-center gap-2 mt-3">
+              {packages.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => scrollToPackage(index)}
+                  className={`h-2 rounded-full transition-all ${
+                    index === currentPackageIndex
+                      ? 'w-6 bg-darkgreen'
+                      : 'w-2 bg-green-300 hover:bg-green-400'
+                  }`}
+                  aria-label={`الانتقال للباقة ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Tree Slider */}
