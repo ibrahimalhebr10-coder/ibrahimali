@@ -243,7 +243,7 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="xl:mr-80 pt-20 xl:pt-0 min-h-screen">
+      <div className="xl:mr-80 pt-20 xl:pt-0">
         <div className="p-4 sm:p-6 lg:p-8 xl:p-10 pb-24 xl:pb-10">
           {renderContent()}
         </div>
