@@ -1,12 +1,37 @@
+import { useState, useRef } from 'react';
 import { Sprout, ArrowRight } from 'lucide-react';
 
 interface HeaderProps {
   onBack?: () => void;
   showBackButton?: boolean;
   isVisible?: boolean;
+  onAdminAccess?: () => void;
 }
 
-export default function Header({ onBack, showBackButton = false, isVisible = true }: HeaderProps) {
+export default function Header({ onBack, showBackButton = false, isVisible = true, onAdminAccess }: HeaderProps) {
+  const [clickCount, setClickCount] = useState(0);
+  const clickTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleHiddenAreaClick = () => {
+    const newCount = clickCount + 1;
+    setClickCount(newCount);
+
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+    }
+
+    if (newCount === 4) {
+      setClickCount(0);
+      if (onAdminAccess) {
+        onAdminAccess();
+      }
+    } else {
+      clickTimeoutRef.current = setTimeout(() => {
+        setClickCount(0);
+      }, 2000);
+    }
+  };
+
   return (
     <header
       className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between z-50 backdrop-blur-2xl flex-shrink-0 fixed left-0 right-0 top-0"
@@ -77,6 +102,13 @@ export default function Header({ onBack, showBackButton = false, isVisible = tru
           <ArrowRight className="w-5 h-5 lg:w-6 lg:h-6 text-darkgreen transition-transform duration-300 group-hover:translate-x-1" />
         </button>
       )}
+
+      {/* Hidden Admin Entry - Click 4 times */}
+      <div
+        onClick={handleHiddenAreaClick}
+        className="absolute left-4 top-0 bottom-0 w-12 cursor-default"
+        style={{ opacity: 0, zIndex: 1 }}
+      />
     </header>
   );
 }

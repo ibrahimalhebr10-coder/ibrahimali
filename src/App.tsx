@@ -13,13 +13,16 @@ import AppModeSelector, { type AppMode } from './components/AppModeSelector';
 import InvestmentFarmPage from './components/InvestmentFarmPage';
 import AgriculturalFarmPage from './components/AgriculturalFarmPage';
 import AdminDashboard from './components/admin/AdminDashboard';
+import AdminLogin from './components/admin/AdminLogin';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
 import { useAuth } from './contexts/AuthContext';
+import { useAdminAuth } from './contexts/AdminAuthContext';
 import { initializeSupabase } from './lib/supabase';
 
 function App() {
   const { user } = useAuth();
+  const { admin } = useAdminAuth();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const farmsSliderRef = useRef<HTMLDivElement>(null);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
@@ -42,6 +45,7 @@ function App() {
   const [showStandaloneRegistration, setShowStandaloneRegistration] = useState(false);
   const [showWelcomeToAccount, setShowWelcomeToAccount] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [selectedInvestmentFarm, setSelectedInvestmentFarm] = useState<FarmProject | null>(null);
 
@@ -423,7 +427,12 @@ function App() {
           `
         }}></div>
 
-        {!selectedInvestmentFarm && <Header isVisible={!isScrollingDown} />}
+        {!selectedInvestmentFarm && (
+          <Header
+            isVisible={!isScrollingDown}
+            onAdminAccess={() => setShowAdminLogin(true)}
+          />
+        )}
 
         {!selectedInvestmentFarm && (
           <>
@@ -1142,7 +1151,20 @@ function App() {
         </>
       )}
 
-      {showAdminDashboard && <AdminDashboard />}
+      {(showAdminDashboard || showAdminLogin) && (
+        <>
+          {admin ? (
+            <AdminDashboard />
+          ) : (
+            <AdminLogin
+              onLoginSuccess={() => {
+                setShowAdminLogin(false);
+                setShowAdminDashboard(true);
+              }}
+            />
+          )}
+        </>
+      )}
       </div>
     </ErrorBoundary>
   );
