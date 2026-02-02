@@ -459,68 +459,71 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         </div>
       </div>
 
-      {/* Purchase Summary - Fixed Bottom */}
+      {/* Purchase Summary - Fixed Bottom - Compact Design */}
       {treeCount > 0 && selectedContract && !showReviewScreen && !showPrePaymentRegistration && !showPaymentSelector && !showPaymentSuccess && (
         <div
-          className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-darkgreen/30 shadow-2xl p-5 pb-safe z-[100000]"
-          style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
+          className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-xl border-t-2 border-darkgreen/40 shadow-2xl z-[100000]"
+          style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
         >
-            <div className="max-w-lg mx-auto space-y-4 py-2">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-green-50/50 rounded-lg p-3">
-                  <div className="text-gray-600 text-xs mb-1">عدد الأشجار</div>
-                  <div className="font-bold text-darkgreen text-base">{treeCount} شجرة</div>
+          <div className="max-w-lg mx-auto px-4 pt-3 pb-2">
+            {/* Compact Info Row */}
+            <div className="flex items-center justify-between text-xs mb-3 px-2">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-darkgreen"></div>
+                  <span className="text-gray-600">{treeCount} شجرة</span>
                 </div>
-
-                <div className="bg-green-50/50 rounded-lg p-3">
-                  <div className="text-gray-600 text-xs mb-1">مدة العقد</div>
-                  <div className="font-bold text-darkgreen text-base">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                  <span className="text-gray-600">
                     {selectedContract.duration_years} سنوات
                     {selectedContract.bonus_years > 0 && (
-                      <span className="text-green-600 mr-1">+{selectedContract.bonus_years}</span>
+                      <span className="text-green-600 font-bold"> +{selectedContract.bonus_years}</span>
                     )}
-                  </div>
+                  </span>
                 </div>
               </div>
+              <div className="text-gray-500 font-semibold">خطوة واحدة ✓</div>
+            </div>
 
-              <div className="text-center py-2">
-                <p className="text-sm font-bold text-darkgreen">
-                  أنت على بعد خطوة من امتلاك أشجارك الخاصة
-                </p>
-                <p className="text-xs text-gray-600 mt-1">
-                  سيتم تسجيل أشجارك مباشرة باسمك بعد إتمام الدفع
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between bg-gradient-to-r from-green-100/60 to-emerald-100/50 rounded-xl p-4 border-2 border-darkgreen/40 min-h-[80px]">
-                <div>
-                  <div className="text-xs text-gray-600 mb-1">الإجمالي</div>
-                  <div className="text-2xl font-bold text-darkgreen">
-                    {calculateTotal().toLocaleString()} ر.س
+            {/* Total and Action Button - Prominent */}
+            <div className="bg-gradient-to-br from-darkgreen to-emerald-700 rounded-2xl p-4 shadow-xl">
+              <div className="flex items-center justify-between gap-4">
+                {/* Total Section */}
+                <div className="flex-1">
+                  <div className="text-green-100 text-xs mb-1 font-medium">الإجمالي الكلي</div>
+                  <div className="text-white text-3xl font-bold tracking-tight">
+                    {calculateTotal().toLocaleString()}
+                    <span className="text-lg mr-1.5">ر.س</span>
+                  </div>
+                  <div className="text-green-100/80 text-[10px] mt-0.5">
+                    {selectedPackage?.package_name}
                   </div>
                 </div>
 
+                {/* Action Button */}
                 <button
                   onClick={handleBuyNow}
                   disabled={isCreatingReservation}
-                  className="px-6 py-3 bg-gradient-to-r from-darkgreen to-[#2F8266] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-6 py-4 bg-white text-darkgreen font-bold rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
                 >
                   {isCreatingReservation ? (
                     <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>جاري التأكيد...</span>
+                      <div className="w-5 h-5 border-2 border-darkgreen border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-sm">جاري...</span>
                     </>
                   ) : (
                     <>
                       <ShoppingCart className="w-5 h-5" />
-                      <span>احجز أشجارك الآن</span>
+                      <span className="text-sm">احجز الآن</span>
                     </>
                   )}
                 </button>
               </div>
             </div>
           </div>
-        )
+        </div>
+      )
       }
 
       {/* Video Modal */}
