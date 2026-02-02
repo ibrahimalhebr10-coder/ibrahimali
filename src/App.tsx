@@ -934,7 +934,7 @@ function App() {
           </button>
 
           <button
-            onClick={() => alert(`قريباً: ${appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}`)}
+            onClick={() => alert('قريباً: متابعة أشجاري')}
             className="flex items-center gap-2 px-5 py-2 rounded-2xl transition-all duration-300 hover:scale-110 hover:shadow-2xl relative overflow-hidden group"
             style={{
               background: appMode === 'agricultural'
@@ -953,7 +953,7 @@ function App() {
               <TrendingUp className="w-7 h-7 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
             )}
             <span className="text-sm font-black text-white relative z-10" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-              {appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}
+              متابعة أشجاري
             </span>
           </button>
 
@@ -1048,7 +1048,7 @@ function App() {
           </button>
 
           <button
-            onClick={() => alert(`قريباً: ${appMode === 'agricultural' ? 'محصولي الزراعي' : 'محصولي الاستثماري'}`)}
+            onClick={() => alert('قريباً: متابعة أشجاري')}
             className="flex flex-col items-center justify-center gap-1 relative -mt-5 active:scale-95 transition-all duration-300"
           >
             <div
