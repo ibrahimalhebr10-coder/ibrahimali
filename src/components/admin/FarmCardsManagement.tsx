@@ -7,6 +7,9 @@ interface Farm {
   id: string;
   name_ar: string;
   location: string;
+  category_id: string;
+  area_size?: string;
+  internal_cost_per_tree?: number;
   total_trees: number;
   available_trees: number;
   reserved_trees: number;
@@ -20,6 +23,7 @@ const FarmCardsManagement: React.FC = () => {
   const [farms, setFarms] = useState<Farm[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
@@ -35,7 +39,7 @@ const FarmCardsManagement: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('farms')
-        .select('id, name_ar, location, total_trees, available_trees, reserved_trees, card_description, coming_soon_label, is_open_for_booking, tree_types')
+        .select('id, name_ar, location, category_id, area_size, internal_cost_per_tree, total_trees, available_trees, reserved_trees, card_description, coming_soon_label, is_open_for_booking, tree_types')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -53,6 +57,17 @@ const FarmCardsManagement: React.FC = () => {
 
   const handleAddSuccess = () => {
     setShowAddForm(false);
+    setRefreshTrigger(prev => prev + 1);
+  };
+
+  const handleEditClick = (farm: Farm) => {
+    setSelectedFarm(farm);
+    setShowEditForm(true);
+  };
+
+  const handleEditSuccess = () => {
+    setShowEditForm(false);
+    setSelectedFarm(null);
     setRefreshTrigger(prev => prev + 1);
   };
 
@@ -285,7 +300,7 @@ const FarmCardsManagement: React.FC = () => {
                       <span className="text-xs font-semibold">عرض</span>
                     </button>
                     <button
-                      onClick={() => alert('سيتم إضافة وظيفة التعديل قريباً')}
+                      onClick={() => handleEditClick(farm)}
                       className="flex items-center justify-center gap-1.5 py-2 px-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
@@ -311,6 +326,30 @@ const FarmCardsManagement: React.FC = () => {
         <AddFarmForm
           onClose={() => setShowAddForm(false)}
           onSuccess={handleAddSuccess}
+        />
+      )}
+
+      {/* Edit Farm Modal */}
+      {showEditForm && selectedFarm && (
+        <AddFarmForm
+          onClose={() => {
+            setShowEditForm(false);
+            setSelectedFarm(null);
+          }}
+          onSuccess={handleEditSuccess}
+          editMode={true}
+          farmData={{
+            id: selectedFarm.id,
+            name_ar: selectedFarm.name_ar,
+            location: selectedFarm.location,
+            category_id: selectedFarm.category_id,
+            area_size: selectedFarm.area_size,
+            internal_cost_per_tree: selectedFarm.internal_cost_per_tree,
+            total_trees: selectedFarm.total_trees,
+            coming_soon_label: selectedFarm.coming_soon_label,
+            card_description: selectedFarm.card_description,
+            tree_types: selectedFarm.tree_types
+          }}
         />
       )}
 
@@ -438,7 +477,7 @@ const FarmCardsManagement: React.FC = () => {
               <button
                 onClick={() => {
                   setShowDetailsModal(false);
-                  alert('سيتم إضافة وظيفة التعديل قريباً');
+                  handleEditClick(selectedFarm!);
                 }}
                 className="flex-1 px-4 py-3 bg-darkgreen text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
               >

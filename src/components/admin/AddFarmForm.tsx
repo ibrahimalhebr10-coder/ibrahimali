@@ -16,9 +16,22 @@ interface Category {
 interface AddFarmFormProps {
   onClose: () => void;
   onSuccess: () => void;
+  editMode?: boolean;
+  farmData?: {
+    id: string;
+    name_ar: string;
+    location: string;
+    category_id: string;
+    area_size?: string;
+    internal_cost_per_tree?: number;
+    total_trees: number;
+    coming_soon_label?: string;
+    card_description?: string;
+    tree_types?: any[];
+  };
 }
 
-const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
+const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess, editMode = false, farmData }) => {
   const [name, setName] = useState('');
   const [location, setLocation] = useState('');
   const [areaSize, setAreaSize] = useState('');
@@ -40,6 +53,26 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
   useEffect(() => {
     loadCategories();
   }, []);
+
+  useEffect(() => {
+    if (editMode && farmData) {
+      setName(farmData.name_ar || '');
+      setLocation(farmData.location || '');
+      setAreaSize(farmData.area_size || '');
+      setInternalCost(farmData.internal_cost_per_tree?.toString() || '');
+      setTotalTrees(farmData.total_trees?.toString() || '');
+      setComingSoonLabel(farmData.coming_soon_label || 'قريبًا');
+      setCardDescription(farmData.card_description || '');
+      setSelectedCategory(farmData.category_id || '');
+
+      if (farmData.tree_types && farmData.tree_types.length > 0) {
+        setTreeTypes(farmData.tree_types.map(t => ({
+          name: t.name || '',
+          count: t.count || 0
+        })));
+      }
+    }
+  }, [editMode, farmData]);
 
   const loadCategories = async () => {
     try {
@@ -141,10 +174,10 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
         order: index + 1
       }));
 
-      const { data, error: insertError } = await supabase
-        .from('farms')
-        .insert([
-          {
+      if (editMode && farmData) {
+        const { error: updateError } = await supabase
+          .from('farms')
+          .update({
             category_id: selectedCategory,
             name_ar: name,
             name_en: name,
@@ -156,28 +189,55 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
             card_description: cardDescription || null,
             tree_types: treeTypesJson,
             description_ar: cardDescription || name,
-            image_url: 'https://images.pexels.com/photos/96715/pexels-photo-96715.jpeg',
-            annual_return_rate: 15,
-            min_investment: 1000,
-            max_investment: 100000,
-            total_capacity: Number(totalTrees),
-            start_date: new Date().toISOString().split('T')[0],
-            end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            status: 'active',
-            is_open_for_booking: true,
-            available_trees: Number(totalTrees),
-            reserved_trees: 0,
-            return_rate_display: '15% سنوياً',
-            order_index: 0
-          }
-        ])
-        .select();
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', farmData.id);
 
-      if (insertError) {
-        console.error('Insert error:', insertError);
-        setError('حدث خطأ أثناء إضافة المزرعة');
-        setIsLoading(false);
-        return;
+        if (updateError) {
+          console.error('Update error:', updateError);
+          setError('حدث خطأ أثناء تعديل المزرعة');
+          setIsLoading(false);
+          return;
+        }
+      } else {
+        const { error: insertError } = await supabase
+          .from('farms')
+          .insert([
+            {
+              category_id: selectedCategory,
+              name_ar: name,
+              name_en: name,
+              location: location,
+              area_size: areaSize || null,
+              internal_cost_per_tree: Number(internalCost) || 0,
+              total_trees: Number(totalTrees),
+              coming_soon_label: comingSoonLabel || 'قريبًا',
+              card_description: cardDescription || null,
+              tree_types: treeTypesJson,
+              description_ar: cardDescription || name,
+              image_url: 'https://images.pexels.com/photos/96715/pexels-photo-96715.jpeg',
+              annual_return_rate: 15,
+              min_investment: 1000,
+              max_investment: 100000,
+              total_capacity: Number(totalTrees),
+              start_date: new Date().toISOString().split('T')[0],
+              end_date: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+              status: 'active',
+              is_open_for_booking: true,
+              available_trees: Number(totalTrees),
+              reserved_trees: 0,
+              return_rate_display: '15% سنوياً',
+              order_index: 0
+            }
+          ])
+          .select();
+
+        if (insertError) {
+          console.error('Insert error:', insertError);
+          setError('حدث خطأ أثناء إضافة المزرعة');
+          setIsLoading(false);
+          return;
+        }
       }
 
       onSuccess();
@@ -199,8 +259,12 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
         {/* Header */}
         <div className="bg-gradient-to-r from-darkgreen to-green-700 text-white p-6 flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold">إضافة مزرعة جديدة</h2>
-            <p className="text-green-100 text-sm mt-1">المزرعة = خزان | التسعير من الباقات</p>
+            <h2 className="text-2xl font-bold">
+              {editMode ? 'تعديل المزرعة' : 'إضافة مزرعة جديدة'}
+            </h2>
+            <p className="text-green-100 text-sm mt-1">
+              {editMode ? 'تحديث معلومات المزرعة' : 'المزرعة = خزان | التسعير من الباقات'}
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -502,12 +566,12 @@ const AddFarmForm: React.FC<AddFarmFormProps> = ({ onClose, onSuccess }) => {
             {isLoading ? (
               <>
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                <span>جارٍ الحفظ...</span>
+                <span>{editMode ? 'جارٍ التحديث...' : 'جارٍ الحفظ...'}</span>
               </>
             ) : (
               <>
                 <Save className="w-5 h-5" />
-                <span>حفظ المزرعة</span>
+                <span>{editMode ? 'تحديث المزرعة' : 'حفظ المزرعة'}</span>
               </>
             )}
           </button>
