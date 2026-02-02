@@ -1,4 +1,4 @@
-import { X, Home, BarChart3, Trophy, Camera, User, LogOut, Sparkles, ChevronLeft } from 'lucide-react';
+import { X, Home, BarChart3, Trophy, Camera, User, LogOut, Sparkles, ChevronLeft, Edit2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import InvestmentContract from './InvestmentContract';
@@ -9,6 +9,7 @@ import AchievementsRewards from './AchievementsRewards';
 import SmartPhotoGallery from './SmartPhotoGallery';
 import LoyaltyPointsRewards from './LoyaltyPointsRewards';
 import InteractiveFarmCalendar from './InteractiveFarmCalendar';
+import FarmNicknameModal from './FarmNicknameModal';
 import { investorAccountService, type InvestorStats, type InvestorInvestment } from '../services/investorAccountService';
 
 interface AccountProfileProps {
@@ -30,6 +31,9 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onStartInv
   const [selectedInvestmentId, setSelectedInvestmentId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<ActiveTab>('home');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [farmNickname, setFarmNickname] = useState<string | null>(null);
+  const [showNicknameModal, setShowNicknameModal] = useState(false);
+  const [hasCheckedNickname, setHasCheckedNickname] = useState(false);
 
   useEffect(() => {
     if (isOpen && user) {
@@ -46,13 +50,20 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onStartInv
 
     setLoading(true);
     try {
-      const [statsData, investmentsData] = await Promise.all([
+      const [statsData, investmentsData, nickname] = await Promise.all([
         investorAccountService.getInvestorStats(user.id),
-        investorAccountService.getInvestorInvestments(user.id)
+        investorAccountService.getInvestorInvestments(user.id),
+        investorAccountService.getFarmNickname(user.id)
       ]);
 
       setStats(statsData);
       setInvestments(investmentsData);
+      setFarmNickname(nickname);
+
+      if (!hasCheckedNickname && statsData.status !== 'none' && !nickname) {
+        setShowNicknameModal(true);
+        setHasCheckedNickname(true);
+      }
     } catch (error) {
       console.error('Error loading investor data:', error);
     } finally {
@@ -220,9 +231,32 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onStartInv
 
                       <div className="relative z-10">
                         <p className="text-sm opacity-90 mb-1">مرحباً</p>
-                        <h2 className="text-2xl font-bold mb-6">
+                        <h2 className="text-2xl font-bold mb-2">
                           {user.user_metadata?.full_name || user.email?.split('@')[0]}
                         </h2>
+
+                        {farmNickname ? (
+                          <div className="flex items-center gap-2 mb-4">
+                            <div className="bg-white/20 backdrop-blur-sm rounded-lg px-3 py-1.5 flex items-center gap-2 flex-1">
+                              <Sparkles className="w-4 h-4" />
+                              <span className="text-sm font-semibold">{farmNickname}</span>
+                            </div>
+                            <button
+                              onClick={() => setShowNicknameModal(true)}
+                              className="w-8 h-8 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setShowNicknameModal(true)}
+                            className="mb-4 flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-lg px-3 py-2 hover:bg-white/30 transition-all"
+                          >
+                            <Sparkles className="w-4 h-4" />
+                            <span className="text-sm font-semibold">اختر اسماً لمزرعتك</span>
+                          </button>
+                        )}
 
                         <div className="grid grid-cols-2 gap-4">
                           <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
@@ -369,6 +403,19 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onStartInv
               </div>
             </div>
           </div>
+        )}
+
+        {/* Farm Nickname Modal */}
+        {showNicknameModal && user && (
+          <FarmNicknameModal
+            userId={user.id}
+            currentNickname={farmNickname}
+            isFirstTime={!farmNickname}
+            onClose={() => setShowNicknameModal(false)}
+            onSave={(newNickname) => {
+              setFarmNickname(newNickname);
+            }}
+          />
         )}
       </div>
     </>

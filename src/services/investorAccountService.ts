@@ -23,6 +23,45 @@ export interface InvestorStats {
 }
 
 export const investorAccountService = {
+  async getFarmNickname(userId: string): Promise<string | null> {
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('farm_nickname')
+        .eq('id', userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('[InvestorAccountService] Error fetching farm nickname:', error);
+        return null;
+      }
+
+      return data?.farm_nickname || null;
+    } catch (error) {
+      console.error('[InvestorAccountService] Exception:', error);
+      return null;
+    }
+  },
+
+  async updateFarmNickname(userId: string, nickname: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ farm_nickname: nickname })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('[InvestorAccountService] Error updating farm nickname:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('[InvestorAccountService] Exception:', error);
+      return false;
+    }
+  },
+
   async getInvestorInvestments(userId: string): Promise<InvestorInvestment[]> {
     try {
       const { data: reservations, error } = await supabase

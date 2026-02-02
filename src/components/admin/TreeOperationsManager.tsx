@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Droplets, Wrench, Scissors, Apple, Plus, X, Upload, Image, Video, Calendar, DollarSign, FileText, User, MapPin, Search, Filter, Eye } from 'lucide-react';
+import { Droplets, Wrench, Scissors, Apple, Plus, X, Upload, Image, Video, Calendar, DollarSign, FileText, User, MapPin, Search, Filter, Eye, Sparkles } from 'lucide-react';
 import { treeOperationsService, type TreeOperation, type CreateTreeOperationInput } from '../../services/treeOperationsService';
 import { supabase } from '../../lib/supabase';
 
@@ -246,7 +246,15 @@ export default function TreeOperationsManager({ farmId }: TreeOperationsManagerP
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
                   <div className="flex items-center gap-2 text-sm">
                     <User className="w-4 h-4 text-gray-400" />
-                    <span className="text-gray-600">{operation.investor_name}</span>
+                    <div className="flex flex-col">
+                      <span className="text-gray-600">{operation.investor_name}</span>
+                      {operation.farm_nickname && (
+                        <span className="text-xs text-emerald-600 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3" />
+                          {operation.farm_nickname}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <MapPin className="w-4 h-4 text-gray-400" />

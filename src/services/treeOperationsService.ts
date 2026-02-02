@@ -18,6 +18,7 @@ export interface TreeOperation {
   media?: TreeOperationMedia[];
   investor_name?: string;
   farm_name?: string;
+  farm_nickname?: string;
 }
 
 export interface TreeOperationMedia {
@@ -60,7 +61,7 @@ export const treeOperationsService = {
       }])
       .select(`
         *,
-        users:investor_id(full_name),
+        user_profiles!tree_operations_investor_id_fkey(full_name, farm_nickname),
         farms:farm_id(name)
       `)
       .single();
@@ -72,8 +73,9 @@ export const treeOperationsService = {
 
     return {
       ...data,
-      investor_name: data.users?.full_name,
-      farm_name: data.farms?.name
+      investor_name: data.user_profiles?.full_name,
+      farm_name: data.farms?.name,
+      farm_nickname: data.user_profiles?.farm_nickname
     };
   },
 
@@ -82,7 +84,7 @@ export const treeOperationsService = {
       .from('tree_operations')
       .select(`
         *,
-        users:investor_id(full_name),
+        user_profiles!tree_operations_investor_id_fkey(full_name, farm_nickname),
         farms:farm_id(name),
         media:tree_operation_media(*)
       `)
@@ -128,7 +130,7 @@ export const treeOperationsService = {
       .from('tree_operations')
       .select(`
         *,
-        users:investor_id(full_name),
+        user_profiles!tree_operations_investor_id_fkey(full_name, farm_nickname),
         farms:farm_id(name),
         media:tree_operation_media(*)
       `)
@@ -144,8 +146,9 @@ export const treeOperationsService = {
 
     return {
       ...data,
-      investor_name: data.users?.full_name,
-      farm_name: data.farms?.name
+      investor_name: data.user_profiles?.full_name,
+      farm_name: data.farms?.name,
+      farm_nickname: data.user_profiles?.farm_nickname
     };
   },
 
@@ -156,7 +159,7 @@ export const treeOperationsService = {
       .eq('id', operationId)
       .select(`
         *,
-        users:investor_id(full_name),
+        user_profiles!tree_operations_investor_id_fkey(full_name, farm_nickname),
         farms:farm_id(name),
         media:tree_operation_media(*)
       `)
@@ -169,8 +172,9 @@ export const treeOperationsService = {
 
     return {
       ...data,
-      investor_name: data.users?.full_name,
-      farm_name: data.farms?.name
+      investor_name: data.user_profiles?.full_name,
+      farm_name: data.farms?.name,
+      farm_nickname: data.user_profiles?.farm_nickname
     };
   },
 
