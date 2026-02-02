@@ -453,14 +453,14 @@ function App() {
           `
         }}></div>
 
-        {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !admin && (
+        {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && (
           <Header
             isVisible={!isScrollingDown}
             onAdminAccess={() => setShowAdminLogin(true)}
           />
         )}
 
-        {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !admin && (
+        {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && (
           <>
             <div className="flex-1 flex flex-col overflow-hidden">
               <div className="sticky top-16 lg:top-20 z-20 backdrop-blur-2xl relative" style={{
@@ -876,7 +876,7 @@ function App() {
           </>
         )}
 
-      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && !admin && (
+      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && (
         <nav
           className="hidden lg:flex fixed left-0 right-0 z-50 backdrop-blur-2xl"
           style={{
@@ -982,7 +982,7 @@ function App() {
       </nav>
       )}
 
-      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && !admin && (
+      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && (
         <nav
           className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
         style={{
