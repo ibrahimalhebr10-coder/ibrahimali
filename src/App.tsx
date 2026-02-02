@@ -1071,23 +1071,6 @@ function App() {
             </div>
             <span className="text-[10px] font-black text-darkgreen/90">حسابي</span>
           </button>
-
-          <button
-            onClick={() => setShowAdminDashboard(true)}
-            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
-          >
-            <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
-              style={{
-                background: 'linear-gradient(145deg, rgba(59,130,246,0.1) 0%, rgba(37,99,235,0.15) 100%)',
-                boxShadow: '0 6px 12px rgba(59,130,246,0.25), inset 0 2px 4px rgba(255,255,255,0.9)',
-                border: '2.5px solid #3B82F6'
-              }}
-            >
-              <Settings className="w-6 h-6 text-blue-600 transition-all duration-300 group-active:scale-110" />
-            </div>
-            <span className="text-[10px] font-black text-blue-600/90">الإدارة</span>
-          </button>
         </div>
       </nav>
       )}

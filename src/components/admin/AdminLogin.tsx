@@ -1,36 +1,84 @@
 import React, { useState } from 'react';
-import { Lock, Mail, AlertCircle, Shield } from 'lucide-react';
+import { Lock, Mail, AlertCircle, Shield, CheckCircle2, ArrowRight } from 'lucide-react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
+import { supabase } from '../../lib/supabase';
 
 interface AdminLoginProps {
   onLoginSuccess: () => void;
 }
 
+type LoginStep = 'identifier' | 'password';
+
 const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
-  const [email, setEmail] = useState('');
+  const [step, setStep] = useState<LoginStep>('identifier');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [adminName, setAdminName] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAdminAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleIdentifierSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    if (!email || !password) {
-      setError('يرجى ملء جميع الحقول');
+    if (!identifier.trim()) {
+      setError('يرجى إدخال اسم المستخدم أو البريد الإلكتروني');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const result = await login(email, password);
+      const { data: adminRecord, error: adminError } = await supabase
+        .from('admins')
+        .select('id, email, full_name, role, is_active')
+        .eq('email', identifier.toLowerCase().trim())
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (adminError) {
+        console.error('Admin query error:', adminError);
+        setError('خطأ في الاتصال بقاعدة البيانات');
+        setIsLoading(false);
+        return;
+      }
+
+      if (!adminRecord) {
+        setError('هذا الحساب غير مخوّل للدخول إلى لوحة الإدارة');
+        setIsLoading(false);
+        return;
+      }
+
+      setAdminName(adminRecord.full_name);
+      setStep('password');
+      setError('');
+    } catch (err) {
+      console.error('Verification error:', err);
+      setError('حدث خطأ غير متوقع');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (!password) {
+      setError('يرجى إدخال كلمة المرور');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const result = await login(identifier, password);
 
       if (result.success) {
         onLoginSuccess();
       } else {
-        setError(result.error || 'فشل تسجيل الدخول');
+        setError(result.error || 'كلمة المرور غير صحيحة');
       }
     } catch (err) {
       setError('حدث خطأ غير متوقع');
@@ -39,81 +87,152 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
     }
   };
 
+  const handleBack = () => {
+    setStep('identifier');
+    setPassword('');
+    setError('');
+    setAdminName('');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4" dir="rtl">
       <div className="w-full max-w-md">
         {/* Logo/Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-darkgreen rounded-full mb-4">
-            <Shield className="w-8 h-8 md:w-10 md:h-10 text-white" />
+          <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-darkgreen rounded-full mb-4 relative overflow-hidden group">
+            <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-transparent animate-pulse"></div>
+            <Shield className="w-8 h-8 md:w-10 md:h-10 text-white relative z-10" strokeWidth={2.5} />
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">لوحة إدارة المنصة</h1>
-          <p className="text-sm md:text-base text-gray-600">تسجيل الدخول للإداريين فقط</p>
+          <p className="text-sm md:text-base text-gray-600">
+            {step === 'identifier' ? 'تسجيل الدخول للإداريين فقط' : 'أدخل كلمة المرور للمتابعة'}
+          </p>
         </div>
 
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Error Message */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 md:p-4 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <p className="text-sm md:text-base text-red-800">{error}</p>
-              </div>
-            )}
+          {/* Step 1: Identifier */}
+          {step === 'identifier' && (
+            <form onSubmit={handleIdentifierSubmit} className="space-y-5">
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 md:p-4 flex items-start gap-3 animate-fadeIn">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm md:text-base text-red-800">{error}</p>
+                </div>
+              )}
 
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm md:text-base font-semibold text-gray-700 mb-2">
-                البريد الإلكتروني أو اسم المستخدم
-              </label>
-              <div className="relative">
-                <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  id="email"
-                  type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pr-11 pl-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkgreen focus:border-transparent text-right text-sm md:text-base"
-                  placeholder="أدخل البريد الإلكتروني"
+              {/* Identifier Field */}
+              <div>
+                <label htmlFor="identifier" className="block text-sm md:text-base font-semibold text-gray-700 mb-2">
+                  اسم المستخدم أو البريد الإلكتروني
+                </label>
+                <div className="relative">
+                  <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="identifier"
+                    type="text"
+                    value={identifier}
+                    onChange={(e) => setIdentifier(e.target.value)}
+                    className="w-full pr-11 pl-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkgreen focus:border-transparent text-right text-sm md:text-base transition-all"
+                    placeholder="أدخل اسم المستخدم أو البريد"
+                    disabled={isLoading}
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-darkgreen text-white py-3 md:py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base shadow-lg hover:shadow-xl"
+              >
+                {isLoading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    <span>جارٍ التحقق...</span>
+                  </div>
+                ) : (
+                  'متابعة'
+                )}
+              </button>
+            </form>
+          )}
+
+          {/* Step 2: Password */}
+          {step === 'password' && (
+            <form onSubmit={handlePasswordSubmit} className="space-y-5">
+              {/* Success Message */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 md:p-4 flex items-start gap-3 animate-fadeIn">
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm md:text-base text-green-800 font-semibold">تم التعرف على حساب إداري</p>
+                  <p className="text-xs md:text-sm text-green-700 mt-1">مرحباً، {adminName}</p>
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 md:p-4 flex items-start gap-3 animate-fadeIn">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm md:text-base text-red-800">{error}</p>
+                </div>
+              )}
+
+              {/* Password Field */}
+              <div>
+                <label htmlFor="password" className="block text-sm md:text-base font-semibold text-gray-700 mb-2">
+                  كلمة المرور
+                </label>
+                <div className="relative">
+                  <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pr-11 pl-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkgreen focus:border-transparent text-right text-sm md:text-base transition-all"
+                    placeholder="أدخل كلمة المرور"
+                    disabled={isLoading}
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={handleBack}
                   disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm md:text-base font-semibold text-gray-700 mb-2">
-                كلمة المرور
-              </label>
-              <div className="relative">
-                <Lock className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pr-11 pl-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-darkgreen focus:border-transparent text-right text-sm md:text-base"
-                  placeholder="أدخل كلمة المرور"
+                  className="flex-shrink-0 px-4 py-3 md:py-4 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <ArrowRight className="w-5 h-5" />
+                  <span className="hidden md:inline">رجوع</span>
+                </button>
+                <button
+                  type="submit"
                   disabled={isLoading}
-                />
+                  className="flex-1 bg-darkgreen text-white py-3 md:py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base shadow-lg hover:shadow-xl"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>جارٍ الدخول...</span>
+                    </div>
+                  ) : (
+                    'دخول لوحة الإدارة'
+                  )}
+                </button>
               </div>
-            </div>
-
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-darkgreen text-white py-3 md:py-4 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm md:text-base"
-            >
-              {isLoading ? 'جارٍ تسجيل الدخول...' : 'دخول لوحة الإدارة'}
-            </button>
-          </form>
+            </form>
+          )}
 
           {/* Info */}
           <div className="mt-6 pt-6 border-t border-gray-200">
             <div className="bg-amber-50 rounded-lg p-3 md:p-4">
-              <p className="text-xs md:text-sm text-amber-900 text-center">
+              <p className="text-xs md:text-sm text-amber-900 text-center leading-relaxed">
                 لا يوجد خيار لإنشاء حساب أو استعادة كلمة المرور من هنا.
                 <br />
                 يتم إنشاء الحسابات من داخل النظام فقط.
