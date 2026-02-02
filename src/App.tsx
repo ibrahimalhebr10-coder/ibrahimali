@@ -404,36 +404,39 @@ function App() {
                         label: 'حاسبة مزرعتك',
                         onClick: () => alert('قريباً: حاسبة المزرعة'),
                         delay: '0ms',
-                        gradient: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 25%, #06b6d4 50%, #0891b2 75%, #06b6d4 100%)',
-                        hoverGradient: 'linear-gradient(135deg, #22d3ee 0%, #06b6d4 50%, #22d3ee 100%)',
-                        iconColor: '#ecfeff',
-                        border: 'rgba(6, 182, 212, 0.6)',
-                        shadow: 'rgba(6, 182, 212, 0.4)',
-                        glow: 'rgba(6, 182, 212, 0.5)'
+                        gradient: 'linear-gradient(135deg, rgba(6, 182, 212, 0.12) 0%, rgba(8, 145, 178, 0.15) 50%, rgba(6, 182, 212, 0.12) 100%)',
+                        hoverGradient: 'linear-gradient(135deg, rgba(34, 211, 238, 0.18) 0%, rgba(6, 182, 212, 0.22) 50%, rgba(34, 211, 238, 0.18) 100%)',
+                        iconColor: '#0891b2',
+                        textColor: '#0e7490',
+                        border: 'rgba(6, 182, 212, 0.25)',
+                        shadow: 'rgba(6, 182, 212, 0.15)',
+                        glow: 'rgba(6, 182, 212, 0.08)'
                       },
                       {
                         icon: Video,
                         label: 'فيديو تعريفي',
                         onClick: () => setShowVideoIntro(true),
                         delay: '100ms',
-                        gradient: 'linear-gradient(135deg, #ec4899 0%, #db2777 25%, #ec4899 50%, #db2777 75%, #ec4899 100%)',
-                        hoverGradient: 'linear-gradient(135deg, #f472b6 0%, #ec4899 50%, #f472b6 100%)',
-                        iconColor: '#fdf2f8',
-                        border: 'rgba(236, 72, 153, 0.6)',
-                        shadow: 'rgba(236, 72, 153, 0.4)',
-                        glow: 'rgba(236, 72, 153, 0.5)'
+                        gradient: 'linear-gradient(135deg, rgba(236, 72, 153, 0.12) 0%, rgba(219, 39, 119, 0.15) 50%, rgba(236, 72, 153, 0.12) 100%)',
+                        hoverGradient: 'linear-gradient(135deg, rgba(244, 114, 182, 0.18) 0%, rgba(236, 72, 153, 0.22) 50%, rgba(244, 114, 182, 0.18) 100%)',
+                        iconColor: '#db2777',
+                        textColor: '#be185d',
+                        border: 'rgba(236, 72, 153, 0.25)',
+                        shadow: 'rgba(236, 72, 153, 0.15)',
+                        glow: 'rgba(236, 72, 153, 0.08)'
                       },
                       {
                         icon: HelpCircle,
                         label: 'كيف تبدأ؟',
                         onClick: () => setShowHowToStart(true),
                         delay: '200ms',
-                        gradient: 'linear-gradient(135deg, #f59e0b 0%, #d97706 25%, #f59e0b 50%, #d97706 75%, #f59e0b 100%)',
-                        hoverGradient: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fbbf24 100%)',
-                        iconColor: '#fffbeb',
-                        border: 'rgba(245, 158, 11, 0.6)',
-                        shadow: 'rgba(245, 158, 11, 0.4)',
-                        glow: 'rgba(245, 158, 11, 0.5)'
+                        gradient: 'linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(217, 119, 6, 0.15) 50%, rgba(245, 158, 11, 0.12) 100%)',
+                        hoverGradient: 'linear-gradient(135deg, rgba(251, 191, 36, 0.18) 0%, rgba(245, 158, 11, 0.22) 50%, rgba(251, 191, 36, 0.18) 100%)',
+                        iconColor: '#d97706',
+                        textColor: '#b45309',
+                        border: 'rgba(245, 158, 11, 0.25)',
+                        shadow: 'rgba(245, 158, 11, 0.15)',
+                        glow: 'rgba(245, 158, 11, 0.08)'
                       }
                     ].map((action, idx) => (
                       <button
@@ -441,14 +444,20 @@ function App() {
                         onClick={action.onClick}
                         className="rounded-xl lg:rounded-2xl flex-1 h-11 lg:h-16 xl:h-18 flex flex-col items-center justify-center relative group overflow-hidden transition-all duration-300 hover:scale-[1.04] active:scale-[0.96]"
                         style={{
-                          boxShadow: `0 5px 15px ${action.shadow}, 0 8px 30px ${action.glow}, inset 0 2px 0 rgba(255,255,255,0.35), inset 0 -2px 0 rgba(0,0,0,0.1)`,
-                          border: `2.5px solid ${action.border}`,
-                          background: action.gradient,
-                          backdropFilter: 'blur(12px)',
-                          WebkitBackdropFilter: 'blur(12px)',
+                          boxShadow: `0 4px 12px ${action.shadow}, 0 2px 8px ${action.glow}, inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.05)`,
+                          border: `1.5px solid ${action.border}`,
+                          background: `rgba(255, 255, 255, 0.65)`,
+                          backdropFilter: 'blur(16px)',
+                          WebkitBackdropFilter: 'blur(16px)',
                           animationDelay: action.delay
                         }}
                       >
+                        <div
+                          className="absolute inset-0 rounded-xl lg:rounded-2xl pointer-events-none"
+                          style={{
+                            background: action.gradient
+                          }}
+                        />
                         <div
                           className="absolute inset-0 rounded-xl lg:rounded-2xl pointer-events-none transition-opacity duration-300 opacity-0 group-hover:opacity-100"
                           style={{
@@ -458,28 +467,28 @@ function App() {
                         <div
                           className="absolute inset-0 rounded-xl lg:rounded-2xl pointer-events-none"
                           style={{
-                            background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.3) 0%, transparent 60%)'
+                            background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.4) 0%, transparent 60%)'
                           }}
                         />
                         <div
                           className="absolute bottom-0 left-0 right-0 h-1/2 rounded-b-xl lg:rounded-b-2xl pointer-events-none"
                           style={{
-                            background: 'linear-gradient(to top, rgba(0,0,0,0.08) 0%, transparent 100%)'
+                            background: 'linear-gradient(to top, rgba(0,0,0,0.03) 0%, transparent 100%)'
                           }}
                         />
                         <action.icon
                           className="w-5 h-5 lg:w-7 lg:h-7 xl:w-8 xl:h-8 mb-0.5 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3"
                           style={{
                             color: action.iconColor,
-                            filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.35))',
+                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.15))',
                             strokeWidth: '2.5px'
                           }}
                         />
                         <span
                           className="text-[10px] lg:text-xs xl:text-sm font-black text-center leading-tight px-1.5 relative z-10 tracking-wide transition-all duration-300 group-hover:scale-105"
                           style={{
-                            color: action.iconColor,
-                            textShadow: '0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
+                            color: action.textColor,
+                            textShadow: '0 1px 2px rgba(255,255,255,0.8)',
                             letterSpacing: '0.2px'
                           }}
                         >
