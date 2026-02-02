@@ -1034,7 +1034,7 @@ function App() {
               )}
             </div>
             <span className="text-[9px] font-black text-darkgreen mt-1">
-              {appMode === 'agricultural' ? 'زراعي' : 'استثماري'}
+              {appMode === 'agricultural' ? 'متابعة مزرعتي' : 'متابعة استثماراتي'}
             </span>
           </button>
 
