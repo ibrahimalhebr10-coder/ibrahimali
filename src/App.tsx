@@ -383,12 +383,12 @@ function App() {
               <div className="sticky top-16 lg:top-20 z-20 backdrop-blur-2xl relative" style={{
                 background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 252, 250, 0.95) 50%, rgba(252, 254, 253, 0.95) 100%)',
                 boxShadow: '0 8px 32px rgba(58, 161, 126, 0.12), 0 2px 8px rgba(0, 0, 0, 0.05)',
-                borderBottom: '2px solid rgba(58, 161, 126, 0.2)',
                 transform: !isScrollingDown ? 'translateY(0)' : 'translateY(-100%)',
                 transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
                 willChange: 'transform',
                 WebkitTransform: !isScrollingDown ? 'translateY(0)' : 'translateY(-100%)',
-                WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
+                WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
+                paddingBottom: !isScrollingDown ? '1.5rem' : '0.25rem'
               }}>
                 <div className="absolute inset-0 pointer-events-none" style={{
                   background: 'radial-gradient(ellipse at top, rgba(58, 161, 126, 0.05) 0%, transparent 70%)'
@@ -586,15 +586,6 @@ function App() {
           </div>
           )}
                 </section>
-
-                <div className="absolute left-0 right-0 bottom-0 pointer-events-none" style={{
-                  height: '4rem',
-                  transform: 'translateY(100%)',
-                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 252, 250, 0.95) 50%, rgba(252, 254, 253, 0.95) 100%)',
-                  backdropFilter: 'blur(16px)',
-                  WebkitBackdropFilter: 'blur(16px)',
-                  zIndex: -1
-                }}></div>
               </div>
 
               <div
@@ -610,7 +601,7 @@ function App() {
               >
                 <div className="max-w-7xl mx-auto">
                   <section className="px-3 lg:px-4 pb-4 lg:pb-6" style={{
-                    paddingTop: !isScrollingDown ? '4rem' : '0.5rem',
+                    paddingTop: !isScrollingDown ? '1.5rem' : '0.25rem',
                     transition: 'padding-top 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
                   }}>
           {loading ? (
