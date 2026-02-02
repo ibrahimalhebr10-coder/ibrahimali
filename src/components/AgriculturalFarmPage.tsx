@@ -235,7 +235,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         ref={scrollContainerRef}
         className="fixed inset-0 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 z-50 overflow-y-auto pt-[73px]"
       >
-        <div className={`min-h-screen ${treeCount > 0 ? 'pb-72' : 'pb-32'}`}>
+        <div className={`min-h-screen ${treeCount > 0 ? 'pb-96' : 'pb-32'}`}>
           {/* Hero Image 3D */}
         <div className="w-full h-48 bg-gradient-to-br from-green-100 to-emerald-100 relative overflow-hidden">
           {farm.heroImage || farm.image ? (
@@ -341,11 +341,25 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                       </div>
                     )}
 
+                    {/* Primary Action: Select Package */}
+                    <button
+                      onClick={() => handleSelectPackage(pkg)}
+                      className={`w-full py-3 px-3 text-xs font-bold rounded-lg transition-all active:scale-95 flex items-center justify-center gap-1.5 ${
+                        isSelected
+                          ? 'bg-darkgreen text-white shadow-lg'
+                          : 'bg-gradient-to-r from-darkgreen to-emerald-600 text-white hover:shadow-lg'
+                      }`}
+                    >
+                      <Sprout className="w-4 h-4" />
+                      <span>{isSelected ? 'الباقة المختارة ✓' : 'اختر هذه الباقة'}</span>
+                    </button>
+
+                    {/* Secondary Action: Read More (Optional) */}
                     <button
                       onClick={() => handlePackageDetailsClick(pkg)}
-                      className="w-full py-2 px-3 bg-gradient-to-r from-darkgreen to-emerald-600 text-white text-xs font-bold rounded-lg hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                      className="w-full py-1.5 px-2 bg-transparent text-darkgreen/70 text-[11px] font-medium rounded-lg hover:bg-green-50 transition-all active:scale-95 flex items-center justify-center gap-1"
                     >
-                      <FileText className="w-3.5 h-3.5" />
+                      <FileText className="w-3 h-3" />
                       <span>اقرأ المزيد عن الباقة</span>
                     </button>
                   </div>
@@ -463,9 +477,9 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       {treeCount > 0 && selectedContract && !showReviewScreen && !showPrePaymentRegistration && !showPaymentSelector && !showPaymentSuccess && (
         <div
           className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-xl border-t-2 border-darkgreen/40 shadow-2xl z-[100000]"
-          style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+          style={{ paddingBottom: 'max(2rem, env(safe-area-inset-bottom))' }}
         >
-          <div className="max-w-lg mx-auto px-4 pt-3 pb-2">
+          <div className="max-w-lg mx-auto px-4 pt-4 pb-3">
             {/* Compact Info Row */}
             <div className="flex items-center justify-between text-xs mb-3 px-2">
               <div className="flex items-center gap-4">
