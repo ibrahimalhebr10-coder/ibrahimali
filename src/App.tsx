@@ -382,6 +382,32 @@ function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentFarmIndex, currentFarms.length, selectedInvestmentFarm, scrollToFarm]);
 
+  useEffect(() => {
+    const slider = farmsSliderRef.current;
+    if (!slider) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (selectedInvestmentFarm) return;
+
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        return;
+      }
+
+      if (window.innerWidth >= 1024) {
+        e.preventDefault();
+
+        if (e.deltaY > 0 && currentFarmIndex < currentFarms.length - 1) {
+          scrollToFarm(currentFarmIndex + 1);
+        } else if (e.deltaY < 0 && currentFarmIndex > 0) {
+          scrollToFarm(currentFarmIndex - 1);
+        }
+      }
+    };
+
+    slider.addEventListener('wheel', handleWheel, { passive: false });
+    return () => slider.removeEventListener('wheel', handleWheel);
+  }, [currentFarmIndex, currentFarms.length, selectedInvestmentFarm, scrollToFarm]);
+
   const handleUnreadCountChange = async () => {
     try {
       const count = await getUnreadCount();

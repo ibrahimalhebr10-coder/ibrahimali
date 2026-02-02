@@ -68,6 +68,30 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
     }
   }, [selectedContract]);
 
+  useEffect(() => {
+    const slider = packagesScrollRef.current;
+    if (!slider || packages.length <= 1) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+        return;
+      }
+
+      if (window.innerWidth >= 768) {
+        e.preventDefault();
+
+        if (e.deltaY > 0 && currentPackageIndex < packages.length - 1) {
+          scrollToPackage(currentPackageIndex + 1);
+        } else if (e.deltaY < 0 && currentPackageIndex > 0) {
+          scrollToPackage(currentPackageIndex - 1);
+        }
+      }
+    };
+
+    slider.addEventListener('wheel', handleWheel, { passive: false });
+    return () => slider.removeEventListener('wheel', handleWheel);
+  }, [currentPackageIndex, packages.length]);
+
   const maxTrees = farm.availableTrees || 0;
 
   const calculateTotal = () => {
@@ -353,7 +377,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
                   <div
                     key={pkg.id}
                     onClick={() => handleSelectPackage(pkg)}
-                    className={`relative flex-shrink-0 w-[85%] snap-center p-4 rounded-xl border-2 transition-all cursor-pointer active:scale-95 ${
+                    className={`relative flex-shrink-0 w-[85%] md:w-[48%] lg:w-[45%] xl:w-[30%] snap-center p-4 rounded-xl border-2 transition-all cursor-pointer active:scale-95 ${
                       isSelected
                         ? 'bg-gradient-to-br from-amber-100/60 to-yellow-100/50 border-[#D4AF37] shadow-lg'
                         : 'bg-white/80 border-amber-200 hover:border-amber-400 hover:shadow-md'
