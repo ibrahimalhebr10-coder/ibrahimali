@@ -26,27 +26,27 @@ const DashboardOverview: React.FC = () => {
   return (
     <div>
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">الصفحة الرئيسية</h1>
-        <p className="text-gray-600">نظرة عامة على أداء المنصة</p>
+      <div className="mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">الصفحة الرئيسية</h1>
+        <p className="text-sm md:text-base text-gray-600">نظرة عامة على أداء المنصة</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <div
               key={index}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow"
+              className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 hover:shadow-md transition-shadow"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 mb-2">{stat.label}</p>
-                  <p className="text-3xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-xs md:text-sm text-gray-600 mb-2">{stat.label}</p>
+                  <p className="text-2xl md:text-3xl font-bold text-gray-900">{stat.value}</p>
                 </div>
-                <div className={`p-3 rounded-lg ${getColorClasses(stat.color)}`}>
-                  <Icon className="w-6 h-6" />
+                <div className={`p-2 md:p-3 rounded-lg ${getColorClasses(stat.color)}`}>
+                  <Icon className="w-5 h-5 md:w-6 md:h-6" />
                 </div>
               </div>
             </div>
@@ -55,12 +55,12 @@ const DashboardOverview: React.FC = () => {
       </div>
 
       {/* Info Card */}
-      <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-6 border border-green-100">
+      <div className="bg-gradient-to-br from-green-50 to-blue-50 rounded-xl p-4 md:p-6 border border-green-100">
         <div className="flex items-center gap-3 mb-3">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          <h3 className="text-lg font-semibold text-gray-900">هيكلة لوحة التحكم</h3>
+          <h3 className="text-base md:text-lg font-semibold text-gray-900">هيكلة لوحة التحكم</h3>
         </div>
-        <p className="text-gray-700 leading-relaxed">
+        <p className="text-sm md:text-base text-gray-700 leading-relaxed">
           هذه نسخة هيكلية من لوحة التحكم. جميع الأقسام جاهزة للتطوير المرحلي.
           المؤشرات والبيانات سيتم ربطها في المراحل القادمة.
         </p>
