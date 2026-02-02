@@ -13,6 +13,7 @@ import {
   Menu,
   X
 } from 'lucide-react';
+import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import DashboardOverview from './DashboardOverview';
 import FarmCardsManagement from './FarmCardsManagement';
 import PackagesManagement from './PackagesManagement';
@@ -37,6 +38,7 @@ type AdminSection =
 const AdminDashboard: React.FC = () => {
   const [activeSection, setActiveSection] = useState<AdminSection>('overview');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { logout } = useAdminAuth();
 
   const menuItems = [
     { id: 'overview' as AdminSection, label: 'الرئيسية', icon: LayoutDashboard, color: 'blue' },
@@ -53,6 +55,14 @@ const AdminDashboard: React.FC = () => {
   const handleSectionChange = (section: AdminSection) => {
     setActiveSection(section);
     setIsMobileMenuOpen(false);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
   const renderContent = () => {
@@ -167,7 +177,10 @@ const AdminDashboard: React.FC = () => {
 
           {/* Footer */}
           <div className="p-4 border-t border-gray-200">
-            <button className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
               <LogOut className="w-5 h-5" />
               <span>تسجيل الخروج</span>
             </button>
@@ -235,7 +248,10 @@ const AdminDashboard: React.FC = () => {
 
         {/* Footer */}
         <div className="p-4 border-t border-gray-200 bg-gray-50">
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all hover:shadow-sm font-medium">
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all hover:shadow-sm font-medium"
+          >
             <LogOut className="w-5 h-5" />
             <span>تسجيل الخروج</span>
           </button>
