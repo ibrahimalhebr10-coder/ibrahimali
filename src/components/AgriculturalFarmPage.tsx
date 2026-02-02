@@ -163,9 +163,9 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           farm_id: farm.id,
           farm_name: farm.name,
           contract_id: selectedContract.id,
-          contract_name: selectedContract.contract_name,
-          duration_years: selectedContract.duration_years,
-          bonus_years: selectedContract.bonus_years,
+          contract_name: selectedPackage?.package_name || selectedContract.contract_name,
+          duration_years: selectedPackage?.contract_years || selectedContract.duration_years,
+          bonus_years: selectedPackage?.bonus_years || selectedContract.bonus_years,
           total_trees: treeCount,
           total_price: totalPrice,
           status: 'pending',
@@ -184,10 +184,10 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       setReservationData({
         id: reservation.id,
         farmName: farm.name,
-        contractName: selectedContract.contract_name,
+        contractName: selectedPackage?.package_name || selectedContract.contract_name,
         treeCount,
-        durationYears: selectedContract.duration_years,
-        bonusYears: selectedContract.bonus_years,
+        durationYears: selectedPackage?.contract_years || selectedContract.duration_years,
+        bonusYears: selectedPackage?.bonus_years || selectedContract.bonus_years,
         totalPrice,
         investmentNumber: reservation.id.substring(0, 8).toUpperCase(),
         createdAt: reservation.created_at
@@ -499,9 +499,9 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                 <div className="flex items-center gap-1.5">
                   <div className="w-2 h-2 rounded-full bg-green-500"></div>
                   <span className="text-gray-600">
-                    {selectedContract.duration_years} سنوات
-                    {selectedContract.bonus_years > 0 && (
-                      <span className="text-green-600 font-bold"> +{selectedContract.bonus_years}</span>
+                    {selectedPackage?.contract_years || selectedContract.duration_years} سنوات
+                    {(selectedPackage?.bonus_years || selectedContract.bonus_years) > 0 && (
+                      <span className="text-green-600 font-bold"> +{selectedPackage?.bonus_years || selectedContract.bonus_years}</span>
                     )}
                   </span>
                 </div>
@@ -644,8 +644,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           farmName={farm.name}
           farmLocation={farm.location}
           contractName={selectedPackage?.package_name || selectedContract.contract_name}
-          durationYears={selectedContract.duration_years}
-          bonusYears={selectedContract.bonus_years}
+          durationYears={selectedPackage?.contract_years || selectedContract.duration_years}
+          bonusYears={selectedPackage?.bonus_years || selectedContract.bonus_years}
           treeCount={treeCount}
           totalPrice={calculateTotal()}
           pricePerTree={selectedPackage?.price_per_tree || selectedContract.farmer_price || selectedContract.investor_price || 0}
