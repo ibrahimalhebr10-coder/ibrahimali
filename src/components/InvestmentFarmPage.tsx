@@ -250,6 +250,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   };
 
   return (
+    <>
     <div className="fixed inset-0 bg-gradient-to-br from-amber-50/95 via-yellow-50/90 to-orange-50/95 z-50 overflow-y-auto">
       <div className={`min-h-screen ${treeCount > 0 ? 'pb-96' : 'pb-32'}`}>
         {/* Header with Back Button */}
@@ -419,125 +420,152 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           </div>
         )}
 
-        {/* Tree Slider */}
-        <div className="px-4 py-4 bg-white/60 backdrop-blur-sm mt-2">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-[#B8942F]">عدد الأشجار</h3>
-            <div className="text-sm text-gray-600">
-              متاح: <span className="font-bold text-[#D4AF37]">{maxTrees}</span> شجرة
+        {/* Tree Slider - احجز أشجارك */}
+        <div className="px-4 py-6 mt-4 bg-white rounded-2xl shadow-lg border border-amber-100 mx-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-bold text-[#B8942F] flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                احجز استثمارك
+              </h3>
+              <p className="text-xs text-gray-500 mt-0.5">اختر عدد الأشجار التي تريد الاستثمار فيها</p>
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-gray-500">متاح الآن</div>
+              <div className="text-lg font-bold text-[#D4AF37]">{maxTrees}</div>
+              <div className="text-xs text-gray-500">شجرة</div>
             </div>
           </div>
 
           {/* Counter Controls */}
-          <div className="flex items-center justify-center gap-4 mb-4">
+          <div className="flex items-center justify-center gap-6 mb-6 py-4 bg-gradient-to-br from-amber-50/50 to-yellow-50/50 rounded-xl">
             <button
               onClick={() => handleTreeCountChange(-1)}
               disabled={treeCount === 0}
-              className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-yellow-100 border-2 border-[#D4AF37]/30 flex items-center justify-center hover:border-[#D4AF37] transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+              className="w-14 h-14 rounded-full bg-white border-2 border-[#D4AF37]/40 flex items-center justify-center hover:border-[#D4AF37] hover:bg-amber-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 shadow-sm"
             >
-              <Minus className="w-5 h-5 text-[#B8942F]" />
+              <Minus className="w-6 h-6 text-[#B8942F]" />
             </button>
 
-            <div className="text-4xl font-bold text-[#D4AF37] min-w-[100px] text-center">
-              {treeCount}
+            <div className="text-center">
+              <div className="text-5xl font-bold text-[#D4AF37] min-w-[120px]">
+                {treeCount}
+              </div>
+              <div className="text-sm text-gray-600 mt-1">شجرة</div>
             </div>
 
             <button
               onClick={() => handleTreeCountChange(1)}
               disabled={treeCount >= maxTrees}
-              className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-yellow-100 border-2 border-[#D4AF37]/30 flex items-center justify-center hover:border-[#D4AF37] transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+              className="w-14 h-14 rounded-full bg-white border-2 border-[#D4AF37]/40 flex items-center justify-center hover:border-[#D4AF37] hover:bg-amber-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 shadow-sm"
             >
-              <Plus className="w-5 h-5 text-[#B8942F]" />
+              <Plus className="w-6 h-6 text-[#B8942F]" />
             </button>
           </div>
 
           {/* Slider */}
-          <div className="relative">
+          <div className="relative mb-6">
             <input
               type="range"
               min="0"
               max={maxTrees}
               value={treeCount}
               onChange={handleSliderChange}
-              className="w-full h-2 bg-amber-200 rounded-lg appearance-none cursor-pointer slider-thumb-gold"
+              className="w-full h-3 bg-amber-200 rounded-lg appearance-none cursor-pointer slider-thumb-gold"
               style={{
                 background: `linear-gradient(to right, #D4AF37 0%, #D4AF37 ${(treeCount / maxTrees) * 100}%, #FCD34D ${(treeCount / maxTrees) * 100}%, #FCD34D 100%)`
               }}
             />
+            <div className="flex justify-between text-xs text-gray-500 mt-2">
+              <span>0</span>
+              <span>{maxTrees}</span>
+            </div>
           </div>
 
           {/* Quick Selectors */}
-          <div className="flex gap-2 mt-4">
-            {[10, 25, 50, 100].filter(num => num <= maxTrees).map((num) => (
-              <button
-                key={num}
-                onClick={() => setTreeCount(num)}
-                className="flex-1 py-2 px-3 rounded-lg bg-amber-50 border border-amber-300 text-sm font-bold text-[#B8942F] hover:bg-amber-100 hover:border-[#D4AF37] transition-all active:scale-95"
-              >
-                {num}
-              </button>
-            ))}
+          <div className="space-y-2">
+            <p className="text-xs text-gray-600 font-semibold">اختيار سريع:</p>
+            <div className="flex gap-2">
+              {[10, 25, 50, 100].filter(num => num <= maxTrees).map((num) => (
+                <button
+                  key={num}
+                  onClick={() => setTreeCount(num)}
+                  className={`flex-1 py-3 px-3 rounded-xl border-2 text-sm font-bold transition-all active:scale-95 ${
+                    treeCount === num
+                      ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-md'
+                      : 'bg-white text-[#B8942F] border-amber-300 hover:bg-amber-50 hover:border-[#D4AF37]'
+                  }`}
+                >
+                  {num}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Investment Summary - Fixed Bottom */}
-        {treeCount > 0 && selectedContract && !showReviewScreen && !showPrePaymentRegistration && !showPaymentSelector && !showPaymentSuccess && (
+      {/* Investment Summary - Fixed Bottom - Compact Design */}
+      {treeCount > 0 && selectedContract && !showReviewScreen && !showPrePaymentRegistration && !showPaymentSelector && !showPaymentSuccess && (
           <div
-            className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t-2 border-[#D4AF37]/30 shadow-2xl p-5 pb-safe z-[100000]"
-            style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
+            className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-xl border-t-2 border-[#D4AF37]/40 shadow-2xl z-[100000]"
+            style={{ paddingBottom: 'max(4rem, env(safe-area-inset-bottom))' }}
           >
-            <div className="max-w-lg mx-auto space-y-4 py-2">
-              <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-amber-50/50 rounded-lg p-3">
-                  <div className="text-gray-600 text-xs mb-1">عدد الأشجار</div>
-                  <div className="font-bold text-[#B8942F] text-base">{treeCount} شجرة</div>
-                </div>
+            <div className="max-w-lg mx-auto px-4 pt-5 pb-4">
 
-                <div className="bg-amber-50/50 rounded-lg p-3">
-                  <div className="text-gray-600 text-xs mb-1">مدة الاستثمار</div>
-                  <div className="font-bold text-[#B8942F] text-base">
-                    {selectedContract.duration_years} سنوات
-                    {selectedContract.bonus_years > 0 && (
-                      <span className="text-green-600 mr-1">+{selectedContract.bonus_years}</span>
+              {/* Compact Info Row */}
+              <div className="flex items-center justify-between text-xs mb-3 px-2">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-[#D4AF37]"></div>
+                    <span className="text-gray-600">{treeCount} شجرة</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                    <span className="text-gray-600">
+                      {selectedContract.duration_years} {selectedContract.duration_years === 1 ? 'سنة' : 'سنوات'}
+                      {selectedContract.bonus_years > 0 && (
+                        <span className="text-green-600 font-bold"> +{selectedContract.bonus_years}</span>
+                      )}
+                    </span>
+                  </div>
+                </div>
+                <div className="text-gray-500 font-semibold">خطوة واحدة ✓</div>
+              </div>
+
+              {/* Total and Action Button - Prominent */}
+              <div className="bg-gradient-to-br from-[#D4AF37] to-[#B8942F] rounded-2xl p-4 shadow-xl">
+                <div className="flex items-center justify-between gap-4">
+                  {/* Total Section */}
+                  <div className="flex-1">
+                    <div className="text-amber-100 text-xs mb-1 font-medium">الإجمالي الكلي</div>
+                    <div className="text-white text-3xl font-bold tracking-tight">
+                      {calculateTotal().toLocaleString()}
+                      <span className="text-lg mr-1.5">ر.س</span>
+                    </div>
+                    <div className="text-amber-100/80 text-[10px] mt-0.5">
+                      {selectedPackage?.package_name || selectedContract.contract_name}
+                    </div>
+                  </div>
+
+                  {/* Action Button */}
+                  <button
+                    onClick={handleInvestNow}
+                    disabled={isCreatingReservation}
+                    className="px-6 py-4 bg-white text-[#B8942F] font-bold rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  >
+                    {isCreatingReservation ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-[#B8942F] border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-sm">جاري...</span>
+                      </>
+                    ) : (
+                      <>
+                        <DollarSign className="w-5 h-5" />
+                        <span className="text-sm">استثمر الآن</span>
+                      </>
                     )}
-                  </div>
+                  </button>
                 </div>
-              </div>
-
-              <div className="text-center py-2">
-                <p className="text-sm font-bold text-[#B8942F]">
-                  أنت على بعد خطوة من امتلاك استثمارك الزراعي
-                </p>
-                <p className="text-xs text-gray-600 mt-1">
-                  سيتم تفعيل استثمار أشجارك مباشرة بعد الدفع
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between bg-gradient-to-r from-[#D4AF37]/20 to-[#B8942F]/10 rounded-xl p-4 border-2 border-[#D4AF37]/40 min-h-[80px]">
-                <div>
-                  <div className="text-xs text-gray-600 mb-1">الإجمالي</div>
-                  <div className="text-2xl font-bold text-[#D4AF37]">
-                    {calculateTotal().toLocaleString()} ر.س
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleInvestNow}
-                  disabled={isCreatingReservation}
-                  className="px-6 py-3 bg-gradient-to-r from-[#D4AF37] to-[#B8942F] text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isCreatingReservation ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span>جاري التأكيد...</span>
-                    </>
-                  ) : (
-                    <>
-                      <DollarSign className="w-5 h-5" />
-                      <span>ابدأ استثمار أشجارك الآن</span>
-                    </>
-                  )}
-                </button>
               </div>
             </div>
           </div>
@@ -719,6 +747,6 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           border: 3px solid white;
         }
       `}</style>
-    </div>
+    </>
   );
 }
