@@ -586,6 +586,15 @@ function App() {
           </div>
           )}
                 </section>
+
+                <div className="absolute left-0 right-0 bottom-0 pointer-events-none" style={{
+                  height: '4rem',
+                  transform: 'translateY(100%)',
+                  background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 252, 250, 0.95) 50%, rgba(252, 254, 253, 0.95) 100%)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                  zIndex: -1
+                }}></div>
               </div>
 
               <div
