@@ -1,12 +1,14 @@
-import { useState, useEffect } from 'react';
-import { X, Video, HelpCircle, MapPin, Minus, Plus, TrendingUp, Clock, Gift, DollarSign, ArrowLeft } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Video, HelpCircle, MapPin, Minus, Plus, TrendingUp, Clock, Gift, DollarSign, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import type { FarmProject, FarmContract } from '../services/farmService';
+import { investmentPackagesService, type InvestmentPackage } from '../services/investmentPackagesService';
 import InvestmentReviewScreen from './InvestmentReviewScreen';
 import PaymentMethodSelector from './PaymentMethodSelector';
 import PrePaymentRegistration from './PrePaymentRegistration';
 import PaymentSuccessScreen from './PaymentSuccessScreen';
+import InvestmentPackageDetailsModal from './InvestmentPackageDetailsModal';
 
 interface InvestmentFarmPageProps {
   farm: FarmProject;
@@ -16,10 +18,13 @@ interface InvestmentFarmPageProps {
 
 export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: InvestmentFarmPageProps) {
   const { user } = useAuth();
+  const [packages, setPackages] = useState<InvestmentPackage[]>([]);
+  const [selectedPackage, setSelectedPackage] = useState<InvestmentPackage | null>(null);
   const [selectedContract, setSelectedContract] = useState<FarmContract | null>(null);
   const [treeCount, setTreeCount] = useState(0);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showPackageDetailsModal, setShowPackageDetailsModal] = useState(false);
   const [showReviewScreen, setShowReviewScreen] = useState(false);
   const [showPrePaymentRegistration, setShowPrePaymentRegistration] = useState(false);
   const [showPaymentSelector, setShowPaymentSelector] = useState(false);
@@ -28,18 +33,52 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   const [reservationData, setReservationData] = useState<any>(null);
   const [registeredUserName, setRegisteredUserName] = useState<string>('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mada' | 'bank_transfer' | null>(null);
+  const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
+  const [isLoadingContract, setIsLoadingContract] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const packagesScrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (farm.contracts && farm.contracts.length > 0) {
-      setSelectedContract(farm.contracts[0]);
+      const firstContract = farm.contracts[0];
+      setSelectedContract(firstContract);
     }
   }, [farm.contracts]);
+
+  useEffect(() => {
+    const loadPackages = async () => {
+      try {
+        const pkgs = await investmentPackagesService.getActivePackages();
+        setPackages(pkgs);
+      } catch (error) {
+        console.error('Error loading packages:', error);
+      }
+    };
+    loadPackages();
+  }, []);
+
+  useEffect(() => {
+    if (selectedContract) {
+      console.log('🔄 selectedContract تم تحديثه:', {
+        name: selectedContract.contract_name,
+        duration: selectedContract.duration_years,
+        bonus: selectedContract.bonus_years,
+        id: selectedContract.id
+      });
+    }
+  }, [selectedContract]);
 
   const maxTrees = farm.availableTrees || 0;
 
   const calculateTotal = () => {
-    if (!selectedContract || treeCount === 0) return 0;
-    return treeCount * selectedContract.investor_price;
+    if (treeCount === 0) return 0;
+    if (selectedPackage) {
+      return treeCount * selectedPackage.price_per_tree;
+    }
+    if (selectedContract) {
+      return treeCount * selectedContract.investor_price;
+    }
+    return 0;
   };
 
   const handleTreeCountChange = (delta: number) => {
@@ -51,8 +90,66 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
     setTreeCount(parseInt(e.target.value));
   };
 
+  const handlePackageDetailsClick = (pkg: InvestmentPackage) => {
+    setSelectedPackage(pkg);
+    setShowPackageDetailsModal(true);
+  };
+
+  const handleSelectPackage = async (pkg: InvestmentPackage) => {
+    setIsLoadingContract(true);
+    setSelectedPackage(pkg);
+
+    try {
+      const { data: contract, error } = await supabase
+        .from('farm_contracts')
+        .select('*')
+        .eq('id', pkg.contract_id)
+        .maybeSingle();
+
+      if (contract && !error) {
+        setTimeout(() => {
+          setSelectedContract(contract);
+          setIsLoadingContract(false);
+        }, 0);
+      } else {
+        console.error('❌ خطأ في تحميل العقد:', error);
+        const fallbackContract = farm.contracts?.find(c => c.id === pkg.contract_id);
+        if (fallbackContract) {
+          setSelectedContract(fallbackContract);
+        }
+        setIsLoadingContract(false);
+      }
+    } catch (error) {
+      console.error('❌ خطأ في جلب العقد:', error);
+      setIsLoadingContract(false);
+    }
+
+    setShowPackageDetailsModal(false);
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToPackage = (index: number) => {
+    if (packagesScrollRef.current) {
+      const scrollWidth = packagesScrollRef.current.scrollWidth;
+      const containerWidth = packagesScrollRef.current.clientWidth;
+      const scrollPosition = (scrollWidth / packages.length) * index;
+      packagesScrollRef.current.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+    }
+  };
+
+  const handlePackageScroll = () => {
+    if (packagesScrollRef.current && packages.length > 0) {
+      const scrollLeft = packagesScrollRef.current.scrollLeft;
+      const containerWidth = packagesScrollRef.current.clientWidth;
+      const index = Math.round(scrollLeft / containerWidth);
+      setCurrentPackageIndex(Math.min(index, packages.length - 1));
+    }
+  };
+
   const handleInvestNow = () => {
-    if (!selectedContract || treeCount === 0) {
+    if ((!selectedContract && !selectedPackage) || treeCount === 0) {
       alert('يرجى اختيار باقة وعدد الأشجار');
       return;
     }
@@ -219,46 +316,108 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
         </div>
 
         {/* Investment Packages Slider - Fixed Position */}
-        <div className="sticky top-[73px] z-20 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 backdrop-blur-xl border-y border-amber-200/50 shadow-lg px-4 py-3">
-          <h3 className="text-base font-bold text-[#B8942F] mb-3">اختر باقة الاستثمار</h3>
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {farm.contracts?.map((contract) => {
-              const isSelected = selectedContract?.id === contract.id;
-              return (
-                <button
-                  key={contract.id}
-                  onClick={() => setSelectedContract(contract)}
-                  className={`flex-shrink-0 w-44 p-4 rounded-xl border-2 transition-all ${
-                    isSelected
-                      ? 'bg-gradient-to-br from-[#D4AF37]/20 to-[#B8942F]/10 border-[#D4AF37] shadow-lg scale-105'
-                      : 'bg-white/80 border-amber-200 hover:border-[#D4AF37]/50'
-                  }`}
-                >
-                  <div className="text-center space-y-2">
-                    <h4 className="font-bold text-[#B8942F] text-sm">{contract.contract_name}</h4>
+        {packages.length > 0 && (
+          <div className="sticky top-[73px] z-20 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 backdrop-blur-xl border-y border-amber-200/50 shadow-lg px-4 py-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-base font-bold text-[#B8942F]">باقات الاستثمار</h3>
+              {packages.length > 1 && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => scrollToPackage(Math.max(0, currentPackageIndex - 1))}
+                    disabled={currentPackageIndex === 0}
+                    className="p-1.5 bg-white/80 rounded-lg border border-amber-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white transition-all"
+                  >
+                    <ChevronRight className="w-4 h-4 text-[#B8942F]" />
+                  </button>
+                  <button
+                    onClick={() => scrollToPackage(Math.min(packages.length - 1, currentPackageIndex + 1))}
+                    disabled={currentPackageIndex === packages.length - 1}
+                    className="p-1.5 bg-white/80 rounded-lg border border-amber-200 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white transition-all"
+                  >
+                    <ChevronLeft className="w-4 h-4 text-[#B8942F]" />
+                  </button>
+                </div>
+              )}
+            </div>
 
-                    <div className="flex items-center justify-center gap-1 text-xs text-gray-600">
-                      <Clock className="w-2 h-2" />
-                      <span>{contract.duration_years} سنوات</span>
-                    </div>
+            <div
+              ref={packagesScrollRef}
+              onScroll={handlePackageScroll}
+              className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4"
+              style={{ scrollPaddingLeft: '1rem' }}
+            >
+              {packages.map((pkg) => {
+                const isSelected = selectedPackage?.id === pkg.id;
+                return (
+                  <div
+                    key={pkg.id}
+                    onClick={() => handleSelectPackage(pkg)}
+                    className={`relative flex-shrink-0 w-[85%] snap-center p-4 rounded-xl border-2 transition-all cursor-pointer active:scale-95 ${
+                      isSelected
+                        ? 'bg-gradient-to-br from-amber-100/60 to-yellow-100/50 border-[#D4AF37] shadow-lg'
+                        : 'bg-white/80 border-amber-200 hover:border-amber-400 hover:shadow-md'
+                    }`}
+                  >
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePackageDetailsClick(pkg);
+                      }}
+                      className="absolute top-2 left-2 bg-gradient-to-l from-white/95 via-white/90 to-white/80 backdrop-blur-sm border border-amber-300/60 hover:border-[#D4AF37]/80 hover:from-amber-50/95 hover:via-amber-50/90 hover:to-amber-50/80 transition-all flex items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95 z-10 rounded-full px-3 py-1.5"
+                    >
+                      <HelpCircle className="w-3.5 h-3.5 text-[#D4AF37]" />
+                      <span className="text-[10px] font-semibold text-[#B8942F]/90 tracking-wide">
+                        اقرأ عن الباقة
+                      </span>
+                    </button>
 
-                    {contract.bonus_years > 0 && (
-                      <div className="flex items-center justify-center gap-1 text-xs text-green-600 bg-green-50 rounded-lg py-1 px-2">
-                        <Gift className="w-2 h-2" />
-                        <span>+{contract.bonus_years} مجاني</span>
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 bg-[#D4AF37] text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                        <span>✓</span>
+                        <span>مختارة</span>
                       </div>
                     )}
 
-                    <div className="text-lg font-bold text-[#D4AF37]">
-                      {contract.investor_price.toLocaleString()} ر.س
+                    <div className="text-center space-y-2.5 pt-6">
+                      <h4 className="font-bold text-[#B8942F] text-sm">{pkg.package_name}</h4>
+
+                      <div className="bg-gradient-to-br from-[#D4AF37] to-[#B8942F] text-white rounded-lg py-2 px-3">
+                        <div className="text-xl font-bold">{pkg.price_per_tree} ر.س</div>
+                        <div className="text-[10px] opacity-90">للشجرة الواحدة</div>
+                      </div>
+
+                      {pkg.motivational_text && (
+                        <div className="text-xs text-amber-700 font-semibold bg-amber-50 rounded-lg py-1.5 px-2">
+                          {pkg.motivational_text}
+                        </div>
+                      )}
+
+                      <div className="text-[10px] text-gray-600 pt-1">
+                        انقر لاختيار هذه الباقة
+                      </div>
                     </div>
-                    <div className="text-[10px] text-gray-500">للشجرة الواحدة</div>
                   </div>
-                </button>
-              );
-            })}
+                );
+              })}
+            </div>
+
+            {packages.length > 1 && (
+              <div className="flex justify-center gap-1.5 mt-3">
+                {packages.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => scrollToPackage(index)}
+                    className={`h-1.5 rounded-full transition-all ${
+                      index === currentPackageIndex
+                        ? 'w-6 bg-[#D4AF37]'
+                        : 'w-1.5 bg-amber-300/50 hover:bg-amber-300'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        </div>
+        )}
 
         {/* Tree Slider */}
         <div className="px-4 py-4 bg-white/60 backdrop-blur-sm mt-2">
@@ -475,12 +634,12 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
         <InvestmentReviewScreen
           farmName={farm.name}
           farmLocation={farm.location}
-          contractName={selectedContract.contract_name}
+          contractName={selectedPackage?.package_name || selectedContract.contract_name}
           durationYears={selectedContract.duration_years}
           bonusYears={selectedContract.bonus_years}
           treeCount={treeCount}
           totalPrice={calculateTotal()}
-          pricePerTree={selectedContract.investor_price}
+          pricePerTree={selectedPackage?.price_per_tree || selectedContract.investor_price}
           onConfirm={handleConfirmReview}
           onBack={() => setShowReviewScreen(false)}
         />
@@ -520,6 +679,15 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           totalPrice={reservationData.totalPrice}
           investmentNumber={reservationData.investmentNumber}
           onGoToAccount={handleGoToAccount}
+        />
+      )}
+
+      {/* Package Details Modal */}
+      {showPackageDetailsModal && selectedPackage && (
+        <InvestmentPackageDetailsModal
+          package={selectedPackage}
+          onClose={() => setShowPackageDetailsModal(false)}
+          onSelectPackage={handleSelectPackage}
         />
       )}
 
