@@ -646,7 +646,7 @@ function App() {
                 }}
               >
                 <div className="max-w-7xl mx-auto">
-                  <section className="px-3 lg:px-4 pb-4 lg:pb-6 pt-8 lg:pt-6">
+                  <section className="px-3 lg:px-4 pb-4 lg:pb-6 pt-14 lg:pt-6">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-3 animate-fadeIn">
               <div className="relative">
