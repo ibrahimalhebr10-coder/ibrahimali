@@ -158,7 +158,7 @@ const FarmCardsManagement: React.FC = () => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full min-h-screen">
       {/* Header - Fixed at top */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
@@ -228,7 +228,7 @@ const FarmCardsManagement: React.FC = () => {
 
       {/* Farms Grid - Scrollable */}
       {!isLoading && farms.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 lg:gap-6 pb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4 lg:gap-6 pb-6 w-full">
           {farms.map((farm) => {
             const progress = calculateProgress(farm);
             const treeTypesCount = farm.tree_types?.length || 0;
@@ -236,7 +236,7 @@ const FarmCardsManagement: React.FC = () => {
             return (
               <div
                 key={farm.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
+                className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col w-full max-w-full"
               >
                 {/* Header */}
                 <div className="bg-gradient-to-r from-darkgreen to-green-700 text-white p-4">

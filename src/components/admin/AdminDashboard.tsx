@@ -94,7 +94,7 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 overflow-x-hidden" dir="rtl">
       {/* Mobile Header */}
       <div className="xl:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="flex items-center justify-between p-4">
@@ -243,8 +243,8 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="xl:mr-80 pt-20 xl:pt-0">
-        <div className="p-4 sm:p-6 lg:p-8 xl:p-10 pb-24 xl:pb-10">
+      <div className="xl:mr-80 pt-20 xl:pt-0 min-h-screen">
+        <div className="p-4 sm:p-6 lg:p-8 xl:p-10 pb-32 xl:pb-10 w-full">
           {renderContent()}
         </div>
       </div>
