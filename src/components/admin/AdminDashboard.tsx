@@ -94,9 +94,9 @@ const AdminDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50" dir="rtl">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50" dir="rtl">
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+      <div className="xl:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="flex items-center justify-between p-4">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -121,7 +121,7 @@ const AdminDashboard: React.FC = () => {
       {/* Mobile Sidebar Overlay */}
       {isMobileMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
+          className="xl:hidden fixed inset-0 bg-black/50 z-40"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -129,15 +129,15 @@ const AdminDashboard: React.FC = () => {
       {/* Mobile Sidebar */}
       <div
         className={`
-          lg:hidden fixed top-0 right-0 bottom-0 w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300
+          xl:hidden fixed top-0 right-0 bottom-0 w-80 bg-white shadow-2xl z-50 transform transition-transform duration-300
           ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}
         `}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="p-6 border-b border-gray-200">
-            <h1 className="text-2xl font-bold text-darkgreen">لوحة التحكم</h1>
-            <p className="text-sm text-gray-600 mt-1">إدارة المنصة الهجينة</p>
+          <div className="p-6 border-b border-gray-200 bg-gradient-to-br from-darkgreen to-green-700">
+            <h1 className="text-2xl font-bold text-white">لوحة التحكم</h1>
+            <p className="text-sm text-green-100 mt-1">إدارة المنصة الهجينة</p>
           </div>
 
           {/* Menu Items */}
@@ -159,7 +159,7 @@ const AdminDashboard: React.FC = () => {
                   `}
                 >
                   <Icon className={`w-5 h-5 ${isActive ? 'text-darkgreen' : getColorClasses(item.color)}`} />
-                  <span>{item.label}</span>
+                  <span className="text-sm">{item.label}</span>
                 </button>
               );
             })}
@@ -176,15 +176,35 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:fixed lg:top-0 lg:right-0 lg:bottom-0 lg:w-72 bg-white border-l border-gray-200 shadow-lg flex-col z-30">
+      <div className="hidden xl:flex xl:fixed xl:top-0 xl:right-0 xl:bottom-0 xl:w-80 bg-white border-l border-gray-200 shadow-xl flex-col z-30">
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-darkgreen">لوحة التحكم</h1>
-          <p className="text-sm text-gray-600 mt-1">إدارة المنصة الهجينة</p>
+        <div className="p-8 border-b border-gray-200 bg-gradient-to-br from-darkgreen to-green-700">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+              <LayoutDashboard className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white">لوحة التحكم</h1>
+              <p className="text-xs text-green-100 mt-0.5">المنصة الهجينة</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Admin Info Card */}
+        <div className="px-6 py-4 bg-gradient-to-r from-green-50 to-blue-50 border-b border-gray-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-darkgreen rounded-full flex items-center justify-center text-white font-bold">
+              A
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-gray-900">المدير العام</p>
+              <p className="text-xs text-gray-600">admin@dev.com</p>
+            </div>
+          </div>
         </div>
 
         {/* Menu Items */}
-        <nav className="flex-1 overflow-y-auto py-4">
+        <nav className="flex-1 overflow-y-auto py-4 px-3">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeSection === item.id;
@@ -194,23 +214,28 @@ const AdminDashboard: React.FC = () => {
                 key={item.id}
                 onClick={() => setActiveSection(item.id)}
                 className={`
-                  w-full flex items-center gap-3 px-6 py-3 text-right transition-all
+                  w-full flex items-center gap-3 px-4 py-3.5 text-right transition-all mb-1 rounded-xl
                   ${isActive
-                    ? 'bg-green-50 text-darkgreen border-r-4 border-darkgreen font-semibold'
+                    ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-darkgreen border-r-4 border-darkgreen font-semibold shadow-sm'
                     : 'text-gray-700 hover:bg-gray-50'
                   }
                 `}
               >
-                <Icon className={`w-5 h-5 ${isActive ? 'text-darkgreen' : getColorClasses(item.color)}`} />
-                <span>{item.label}</span>
+                <div className={`p-2 rounded-lg ${isActive ? 'bg-white shadow-sm' : ''}`}>
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-darkgreen' : getColorClasses(item.color)}`} />
+                </div>
+                <span className="text-[15px]">{item.label}</span>
+                {isActive && (
+                  <div className="mr-auto w-2 h-2 bg-darkgreen rounded-full animate-pulse"></div>
+                )}
               </button>
             );
           })}
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-gray-200">
-          <button className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+        <div className="p-4 border-t border-gray-200 bg-gray-50">
+          <button className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all hover:shadow-sm font-medium">
             <LogOut className="w-5 h-5" />
             <span>تسجيل الخروج</span>
           </button>
@@ -218,8 +243,8 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="lg:mr-72 pt-20 lg:pt-0">
-        <div className="p-4 md:p-6 lg:p-8 pb-24 lg:pb-8">
+      <div className="xl:mr-80 pt-20 xl:pt-0 min-h-screen">
+        <div className="p-4 sm:p-6 lg:p-8 xl:p-10 pb-24 xl:pb-10">
           {renderContent()}
         </div>
       </div>
