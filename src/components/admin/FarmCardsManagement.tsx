@@ -86,6 +86,20 @@ const FarmCardsManagement: React.FC = () => {
 
     setIsDeleting(true);
     try {
+      const { count: reservationsCount } = await supabase
+        .from('reservations')
+        .select('*', { count: 'exact', head: true })
+        .eq('farm_id', selectedFarm.id);
+
+      if (reservationsCount && reservationsCount > 0) {
+        alert(
+          `لا يمكن حذف المزرعة "${selectedFarm.name_ar}" لأنها تحتوي على ${reservationsCount} حجز.\n\n` +
+          'يجب حذف جميع الحجوزات المرتبطة بالمزرعة أولاً.'
+        );
+        setIsDeleting(false);
+        return;
+      }
+
       const { error } = await supabase
         .from('farms')
         .delete()
@@ -93,7 +107,15 @@ const FarmCardsManagement: React.FC = () => {
 
       if (error) {
         console.error('Error deleting farm:', error);
-        alert('حدث خطأ أثناء حذف المزرعة');
+        if (error.code === '23503') {
+          alert(
+            'لا يمكن حذف هذه المزرعة لأنها مرتبطة ببيانات أخرى في النظام.\n\n' +
+            'الرجاء حذف جميع البيانات المرتبطة أولاً (الحجوزات، المهام، الرسائل، إلخ).'
+          );
+        } else {
+          alert('حدث خطأ أثناء حذف المزرعة');
+        }
+        setIsDeleting(false);
         return;
       }
 
@@ -103,6 +125,7 @@ const FarmCardsManagement: React.FC = () => {
     } catch (err) {
       console.error('Unexpected error deleting farm:', err);
       alert('حدث خطأ غير متوقع');
+      setIsDeleting(false);
     } finally {
       setIsDeleting(false);
     }
