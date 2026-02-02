@@ -1,5 +1,5 @@
-import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock, Layers } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
 import SmartAssistant from './components/SmartAssistant';
@@ -323,6 +323,12 @@ function App() {
     return colorScheme[normalizedName]?.[mode] || colorScheme.leaf[mode];
   };
 
+  const currentFarms = activeCategory === 'all'
+    ? Object.values(farmProjects).flat()
+    : farmProjects[activeCategory] || [];
+  const activeIconName = activeCategory === 'all' ? 'all' : categories.find(cat => cat.slug === activeCategory)?.icon || 'leaf';
+  const activeColors = getColorForIcon(activeIconName, appMode);
+
   const handleCategoryChange = (categoryId: string) => {
     setActiveCategory(categoryId);
     setCurrentFarmIndex(0);
@@ -331,7 +337,7 @@ function App() {
     }
   };
 
-  const scrollToFarm = (index: number) => {
+  const scrollToFarm = useCallback((index: number) => {
     if (farmsSliderRef.current) {
       const container = farmsSliderRef.current;
       const scrollWidth = container.scrollWidth;
@@ -340,9 +346,9 @@ function App() {
       const scrollPosition = cardWidth * index;
       container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
     }
-  };
+  }, [currentFarms.length]);
 
-  const handleFarmScroll = () => {
+  const handleFarmScroll = useCallback(() => {
     if (farmsSliderRef.current && currentFarms.length > 0) {
       const container = farmsSliderRef.current;
       const scrollLeft = container.scrollLeft;
@@ -353,7 +359,7 @@ function App() {
         setHasSwipedOnce(true);
       }
     }
-  };
+  }, [currentFarms.length, hasSwipedOnce]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -368,13 +374,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [currentFarmIndex, currentFarms.length, selectedInvestmentFarm]);
-
-  const currentFarms = activeCategory === 'all'
-    ? Object.values(farmProjects).flat()
-    : farmProjects[activeCategory] || [];
-  const activeIconName = activeCategory === 'all' ? 'all' : categories.find(cat => cat.slug === activeCategory)?.icon || 'leaf';
-  const activeColors = getColorForIcon(activeIconName, appMode);
+  }, [currentFarmIndex, currentFarms.length, selectedInvestmentFarm, scrollToFarm]);
 
   const handleUnreadCountChange = async () => {
     try {
