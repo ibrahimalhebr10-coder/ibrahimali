@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Video, HelpCircle, MapPin, Minus, Plus, Sprout, Clock, Gift, ShoppingCart, ArrowLeft } from 'lucide-react';
+import { X, Video, HelpCircle, MapPin, Minus, Plus, Sprout, Clock, Gift, ShoppingCart, ArrowLeft, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import type { FarmProject, FarmContract } from '../services/farmService';
+import { agriculturalPackagesService, type AgriculturalPackage } from '../services/agriculturalPackagesService';
 import AgriculturalReviewScreen from './AgriculturalReviewScreen';
 import PaymentMethodSelector from './PaymentMethodSelector';
 import PrePaymentRegistration from './PrePaymentRegistration';
 import PaymentSuccessScreen from './PaymentSuccessScreen';
+import PackageDetailsModal from './PackageDetailsModal';
 
 interface AgriculturalFarmPageProps {
   farm: FarmProject;
@@ -16,10 +18,13 @@ interface AgriculturalFarmPageProps {
 
 export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: AgriculturalFarmPageProps) {
   const { user } = useAuth();
+  const [packages, setPackages] = useState<AgriculturalPackage[]>([]);
+  const [selectedPackage, setSelectedPackage] = useState<AgriculturalPackage | null>(null);
   const [selectedContract, setSelectedContract] = useState<FarmContract | null>(null);
   const [treeCount, setTreeCount] = useState(0);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
+  const [showPackageDetailsModal, setShowPackageDetailsModal] = useState(false);
   const [showReviewScreen, setShowReviewScreen] = useState(false);
   const [showPrePaymentRegistration, setShowPrePaymentRegistration] = useState(false);
   const [showPaymentSelector, setShowPaymentSelector] = useState(false);
@@ -36,12 +41,30 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     }
   }, [farm.contracts]);
 
+  useEffect(() => {
+    const loadPackages = async () => {
+      try {
+        const pkgs = await agriculturalPackagesService.getActivePackages();
+        setPackages(pkgs);
+      } catch (error) {
+        console.error('Error loading packages:', error);
+      }
+    };
+    loadPackages();
+  }, []);
+
   const maxTrees = farm.availableTrees || 0;
 
   const calculateTotal = () => {
-    if (!selectedContract || treeCount === 0) return 0;
-    const price = selectedContract.farmer_price || selectedContract.investor_price || 0;
-    return treeCount * price;
+    if (treeCount === 0) return 0;
+    if (selectedPackage) {
+      return treeCount * selectedPackage.price_per_tree;
+    }
+    if (selectedContract) {
+      const price = selectedContract.farmer_price || selectedContract.investor_price || 0;
+      return treeCount * price;
+    }
+    return 0;
   };
 
   const handleTreeCountChange = (delta: number) => {
@@ -53,8 +76,25 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     setTreeCount(parseInt(e.target.value));
   };
 
+  const handlePackageDetailsClick = (pkg: AgriculturalPackage) => {
+    setSelectedPackage(pkg);
+    setShowPackageDetailsModal(true);
+  };
+
+  const handleSelectPackage = (pkg: AgriculturalPackage) => {
+    setSelectedPackage(pkg);
+    const contract = farm.contracts?.find(c => c.id === pkg.contract_id);
+    if (contract) {
+      setSelectedContract(contract);
+    }
+    setShowPackageDetailsModal(false);
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: 'smooth' });
+    }
+  };
+
   const handleBuyNow = () => {
-    if (!selectedContract || treeCount === 0) {
+    if ((!selectedContract && !selectedPackage) || treeCount === 0) {
       alert('يرجى اختيار باقة وعدد الأشجار');
       return;
     }
@@ -225,43 +265,44 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           </div>
         </div>
 
-        {/* Farm Packages Slider - Fixed Position */}
-        <div className="sticky top-[73px] z-20 bg-gradient-to-br from-green-50/98 via-emerald-50/95 to-teal-50/98 backdrop-blur-xl border-y border-green-200/50 shadow-lg px-4 py-3">
-          <h3 className="text-base font-bold text-darkgreen mb-3">اختر باقة الأشجار</h3>
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {farm.contracts?.map((contract) => {
-              const isSelected = selectedContract?.id === contract.id;
+        {/* Agricultural Packages - Fixed Position */}
+        <div className="sticky top-[73px] z-20 bg-gradient-to-br from-green-50/98 via-emerald-50/95 to-teal-50/98 backdrop-blur-xl border-y border-green-200/50 shadow-lg px-4 py-4">
+          <h3 className="text-base font-bold text-darkgreen mb-3">باقات محصولي الزراعي</h3>
+          <div className="grid grid-cols-2 gap-3">
+            {packages.map((pkg) => {
+              const isSelected = selectedPackage?.id === pkg.id;
               return (
-                <button
-                  key={contract.id}
-                  onClick={() => setSelectedContract(contract)}
-                  className={`flex-shrink-0 w-44 p-4 rounded-xl border-2 transition-all ${
+                <div
+                  key={pkg.id}
+                  className={`relative p-4 rounded-xl border-2 transition-all ${
                     isSelected
-                      ? 'bg-gradient-to-br from-green-100/60 to-emerald-100/50 border-darkgreen shadow-lg scale-105'
-                      : 'bg-white/80 border-green-200 hover:border-darkgreen/50'
+                      ? 'bg-gradient-to-br from-green-100/60 to-emerald-100/50 border-darkgreen shadow-lg'
+                      : 'bg-white/80 border-green-200'
                   }`}
                 >
-                  <div className="text-center space-y-2">
-                    <h4 className="font-bold text-darkgreen text-sm">{contract.contract_name}</h4>
+                  <div className="text-center space-y-2.5">
+                    <h4 className="font-bold text-darkgreen text-sm">{pkg.package_name}</h4>
 
-                    <div className="flex items-center justify-center gap-1 text-xs text-gray-600">
-                      <Clock className="w-2 h-2" />
-                      <span>{contract.duration_years} سنوات</span>
+                    <div className="bg-green-600 text-white rounded-lg py-2 px-3">
+                      <div className="text-xl font-bold">{pkg.price_per_tree} ر.س</div>
+                      <div className="text-[10px] opacity-90">للشجرة الواحدة</div>
                     </div>
 
-                    {contract.bonus_years > 0 && (
-                      <div className="flex items-center justify-center gap-1 text-xs text-green-600 bg-green-50 rounded-lg py-1 px-2">
-                        <Gift className="w-2 h-2" />
-                        <span>+{contract.bonus_years} مجاني</span>
+                    {pkg.motivational_text && (
+                      <div className="text-xs text-green-700 font-semibold bg-green-50 rounded-lg py-1.5 px-2">
+                        {pkg.motivational_text}
                       </div>
                     )}
 
-                    <div className="text-lg font-bold text-darkgreen">
-                      {(contract.farmer_price || contract.investor_price || 0).toLocaleString()} ر.س
-                    </div>
-                    <div className="text-[10px] text-gray-500">للشجرة الواحدة</div>
+                    <button
+                      onClick={() => handlePackageDetailsClick(pkg)}
+                      className="w-full py-2 px-3 bg-gradient-to-r from-darkgreen to-emerald-600 text-white text-xs font-bold rounded-lg hover:shadow-lg transition-all active:scale-95 flex items-center justify-center gap-1.5"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      <span>اقرأ المزيد عن الباقة</span>
+                    </button>
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -489,12 +530,12 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         <AgriculturalReviewScreen
           farmName={farm.name}
           farmLocation={farm.location}
-          contractName={selectedContract.contract_name}
+          contractName={selectedPackage?.package_name || selectedContract.contract_name}
           durationYears={selectedContract.duration_years}
           bonusYears={selectedContract.bonus_years}
           treeCount={treeCount}
           totalPrice={calculateTotal()}
-          pricePerTree={selectedContract.farmer_price || selectedContract.investor_price || 0}
+          pricePerTree={selectedPackage?.price_per_tree || selectedContract.farmer_price || selectedContract.investor_price || 0}
           onConfirm={handleConfirmReview}
           onBack={() => setShowReviewScreen(false)}
         />
@@ -534,6 +575,15 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           totalPrice={reservationData.totalPrice}
           investmentNumber={reservationData.investmentNumber}
           onGoToAccount={handleGoToAccount}
+        />
+      )}
+
+      {/* Package Details Modal */}
+      {showPackageDetailsModal && selectedPackage && (
+        <PackageDetailsModal
+          package={selectedPackage}
+          onClose={() => setShowPackageDetailsModal(false)}
+          onSelectPackage={handleSelectPackage}
         />
       )}
 
