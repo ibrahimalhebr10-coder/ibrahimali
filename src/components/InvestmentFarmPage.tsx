@@ -94,6 +94,14 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
 
   const maxTrees = farm.availableTrees || 0;
 
+  const getMinTrees = () => selectedPackage?.min_trees || 50;
+  const getTreeIncrement = () => selectedPackage?.tree_increment || 50;
+
+  const getEffectiveMaxTrees = () => {
+    const farmMax = maxTrees;
+    return farmMax;
+  };
+
   const calculateTotal = () => {
     if (treeCount === 0) return 0;
     if (selectedPackage) {
@@ -106,12 +114,47 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   };
 
   const handleTreeCountChange = (delta: number) => {
-    const newCount = Math.max(0, Math.min(maxTrees, treeCount + delta));
+    const minTrees = getMinTrees();
+    const increment = getTreeIncrement();
+    const effectiveMax = getEffectiveMaxTrees();
+
+    let newCount = treeCount + delta;
+
+    if (newCount < minTrees) {
+      newCount = minTrees;
+    } else if (newCount > effectiveMax) {
+      newCount = effectiveMax;
+    }
+
+    const remainder = newCount % increment;
+    if (remainder !== 0) {
+      if (delta > 0) {
+        newCount = Math.ceil(newCount / increment) * increment;
+      } else {
+        newCount = Math.floor(newCount / increment) * increment;
+      }
+    }
+
+    newCount = Math.max(minTrees, Math.min(effectiveMax, newCount));
     setTreeCount(newCount);
   };
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTreeCount(parseInt(e.target.value));
+    const value = parseInt(e.target.value);
+    const increment = getTreeIncrement();
+    const minTrees = getMinTrees();
+
+    const steps = Math.round((value - minTrees) / increment);
+    const alignedValue = minTrees + (steps * increment);
+
+    setTreeCount(alignedValue);
+  };
+
+  const handleQuickSelect = (count: number) => {
+    const minTrees = getMinTrees();
+    const effectiveMax = getEffectiveMaxTrees();
+    const finalCount = Math.max(minTrees, Math.min(effectiveMax, count));
+    setTreeCount(finalCount);
   };
 
   const handlePackageDetailsClick = (pkg: InvestmentPackage) => {
@@ -122,6 +165,8 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   const handleSelectPackage = async (pkg: InvestmentPackage) => {
     setIsLoadingContract(true);
     setSelectedPackage(pkg);
+
+    setTreeCount(pkg.min_trees);
 
     try {
       const { data: contract, error } = await supabase
@@ -173,10 +218,26 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   };
 
   const handleInvestNow = () => {
-    if ((!selectedContract && !selectedPackage) || treeCount === 0) {
-      alert('يرجى اختيار باقة وعدد الأشجار');
+    if (!selectedPackage || !selectedContract) {
+      alert('يرجى اختيار باقة استثمارية أولاً');
       return;
     }
+
+    if (treeCount === 0 || treeCount < getMinTrees()) {
+      alert(`الحد الأدنى للاستثمار هو ${getMinTrees()} شجرة`);
+      return;
+    }
+
+    if (treeCount % getTreeIncrement() !== 0) {
+      alert(`عدد الأشجار يجب أن يكون من مضاعفات ${getTreeIncrement()}`);
+      return;
+    }
+
+    if (treeCount > getEffectiveMaxTrees()) {
+      alert(`الحد الأقصى المتاح هو ${getEffectiveMaxTrees()} شجرة`);
+      return;
+    }
+
     setShowReviewScreen(true);
   };
 
@@ -222,9 +283,9 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           farm_id: farm.id,
           farm_name: farm.name,
           contract_id: selectedContract.id,
-          contract_name: selectedContract.contract_name,
-          duration_years: selectedContract.duration_years,
-          bonus_years: selectedContract.bonus_years,
+          contract_name: selectedPackage?.package_name || selectedContract.contract_name,
+          duration_years: selectedPackage?.base_duration_years || selectedContract.duration_years,
+          bonus_years: selectedPackage?.bonus_free_years || selectedContract.bonus_years,
           total_trees: treeCount,
           total_price: totalPrice,
           status: 'pending',
@@ -452,7 +513,13 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
                 <TrendingUp className="w-5 h-5" />
                 احجز استثمارك
               </h3>
-              <p className="text-xs text-gray-500 mt-0.5">اختر عدد الأشجار التي تريد الاستثمار فيها</p>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {selectedPackage ? (
+                  <>الحد الأدنى {selectedPackage.min_trees} شجرة، بمضاعفات {selectedPackage.tree_increment}</>
+                ) : (
+                  'اختر باقة أولاً لرؤية القواعد'
+                )}
+              </p>
             </div>
             <div className="text-right">
               <div className="text-xs text-gray-500">متاح الآن</div>
@@ -461,70 +528,82 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
             </div>
           </div>
 
-          {/* Counter Controls */}
-          <div className="flex items-center justify-center gap-6 mb-6 py-4 bg-gradient-to-br from-amber-50/50 to-yellow-50/50 rounded-xl">
-            <button
-              onClick={() => handleTreeCountChange(-1)}
-              disabled={treeCount === 0}
-              className="w-14 h-14 rounded-full bg-white border-2 border-[#D4AF37]/40 flex items-center justify-center hover:border-[#D4AF37] hover:bg-amber-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 shadow-sm"
-            >
-              <Minus className="w-6 h-6 text-[#B8942F]" />
-            </button>
-
-            <div className="text-center">
-              <div className="text-5xl font-bold text-[#D4AF37] min-w-[120px]">
-                {treeCount}
-              </div>
-              <div className="text-sm text-gray-600 mt-1">شجرة</div>
-            </div>
-
-            <button
-              onClick={() => handleTreeCountChange(1)}
-              disabled={treeCount >= maxTrees}
-              className="w-14 h-14 rounded-full bg-white border-2 border-[#D4AF37]/40 flex items-center justify-center hover:border-[#D4AF37] hover:bg-amber-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 shadow-sm"
-            >
-              <Plus className="w-6 h-6 text-[#B8942F]" />
-            </button>
-          </div>
-
-          {/* Slider */}
-          <div className="relative mb-6">
-            <input
-              type="range"
-              min="0"
-              max={maxTrees}
-              value={treeCount}
-              onChange={handleSliderChange}
-              className="w-full h-3 bg-amber-200 rounded-lg appearance-none cursor-pointer slider-thumb-gold"
-              style={{
-                background: `linear-gradient(to right, #D4AF37 0%, #D4AF37 ${(treeCount / maxTrees) * 100}%, #FCD34D ${(treeCount / maxTrees) * 100}%, #FCD34D 100%)`
-              }}
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-2">
-              <span>0</span>
-              <span>{maxTrees}</span>
-            </div>
-          </div>
-
-          {/* Quick Selectors */}
-          <div className="space-y-2">
-            <p className="text-xs text-gray-600 font-semibold">اختيار سريع:</p>
-            <div className="flex gap-2">
-              {[10, 25, 50, 100].filter(num => num <= maxTrees).map((num) => (
+          {selectedPackage ? (
+            <>
+              {/* Counter Controls */}
+              <div className="flex items-center justify-center gap-6 mb-6 py-4 bg-gradient-to-br from-amber-50/50 to-yellow-50/50 rounded-xl">
                 <button
-                  key={num}
-                  onClick={() => setTreeCount(num)}
-                  className={`flex-1 py-3 px-3 rounded-xl border-2 text-sm font-bold transition-all active:scale-95 ${
-                    treeCount === num
-                      ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-md'
-                      : 'bg-white text-[#B8942F] border-amber-300 hover:bg-amber-50 hover:border-[#D4AF37]'
-                  }`}
+                  onClick={() => handleTreeCountChange(-getTreeIncrement())}
+                  disabled={treeCount <= getMinTrees()}
+                  className="w-14 h-14 rounded-full bg-white border-2 border-[#D4AF37]/40 flex items-center justify-center hover:border-[#D4AF37] hover:bg-amber-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 shadow-sm"
                 >
-                  {num}
+                  <Minus className="w-6 h-6 text-[#B8942F]" />
                 </button>
-              ))}
+
+                <div className="text-center">
+                  <div className="text-5xl font-bold text-[#D4AF37] min-w-[120px]">
+                    {treeCount}
+                  </div>
+                  <div className="text-sm text-gray-600 mt-1">شجرة</div>
+                </div>
+
+                <button
+                  onClick={() => handleTreeCountChange(getTreeIncrement())}
+                  disabled={treeCount >= getEffectiveMaxTrees()}
+                  className="w-14 h-14 rounded-full bg-white border-2 border-[#D4AF37]/40 flex items-center justify-center hover:border-[#D4AF37] hover:bg-amber-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 shadow-sm"
+                >
+                  <Plus className="w-6 h-6 text-[#B8942F]" />
+                </button>
+              </div>
+
+              {/* Slider */}
+              <div className="relative mb-6">
+                <input
+                  type="range"
+                  min={getMinTrees()}
+                  max={getEffectiveMaxTrees()}
+                  value={treeCount || getMinTrees()}
+                  onChange={handleSliderChange}
+                  step={getTreeIncrement()}
+                  className="w-full h-3 bg-amber-200 rounded-lg appearance-none cursor-pointer slider-thumb-gold"
+                  style={{
+                    background: `linear-gradient(to right, #D4AF37 0%, #D4AF37 ${((treeCount - getMinTrees()) / (getEffectiveMaxTrees() - getMinTrees())) * 100}%, #FCD34D ${((treeCount - getMinTrees()) / (getEffectiveMaxTrees() - getMinTrees())) * 100}%, #FCD34D 100%)`
+                  }}
+                />
+                <div className="flex justify-between text-xs text-gray-500 mt-2">
+                  <span>{getMinTrees()}</span>
+                  <span>{getEffectiveMaxTrees()}</span>
+                </div>
+              </div>
+
+              {/* Quick Selectors */}
+              <div className="space-y-2">
+                <p className="text-xs text-gray-600 font-semibold">اختيار سريع:</p>
+                <div className="grid grid-cols-4 gap-2">
+                  {selectedPackage.quick_select_options
+                    .filter(num => num >= getMinTrees() && num <= getEffectiveMaxTrees())
+                    .map((num) => (
+                      <button
+                        key={num}
+                        onClick={() => handleQuickSelect(num)}
+                        className={`py-3 px-2 rounded-xl border-2 text-sm font-bold transition-all active:scale-95 ${
+                          treeCount === num
+                            ? 'bg-[#D4AF37] text-white border-[#D4AF37] shadow-md'
+                            : 'bg-white text-[#B8942F] border-amber-300 hover:bg-amber-50 hover:border-[#D4AF37]'
+                        }`}
+                      >
+                        {num}
+                      </button>
+                    ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              <Gift className="w-12 h-12 mx-auto mb-3 opacity-30" />
+              <p className="text-sm">اختر باقة استثمارية أولاً</p>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
@@ -546,9 +625,20 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
                   <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full bg-amber-500"></div>
                     <span className="text-gray-600">
-                      {selectedContract.duration_years} {selectedContract.duration_years === 1 ? 'سنة' : 'سنوات'}
-                      {selectedContract.bonus_years > 0 && (
-                        <span className="text-green-600 font-bold"> +{selectedContract.bonus_years}</span>
+                      {selectedPackage ? (
+                        <>
+                          {selectedPackage.base_duration_years} {selectedPackage.base_duration_years === 1 ? 'سنة' : 'سنوات'}
+                          {selectedPackage.bonus_free_years > 0 && (
+                            <span className="text-green-600 font-bold"> +{selectedPackage.bonus_free_years}</span>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {selectedContract.duration_years} {selectedContract.duration_years === 1 ? 'سنة' : 'سنوات'}
+                          {selectedContract.bonus_years > 0 && (
+                            <span className="text-green-600 font-bold"> +{selectedContract.bonus_years}</span>
+                          )}
+                        </>
                       )}
                     </span>
                   </div>
