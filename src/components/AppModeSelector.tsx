@@ -13,19 +13,23 @@ export default function AppModeSelector({ activeMode, onModeChange }: AppModeSel
       id: 'agricultural' as AppMode,
       label: 'محصولي الزراعي',
       icon: Sprout,
-      gradient: 'linear-gradient(145deg, rgba(58, 161, 126, 0.95) 0%, rgba(47, 130, 102, 0.90) 50%, rgba(58, 161, 126, 0.95) 100%)',
-      inactiveGradient: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(249,249,249,0.8) 100%)',
-      border: 'rgba(58, 161, 126, 0.70)',
-      shadow: 'rgba(58, 161, 126, 0.45)'
+      gradient: 'linear-gradient(135deg, #3aa17e 0%, #2f8266 25%, #3aa17e 50%, #2f8266 75%, #3aa17e 100%)',
+      inactiveGradient: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,245,0.9) 50%, rgba(255,255,255,0.95) 100%)',
+      border: '#3aa17e',
+      activeBorder: 'rgba(58, 161, 126, 0.8)',
+      shadow: 'rgba(58, 161, 126, 0.5)',
+      glow: 'rgba(58, 161, 126, 0.6)'
     },
     {
       id: 'investment' as AppMode,
       label: 'محصولي الاستثماري',
       icon: TrendingUp,
-      gradient: 'linear-gradient(145deg, rgba(212, 175, 55, 0.95) 0%, rgba(184, 148, 47, 0.90) 50%, rgba(212, 175, 55, 0.95) 100%)',
-      inactiveGradient: 'linear-gradient(145deg, rgba(255,255,255,0.9) 0%, rgba(249,249,249,0.8) 100%)',
-      border: 'rgba(212, 175, 55, 0.70)',
-      shadow: 'rgba(212, 175, 55, 0.45)'
+      gradient: 'linear-gradient(135deg, #d4af37 0%, #b8942f 25%, #d4af37 50%, #b8942f 75%, #d4af37 100%)',
+      inactiveGradient: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,245,0.9) 50%, rgba(255,255,255,0.95) 100%)',
+      border: '#d4af37',
+      activeBorder: 'rgba(212, 175, 55, 0.8)',
+      shadow: 'rgba(212, 175, 55, 0.5)',
+      glow: 'rgba(212, 175, 55, 0.6)'
     }
   ];
 
@@ -39,41 +43,55 @@ export default function AppModeSelector({ activeMode, onModeChange }: AppModeSel
           <button
             key={mode.id}
             onClick={() => onModeChange(mode.id)}
-            className="flex-1 rounded-xl lg:rounded-2xl h-12 lg:h-16 xl:h-18 flex flex-col items-center justify-center bg-white transition-all duration-300 hover:scale-[1.02] active:scale-95 backdrop-blur-lg relative overflow-hidden"
+            className="flex-1 rounded-xl lg:rounded-2xl h-12 lg:h-16 xl:h-18 flex flex-col items-center justify-center transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] relative overflow-hidden group"
             style={{
               boxShadow: isActive
-                ? `0 4px 16px ${mode.shadow}, 0 8px 32px ${mode.shadow}, inset 0 1px 0 rgba(255,255,255,0.7)`
-                : '0 2px 6px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.6)',
-              background: isActive
-                ? mode.gradient
-                : mode.inactiveGradient,
-              border: `2px solid ${isActive ? mode.border : 'rgba(220,220,220,0.4)'}`,
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)'
+                ? `0 6px 20px ${mode.shadow}, 0 10px 40px ${mode.glow}, inset 0 2px 0 rgba(255,255,255,0.4), inset 0 -2px 0 rgba(0,0,0,0.1)`
+                : '0 3px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8)',
+              background: isActive ? mode.gradient : mode.inactiveGradient,
+              border: isActive
+                ? `3px solid ${mode.activeBorder}`
+                : '2px solid rgba(210,210,210,0.5)',
+              backdropFilter: 'blur(16px)',
+              WebkitBackdropFilter: 'blur(16px)'
             }}
           >
             <Icon
-              className={`w-5 h-5 lg:w-7 lg:h-7 xl:w-8 xl:h-8 mb-0.5 lg:mb-1 ${
-                isActive ? 'text-white drop-shadow-lg' : 'text-darkgreen/60'
+              className={`w-4 h-4 lg:w-6 lg:h-6 xl:w-7 xl:h-7 mb-0.5 transition-all duration-300 ${
+                isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-700'
               }`}
-              strokeWidth={2.5}
-              style={isActive ? { filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' } : {}}
+              strokeWidth={isActive ? 3 : 2.5}
+              style={isActive ? {
+                filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.4))',
+                transform: 'translateY(-1px)'
+              } : {}}
             />
             <span
-              className={`text-[9px] lg:text-xs xl:text-sm font-black text-center leading-tight px-2 ${
-                isActive ? 'text-white drop-shadow-md' : 'text-darkgreen/60'
+              className={`text-[11px] lg:text-sm xl:text-base font-black text-center leading-tight px-2 tracking-wide transition-all duration-300 ${
+                isActive ? 'text-white' : 'text-gray-600 group-hover:text-gray-800'
               }`}
-              style={isActive ? { textShadow: '0 1px 2px rgba(0,0,0,0.2)' } : {}}
+              style={isActive ? {
+                textShadow: '0 2px 4px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',
+                letterSpacing: '0.3px'
+              } : {}}
             >
               {mode.label}
             </span>
             {isActive && (
-              <div
-                className="absolute inset-0 rounded-xl lg:rounded-2xl pointer-events-none"
-                style={{
-                  background: 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0%, transparent 70%)'
-                }}
-              />
+              <>
+                <div
+                  className="absolute inset-0 rounded-xl lg:rounded-2xl pointer-events-none"
+                  style={{
+                    background: 'radial-gradient(circle at 50% 0%, rgba(255,255,255,0.35) 0%, transparent 60%)'
+                  }}
+                />
+                <div
+                  className="absolute bottom-0 left-0 right-0 h-1/2 rounded-b-xl lg:rounded-b-2xl pointer-events-none"
+                  style={{
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.08) 0%, transparent 100%)'
+                  }}
+                />
+              </>
             )}
           </button>
         );
