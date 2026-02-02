@@ -41,24 +41,36 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
   const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.toLowerCase().trim(),
+        password: password
+      });
+
+      if (authError) {
+        console.error('Auth error:', authError);
+        return { success: false, error: 'بيانات الدخول غير صحيحة' };
+      }
+
+      if (!authData.user) {
+        return { success: false, error: 'بيانات الدخول غير صحيحة' };
+      }
+
       const { data: adminRecord, error: adminError } = await supabase
         .from('admins')
         .select('id, email, full_name, role')
-        .eq('email', email.toLowerCase().trim())
+        .eq('user_id', authData.user.id)
         .eq('is_active', true)
         .maybeSingle();
 
       if (adminError) {
         console.error('Admin query error:', adminError);
+        await supabase.auth.signOut();
         return { success: false, error: 'خطأ في الاتصال بقاعدة البيانات' };
       }
 
       if (!adminRecord) {
-        return { success: false, error: 'بيانات الدخول غير صحيحة' };
-      }
-
-      if (password !== 'admin123') {
-        return { success: false, error: 'بيانات الدخول غير صحيحة' };
+        await supabase.auth.signOut();
+        return { success: false, error: 'هذا الحساب غير مخوّل للدخول إلى لوحة الإدارة' };
       }
 
       const adminData: Admin = {
@@ -79,6 +91,7 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   };
 
   const logout = async () => {
+    await supabase.auth.signOut();
     sessionStorage.removeItem('admin_session');
     setAdmin(null);
   };
