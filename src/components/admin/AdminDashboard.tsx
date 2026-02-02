@@ -11,7 +11,8 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  TreePine
 } from 'lucide-react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import DashboardOverview from './DashboardOverview';
@@ -23,6 +24,7 @@ import ContractsPage from './ContractsPage';
 import MarketingManagement from './MarketingManagement';
 import ContentManagement from './ContentManagement';
 import GeneralSettings from './GeneralSettings';
+import MyTreesSection from './MyTreesSection';
 
 type AdminSection =
   | 'overview'
@@ -31,6 +33,7 @@ type AdminSection =
   | 'agricultural'
   | 'investment'
   | 'contracts'
+  | 'mytrees'
   | 'marketing'
   | 'content'
   | 'settings';
@@ -47,6 +50,7 @@ const AdminDashboard: React.FC = () => {
     { id: 'agricultural' as AdminSection, label: 'زراعي', icon: Sprout, color: 'green' },
     { id: 'investment' as AdminSection, label: 'استثماري', icon: TrendingUp, color: 'orange' },
     { id: 'contracts' as AdminSection, label: 'العقود', icon: FileText, color: 'blue' },
+    { id: 'mytrees' as AdminSection, label: 'متابعة أشجاري', icon: TreePine, color: 'emerald' },
     { id: 'marketing' as AdminSection, label: 'التسويق', icon: Megaphone, color: 'pink' },
     { id: 'content' as AdminSection, label: 'المحتوى', icon: MessageSquare, color: 'indigo' },
     { id: 'settings' as AdminSection, label: 'الإعدادات', icon: Settings, color: 'gray' },
@@ -79,6 +83,8 @@ const AdminDashboard: React.FC = () => {
         return <InvestmentSection />;
       case 'contracts':
         return <ContractsPage />;
+      case 'mytrees':
+        return <MyTreesSection />;
       case 'marketing':
         return <MarketingManagement />;
       case 'content':
@@ -98,6 +104,7 @@ const AdminDashboard: React.FC = () => {
       orange: 'text-orange-600',
       pink: 'text-pink-600',
       indigo: 'text-indigo-600',
+      emerald: 'text-emerald-600',
       gray: 'text-gray-600',
     };
     return colors[color as keyof typeof colors] || colors.blue;
