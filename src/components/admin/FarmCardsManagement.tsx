@@ -92,12 +92,25 @@ const FarmCardsManagement: React.FC = () => {
         .eq('farm_id', selectedFarm.id);
 
       if (reservationsCount && reservationsCount > 0) {
-        alert(
-          `لا يمكن حذف المزرعة "${selectedFarm.name_ar}" لأنها تحتوي على ${reservationsCount} حجز.\n\n` +
-          'يجب حذف جميع الحجوزات المرتبطة بالمزرعة أولاً.'
-        );
         setIsDeleting(false);
-        return;
+
+        const confirmMessage =
+          `⚠️ تحذير هام ⚠️\n\n` +
+          `المزرعة "${selectedFarm.name_ar}" تحتوي على ${reservationsCount} ${reservationsCount === 1 ? 'حجز' : 'حجوزات'}.\n\n` +
+          `حذف هذه المزرعة سيؤدي إلى:\n` +
+          `• حذف جميع الـ ${reservationsCount} ${reservationsCount === 1 ? 'حجز' : 'حجوزات'} نهائياً\n` +
+          `• حذف جميع البيانات المرتبطة (العقود، المهام، الرسائل)\n` +
+          `• لا يمكن التراجع عن هذا الإجراء\n\n` +
+          `هل أنت متأكد تماماً من المتابعة؟`;
+
+        const userConfirmed = window.confirm(confirmMessage);
+
+        if (!userConfirmed) {
+          setShowDeleteConfirm(false);
+          return;
+        }
+
+        setIsDeleting(true);
       }
 
       const { error } = await supabase
@@ -109,8 +122,8 @@ const FarmCardsManagement: React.FC = () => {
         console.error('Error deleting farm:', error);
         if (error.code === '23503') {
           alert(
-            'لا يمكن حذف هذه المزرعة لأنها مرتبطة ببيانات أخرى في النظام.\n\n' +
-            'الرجاء حذف جميع البيانات المرتبطة أولاً (الحجوزات، المهام، الرسائل، إلخ).'
+            'حدث خطأ: المزرعة مرتبطة ببيانات أخرى في النظام.\n\n' +
+            'يرجى الاتصال بالدعم الفني.'
           );
         } else {
           alert('حدث خطأ أثناء حذف المزرعة');
@@ -118,6 +131,14 @@ const FarmCardsManagement: React.FC = () => {
         setIsDeleting(false);
         return;
       }
+
+      alert(
+        `تم حذف المزرعة "${selectedFarm.name_ar}" بنجاح` +
+        (reservationsCount && reservationsCount > 0
+          ? `\n\nتم حذف ${reservationsCount} ${reservationsCount === 1 ? 'حجز' : 'حجوزات'} مرتبط`
+          : ''
+        )
+      );
 
       setShowDeleteConfirm(false);
       setSelectedFarm(null);
