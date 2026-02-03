@@ -13,12 +13,10 @@ interface MyTreesPageProps {
   onLogin: () => void;
 }
 
-type MainTab = 'investment' | 'agricultural';
 type InvestmentSubTab = 'assets' | 'products' | 'waste' | 'expansion' | 'reports';
 
 export default function MyTreesPage({ isOpen, onClose, onLogin }: MyTreesPageProps) {
   const { user } = useAuth();
-  const [mainTab, setMainTab] = useState<MainTab>('investment');
   const [investmentSubTab, setInvestmentSubTab] = useState<InvestmentSubTab>('assets');
 
   if (!isOpen) return null;
@@ -66,14 +64,14 @@ export default function MyTreesPage({ isOpen, onClose, onLogin }: MyTreesPagePro
         }}
       >
         <div className="sticky top-0 z-20 bg-gradient-to-r from-darkgreen to-green-600 text-white px-6 py-4 rounded-t-3xl shadow-lg">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                 <TreePine className="w-6 h-6" />
               </div>
               <div>
                 <h2 className="text-2xl font-bold">متابعة أشجاري</h2>
-                <p className="text-sm text-white/80">Dashboard الأصول الزراعية</p>
+                <p className="text-sm text-white/80">متابعة استثماراتك الزراعية</p>
               </div>
             </div>
             <button
@@ -83,33 +81,10 @@ export default function MyTreesPage({ isOpen, onClose, onLogin }: MyTreesPagePro
               <X className="w-6 h-6" />
             </button>
           </div>
-
-          <div className="flex gap-2">
-            <button
-              onClick={() => setMainTab('investment')}
-              className={`flex-1 px-6 py-3 rounded-xl font-bold transition-all ${
-                mainTab === 'investment'
-                  ? 'bg-white text-darkgreen shadow-lg'
-                  : 'bg-white/10 text-white/70 hover:bg-white/20'
-              }`}
-            >
-              الاستثماري
-            </button>
-            <button
-              className="flex-1 px-6 py-3 rounded-xl font-bold bg-white/10 text-white/40 cursor-not-allowed relative"
-              disabled
-            >
-              الزراعي
-              <span className="absolute -top-2 -left-2 bg-yellow-400 text-darkgreen text-xs px-2 py-1 rounded-full font-bold">
-                قريبًا
-              </span>
-            </button>
-          </div>
         </div>
 
-        {mainTab === 'investment' && (
-          <div className="sticky top-[120px] lg:top-[136px] z-10 bg-white border-b-2 border-gray-200 px-4 overflow-x-auto">
-            <div className="flex gap-2 py-3 min-w-max">
+        <div className="sticky top-[88px] lg:top-[96px] z-10 bg-white border-b-2 border-gray-200 px-4 overflow-x-auto">
+          <div className="flex gap-2 py-3 min-w-max">
               <button
                 onClick={() => setInvestmentSubTab('assets')}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all whitespace-nowrap ${
@@ -167,7 +142,6 @@ export default function MyTreesPage({ isOpen, onClose, onLogin }: MyTreesPagePro
               </button>
             </div>
           </div>
-        )}
 
         <div
           className="flex-1 overflow-y-auto"
@@ -177,11 +151,11 @@ export default function MyTreesPage({ isOpen, onClose, onLogin }: MyTreesPagePro
           }}
         >
           <div className="p-6">
-            {mainTab === 'investment' && investmentSubTab === 'assets' && <AgriculturalAssetsTab />}
-            {mainTab === 'investment' && investmentSubTab === 'products' && <ProductYieldsTab />}
-            {mainTab === 'investment' && investmentSubTab === 'waste' && <WasteYieldsTab />}
-            {mainTab === 'investment' && investmentSubTab === 'expansion' && <ExpansionOpportunitiesTab />}
-            {mainTab === 'investment' && investmentSubTab === 'reports' && <SmartReportsTab />}
+            {investmentSubTab === 'assets' && <AgriculturalAssetsTab />}
+            {investmentSubTab === 'products' && <ProductYieldsTab />}
+            {investmentSubTab === 'waste' && <WasteYieldsTab />}
+            {investmentSubTab === 'expansion' && <ExpansionOpportunitiesTab />}
+            {investmentSubTab === 'reports' && <SmartReportsTab />}
           </div>
         </div>
       </div>
