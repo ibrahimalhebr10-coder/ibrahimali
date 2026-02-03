@@ -82,7 +82,7 @@ export default function FarmOfferMode() {
 
   if (stage === 'intro') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-amber-50 overflow-y-auto flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-amber-50 flex items-center justify-center p-4">
         <div className="text-center max-w-2xl">
           <div className="mb-8 animate-bounce">
             <Sprout className="w-24 h-24 text-green-600 mx-auto" />
@@ -112,8 +112,8 @@ export default function FarmOfferMode() {
 
   if (stage === 'success' && submittedOffer) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-amber-50 overflow-y-auto">
-        <div className="max-w-4xl mx-auto p-6 pt-12 pb-20">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-amber-50">
+        <div className="max-w-4xl mx-auto p-6 py-12">
           <div className="bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-green-100">
             <div className="text-center mb-8">
               <div className="mb-6">
@@ -159,7 +159,7 @@ export default function FarmOfferMode() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-amber-50 overflow-y-auto">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-amber-50">
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-green-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -183,7 +183,7 @@ export default function FarmOfferMode() {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto p-6 pt-12 pb-20">
+      <div className="max-w-4xl mx-auto p-6 py-8 mb-8">
         <div className="bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-green-100">
           <div className="text-center mb-8">
             <div className="mb-6">

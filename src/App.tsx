@@ -464,7 +464,7 @@ function AppContent() {
   return (
     <ErrorBoundary>
       <div
-        className="h-screen flex flex-col overflow-hidden relative"
+        className="min-h-screen flex flex-col overflow-hidden relative"
         style={{
           background: 'linear-gradient(135deg, rgba(250, 252, 251, 1) 0%, rgba(245, 250, 247, 1) 50%, rgba(248, 252, 250, 1) 100%)',
           backdropFilter: 'blur(10px)',
