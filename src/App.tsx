@@ -8,6 +8,7 @@ import AccountProfile from './components/AccountProfile';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
 import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
 import Header from './components/Header';
+import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
 import InvestmentFarmPage from './components/InvestmentFarmPage';
@@ -1120,6 +1121,13 @@ function App() {
             />
           )}
         </>
+      )}
+
+      {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && (
+        <Footer
+          identity={identity}
+          onClick={handleMyAccountClick}
+        />
       )}
 
       </div>
