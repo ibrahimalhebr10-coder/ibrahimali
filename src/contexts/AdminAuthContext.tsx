@@ -45,7 +45,6 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (adminError || !adminRecord) {
         sessionStorage.removeItem('admin_session');
-        await supabase.auth.signOut();
         setAdmin(null);
         setIsLoading(false);
         return;
@@ -94,12 +93,10 @@ export const AdminAuthProvider: React.FC<{ children: React.ReactNode }> = ({ chi
 
       if (adminError) {
         console.error('Admin query error:', adminError);
-        await supabase.auth.signOut();
         return { success: false, error: 'خطأ في الاتصال بقاعدة البيانات' };
       }
 
       if (!adminRecord) {
-        await supabase.auth.signOut();
         return { success: false, error: 'هذا الحساب غير مخوّل للدخول إلى لوحة الإدارة' };
       }
 
