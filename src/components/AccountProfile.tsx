@@ -1,8 +1,8 @@
 import { X, User, LogOut, Sparkles, Sprout, TrendingUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import IdentityManager from './IdentityManager';
-import { type IdentityType } from '../services/identityService';
+import { type IdentityType, identityService } from '../services/identityService';
 
 interface AccountProfileProps {
   isOpen: boolean;
@@ -18,7 +18,32 @@ type AppMode = 'agricultural' | 'investment';
 export default function AccountProfile({ isOpen, currentContext, onClose, onOpenAuth, onStartInvestment }: AccountProfileProps) {
   const { user, signOut } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const appMode: AppMode = currentContext === 'agricultural' ? 'agricultural' : 'investment';
+  const [primaryIdentity, setPrimaryIdentity] = useState<IdentityType | null>(null);
+  const [isLoadingIdentity, setIsLoadingIdentity] = useState(true);
+
+  useEffect(() => {
+    const loadPrimaryIdentity = async () => {
+      if (!user) {
+        setIsLoadingIdentity(false);
+        return;
+      }
+
+      setIsLoadingIdentity(true);
+      const identity = await identityService.getUserIdentity(user.id);
+      if (identity) {
+        setPrimaryIdentity(identity.primaryIdentity);
+      } else {
+        setPrimaryIdentity('agricultural');
+      }
+      setIsLoadingIdentity(false);
+    };
+
+    if (isOpen && user) {
+      loadPrimaryIdentity();
+    }
+  }, [isOpen, user]);
+
+  const appMode: AppMode = (primaryIdentity || currentContext) === 'agricultural' ? 'agricultural' : 'investment';
 
   if (!isOpen) return null;
 
@@ -180,59 +205,76 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
 
         <div className="flex-1 overflow-y-auto pb-8">
           <div className="max-w-2xl mx-auto px-4 py-6">
-            <div className="space-y-6">
-              <div
-                className="rounded-3xl p-8 shadow-2xl text-white relative overflow-hidden"
-                style={{ background: config.gradient }}
-              >
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20"></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16"></div>
+            {isLoadingIdentity ? (
+              <div className="flex items-center justify-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-green-500"></div>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div
+                  className="rounded-3xl p-8 shadow-2xl text-white relative overflow-hidden"
+                  style={{ background: config.gradient }}
+                >
+                  <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20"></div>
+                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16"></div>
 
-                <div className="relative z-10 text-center">
-                  <div
-                    className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 shadow-xl"
-                    style={{ background: 'rgba(255,255,255,0.2)' }}
-                  >
-                    <IdentityIcon className="w-12 h-12 text-white" />
+                  <div className="relative z-10 text-center">
+                    <div className="relative inline-block mb-6">
+                      <div
+                        className="w-24 h-24 rounded-full flex items-center justify-center shadow-xl"
+                        style={{ background: 'rgba(255,255,255,0.2)' }}
+                      >
+                        <IdentityIcon className="w-12 h-12 text-white" />
+                      </div>
+                      <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-lg">
+                        <span className="text-lg">{appMode === 'agricultural' ? '🌿' : '💼'}</span>
+                      </div>
+                    </div>
+
+                    <div
+                      className="inline-block px-6 py-2 rounded-full mb-4"
+                      style={{ background: 'rgba(255,255,255,0.2)' }}
+                    >
+                      <span className="text-lg font-bold">
+                        {config.label}
+                      </span>
+                    </div>
+
+                    <h2 className="text-2xl font-bold mb-2">
+                      {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                    </h2>
+
+                    <p className="text-sm opacity-90 mb-2">
+                      {config.description}
+                    </p>
+
+                    {primaryIdentity && (
+                      <div className="text-xs opacity-80 mb-6">
+                        <p>هويتك الأساسية: {identityService.getIdentityLabel(primaryIdentity)}</p>
+                      </div>
+                    )}
+
+                    <button
+                      onClick={config.buttonAction}
+                      className="w-full py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
+                      style={{
+                        background: 'rgba(255,255,255,0.95)',
+                        color: config.color
+                      }}
+                    >
+                      <Sparkles className="w-5 h-5" />
+                      <span>{config.buttonText}</span>
+                    </button>
                   </div>
+                </div>
 
-                  <div
-                    className="inline-block px-6 py-2 rounded-full mb-4"
-                    style={{ background: 'rgba(255,255,255,0.2)' }}
-                  >
-                    <span className="text-lg font-bold">
-                      {config.label}
-                    </span>
-                  </div>
+                <IdentityManager />
 
-                  <h2 className="text-2xl font-bold mb-2">
-                    {user.user_metadata?.full_name || user.email?.split('@')[0]}
-                  </h2>
-
-                  <p className="text-sm opacity-90 mb-6">
-                    {config.description}
-                  </p>
-
-                  <button
-                    onClick={config.buttonAction}
-                    className="w-full py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-                    style={{
-                      background: 'rgba(255,255,255,0.95)',
-                      color: config.color
-                    }}
-                  >
-                    <Sparkles className="w-5 h-5" />
-                    <span>{config.buttonText}</span>
-                  </button>
+                <div className="text-center text-gray-500 text-sm">
+                  <p>المزيد من المزايا قريباً</p>
                 </div>
               </div>
-
-              <IdentityManager />
-
-              <div className="text-center text-gray-500 text-sm">
-                <p>المزيد من المزايا قريباً</p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
