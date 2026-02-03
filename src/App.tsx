@@ -12,6 +12,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
 import InvestmentFarmPage from './components/InvestmentFarmPage';
 import AgriculturalFarmPage from './components/AgriculturalFarmPage';
+import IdentitySwitcher from './components/IdentitySwitcher';
 import AdminDashboard from './components/admin/AdminDashboard';
 import AdminLogin from './components/admin/AdminLogin';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
@@ -1061,6 +1062,8 @@ function App() {
         isOpen={showAssistant}
         onClose={() => setShowAssistant(false)}
       />
+
+      <IdentitySwitcher />
 
       {showWelcomeToAccount && (
         <WelcomeToAccountScreen

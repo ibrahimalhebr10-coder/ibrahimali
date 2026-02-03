@@ -9,10 +9,15 @@ interface AuthContextType {
   loading: boolean;
   identity: IdentityType;
   identityLoading: boolean;
+  secondaryIdentity: IdentityType | null;
+  secondaryIdentityEnabled: boolean;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   updateIdentity: (newIdentity: IdentityType) => Promise<boolean>;
+  enableSecondaryIdentity: (secondaryIdentity: IdentityType) => Promise<boolean>;
+  switchToSecondaryIdentity: () => Promise<boolean>;
+  disableSecondaryIdentity: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +28,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [identity, setIdentity] = useState<IdentityType>('agricultural');
   const [identityLoading, setIdentityLoading] = useState(false);
+  const [secondaryIdentity, setSecondaryIdentity] = useState<IdentityType | null>(null);
+  const [secondaryIdentityEnabled, setSecondaryIdentityEnabled] = useState(false);
 
   useEffect(() => {
     async function loadIdentity(userId: string) {
@@ -31,11 +38,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const userIdentity = await identityService.getUserIdentity(userId);
         if (userIdentity) {
           setIdentity(userIdentity.primaryIdentity);
+          setSecondaryIdentity(userIdentity.secondaryIdentity);
+          setSecondaryIdentityEnabled(userIdentity.secondaryIdentityEnabled);
         } else {
           const savedMode = localStorage.getItem('appMode');
           const fallbackIdentity: IdentityType =
             (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
           setIdentity(fallbackIdentity);
+          setSecondaryIdentity(null);
+          setSecondaryIdentityEnabled(false);
           await identityService.setPrimaryIdentity(userId, fallbackIdentity);
         }
       } catch (error) {
@@ -44,6 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const fallbackIdentity: IdentityType =
           (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
         setIdentity(fallbackIdentity);
+        setSecondaryIdentity(null);
+        setSecondaryIdentityEnabled(false);
       } finally {
         setIdentityLoading(false);
       }
@@ -138,6 +151,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const enableSecondaryIdentity = async (newSecondaryIdentity: IdentityType): Promise<boolean> => {
+    if (!user) {
+      return false;
+    }
+
+    const success = await identityService.enableSecondaryIdentity(user.id, newSecondaryIdentity);
+    if (success) {
+      setSecondaryIdentity(newSecondaryIdentity);
+      setSecondaryIdentityEnabled(true);
+      return true;
+    }
+    return false;
+  };
+
+  const switchToSecondaryIdentity = async (): Promise<boolean> => {
+    if (!user || !secondaryIdentity || !secondaryIdentityEnabled) {
+      return false;
+    }
+
+    const success = await identityService.switchIdentities(user.id);
+    if (success) {
+      const temp = identity;
+      setIdentity(secondaryIdentity);
+      setSecondaryIdentity(temp);
+      localStorage.setItem('appMode', secondaryIdentity);
+      return true;
+    }
+    return false;
+  };
+
+  const disableSecondaryIdentity = async (): Promise<boolean> => {
+    if (!user) {
+      return false;
+    }
+
+    const success = await identityService.disableSecondaryIdentity(user.id);
+    if (success) {
+      setSecondaryIdentity(null);
+      setSecondaryIdentityEnabled(false);
+      return true;
+    }
+    return false;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -146,10 +203,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loading,
         identity,
         identityLoading,
+        secondaryIdentity,
+        secondaryIdentityEnabled,
         signUp,
         signIn,
         signOut,
-        updateIdentity
+        updateIdentity,
+        enableSecondaryIdentity,
+        switchToSecondaryIdentity,
+        disableSecondaryIdentity
       }}
     >
       {children}

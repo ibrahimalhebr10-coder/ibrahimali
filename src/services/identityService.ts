@@ -95,7 +95,7 @@ class IdentityService {
     }
   }
 
-  async enableSecondaryIdentity(userId: string, enabled: boolean): Promise<boolean> {
+  async enableSecondaryIdentity(userId: string, secondaryIdentity: IdentityType): Promise<boolean> {
     try {
       const identity = await this.getUserIdentity(userId);
 
@@ -104,14 +104,17 @@ class IdentityService {
         return false;
       }
 
-      if (enabled && !identity.secondaryIdentity) {
-        console.error('Cannot enable secondary identity when none is set');
+      if (secondaryIdentity === identity.primaryIdentity) {
+        console.error('Secondary identity cannot be the same as primary identity');
         return false;
       }
 
       const { error } = await supabase
         .from('user_profiles')
-        .update({ secondary_identity_enabled: enabled })
+        .update({
+          secondary_identity: secondaryIdentity,
+          secondary_identity_enabled: true
+        })
         .eq('id', userId);
 
       if (error) {
@@ -122,6 +125,62 @@ class IdentityService {
       return true;
     } catch (error) {
       console.error('Error in enableSecondaryIdentity:', error);
+      return false;
+    }
+  }
+
+  async disableSecondaryIdentity(userId: string): Promise<boolean> {
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          secondary_identity: null,
+          secondary_identity_enabled: false
+        })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Error disabling secondary identity:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in disableSecondaryIdentity:', error);
+      return false;
+    }
+  }
+
+  async switchIdentities(userId: string): Promise<boolean> {
+    try {
+      const identity = await this.getUserIdentity(userId);
+
+      if (!identity) {
+        console.error('User profile not found');
+        return false;
+      }
+
+      if (!identity.secondaryIdentity || !identity.secondaryIdentityEnabled) {
+        console.error('Secondary identity is not enabled');
+        return false;
+      }
+
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          primary_identity: identity.secondaryIdentity,
+          secondary_identity: identity.primaryIdentity
+        })
+        .eq('id', userId);
+
+      if (error) {
+        console.error('Error switching identities:', error);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in switchIdentities:', error);
       return false;
     }
   }
