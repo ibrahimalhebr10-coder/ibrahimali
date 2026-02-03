@@ -3,8 +3,6 @@ import {
   LayoutDashboard,
   Layers,
   Package,
-  Sprout,
-  TrendingUp,
   FileText,
   Megaphone,
   MessageSquare,
@@ -18,8 +16,6 @@ import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import DashboardOverview from './DashboardOverview';
 import FarmCardsManagement from './FarmCardsManagement';
 import PackagesManagement from './PackagesManagement';
-import AgriculturalSection from './AgriculturalSection';
-import InvestmentSection from './InvestmentSection';
 import ContractsPage from './ContractsPage';
 import MarketingManagement from './MarketingManagement';
 import ContentManagement from './ContentManagement';
@@ -31,8 +27,6 @@ type AdminSection =
   | 'farms'
   | 'farm-offers'
   | 'packages'
-  | 'agricultural'
-  | 'investment'
   | 'contracts'
   | 'marketing'
   | 'content'
@@ -48,8 +42,6 @@ const AdminDashboard: React.FC = () => {
     { id: 'farms' as AdminSection, label: 'المزارع', icon: Layers, color: 'green' },
     { id: 'farm-offers' as AdminSection, label: 'عروض المزارع', icon: ClipboardList, color: 'emerald' },
     { id: 'packages' as AdminSection, label: 'الباقات', icon: Package, color: 'purple' },
-    { id: 'agricultural' as AdminSection, label: 'زراعي', icon: Sprout, color: 'green' },
-    { id: 'investment' as AdminSection, label: 'استثماري', icon: TrendingUp, color: 'orange' },
     { id: 'contracts' as AdminSection, label: 'العقود', icon: FileText, color: 'blue' },
     { id: 'marketing' as AdminSection, label: 'التسويق', icon: Megaphone, color: 'pink' },
     { id: 'content' as AdminSection, label: 'المحتوى', icon: MessageSquare, color: 'indigo' },
@@ -79,10 +71,6 @@ const AdminDashboard: React.FC = () => {
         return <FarmOffersManager />;
       case 'packages':
         return <PackagesManagement />;
-      case 'agricultural':
-        return <AgriculturalSection />;
-      case 'investment':
-        return <InvestmentSection />;
       case 'contracts':
         return <ContractsPage />;
       case 'marketing':
