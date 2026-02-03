@@ -839,6 +839,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           bonusYears={reservationData.bonusYears}
           totalPrice={reservationData.totalPrice}
           investmentNumber={reservationData.investmentNumber}
+          farmCategory="investment"
           onGoToAccount={handleGoToAccount}
         />
       )}

@@ -8,6 +8,7 @@ interface PaymentSuccessScreenProps {
   bonusYears: number;
   totalPrice: number;
   investmentNumber: string;
+  farmCategory?: 'agricultural' | 'investment';
   onGoToAccount: () => void;
 }
 
@@ -19,6 +20,7 @@ export default function PaymentSuccessScreen({
   bonusYears,
   totalPrice,
   investmentNumber,
+  farmCategory = 'agricultural',
   onGoToAccount
 }: PaymentSuccessScreenProps) {
 
@@ -163,7 +165,11 @@ export default function PaymentSuccessScreen({
               onClick={onGoToAccount}
               className="w-full py-6 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-3 text-lg"
             >
-              <span>الآن تفضل إلى صفحة حسابك الزراعي</span>
+              <span>
+                {farmCategory === 'investment'
+                  ? 'الآن تفضل إلى صفحة حسابك الاستثماري'
+                  : 'الآن تفضل إلى صفحة حسابك الزراعي'}
+              </span>
               <ArrowLeft className="w-6 h-6" />
             </button>
 

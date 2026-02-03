@@ -60,7 +60,7 @@ export default function PrePaymentRegistration({
 
     const identityField = farmCategory === 'investment' ? 'secondary_identity' : 'primary_identity';
     const updateData = {
-      [identityField]: farmCategory === 'investment' ? 'investor' : 'farmer'
+      [identityField]: farmCategory === 'investment' ? 'investment' : 'agricultural'
     };
 
     console.log('📝 [REGISTRATION] تحديث:', identityField, '=', updateData[identityField]);
@@ -195,7 +195,7 @@ export default function PrePaymentRegistration({
           data: {
             full_name: formData.fullName,
             phone_number: phoneNumber,
-            user_type: 'investor'
+            user_type: farmCategory === 'investment' ? 'investor' : 'farmer'
           }
         }
       });
