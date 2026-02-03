@@ -34,7 +34,7 @@ export interface FarmOffer {
   proposed_price?: number;
   partnership_acknowledgment: boolean;
   additional_notes?: string;
-  status: 'submitted' | 'under_review' | 'technical_eval' | 'field_visit_scheduled' | 'field_visit_done' | 'approved' | 'rejected';
+  status: 'under_review' | 'preliminary_accepted' | 'contacted' | 'not_suitable';
   submitted_at: string;
   last_updated_at: string;
   decision_at?: string;
@@ -157,22 +157,16 @@ export const farmOfferService = {
   async updateOfferStatus(
     offerId: string,
     status: FarmOffer['status'],
-    adminNotes?: string,
-    rejectionReason?: string
+    adminNotes?: string
   ): Promise<{ success: boolean; error?: string }> {
     try {
       const updateData: any = {
         status,
-        admin_notes: adminNotes,
         last_updated_at: new Date().toISOString()
       };
 
-      if (status === 'approved' || status === 'rejected') {
-        updateData.decision_at = new Date().toISOString();
-      }
-
-      if (status === 'rejected' && rejectionReason) {
-        updateData.rejection_reason = rejectionReason;
+      if (adminNotes !== undefined) {
+        updateData.admin_notes = adminNotes;
       }
 
       const { error } = await supabase
@@ -192,23 +186,44 @@ export const farmOfferService = {
     }
   },
 
-  async getAcceptanceRate(): Promise<{ rate: number; total: number; accepted: number }> {
+  async getOfferStats(): Promise<{
+    total: number;
+    under_review: number;
+    preliminary_accepted: number;
+    contacted: number;
+    not_suitable: number;
+  }> {
     try {
       const { data: allOffers } = await supabase
         .from('farm_offers')
         .select('status');
 
       if (!allOffers || allOffers.length === 0) {
-        return { rate: 0, total: 0, accepted: 0 };
+        return {
+          total: 0,
+          under_review: 0,
+          preliminary_accepted: 0,
+          contacted: 0,
+          not_suitable: 0
+        };
       }
 
-      const accepted = allOffers.filter(o => o.status === 'approved').length;
-      const rate = (accepted / allOffers.length) * 100;
-
-      return { rate, total: allOffers.length, accepted };
+      return {
+        total: allOffers.length,
+        under_review: allOffers.filter(o => o.status === 'under_review').length,
+        preliminary_accepted: allOffers.filter(o => o.status === 'preliminary_accepted').length,
+        contacted: allOffers.filter(o => o.status === 'contacted').length,
+        not_suitable: allOffers.filter(o => o.status === 'not_suitable').length
+      };
     } catch (error) {
-      console.error('Error getting acceptance rate:', error);
-      return { rate: 0, total: 0, accepted: 0 };
+      console.error('Error getting offer stats:', error);
+      return {
+        total: 0,
+        under_review: 0,
+        preliminary_accepted: 0,
+        contacted: 0,
+        not_suitable: 0
+      };
     }
   }
 };
