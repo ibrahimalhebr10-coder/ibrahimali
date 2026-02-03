@@ -2,6 +2,7 @@ import { X, User, LogOut, Sparkles, Sprout, TrendingUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import IdentityManager from './IdentityManager';
+import MyContracts from './MyContracts';
 import { type IdentityType, identityService } from '../services/identityService';
 
 interface AccountProfileProps {
@@ -271,7 +272,9 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
 
                 <IdentityManager />
 
-                <div className="text-center text-gray-500 text-sm">
+                <MyContracts />
+
+                <div className="text-center text-gray-500 text-sm py-6">
                   <p>المزيد من المزايا قريباً</p>
                 </div>
               </div>
