@@ -769,6 +769,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         <PrePaymentRegistration
           farmName={farm.name}
           treeCount={treeCount}
+          farmCategory="agricultural"
           onSuccess={handleRegistrationSuccess}
           onBack={() => setShowPrePaymentRegistration(false)}
         />

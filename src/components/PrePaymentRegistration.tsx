@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Phone, Lock, AlertCircle, CheckCircle2, Sparkles, Shield, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -6,6 +6,8 @@ import { useAuth } from '../contexts/AuthContext';
 interface PrePaymentRegistrationProps {
   farmName: string;
   treeCount: number;
+  farmCategory: 'agricultural' | 'investment';
+  guestId?: string;
   onSuccess: (userId: string, userName: string) => void;
   onBack?: () => void;
 }
@@ -13,6 +15,8 @@ interface PrePaymentRegistrationProps {
 export default function PrePaymentRegistration({
   farmName,
   treeCount,
+  farmCategory,
+  guestId,
   onSuccess,
   onBack
 }: PrePaymentRegistrationProps) {
@@ -26,8 +30,107 @@ export default function PrePaymentRegistration({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const checkExistingSession = async () => {
+      if (user) {
+        console.log('✅ [REGISTRATION] المستخدم مسجل دخول بالفعل:', user.id);
+
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .single();
+
+        const userName = profile?.full_name || 'المستخدم';
+        console.log('🔄 [REGISTRATION] تخطي التسجيل والمتابعة للدفع...');
+
+        await updateUserIdentity(user.id);
+        await linkTemporaryReservation(user.id);
+
+        onSuccess(user.id, userName);
+      }
+    };
+
+    checkExistingSession();
+  }, [user]);
+
+  const updateUserIdentity = async (userId: string) => {
+    console.log('🔄 [REGISTRATION] تحديث هوية المستخدم...');
+    console.log('📋 [REGISTRATION] farmCategory:', farmCategory);
+
+    const identityField = farmCategory === 'investment' ? 'secondary_identity' : 'primary_identity';
+    const updateData = {
+      [identityField]: farmCategory === 'investment' ? 'investor' : 'farmer'
+    };
+
+    console.log('📝 [REGISTRATION] تحديث:', identityField, '=', updateData[identityField]);
+
+    const { error: profileError } = await supabase
+      .from('user_profiles')
+      .update(updateData)
+      .eq('id', userId);
+
+    if (profileError) {
+      console.error('❌ [REGISTRATION] خطأ في تحديث الهوية:', profileError);
+    } else {
+      console.log('✅ [REGISTRATION] تم تحديث هوية المستخدم بنجاح!');
+    }
+  };
+
+  const linkTemporaryReservation = async (userId: string) => {
+    if (!guestId) {
+      console.log('ℹ️ [REGISTRATION] لا يوجد حجز مؤقت للربط');
+      return;
+    }
+
+    console.log('🔗 [REGISTRATION] ربط الحجز المؤقت:', guestId);
+
+    const { data: tempReservation, error: findError } = await supabase
+      .from('reservations')
+      .select('*')
+      .eq('guest_id', guestId)
+      .eq('status', 'temporary')
+      .maybeSingle();
+
+    if (findError) {
+      console.error('❌ [REGISTRATION] خطأ في البحث عن الحجز المؤقت:', findError);
+      return;
+    }
+
+    if (tempReservation) {
+      console.log('🔄 [REGISTRATION] تحديث الحجز المؤقت ID:', tempReservation.id);
+
+      const { error: updateError } = await supabase
+        .from('reservations')
+        .update({
+          user_id: userId,
+          guest_id: null,
+          status: 'confirmed',
+          temporary_expires_at: null
+        })
+        .eq('id', tempReservation.id);
+
+      if (updateError) {
+        console.error('❌ [REGISTRATION] خطأ في ربط الحجز:', updateError);
+      } else {
+        console.log('✅ [REGISTRATION] تم ربط الحجز المؤقت بالمستخدم!');
+      }
+    } else {
+      console.log('ℹ️ [REGISTRATION] لم يتم العثور على حجز مؤقت');
+    }
+  };
+
   if (user) {
-    return null;
+    return (
+      <div className="fixed inset-0 bg-gradient-to-br from-green-50/98 via-emerald-50/95 to-teal-50/98 z-50 flex items-center justify-center">
+        <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-16 h-16 border-4 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-lg font-bold text-gray-700">جاري التحقق من حسابك...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,6 +184,10 @@ export default function PrePaymentRegistration({
       const phoneNumber = formData.phoneNumber.replace(/\s/g, '');
       const email = `${phoneNumber}@investor.harvest.local`;
 
+      console.log('📝 [REGISTRATION] بدء إنشاء الحساب...');
+      console.log('📝 [REGISTRATION] Phone:', phoneNumber);
+      console.log('📝 [REGISTRATION] Category:', farmCategory);
+
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password: formData.password,
@@ -94,7 +201,7 @@ export default function PrePaymentRegistration({
       });
 
       if (signUpError) {
-        console.error('Supabase signup error:', signUpError);
+        console.error('❌ [REGISTRATION] Supabase signup error:', signUpError);
         if (signUpError.message.includes('already registered')) {
           setError('رقم الجوال مسجل مسبقاً. يرجى تسجيل الدخول أو استخدام رقم آخر');
         } else if (signUpError.message.includes('Password should be at least 6 characters')) {
@@ -107,10 +214,16 @@ export default function PrePaymentRegistration({
       }
 
       if (authData.user) {
+        console.log('✅ [REGISTRATION] تم إنشاء الحساب! User ID:', authData.user.id);
+
+        await updateUserIdentity(authData.user.id);
+        await linkTemporaryReservation(authData.user.id);
+
+        console.log('✅ [REGISTRATION] التسجيل مكتمل! الانتقال للدفع...');
         onSuccess(authData.user.id, formData.fullName);
       }
     } catch (err) {
-      console.error('Registration error:', err);
+      console.error('❌ [REGISTRATION] Registration error:', err);
       setError('حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى');
       setLoading(false);
     }

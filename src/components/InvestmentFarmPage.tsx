@@ -810,6 +810,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
         <PrePaymentRegistration
           farmName={farm.name}
           treeCount={treeCount}
+          farmCategory="investment"
           onSuccess={handleRegistrationSuccess}
           onBack={() => setShowPrePaymentRegistration(false)}
         />
