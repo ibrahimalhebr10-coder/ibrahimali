@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, TreePine, Calendar, MapPin, FileText, Clock, DollarSign, Sparkles, AlertCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import ContractCountdown from './ContractCountdown';
 
 interface Reservation {
   id: string;
@@ -14,6 +15,7 @@ interface Reservation {
   contract_name: string | null;
   duration_years: number | null;
   bonus_years: number | null;
+  contract_start_date: string | null;
   created_at: string;
 }
 
@@ -358,17 +360,31 @@ export default function MyReservations({ isOpen, onClose }: MyReservationsProps)
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-3 border-t border-gray-200">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                        <span className="text-sm font-bold text-green-700">نشط</span>
+                    <div className="space-y-3 pt-3 border-t border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                          <span className="text-sm font-bold text-green-700">نشط</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-gray-500">
+                          <Clock className="w-4 h-4" />
+                          <span className="text-xs">
+                            {new Date(reservation.created_at).toLocaleDateString('ar-SA')}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-gray-500">
-                        <Clock className="w-4 h-4" />
-                        <span className="text-xs">
-                          {new Date(reservation.created_at).toLocaleDateString('ar-SA')}
-                        </span>
-                      </div>
+
+                      {/* العداد التنازلي */}
+                      {reservation.contract_start_date &&
+                       reservation.duration_years &&
+                       reservation.bonus_years !== null && (
+                        <ContractCountdown
+                          contractStartDate={reservation.contract_start_date}
+                          durationYears={reservation.duration_years}
+                          bonusYears={reservation.bonus_years}
+                          status={reservation.status}
+                        />
+                      )}
                     </div>
                   </div>
                 ))}
