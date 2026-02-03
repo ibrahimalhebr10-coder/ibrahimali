@@ -14,7 +14,6 @@ import InvestmentFarmPage from './components/InvestmentFarmPage';
 import AgriculturalFarmPage from './components/AgriculturalFarmPage';
 import AdminDashboard from './components/admin/AdminDashboard';
 import AdminLogin from './components/admin/AdminLogin';
-import MyTreesPage from './components/MyTreesPage';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
 import { useAuth } from './contexts/AuthContext';
@@ -49,7 +48,6 @@ function App() {
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [selectedInvestmentFarm, setSelectedInvestmentFarm] = useState<FarmProject | null>(null);
-  const [showMyTrees, setShowMyTrees] = useState(false);
 
   const handleAppModeChange = (mode: AppMode) => {
     setAppMode(mode);
@@ -935,30 +933,6 @@ function App() {
             }}></div>
           </button>
 
-          <button
-            onClick={() => setShowMyTrees(true)}
-            className="flex items-center gap-2 px-5 py-2 rounded-2xl transition-all duration-300 hover:scale-110 hover:shadow-2xl relative overflow-hidden group"
-            style={{
-              background: appMode === 'agricultural'
-                ? 'linear-gradient(145deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)'
-                : 'linear-gradient(145deg, #F4E4B8 0%, #D4AF37 50%, #B8942F 100%)',
-              boxShadow: appMode === 'agricultural'
-                ? '0 6px 24px rgba(58,161,126,0.5), inset 0 2px 4px rgba(255,255,255,0.4)'
-                : '0 6px 24px rgba(212,175,55,0.5), inset 0 2px 4px rgba(255,255,255,0.4)',
-              border: '3px solid rgba(255,255,255,0.8)'
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/20 pointer-events-none"></div>
-            {appMode === 'agricultural' ? (
-              <Sprout className="w-7 h-7 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
-            ) : (
-              <TrendingUp className="w-7 h-7 text-white relative z-10 transition-transform duration-300 group-hover:scale-110" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' }} />
-            )}
-            <span className="text-sm font-black text-white relative z-10" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
-              متابعة أشجاري
-            </span>
-          </button>
-
           <NotificationCenter
             unreadCount={unreadMessagesCount}
             onCountChange={handleUnreadCountChange}
@@ -1047,36 +1021,6 @@ function App() {
               />
             </div>
             <span className="text-[10px] font-bold text-darkgreen/80">المساعد</span>
-          </button>
-
-          <button
-            onClick={() => setShowMyTrees(true)}
-            className="flex flex-col items-center justify-center gap-1 relative -mt-5 active:scale-95 transition-all duration-300"
-          >
-            <div
-              className="w-18 h-18 rounded-2xl flex items-center justify-center transition-all duration-300 relative overflow-hidden group"
-              style={{
-                background: appMode === 'agricultural'
-                  ? 'linear-gradient(145deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)'
-                  : 'linear-gradient(145deg, #F4E4B8 0%, #D4AF37 50%, #B8942F 100%)',
-                boxShadow: appMode === 'agricultural'
-                  ? '0 10px 30px rgba(58,161,126,0.6), 0 6px 15px rgba(47,130,102,0.4), inset 0 2px 6px rgba(255,255,255,0.5)'
-                  : '0 10px 30px rgba(212,175,55,0.6), 0 6px 15px rgba(184,148,47,0.4), inset 0 2px 6px rgba(255,255,255,0.5)',
-                border: '3px solid rgba(255,255,255,0.9)',
-                width: '3.5rem',
-                height: '3.5rem'
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/20 pointer-events-none"></div>
-              {appMode === 'agricultural' ? (
-                <Sprout className="w-10 h-10 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
-              ) : (
-                <TrendingUp className="w-10 h-10 text-white drop-shadow-2xl relative z-10 animate-pulse" style={{ filter: 'drop-shadow(0 3px 6px rgba(0,0,0,0.3))' }} />
-              )}
-            </div>
-            <span className="text-[9px] font-black text-darkgreen mt-1">
-              متابعة أشجاري
-            </span>
           </button>
 
           <NotificationCenter
@@ -1179,11 +1123,6 @@ function App() {
         </>
       )}
 
-      <MyTreesPage
-        isOpen={showMyTrees}
-        onClose={() => setShowMyTrees(false)}
-        onLogin={handleMyAccountClick}
-      />
       </div>
     </ErrorBoundary>
   );
