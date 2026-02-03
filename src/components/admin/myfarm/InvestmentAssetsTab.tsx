@@ -17,12 +17,12 @@ interface InvestmentAsset {
 interface User {
   id: string;
   full_name: string;
-  email: string;
+  phone: string;
 }
 
 interface Farm {
   id: string;
-  name: string;
+  name_ar: string;
 }
 
 interface Contract {
@@ -65,7 +65,7 @@ const InvestmentAssetsTab: React.FC = () => {
   const loadUsers = async () => {
     const { data } = await supabase
       .from('user_profiles')
-      .select('id, full_name, email')
+      .select('id, full_name, phone')
       .order('full_name');
     if (data) setUsers(data);
   };
@@ -73,8 +73,8 @@ const InvestmentAssetsTab: React.FC = () => {
   const loadFarms = async () => {
     const { data } = await supabase
       .from('farms')
-      .select('id, name')
-      .order('name');
+      .select('id, name_ar')
+      .order('name_ar');
     if (data) setFarms(data);
   };
 
@@ -170,7 +170,7 @@ const InvestmentAssetsTab: React.FC = () => {
   const totalFarms = new Set(assets.map(a => a.farm_id)).size;
 
   const getFarmName = (farmId: string) => {
-    return farms.find(f => f.id === farmId)?.name || 'غير محدد';
+    return farms.find(f => f.id === farmId)?.name_ar || 'غير محدد';
   };
 
   const getContractRef = (contractId: string | null) => {
@@ -210,7 +210,7 @@ const InvestmentAssetsTab: React.FC = () => {
           <option value="">-- اختر مستثمر --</option>
           {users.map((user) => (
             <option key={user.id} value={user.id}>
-              {user.full_name} ({user.email})
+              {user.full_name} ({user.phone})
             </option>
           ))}
         </select>
@@ -364,7 +364,7 @@ const InvestmentAssetsTab: React.FC = () => {
                   <option value="">-- اختر مزرعة --</option>
                   {farms.map((farm) => (
                     <option key={farm.id} value={farm.id}>
-                      {farm.name}
+                      {farm.name_ar}
                     </option>
                   ))}
                 </select>

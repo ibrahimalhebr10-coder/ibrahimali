@@ -18,12 +18,12 @@ interface ExpansionOpportunity {
 interface User {
   id: string;
   full_name: string;
-  email: string;
+  phone: string;
 }
 
 interface Farm {
   id: string;
-  name: string;
+  name_ar: string;
 }
 
 const InvestmentExpansionTab: React.FC = () => {
@@ -61,7 +61,7 @@ const InvestmentExpansionTab: React.FC = () => {
   const loadUsers = async () => {
     const { data } = await supabase
       .from('user_profiles')
-      .select('id, full_name, email')
+      .select('id, full_name, phone')
       .order('full_name');
     if (data) setUsers(data);
   };
@@ -69,8 +69,8 @@ const InvestmentExpansionTab: React.FC = () => {
   const loadFarms = async () => {
     const { data } = await supabase
       .from('farms')
-      .select('id, name')
-      .order('name');
+      .select('id, name_ar')
+      .order('name_ar');
     if (data) setFarms(data);
   };
 
@@ -171,7 +171,7 @@ const InvestmentExpansionTab: React.FC = () => {
 
   const getFarmName = (farmId: string | null) => {
     if (!farmId) return 'غير محدد';
-    return farms.find(f => f.id === farmId)?.name || 'غير محدد';
+    return farms.find(f => f.id === farmId)?.name_ar || 'غير محدد';
   };
 
   const selectedUser = users.find(u => u.id === selectedUserId);
@@ -221,7 +221,7 @@ const InvestmentExpansionTab: React.FC = () => {
           <option value="">-- اختر مستثمر --</option>
           {users.map((user) => (
             <option key={user.id} value={user.id}>
-              {user.full_name} ({user.email})
+              {user.full_name} ({user.phone})
             </option>
           ))}
         </select>
@@ -407,7 +407,7 @@ const InvestmentExpansionTab: React.FC = () => {
                   <option value="">-- غير محدد --</option>
                   {farms.map((farm) => (
                     <option key={farm.id} value={farm.id}>
-                      {farm.name}
+                      {farm.name_ar}
                     </option>
                   ))}
                 </select>

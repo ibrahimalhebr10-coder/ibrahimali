@@ -15,7 +15,7 @@ interface Operation {
 
 interface Farm {
   id: string;
-  name: string;
+  name_ar: string;
 }
 
 const AgriculturalOperationsTab: React.FC = () => {
@@ -48,8 +48,8 @@ const AgriculturalOperationsTab: React.FC = () => {
   const loadFarms = async () => {
     const { data } = await supabase
       .from('farms')
-      .select('id, name')
-      .order('name');
+      .select('id, name_ar')
+      .order('name_ar');
     if (data) setFarms(data);
   };
 
@@ -192,7 +192,7 @@ const AgriculturalOperationsTab: React.FC = () => {
           <option value="">-- اختر مزرعة --</option>
           {farms.map((farm) => (
             <option key={farm.id} value={farm.id}>
-              {farm.name}
+              {farm.name_ar}
             </option>
           ))}
         </select>

@@ -17,7 +17,7 @@ interface InvestmentStatus {
 interface User {
   id: string;
   full_name: string;
-  email: string;
+  phone: string;
 }
 
 interface Contract {
@@ -57,7 +57,7 @@ const InvestmentStatusTab: React.FC = () => {
   const loadUsers = async () => {
     const { data } = await supabase
       .from('user_profiles')
-      .select('id, full_name, email')
+      .select('id, full_name, phone')
       .order('full_name');
     if (data) setUsers(data);
   };
@@ -210,7 +210,7 @@ const InvestmentStatusTab: React.FC = () => {
           <option value="">-- اختر مستثمر --</option>
           {users.map((user) => (
             <option key={user.id} value={user.id}>
-              {user.full_name} ({user.email})
+              {user.full_name} ({user.phone})
             </option>
           ))}
         </select>
