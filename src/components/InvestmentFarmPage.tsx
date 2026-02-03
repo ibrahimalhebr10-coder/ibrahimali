@@ -276,6 +276,10 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 24);
 
+      console.log('💰 [INVESTMENT] بدء إنشاء الحجز...');
+      console.log('💰 [INVESTMENT] User ID:', user.id);
+      console.log('💰 [INVESTMENT] Trees:', treeCount, 'Price:', totalPrice);
+
       const { data: reservation, error: reservationError } = await supabase
         .from('reservations')
         .insert({
@@ -295,11 +299,14 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
         .single() as any;
 
       if (reservationError) {
-        console.error('Reservation error:', reservationError);
+        console.error('❌ [INVESTMENT] خطأ في إنشاء الحجز:', reservationError);
         alert('حدث خطأ في إنشاء الحجز. يرجى المحاولة مرة أخرى');
         setIsCreatingReservation(false);
         return;
       }
+
+      console.log('✅ [INVESTMENT] تم إنشاء الحجز! ID:', reservation.id);
+      console.log('🔄 [INVESTMENT] تحديث الحالة إلى confirmed...');
 
       const { error: statusError } = await supabase
         .from('reservations')
@@ -307,7 +314,9 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
         .eq('id', reservation.id);
 
       if (statusError) {
-        console.error('Error updating reservation status:', statusError);
+        console.error('❌ [INVESTMENT] خطأ في تحديث الحالة:', statusError);
+      } else {
+        console.log('✅ [INVESTMENT] تم تأكيد الحجز بنجاح!');
       }
 
       setReservationData({

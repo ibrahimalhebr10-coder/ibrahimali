@@ -241,6 +241,10 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       const expiresAt = new Date();
       expiresAt.setHours(expiresAt.getHours() + 24);
 
+      console.log('🌾 [AGRICULTURAL] بدء إنشاء الحجز...');
+      console.log('🌾 [AGRICULTURAL] User ID:', user.id);
+      console.log('🌾 [AGRICULTURAL] Trees:', treeCount, 'Price:', totalPrice);
+
       const { data: reservation, error: reservationError } = await supabase
         .from('reservations')
         .insert({
@@ -260,11 +264,14 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         .single() as any;
 
       if (reservationError) {
-        console.error('Reservation error:', reservationError);
+        console.error('❌ [AGRICULTURAL] خطأ في إنشاء الحجز:', reservationError);
         alert('حدث خطأ في إنشاء الحجز. يرجى المحاولة مرة أخرى');
         setIsCreatingReservation(false);
         return;
       }
+
+      console.log('✅ [AGRICULTURAL] تم إنشاء الحجز! ID:', reservation.id);
+      console.log('🔄 [AGRICULTURAL] تحديث الحالة إلى confirmed...');
 
       const { error: statusError } = await supabase
         .from('reservations')
@@ -272,7 +279,9 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         .eq('id', reservation.id);
 
       if (statusError) {
-        console.error('Error updating reservation status:', statusError);
+        console.error('❌ [AGRICULTURAL] خطأ في تحديث الحالة:', statusError);
+      } else {
+        console.log('✅ [AGRICULTURAL] تم تأكيد الحجز بنجاح!');
       }
 
       setReservationData({
