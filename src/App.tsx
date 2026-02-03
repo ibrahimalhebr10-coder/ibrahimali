@@ -21,7 +21,7 @@ import { useAdminAuth } from './contexts/AdminAuthContext';
 import { initializeSupabase } from './lib/supabase';
 
 function App() {
-  const { user } = useAuth();
+  const { user, identity, updateIdentity } = useAuth();
   const { admin } = useAdminAuth();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const farmsSliderRef = useRef<HTMLDivElement>(null);
@@ -29,10 +29,7 @@ function App() {
   const lastScrollYRef = useRef(0);
   const [currentFarmIndex, setCurrentFarmIndex] = useState(0);
   const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
-  const [appMode, setAppMode] = useState<AppMode>(() => {
-    const savedMode = localStorage.getItem('appMode');
-    return (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
-  });
+  const appMode = identity as AppMode;
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [categories, setCategories] = useState<FarmCategory[]>([]);
   const [farmProjects, setFarmProjects] = useState<Record<string, FarmProject[]>>({});
@@ -49,9 +46,8 @@ function App() {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [selectedInvestmentFarm, setSelectedInvestmentFarm] = useState<FarmProject | null>(null);
 
-  const handleAppModeChange = (mode: AppMode) => {
-    setAppMode(mode);
-    localStorage.setItem('appMode', mode);
+  const handleAppModeChange = async (mode: AppMode) => {
+    await updateIdentity(mode);
   };
 
   useEffect(() => {
