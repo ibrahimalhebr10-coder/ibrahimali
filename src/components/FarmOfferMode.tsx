@@ -14,7 +14,6 @@ export default function FarmOfferMode() {
   const [stage, setStage] = useState<Stage>('intro');
   const [loading, setLoading] = useState(false);
   const [submittedOffer, setSubmittedOffer] = useState<FarmOffer | null>(null);
-  const [acceptanceStats, setAcceptanceStats] = useState({ rate: 0, total: 0, accepted: 0 });
   const [whatsappNumber, setWhatsappNumber] = useState<string>('');
   const [contactPhone, setContactPhone] = useState<string>('');
 
@@ -41,14 +40,8 @@ export default function FarmOfferMode() {
   }, [stage]);
 
   useEffect(() => {
-    loadAcceptanceStats();
     loadContactInfo();
   }, []);
-
-  const loadAcceptanceStats = async () => {
-    const stats = await farmOfferService.getAcceptanceRate();
-    setAcceptanceStats(stats);
-  };
 
   const loadContactInfo = async () => {
     const whatsapp = await systemSettingsService.getWhatsAppNumber();

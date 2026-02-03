@@ -16,7 +16,9 @@ import {
   XCircle,
   PhoneCall,
   Save,
-  ArrowRight
+  ArrowRight,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -58,6 +60,8 @@ const FarmOffersManager: React.FC = () => {
   const [newStatus, setNewStatus] = useState('');
   const [newAdminNotes, setNewAdminNotes] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [offerToDelete, setOfferToDelete] = useState<FarmOffer | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const statusOptions = [
     { value: 'under_review', label: 'قيد التقييم', color: 'blue', icon: Clock },
@@ -161,6 +165,33 @@ const FarmOffersManager: React.FC = () => {
       console.error('Error updating offer:', error);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDeleteOffer = async () => {
+    if (!offerToDelete) return;
+
+    try {
+      setIsDeleting(true);
+
+      const { error } = await supabase
+        .from('farm_offers')
+        .delete()
+        .eq('id', offerToDelete.id);
+
+      if (error) throw error;
+
+      await loadOffers();
+      setOfferToDelete(null);
+
+      if (selectedOffer?.id === offerToDelete.id) {
+        setSelectedOffer(null);
+      }
+    } catch (error) {
+      console.error('Error deleting offer:', error);
+      alert('حدث خطأ أثناء حذف العرض');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -316,11 +347,10 @@ const FarmOffersManager: React.FC = () => {
             return (
               <div
                 key={offer.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => openOfferDetails(offer)}
+                className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
+                  <div className="flex-1 cursor-pointer" onClick={() => openOfferDetails(offer)}>
                     <div className="flex items-center gap-3 mb-2">
                       <span className="text-2xl font-bold text-darkgreen">
                         {offer.reference_number}
@@ -358,9 +388,25 @@ const FarmOffersManager: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-                    <Eye className="w-5 h-5 text-gray-600" />
-                  </button>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => openOfferDetails(offer)}
+                      className="p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                      title="عرض التفاصيل"
+                    >
+                      <Eye className="w-5 h-5 text-blue-600" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOfferToDelete(offer);
+                      }}
+                      className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                      title="حذف العرض"
+                    >
+                      <Trash2 className="w-5 h-5 text-red-600" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -571,6 +617,16 @@ const FarmOffersManager: React.FC = () => {
                       )}
                     </button>
                     <button
+                      onClick={() => {
+                        setOfferToDelete(selectedOffer);
+                        setSelectedOffer(null);
+                      }}
+                      className="px-6 py-3 bg-red-50 text-red-600 rounded-lg font-semibold hover:bg-red-100 transition-colors flex items-center gap-2"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                      حذف
+                    </button>
+                    <button
                       onClick={() => setSelectedOffer(null)}
                       className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
                     >
@@ -593,6 +649,61 @@ const FarmOffersManager: React.FC = () => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {offerToDelete && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900">تأكيد الحذف</h3>
+                <p className="text-sm text-gray-600">هذا الإجراء لا يمكن التراجع عنه</p>
+              </div>
+            </div>
+
+            <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-700 mb-2">
+                هل أنت متأكد من حذف هذا العرض؟
+              </p>
+              <div className="space-y-1 text-sm">
+                <p><span className="font-semibold">رقم المرجع:</span> {offerToDelete.reference_number}</p>
+                <p><span className="font-semibold">المالك:</span> {offerToDelete.owner_name}</p>
+                <p><span className="font-semibold">الموقع:</span> {offerToDelete.location}</p>
+              </div>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleDeleteOffer}
+                disabled={isDeleting}
+                className="flex-1 bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>جاري الحذف...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-5 h-5" />
+                    <span>تأكيد الحذف</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => setOfferToDelete(null)}
+                disabled={isDeleting}
+                className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50"
+              >
+                إلغاء
+              </button>
             </div>
           </div>
         </div>
