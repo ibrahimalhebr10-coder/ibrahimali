@@ -49,8 +49,7 @@ const contractsService = {
           contract_start_date,
           contract_end_date
         `)
-        .in('status', ['active', 'confirmed', 'completed'])
-        .not('user_id', 'is', null);
+        .in('status', ['active', 'confirmed', 'completed']);
 
       if (error) throw error;
 
@@ -122,8 +121,7 @@ const contractsService = {
             )
           `)
           .eq('farm_id', farm.id)
-          .in('status', ['active', 'confirmed', 'completed'])
-          .not('user_id', 'is', null);
+          .in('status', ['active', 'confirmed', 'completed']);
 
         if (reservationsError) throw reservationsError;
 
@@ -158,10 +156,12 @@ const contractsService = {
               ? reservation.tree_types
               : [];
 
+          const userName = reservation.user_profiles?.full_name || 'عميل مؤقت';
+
           contracts.push({
             id: reservation.id,
             farm_id: farm.id,
-            user_id: reservation.user_id,
+            user_id: reservation.user_id || 'temp',
             contract_type: reservation.contract_type || 'agricultural',
             tree_count: reservation.total_trees || 0,
             tree_types: treeTypes,
@@ -169,7 +169,7 @@ const contractsService = {
             end_date: reservation.contract_end_date,
             status,
             farm_name: farm.name_ar,
-            user_name: reservation.user_profiles?.full_name || 'غير محدد'
+            user_name: userName
           });
         });
 
