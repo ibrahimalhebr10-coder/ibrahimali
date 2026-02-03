@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   Layers,
   Package,
-  FileText,
   Megaphone,
   MessageSquare,
   Settings,
@@ -17,7 +16,6 @@ import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import DashboardOverview from './DashboardOverview';
 import FarmCardsManagement from './FarmCardsManagement';
 import PackagesManagement from './PackagesManagement';
-import ContractsPage from './ContractsPage';
 import MarketingManagement from './MarketingManagement';
 import ContentManagement from './ContentManagement';
 import GeneralSettings from './GeneralSettings';
@@ -30,7 +28,6 @@ type AdminSection =
   | 'farm-offers'
   | 'packages'
   | 'my-farm'
-  | 'contracts'
   | 'marketing'
   | 'content'
   | 'settings';
@@ -46,7 +43,6 @@ const AdminDashboard: React.FC = () => {
     { id: 'farm-offers' as AdminSection, label: 'عروض المزارع', icon: ClipboardList, color: 'emerald' },
     { id: 'packages' as AdminSection, label: 'الباقات', icon: Package, color: 'purple' },
     { id: 'my-farm' as AdminSection, label: 'مزرعتي', icon: TreePine, color: 'green' },
-    { id: 'contracts' as AdminSection, label: 'العقود', icon: FileText, color: 'blue' },
     { id: 'marketing' as AdminSection, label: 'التسويق', icon: Megaphone, color: 'pink' },
     { id: 'content' as AdminSection, label: 'المحتوى', icon: MessageSquare, color: 'indigo' },
     { id: 'settings' as AdminSection, label: 'الإعدادات', icon: Settings, color: 'gray' },
@@ -77,8 +73,6 @@ const AdminDashboard: React.FC = () => {
         return <PackagesManagement />;
       case 'my-farm':
         return <MyFarmManagement />;
-      case 'contracts':
-        return <ContractsPage />;
       case 'marketing':
         return <MarketingManagement />;
       case 'content':
