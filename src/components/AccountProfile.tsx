@@ -64,7 +64,8 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
       description: 'أنت في رحلة زراعية',
       buttonText: 'تابع مزرعتي',
       buttonAction: () => {
-        console.log('Navigate to Agricultural Journey');
+        onClose();
+        onOpenReservations();
       }
     },
     investment: {
