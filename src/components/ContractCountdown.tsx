@@ -32,6 +32,15 @@ export default function ContractCountdown({
   userType = 'investor'
 }: ContractCountdownProps) {
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining | null>(null);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (!contractStartDate || (status !== 'active' && status !== 'confirmed' && status !== 'completed')) {
@@ -41,7 +50,7 @@ export default function ContractCountdown({
 
     const calculateTimeRemaining = () => {
       const startDate = new Date(contractStartDate);
-      const now = new Date();
+      const now = currentTime;
 
       const contractEndDate = new Date(startDate);
       contractEndDate.setFullYear(contractEndDate.getFullYear() + durationYears);
@@ -71,12 +80,16 @@ export default function ContractCountdown({
         return;
       }
 
-      const totalDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      const totalSeconds = Math.floor(diffMs / 1000);
+      const totalMinutes = Math.floor(totalSeconds / 60);
+      const totalHours = Math.floor(totalMinutes / 60);
+      const totalDays = Math.floor(totalHours / 24);
+
       const years = Math.floor(totalDays / 365);
       const remainingDaysAfterYears = totalDays % 365;
       const months = Math.floor(remainingDaysAfterYears / 30);
       const days = remainingDaysAfterYears % 30;
-      const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const hours = totalHours % 24;
 
       let phase: ContractPhase = 'active';
       let stage: ContractStage = 'growth';
@@ -110,10 +123,7 @@ export default function ContractCountdown({
     };
 
     calculateTimeRemaining();
-    const interval = setInterval(calculateTimeRemaining, 1000 * 60 * 60 * 24);
-
-    return () => clearInterval(interval);
-  }, [contractStartDate, durationYears, bonusYears, status]);
+  }, [contractStartDate, durationYears, bonusYears, status, currentTime]);
 
   if (!timeRemaining || (status !== 'active' && status !== 'confirmed' && status !== 'completed')) {
     return null;
@@ -196,96 +206,140 @@ export default function ContractCountdown({
   const Icon = config.icon;
   const StageIcon = stageInfo.icon;
 
+  const minutes = Math.floor((currentTime.getTime() - Math.floor(currentTime.getTime() / (1000 * 60 * 60)) * (1000 * 60 * 60)) / (1000 * 60)) % 60;
+  const seconds = Math.floor((currentTime.getTime() / 1000) % 60);
+
   return (
-    <div className={`rounded-xl ${config.bgColor} ${config.borderColor} border-2 overflow-hidden`}>
-      <div className="flex items-center gap-3 px-4 py-3">
-        {/* أيقونة الحالة */}
-        <div className={`flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br ${config.gradient} shadow-lg`}>
-          <Icon className="w-5 h-5 text-white" />
+    <div className="space-y-3">
+      {/* بطاقة العداد الرئيسية */}
+      <div className={`rounded-2xl ${config.bgColor} border-2 ${config.borderColor} overflow-hidden shadow-lg`}>
+        {/* القسم العلوي - حالة العقد */}
+        <div className="px-4 py-3 bg-gradient-to-br from-white/50 to-transparent">
+          <div className="flex items-center gap-3">
+            <div className={`flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br ${config.gradient} shadow-lg`}>
+              <Icon className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <span className={`text-sm font-bold ${config.color}`}>
+                  {config.label}
+                </span>
+                {timeRemaining.phase === 'ending-soon' && (
+                  <Hourglass className="w-4 h-4 text-rose-500 animate-pulse" />
+                )}
+              </div>
+              <div className="flex items-center gap-1 mt-0.5">
+                <StageIcon className={`w-3.5 h-3.5 ${config.color} opacity-60`} />
+                <span className={`text-xs ${config.color} opacity-70`}>
+                  {stageInfo.label}
+                </span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* العداد التنازلي */}
-        <div className="flex-1">
-          <div className="flex items-center gap-2 mb-1">
-            <div className={`text-xs font-medium ${config.color}`}>
-              {config.label}
-            </div>
-            {timeRemaining.phase === 'ending-soon' && (
-              <Hourglass className="w-3 h-3 text-rose-400" />
-            )}
-          </div>
-
-          <div className="flex items-center gap-2 flex-wrap">
+        {/* العداد الرئيسي - سنوات وشهور وأيام */}
+        <div className="px-4 py-4 bg-white/30">
+          <div className="flex items-center justify-center gap-3">
             {timeRemaining.years > 0 && (
-              <div className="flex items-center gap-1">
-                <span className={`text-lg font-bold ${config.color}`}>
-                  {timeRemaining.years}
-                </span>
-                <span className={`text-xs ${config.color} opacity-70`}>
+              <div className="text-center">
+                <div className={`text-3xl font-bold ${config.color} tabular-nums leading-none`}>
+                  {String(timeRemaining.years).padStart(2, '0')}
+                </div>
+                <div className={`text-xs ${config.color} opacity-60 mt-1`}>
                   سنة
-                </span>
+                </div>
               </div>
             )}
 
-            {(timeRemaining.months > 0 || timeRemaining.years > 0) && (
+            {(timeRemaining.years > 0 || timeRemaining.months > 0) && (
               <>
                 {timeRemaining.years > 0 && (
-                  <span className={`text-xs ${config.color} opacity-40`}>•</span>
+                  <div className={`text-2xl ${config.color} opacity-30 font-light`}>:</div>
                 )}
-                <div className="flex items-center gap-1">
-                  <span className={`text-lg font-bold ${config.color}`}>
-                    {timeRemaining.months}
-                  </span>
-                  <span className={`text-xs ${config.color} opacity-70`}>
+                <div className="text-center">
+                  <div className={`text-3xl font-bold ${config.color} tabular-nums leading-none`}>
+                    {String(timeRemaining.months).padStart(2, '0')}
+                  </div>
+                  <div className={`text-xs ${config.color} opacity-60 mt-1`}>
                     شهر
-                  </span>
+                  </div>
                 </div>
               </>
             )}
 
-            {(timeRemaining.days > 0 || (timeRemaining.years === 0 && timeRemaining.months === 0)) && (
-              <>
-                {(timeRemaining.months > 0 || timeRemaining.years > 0) && (
-                  <span className={`text-xs ${config.color} opacity-40`}>•</span>
-                )}
-                <div className="flex items-center gap-1">
-                  <span className={`text-lg font-bold ${config.color}`}>
-                    {timeRemaining.days}
-                  </span>
-                  <span className={`text-xs ${config.color} opacity-70`}>
-                    يوم
-                  </span>
-                </div>
-              </>
+            {(timeRemaining.months > 0 || timeRemaining.years > 0) && (
+              <div className={`text-2xl ${config.color} opacity-30 font-light`}>:</div>
             )}
+            <div className="text-center">
+              <div className={`text-3xl font-bold ${config.color} tabular-nums leading-none`}>
+                {String(timeRemaining.days).padStart(2, '0')}
+              </div>
+              <div className={`text-xs ${config.color} opacity-60 mt-1`}>
+                يوم
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* عدد الأيام المتبقية الإجمالي */}
-        {timeRemaining.totalDays > 0 && (
-          <div className="text-left">
-            <div className={`text-lg font-bold ${config.daysColor}`}>
-              {timeRemaining.totalDays}
+        {/* العداد الرقمي الديناميكي - ساعات ودقائق وثواني */}
+        <div className={`px-4 py-3 bg-gradient-to-br ${config.gradient} bg-opacity-10 border-t-2 ${config.borderColor}`}>
+          <div className="flex items-center justify-center gap-2">
+            <Clock className={`w-4 h-4 ${config.color} opacity-50`} />
+            <div className="flex items-center gap-1">
+              <div className={`text-lg font-bold ${config.color} tabular-nums`}>
+                {String(timeRemaining.hours).padStart(2, '0')}
+              </div>
+              <span className={`text-xs ${config.color} opacity-40`}>:</span>
+              <div className={`text-lg font-bold ${config.color} tabular-nums`}>
+                {String(minutes).padStart(2, '0')}
+              </div>
+              <span className={`text-xs ${config.color} opacity-40`}>:</span>
+              <div className={`text-lg font-bold ${config.color} tabular-nums`}>
+                {String(seconds).padStart(2, '0')}
+              </div>
             </div>
             <div className={`text-xs ${config.color} opacity-60`}>
-              يوم
+              متبقي
             </div>
           </div>
-        )}
-      </div>
+        </div>
 
-      {/* شريط مرحلة العقد */}
-      <div className={`px-4 py-2 bg-gradient-to-l ${config.gradient} bg-opacity-5 border-t ${config.borderColor}`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <StageIcon className={`w-3.5 h-3.5 ${config.color} opacity-70`} />
-            <span className={`text-xs font-medium ${config.color} opacity-80`}>
-              {stageInfo.label}
+        {/* شريط المرحلة مع خلفية قوية */}
+        <div className={`px-4 py-3 bg-gradient-to-r ${config.gradient} border-t-2 ${config.borderColor}`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                <StageIcon className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-sm font-bold text-white drop-shadow-lg">
+                {stageInfo.label}
+              </span>
+            </div>
+            <span className="text-sm text-white/90 font-medium drop-shadow">
+              {stageInfo.description}
             </span>
           </div>
-          <span className={`text-xs ${config.color} opacity-60`}>
-            {stageInfo.description}
-          </span>
+        </div>
+      </div>
+
+      {/* بطاقة إحصائيات إضافية */}
+      <div className="grid grid-cols-2 gap-2">
+        <div className={`rounded-xl ${config.bgColor} border ${config.borderColor} p-3 text-center`}>
+          <div className={`text-2xl font-bold ${config.daysColor} tabular-nums`}>
+            {timeRemaining.totalDays}
+          </div>
+          <div className={`text-xs ${config.color} opacity-60 mt-1`}>
+            إجمالي الأيام
+          </div>
+        </div>
+        <div className={`rounded-xl ${config.bgColor} border ${config.borderColor} p-3 text-center`}>
+          <div className={`text-2xl font-bold ${config.daysColor} tabular-nums`}>
+            {Math.round(timeRemaining.progressPercentage)}%
+          </div>
+          <div className={`text-xs ${config.color} opacity-60 mt-1`}>
+            نسبة التقدم
+          </div>
         </div>
       </div>
     </div>
