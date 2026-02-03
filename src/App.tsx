@@ -7,6 +7,7 @@ import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
 import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
+import MyReservations from './components/MyReservations';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
@@ -40,6 +41,7 @@ function App() {
   const [showAssistant, setShowAssistant] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
+  const [showMyReservations, setShowMyReservations] = useState(false);
   const [showStandaloneRegistration, setShowStandaloneRegistration] = useState(false);
   const [showWelcomeToAccount, setShowWelcomeToAccount] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
@@ -1189,7 +1191,10 @@ function App() {
         currentContext={identity}
         onClose={() => setShowAccountProfile(false)}
         onOpenAuth={() => alert('قريباً: تسجيل الدخول')}
-        onOpenReservations={() => alert('قريباً: حجوزاتي')}
+        onOpenReservations={() => {
+          setShowAccountProfile(false);
+          setShowMyReservations(true);
+        }}
         onStartInvestment={() => {
           setShowAccountProfile(false);
         }}
@@ -1227,6 +1232,11 @@ function App() {
           )}
         </>
       )}
+
+      <MyReservations
+        isOpen={showMyReservations}
+        onClose={() => setShowMyReservations(false)}
+      />
 
       </div>
     </ErrorBoundary>

@@ -266,6 +266,15 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         return;
       }
 
+      const { error: statusError } = await supabase
+        .from('reservations')
+        .update({ status: 'confirmed' })
+        .eq('id', reservation.id);
+
+      if (statusError) {
+        console.error('Error updating reservation status:', statusError);
+      }
+
       setReservationData({
         id: reservation.id,
         farmName: farm.name,
