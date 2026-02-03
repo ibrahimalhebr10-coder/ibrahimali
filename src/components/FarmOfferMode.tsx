@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sprout, CheckCircle, MapPin, Phone, Mail, FileText, Home, Plus, Trash2 } from 'lucide-react';
+import { X, Sprout, CheckCircle, MapPin, Phone, Mail, FileText, Home, Plus, Trash2, MessageCircle } from 'lucide-react';
 import { useOfferMode } from '../contexts/OfferModeContext';
 import { farmOfferService, type FarmOfferData, type FarmOffer, type TreeVariety } from '../services/farmOfferService';
+import { systemSettingsService } from '../services/systemSettingsService';
 
 type Stage = 'intro' | 'form' | 'success';
 type OfferType = 'sale' | 'full_lease' | 'partnership';
@@ -14,6 +15,8 @@ export default function FarmOfferMode() {
   const [loading, setLoading] = useState(false);
   const [submittedOffer, setSubmittedOffer] = useState<FarmOffer | null>(null);
   const [acceptanceStats, setAcceptanceStats] = useState({ rate: 0, total: 0, accepted: 0 });
+  const [whatsappNumber, setWhatsappNumber] = useState<string>('');
+  const [contactPhone, setContactPhone] = useState<string>('');
 
   const [formData, setFormData] = useState<FarmOfferData>({
     ownerName: '',
@@ -39,11 +42,19 @@ export default function FarmOfferMode() {
 
   useEffect(() => {
     loadAcceptanceStats();
+    loadContactInfo();
   }, []);
 
   const loadAcceptanceStats = async () => {
     const stats = await farmOfferService.getAcceptanceRate();
     setAcceptanceStats(stats);
+  };
+
+  const loadContactInfo = async () => {
+    const whatsapp = await systemSettingsService.getWhatsAppNumber();
+    const phone = await systemSettingsService.getSetting('admin_contact_phone');
+    setWhatsappNumber(whatsapp || '+966500000000');
+    setContactPhone(phone || '+966500000000');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -162,31 +173,62 @@ export default function FarmOfferMode() {
           <div className="bg-white/70 backdrop-blur-md rounded-3xl shadow-2xl p-8 border border-green-100">
             <div className="text-center mb-8">
               <div className="mb-6">
-                <CheckCircle className="w-20 h-20 text-green-600 mx-auto" />
+                <CheckCircle className="w-20 h-20 text-green-600 mx-auto animate-pulse" />
               </div>
 
-              <h1 className="text-4xl font-bold text-gray-800 mb-4">
-                تم استلام عرض مزرعتك بنجاح
+              <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
+                شكرًا لك، تم استلام عرض مزرعتك بنجاح 🌿
               </h1>
 
-              <div className="inline-block bg-green-100 px-6 py-3 rounded-full mb-6">
-                <p className="text-lg font-mono text-green-800">
-                  رقم المرجع: {submittedOffer.reference_number}
+              <div className="max-w-2xl mx-auto mb-8">
+                <p className="text-lg text-gray-700 leading-relaxed">
+                  نقدر ثقتك بالمنصة.<br />
+                  سيتم مراجعة عرض مزرعتك من قبل الإدارة،<br />
+                  وفي حال القبول المبدئي سيتم التواصل معك خلال <span className="font-bold text-green-700">48 ساعة عمل</span>.
                 </p>
               </div>
 
               <div className="h-px bg-gradient-to-r from-transparent via-green-300 to-transparent my-8"></div>
             </div>
 
-            <div className="bg-blue-50 border-r-4 border-blue-500 rounded-lg p-6 mb-8">
-              <p className="text-base text-gray-800 leading-relaxed">
-                في حال القبول المبدئي، سيتم التواصل معك هاتفيًا بعد اعتماد الإدارة.
-              </p>
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+                وسائل التواصل مع الإدارة
+              </h2>
+
+              <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                <a
+                  href={`tel:${contactPhone}`}
+                  className="flex items-center justify-center gap-3 p-4 bg-blue-50 hover:bg-blue-100 border-2 border-blue-200 rounded-xl transition-all group"
+                >
+                  <Phone className="w-6 h-6 text-blue-600 group-hover:scale-110 transition-transform" />
+                  <div className="text-right">
+                    <p className="text-xs text-gray-600 mb-0.5">رقم الجوال</p>
+                    <p className="text-lg font-bold text-blue-700 direction-ltr">{contactPhone}</p>
+                  </div>
+                </a>
+
+                <a
+                  href={`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-3 p-4 bg-green-50 hover:bg-green-100 border-2 border-green-200 rounded-xl transition-all group"
+                >
+                  <MessageCircle className="w-6 h-6 text-green-600 group-hover:scale-110 transition-transform" />
+                  <div className="text-right">
+                    <p className="text-xs text-gray-600 mb-0.5">واتساب</p>
+                    <p className="text-lg font-bold text-green-700">تواصل مباشر</p>
+                  </div>
+                </a>
+              </div>
             </div>
 
-            <div className="bg-amber-50 border-r-4 border-amber-500 rounded-lg p-4 mb-8">
-              <p className="text-sm text-gray-700">
-                <span className="font-bold">ملاحظة مهمة:</span> احتفظ برقم المرجع للمتابعة
+            <div className="bg-amber-50 border-r-4 border-amber-500 rounded-lg p-4 mb-6">
+              <p className="text-sm text-gray-700 text-center">
+                <span className="font-bold">رقم المرجع:</span> <span className="font-mono text-base">{submittedOffer.reference_number}</span>
+              </p>
+              <p className="text-xs text-gray-600 text-center mt-1">
+                احتفظ بهذا الرقم للمتابعة
               </p>
             </div>
 
@@ -195,7 +237,7 @@ export default function FarmOfferMode() {
               className="w-full bg-gradient-to-l from-green-600 to-green-700 text-white py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
             >
               <Home className="w-5 h-5" />
-              العودة للرئيسية
+              العودة للمنصة
             </button>
           </div>
         </div>
