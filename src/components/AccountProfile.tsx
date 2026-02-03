@@ -1,6 +1,7 @@
 import { X, User, LogOut, Sparkles, Sprout, TrendingUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
+import IdentityManager from './IdentityManager';
 
 interface AccountProfileProps {
   isOpen: boolean;
@@ -230,6 +231,8 @@ export default function AccountProfile({ isOpen, onClose, onOpenAuth, onStartInv
                   </button>
                 </div>
               </div>
+
+              <IdentityManager />
 
               <div className="text-center text-gray-500 text-sm">
                 <p>المزيد من المزايا قريباً</p>
