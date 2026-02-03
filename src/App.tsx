@@ -1,4 +1,4 @@
-import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine } from 'lucide-react';
+import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
@@ -432,6 +432,14 @@ function AppContent() {
   };
 
   const handleMyFarmClick = () => {
+    if (appMode === 'agricultural') {
+      setShowMyFarm(true);
+    } else {
+      setShowInvestmentMyFarm(true);
+    }
+  };
+
+  const handleOfferFarmClick = () => {
     enterOfferMode();
   };
 
@@ -917,18 +925,29 @@ function AppContent() {
           }}
         >
         <div className="max-w-7xl mx-auto w-full px-8 py-5 pb-8 flex items-center justify-around">
-          <button className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
+          <button
+            onClick={handleOfferFarmClick}
+            className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%)',
+              boxShadow: '0 4px 12px rgba(212,175,55,0.4), inset 0 2px 4px rgba(255,255,255,0.9)',
+              border: '2px solid #b8942f'
+            }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.08) 0%, rgba(58,161,126,0.12) 100%)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2)';
+              e.currentTarget.style.boxShadow = '0 8px 24px rgba(212,175,55,0.6), inset 0 2px 4px rgba(255,255,255,0.9)';
+              e.currentTarget.style.transform = 'scale(1.08)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(212,175,55,0.4), inset 0 2px 4px rgba(255,255,255,0.9)';
+              e.currentTarget.style.transform = 'scale(1)';
             }}
           >
-            <Home className="w-6 h-6 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
-            <span className="text-sm font-bold text-darkgreen">الرئيسية</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
+            <div className="relative">
+              <Plus className="w-4 h-4 absolute -top-1 -right-1 text-white group-hover:rotate-90 transition-transform duration-300" />
+              <Sprout className="w-6 h-6 text-white transition-transform duration-300 group-hover:scale-110" />
+            </div>
+            <span className="text-sm font-bold text-white relative">اعرض مزرعتك</span>
           </button>
 
           <button
@@ -1063,18 +1082,25 @@ function AppContent() {
         }}
       >
         <div className="flex items-center justify-around px-2 relative" style={{ height: '5rem' }}>
-          <button className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform">
+          <button
+            onClick={handleOfferFarmClick}
+            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
+          >
             <div
-              className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
+              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90 overflow-hidden relative"
               style={{
-                background: 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,252,250,0.9) 100%)',
-                boxShadow: '0 4px 8px rgba(58,161,126,0.15), inset 0 2px 4px rgba(255,255,255,0.9)',
-                border: '2px solid rgba(58,161,126,0.3)'
+                background: 'linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%)',
+                boxShadow: '0 4px 12px rgba(212,175,55,0.4), inset 0 2px 4px rgba(255,255,255,0.9)',
+                border: '2px solid #b8942f'
               }}
             >
-              <Home className="w-5 h-5 text-darkgreen transition-all duration-300 group-active:scale-110" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
+              <div className="relative">
+                <Plus className="w-3 h-3 absolute -top-0.5 -right-0.5 text-white group-hover:rotate-90 transition-transform duration-300" />
+                <Sprout className="w-5 h-5 text-white transition-all duration-300 group-active:scale-110" />
+              </div>
             </div>
-            <span className="text-[9px] font-bold text-darkgreen/70">الرئيسية</span>
+            <span className="text-[9px] font-bold" style={{ color: '#b8942f' }}>اعرض مزرعتك</span>
           </button>
 
           <button

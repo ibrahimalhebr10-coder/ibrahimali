@@ -1,15 +1,19 @@
-import { Sprout, Plus } from 'lucide-react';
+import { Sprout, Plus, Home } from 'lucide-react';
 import { type IdentityType } from '../services/identityService';
 
 interface FooterProps {
   identity: IdentityType;
-  onClick: () => void;
+  onMyFarmClick: () => void;
+  onOfferFarmClick: () => void;
 }
 
-export default function Footer({ identity, onClick }: FooterProps) {
+export default function Footer({ identity, onMyFarmClick, onOfferFarmClick }: FooterProps) {
   const isAgricultural = identity === 'agricultural';
 
   const color = isAgricultural ? '#3aa17e' : '#d4af37';
+  const gradient = isAgricultural
+    ? 'linear-gradient(135deg, #3aa17e 0%, #2f8266 100%)'
+    : 'linear-gradient(135deg, #d4af37 0%, #b8942f 100%)';
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30 pb-safe">
@@ -20,9 +24,20 @@ export default function Footer({ identity, onClick }: FooterProps) {
           borderColor: `${color}20`
         }}
       >
-        <div className="max-w-md mx-auto px-4 py-3">
+        <div className="max-w-md mx-auto px-4 py-3 space-y-2">
+          {/* زر مزرعتي - الأصلي */}
           <button
-            onClick={onClick}
+            onClick={onMyFarmClick}
+            className="w-full py-4 rounded-2xl font-bold text-white text-lg shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
+            style={{ background: gradient }}
+          >
+            <Home className="w-6 h-6" />
+            <span>مزرعتي</span>
+          </button>
+
+          {/* زر اعرض مزرعتك - الجديد الذهبي */}
+          <button
+            onClick={onOfferFarmClick}
             className="group relative w-full py-4 rounded-2xl font-bold text-white text-lg shadow-lg hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 overflow-hidden border-2"
             style={{
               background: 'linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%)',
@@ -42,7 +57,7 @@ export default function Footer({ identity, onClick }: FooterProps) {
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-300 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </button>
 
-          <p className="text-center text-xs text-gray-500 mt-2">
+          <p className="text-center text-xs text-gray-500">
             نبحث عن شركاء استثنائيين
           </p>
         </div>
