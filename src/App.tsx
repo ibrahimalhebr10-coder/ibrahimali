@@ -896,7 +896,7 @@ function App() {
           }}
         >
         <div className="max-w-7xl mx-auto w-full px-8 py-5 pb-8 flex items-center justify-around">
-          <button className="flex flex-col items-center gap-2 px-8 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
+          <button className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.08) 0%, rgba(58,161,126,0.12) 100%)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2)';
@@ -906,29 +906,13 @@ function App() {
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
-            <Home className="w-7 h-7 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
-            <span className="text-base font-bold text-darkgreen">الرئيسية</span>
-          </button>
-
-          <button
-            onClick={handleMyAccountClick}
-            className="flex flex-col items-center gap-2 px-8 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.08) 0%, rgba(58,161,126,0.12) 100%)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            <TreePine className="w-7 h-7 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
-            <span className="text-base font-bold text-darkgreen">مزرعتي</span>
+            <Home className="w-6 h-6 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
+            <span className="text-sm font-bold text-darkgreen">الرئيسية</span>
           </button>
 
           <button
             onClick={() => setShowAssistant(true)}
-            className="flex flex-col items-center gap-2 px-8 py-3 rounded-2xl transition-all duration-300 hover:scale-105 relative group"
+            className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 hover:scale-105 relative group"
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.08) 0%, rgba(58,161,126,0.12) 100%)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2)';
@@ -938,12 +922,72 @@ function App() {
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
-            <Sparkles className="w-7 h-7 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
-            <span className="text-base font-bold text-darkgreen">المساعد الذكي</span>
+            <Sparkles className="w-6 h-6 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
+            <span className="text-sm font-bold text-darkgreen">المساعد</span>
             <div className="absolute top-2 right-2 w-3 h-3 rounded-full animate-pulse" style={{
               background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
               boxShadow: '0 0 10px rgba(212,175,55,0.6)'
             }}></div>
+          </button>
+
+          <button
+            onClick={handleMyAccountClick}
+            className="flex flex-col items-center gap-2 px-8 py-4 rounded-3xl transition-all duration-300 hover:scale-105 group relative"
+            style={{
+              background: appMode === 'agricultural'
+                ? 'linear-gradient(145deg, rgba(58,161,126,0.25) 0%, rgba(58,161,126,0.15) 50%, rgba(58,161,126,0.25) 100%)'
+                : 'linear-gradient(145deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.15) 50%, rgba(212,175,55,0.25) 100%)',
+              boxShadow: appMode === 'agricultural'
+                ? '0 8px 24px rgba(58,161,126,0.35), 0 4px 12px rgba(58,161,126,0.25), inset 0 2px 4px rgba(255,255,255,0.8)'
+                : '0 8px 24px rgba(212,175,55,0.35), 0 4px 12px rgba(212,175,55,0.25), inset 0 2px 4px rgba(255,255,255,0.8)',
+              border: appMode === 'agricultural' ? '3px solid rgba(58,161,126,0.5)' : '3px solid rgba(212,175,55,0.5)',
+              transform: 'scale(1.1)'
+            }}
+            onMouseEnter={(e) => {
+              if (appMode === 'agricultural') {
+                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.35) 0%, rgba(58,161,126,0.25) 50%, rgba(58,161,126,0.35) 100%)';
+                e.currentTarget.style.boxShadow = '0 12px 32px rgba(58,161,126,0.45), 0 6px 16px rgba(58,161,126,0.35)';
+              } else {
+                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(212,175,55,0.35) 0%, rgba(212,175,55,0.25) 50%, rgba(212,175,55,0.35) 100%)';
+                e.currentTarget.style.boxShadow = '0 12px 32px rgba(212,175,55,0.45), 0 6px 16px rgba(212,175,55,0.35)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (appMode === 'agricultural') {
+                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.25) 0%, rgba(58,161,126,0.15) 50%, rgba(58,161,126,0.25) 100%)';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(58,161,126,0.35), 0 4px 12px rgba(58,161,126,0.25)';
+              } else {
+                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.15) 50%, rgba(212,175,55,0.25) 100%)';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(212,175,55,0.35), 0 4px 12px rgba(212,175,55,0.25)';
+              }
+            }}
+          >
+            <div
+              className="absolute inset-0 rounded-3xl animate-pulse pointer-events-none"
+              style={{
+                background: appMode === 'agricultural'
+                  ? 'radial-gradient(circle at center, rgba(58,161,126,0.2) 0%, transparent 70%)'
+                  : 'radial-gradient(circle at center, rgba(212,175,55,0.2) 0%, transparent 70%)',
+                opacity: 0.6
+              }}
+            />
+            <TreePine
+              className="w-9 h-9 transition-transform duration-300 group-hover:scale-110 relative z-10"
+              style={{
+                color: appMode === 'agricultural' ? '#3AA17E' : '#D4AF37',
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+              }}
+              strokeWidth={2.5}
+            />
+            <span
+              className="text-lg font-black relative z-10"
+              style={{
+                color: appMode === 'agricultural' ? '#2D7A5F' : '#B8942F',
+                textShadow: '0 1px 2px rgba(255,255,255,0.8)'
+              }}
+            >
+              مزرعتي
+            </span>
           </button>
 
           <NotificationCenter
@@ -954,7 +998,7 @@ function App() {
 
           <button
             onClick={handleMyAccountClick}
-            className="flex flex-col items-center gap-2 px-8 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
+            className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
             onMouseEnter={(e) => {
               e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.08) 0%, rgba(58,161,126,0.12) 100%)';
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2)';
@@ -964,8 +1008,8 @@ function App() {
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
-            <User className="w-7 h-7 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
-            <span className="text-base font-bold text-darkgreen">حسابي</span>
+            <User className="w-6 h-6 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
+            <span className="text-sm font-bold text-darkgreen">حسابي</span>
           </button>
         </div>
       </nav>
@@ -997,36 +1041,19 @@ function App() {
           }
         }}
       >
-        <div className="flex items-center justify-around px-2 relative" style={{ height: '4.5rem' }}>
+        <div className="flex items-center justify-around px-2 relative" style={{ height: '5rem' }}>
           <button className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform">
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
+              className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
               style={{
                 background: 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,252,250,0.9) 100%)',
-                boxShadow: '0 6px 12px rgba(58,161,126,0.2), inset 0 2px 4px rgba(255,255,255,0.9)',
-                border: '2.5px solid #3AA17E'
+                boxShadow: '0 4px 8px rgba(58,161,126,0.15), inset 0 2px 4px rgba(255,255,255,0.9)',
+                border: '2px solid rgba(58,161,126,0.3)'
               }}
             >
-              <Home className="w-6 h-6 text-darkgreen transition-all duration-300 group-active:scale-110" />
+              <Home className="w-5 h-5 text-darkgreen transition-all duration-300 group-active:scale-110" />
             </div>
-            <span className="text-[10px] font-bold text-darkgreen/80">الرئيسية</span>
-          </button>
-
-          <button
-            onClick={handleMyAccountClick}
-            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
-          >
-            <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
-              style={{
-                background: 'linear-gradient(145deg, rgba(58,161,126,0.15) 0%, rgba(58,161,126,0.08) 100%)',
-                boxShadow: '0 8px 16px rgba(58,161,126,0.3), inset 0 2px 4px rgba(255,255,255,0.9)',
-                border: '2.5px solid #3AA17E'
-              }}
-            >
-              <TreePine className="w-6 h-6 text-darkgreen transition-all duration-300 group-active:scale-110" />
-            </div>
-            <span className="text-[10px] font-black text-darkgreen">مزرعتي</span>
+            <span className="text-[9px] font-bold text-darkgreen/70">الرئيسية</span>
           </button>
 
           <button
@@ -1034,23 +1061,68 @@ function App() {
             className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
           >
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 relative group-active:scale-90 overflow-hidden"
+              className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 relative group-active:scale-90 overflow-hidden"
               style={{
                 background: 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,252,250,0.9) 100%)',
-                boxShadow: '0 6px 12px rgba(58,161,126,0.2), inset 0 2px 4px rgba(255,255,255,0.9)',
-                border: '2.5px solid #3AA17E'
+                boxShadow: '0 4px 8px rgba(58,161,126,0.15), inset 0 2px 4px rgba(255,255,255,0.9)',
+                border: '2px solid rgba(58,161,126,0.3)'
               }}
             >
-              <Sparkles className="w-6 h-6 text-darkgreen transition-all duration-300 group-active:scale-110" />
+              <Sparkles className="w-5 h-5 text-darkgreen transition-all duration-300 group-active:scale-110" />
               <div
-                className="absolute -top-1 -right-1 w-3 h-3 rounded-full animate-pulse"
+                className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full animate-pulse"
                 style={{
                   background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
                   boxShadow: '0 0 8px rgba(212,175,55,0.6)'
                 }}
               />
             </div>
-            <span className="text-[10px] font-bold text-darkgreen/80">المساعد</span>
+            <span className="text-[9px] font-bold text-darkgreen/70">المساعد</span>
+          </button>
+
+          <button
+            onClick={handleMyAccountClick}
+            className="flex flex-col items-center justify-center gap-1.5 relative group active:scale-95 transition-transform -mt-6"
+          >
+            <div
+              className="w-16 h-16 rounded-3xl flex items-center justify-center transition-all duration-300 relative group-active:scale-90 overflow-hidden"
+              style={{
+                background: appMode === 'agricultural'
+                  ? 'linear-gradient(145deg, rgba(58,161,126,0.28) 0%, rgba(58,161,126,0.18) 50%, rgba(58,161,126,0.28) 100%)'
+                  : 'linear-gradient(145deg, rgba(212,175,55,0.28) 0%, rgba(212,175,55,0.18) 50%, rgba(212,175,55,0.28) 100%)',
+                boxShadow: appMode === 'agricultural'
+                  ? '0 8px 20px rgba(58,161,126,0.4), 0 4px 12px rgba(58,161,126,0.3), inset 0 2px 4px rgba(255,255,255,0.8)'
+                  : '0 8px 20px rgba(212,175,55,0.4), 0 4px 12px rgba(212,175,55,0.3), inset 0 2px 4px rgba(255,255,255,0.8)',
+                border: appMode === 'agricultural' ? '3px solid rgba(58,161,126,0.5)' : '3px solid rgba(212,175,55,0.5)'
+              }}
+            >
+              <div
+                className="absolute inset-0 rounded-3xl animate-pulse pointer-events-none"
+                style={{
+                  background: appMode === 'agricultural'
+                    ? 'radial-gradient(circle at center, rgba(58,161,126,0.25) 0%, transparent 70%)'
+                    : 'radial-gradient(circle at center, rgba(212,175,55,0.25) 0%, transparent 70%)',
+                  opacity: 0.7
+                }}
+              />
+              <TreePine
+                className="w-8 h-8 transition-all duration-300 group-active:scale-110 relative z-10"
+                style={{
+                  color: appMode === 'agricultural' ? '#3AA17E' : '#D4AF37',
+                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
+                }}
+                strokeWidth={2.5}
+              />
+            </div>
+            <span
+              className="text-[11px] font-black relative z-10"
+              style={{
+                color: appMode === 'agricultural' ? '#2D7A5F' : '#B8942F',
+                textShadow: '0 1px 2px rgba(255,255,255,0.8)'
+              }}
+            >
+              مزرعتي
+            </span>
           </button>
 
           <NotificationCenter
@@ -1064,16 +1136,16 @@ function App() {
             className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
           >
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
+              className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
               style={{
                 background: 'linear-gradient(145deg, rgba(240,248,244,0.95) 0%, rgba(232,242,237,0.9) 100%)',
-                boxShadow: '0 6px 12px rgba(58,161,126,0.25), inset 0 2px 4px rgba(255,255,255,0.9)',
-                border: '2.5px solid #3AA17E'
+                boxShadow: '0 4px 8px rgba(58,161,126,0.2), inset 0 2px 4px rgba(255,255,255,0.9)',
+                border: '2px solid rgba(58,161,126,0.35)'
               }}
             >
-              <User className="w-6 h-6 text-darkgreen transition-all duration-300 group-active:scale-110" />
+              <User className="w-5 h-5 text-darkgreen transition-all duration-300 group-active:scale-110" />
             </div>
-            <span className="text-[10px] font-black text-darkgreen/90">حسابي</span>
+            <span className="text-[9px] font-black text-darkgreen/80">حسابي</span>
           </button>
         </div>
       </nav>
