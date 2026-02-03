@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { Sprout, TreePine, Users, Calendar } from 'lucide-react';
+import { Users } from 'lucide-react';
 
-type AgriculturalTab = 'my-trees' | 'harvest' | 'users' | 'schedule';
+type AgriculturalTab = 'users';
 
 const AgriculturalSection: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<AgriculturalTab>('my-trees');
+  const [activeTab, setActiveTab] = useState<AgriculturalTab>('users');
 
   const tabs = [
-    { id: 'my-trees' as AgriculturalTab, label: 'متابعة أشجاري', icon: TreePine },
-    { id: 'harvest' as AgriculturalTab, label: 'الحصاد', icon: Sprout },
     { id: 'users' as AgriculturalTab, label: 'المستخدمين', icon: Users },
-    { id: 'schedule' as AgriculturalTab, label: 'الجدولة', icon: Calendar },
   ];
 
   const renderContent = () => {

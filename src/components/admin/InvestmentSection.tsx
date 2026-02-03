@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { TreePine, DollarSign, Users, BarChart } from 'lucide-react';
+import { Users } from 'lucide-react';
 
-type InvestmentTab = 'my-trees' | 'returns' | 'investors' | 'analytics';
+type InvestmentTab = 'investors';
 
 const InvestmentSection: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<InvestmentTab>('my-trees');
+  const [activeTab, setActiveTab] = useState<InvestmentTab>('investors');
 
   const tabs = [
-    { id: 'my-trees' as InvestmentTab, label: 'متابعة أشجاري', icon: TreePine },
-    { id: 'returns' as InvestmentTab, label: 'العوائد', icon: DollarSign },
     { id: 'investors' as InvestmentTab, label: 'المستثمرين', icon: Users },
-    { id: 'analytics' as InvestmentTab, label: 'التحليلات', icon: BarChart },
   ];
 
   const renderContent = () => {
