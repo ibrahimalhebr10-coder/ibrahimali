@@ -64,6 +64,12 @@ export default function FarmOfferMode() {
       return;
     }
 
+    const phonePattern = /^05[0-9]{8}$/;
+    if (!phonePattern.test(formData.phone)) {
+      alert('رقم الجوال يجب أن يبدأ بـ 05 ويتكون من 10 أرقام (مثال: 0501234567)');
+      return;
+    }
+
     if (formData.offerType === 'partnership' && !formData.partnershipAcknowledgment) {
       alert('يجب الموافقة على إقرار المشاركة للمتابعة');
       return;
@@ -460,10 +466,15 @@ export default function FarmOfferMode() {
                   required
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  pattern="^05[0-9]{8}$"
                   className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                  placeholder="+966 XX XXX XXXX"
+                  placeholder="05XXXXXXXX"
+                  title="يجب أن يبدأ الرقم بـ 05 ويتكون من 10 أرقام"
                 />
               </div>
+              <p className="mt-1 text-xs text-gray-500">
+                مثال: 0501234567
+              </p>
             </div>
 
             <div>
