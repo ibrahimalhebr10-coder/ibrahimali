@@ -94,7 +94,7 @@ export default function AgriculturalMyFarm() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+    <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
       {showOverlay && (
         <VisitorOverlay
           onClose={() => setShowOverlay(false)}
@@ -103,7 +103,7 @@ export default function AgriculturalMyFarm() {
         />
       )}
 
-      <div className="max-w-4xl mx-auto px-4 py-8 pb-32 space-y-6">
+      <div className="max-w-4xl mx-auto px-4 py-8 pb-48 space-y-6">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-md mb-4">
             <Sprout className="w-5 h-5 text-green-500" />

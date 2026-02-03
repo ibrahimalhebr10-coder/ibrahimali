@@ -1208,8 +1208,10 @@ function App() {
       />
 
       {showMyFarm && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <AgriculturalMyFarm />
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-white">
+          <div className="min-h-screen">
+            <AgriculturalMyFarm />
+          </div>
           <button
             onClick={() => setShowMyFarm(false)}
             className="fixed top-4 left-4 z-50 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all"
