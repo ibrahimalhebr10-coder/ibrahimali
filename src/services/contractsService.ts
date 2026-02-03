@@ -49,7 +49,7 @@ const contractsService = {
           contract_start_date,
           contract_end_date
         `)
-        .in('status', ['active', 'completed']);
+        .in('status', ['active', 'confirmed', 'completed']);
 
       if (error) throw error;
 
@@ -70,7 +70,7 @@ const contractsService = {
       reservations?.forEach(reservation => {
         if (reservation.status === 'completed') {
           stats.completed++;
-        } else if (reservation.status === 'active') {
+        } else if (reservation.status === 'active' || reservation.status === 'confirmed') {
           const endDate = new Date(reservation.contract_end_date);
 
           if (endDate < sixMonthsFromNow) {
@@ -98,7 +98,7 @@ const contractsService = {
     try {
       const { data: farms, error: farmsError } = await supabase
         .from('farms')
-        .select('id, name, location');
+        .select('id, name_ar, location');
 
       if (farmsError) throw farmsError;
 
@@ -112,7 +112,7 @@ const contractsService = {
             user_id,
             status,
             contract_type,
-            number_of_trees,
+            total_trees,
             tree_types,
             contract_start_date,
             contract_end_date,
@@ -121,7 +121,7 @@ const contractsService = {
             )
           `)
           .eq('farm_id', farm.id)
-          .in('status', ['active', 'completed']);
+          .in('status', ['active', 'confirmed', 'completed']);
 
         if (reservationsError) throw reservationsError;
 
@@ -135,31 +135,38 @@ const contractsService = {
         sixMonthsFromNow.setMonth(sixMonthsFromNow.getMonth() + 6);
 
         reservations?.forEach(reservation => {
-          let status: 'active' | 'completed' | 'needs_attention' = reservation.status;
+          let status: 'active' | 'completed' | 'needs_attention' = reservation.status === 'completed' ? 'completed' : 'active';
 
-          if (reservation.status === 'active') {
+          if (reservation.status === 'active' || reservation.status === 'confirmed') {
             const endDate = new Date(reservation.contract_end_date);
             if (endDate < sixMonthsFromNow) {
               status = 'needs_attention';
               needsAttentionCount++;
             } else {
+              status = 'active';
               activeCount++;
             }
           } else if (reservation.status === 'completed') {
             completedCount++;
           }
 
+          const treeTypes = typeof reservation.tree_types === 'string'
+            ? [reservation.tree_types]
+            : Array.isArray(reservation.tree_types)
+              ? reservation.tree_types
+              : [];
+
           contracts.push({
             id: reservation.id,
             farm_id: farm.id,
             user_id: reservation.user_id,
             contract_type: reservation.contract_type || 'agricultural',
-            tree_count: reservation.number_of_trees || 0,
-            tree_types: reservation.tree_types || [],
+            tree_count: reservation.total_trees || 0,
+            tree_types: treeTypes,
             start_date: reservation.contract_start_date,
             end_date: reservation.contract_end_date,
             status,
-            farm_name: farm.name,
+            farm_name: farm.name_ar,
             user_name: (reservation.user_profiles as any)?.full_name || 'غير محدد'
           });
         });
@@ -167,7 +174,7 @@ const contractsService = {
         if (contracts.length > 0) {
           farmsWithContracts.push({
             farm_id: farm.id,
-            farm_name: farm.name,
+            farm_name: farm.name_ar,
             location: farm.location || 'غير محدد',
             total_contracts: contracts.length,
             active_count: activeCount,
