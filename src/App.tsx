@@ -18,15 +18,18 @@ import InvestmentMyFarm from './components/InvestmentMyFarm';
 import IdentitySwitcher from './components/IdentitySwitcher';
 import AdminDashboard from './components/admin/AdminDashboard';
 import AdminLogin from './components/admin/AdminLogin';
+import FarmOfferMode from './components/FarmOfferMode';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { getUnreadCount } from './services/messagesService';
 import { useAuth } from './contexts/AuthContext';
 import { useAdminAuth } from './contexts/AdminAuthContext';
+import { OfferModeProvider, useOfferMode } from './contexts/OfferModeContext';
 import { initializeSupabase } from './lib/supabase';
 
-function App() {
+function AppContent() {
   const { user, identity, updateIdentity } = useAuth();
   const { admin } = useAdminAuth();
+  const { isOfferMode, enterOfferMode } = useOfferMode();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const farmsSliderRef = useRef<HTMLDivElement>(null);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
@@ -429,11 +432,7 @@ function App() {
   };
 
   const handleMyFarmClick = () => {
-    if (appMode === 'agricultural') {
-      setShowMyFarm(true);
-    } else {
-      setShowInvestmentMyFarm(true);
-    }
+    enterOfferMode();
   };
 
   const handleWelcomeStartNow = () => {
@@ -445,6 +444,14 @@ function App() {
     setShowStandaloneRegistration(false);
     setShowAccountProfile(true);
   };
+
+  if (isOfferMode) {
+    return (
+      <ErrorBoundary>
+        <FarmOfferMode />
+      </ErrorBoundary>
+    );
+  }
 
   return (
     <ErrorBoundary>
@@ -1285,6 +1292,14 @@ function App() {
 
       </div>
     </ErrorBoundary>
+  );
+}
+
+function App() {
+  return (
+    <OfferModeProvider>
+      <AppContent />
+    </OfferModeProvider>
   );
 }
 
