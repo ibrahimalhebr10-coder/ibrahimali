@@ -203,7 +203,7 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
           </div>
         )}
 
-        <div className="flex-1 overflow-y-auto pb-8">
+        <div className="flex-1 overflow-y-auto pb-32">
           <div className="max-w-2xl mx-auto px-4 py-6">
             {isLoadingIdentity ? (
               <div className="flex items-center justify-center py-20">
