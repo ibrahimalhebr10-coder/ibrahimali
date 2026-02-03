@@ -13,6 +13,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
 import InvestmentFarmPage from './components/InvestmentFarmPage';
 import AgriculturalFarmPage from './components/AgriculturalFarmPage';
+import AgriculturalMyFarm from './components/AgriculturalMyFarm';
 import IdentitySwitcher from './components/IdentitySwitcher';
 import AdminDashboard from './components/admin/AdminDashboard';
 import AdminLogin from './components/admin/AdminLogin';
@@ -46,6 +47,7 @@ function App() {
   const [showWelcomeToAccount, setShowWelcomeToAccount] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [showMyFarm, setShowMyFarm] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [selectedInvestmentFarm, setSelectedInvestmentFarm] = useState<FarmProject | null>(null);
 
@@ -422,6 +424,10 @@ function App() {
     } else {
       setShowWelcomeToAccount(true);
     }
+  };
+
+  const handleMyFarmClick = () => {
+    setShowMyFarm(true);
   };
 
   const handleWelcomeStartNow = () => {
@@ -933,7 +939,7 @@ function App() {
           </button>
 
           <button
-            onClick={handleMyAccountClick}
+            onClick={handleMyFarmClick}
             className="flex flex-col items-center gap-2 px-8 py-4 rounded-3xl transition-all duration-300 hover:scale-105 group relative"
             style={{
               background: appMode === 'agricultural'
@@ -1083,7 +1089,7 @@ function App() {
           </button>
 
           <button
-            onClick={handleMyAccountClick}
+            onClick={handleMyFarmClick}
             className="flex flex-col items-center justify-center gap-1.5 relative group active:scale-95 transition-transform -mt-6"
           >
             <div
@@ -1200,6 +1206,20 @@ function App() {
           setShowMyReservations(true);
         }}
       />
+
+      {showMyFarm && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <AgriculturalMyFarm />
+          <button
+            onClick={() => setShowMyFarm(false)}
+            className="fixed top-4 left-4 z-50 w-12 h-12 rounded-full bg-white shadow-lg flex items-center justify-center hover:bg-gray-100 transition-all"
+          >
+            <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
 
       {selectedInvestmentFarm && (
         <>
