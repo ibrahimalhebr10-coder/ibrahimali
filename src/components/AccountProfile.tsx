@@ -1,10 +1,12 @@
 import { X, User, LogOut, Sparkles, Sprout, TrendingUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import IdentityManager from './IdentityManager';
+import { type IdentityType } from '../services/identityService';
 
 interface AccountProfileProps {
   isOpen: boolean;
+  currentContext: IdentityType;
   onClose: () => void;
   onOpenAuth: () => void;
   onOpenReservations: () => void;
@@ -13,17 +15,10 @@ interface AccountProfileProps {
 
 type AppMode = 'agricultural' | 'investment';
 
-export default function AccountProfile({ isOpen, onClose, onOpenAuth, onStartInvestment }: AccountProfileProps) {
+export default function AccountProfile({ isOpen, currentContext, onClose, onOpenAuth, onStartInvestment }: AccountProfileProps) {
   const { user, signOut } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [appMode, setAppMode] = useState<AppMode>('agricultural');
-
-  useEffect(() => {
-    const savedMode = localStorage.getItem('appMode');
-    if (savedMode === 'agricultural' || savedMode === 'investment') {
-      setAppMode(savedMode);
-    }
-  }, [isOpen]);
+  const appMode: AppMode = currentContext === 'agricultural' ? 'agricultural' : 'investment';
 
   if (!isOpen) return null;
 

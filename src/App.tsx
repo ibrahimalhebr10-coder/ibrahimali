@@ -1082,6 +1082,7 @@ function App() {
 
       <AccountProfile
         isOpen={showAccountProfile}
+        currentContext={identity}
         onClose={() => setShowAccountProfile(false)}
         onOpenAuth={() => alert('قريباً: تسجيل الدخول')}
         onOpenReservations={() => alert('قريباً: حجوزاتي')}
