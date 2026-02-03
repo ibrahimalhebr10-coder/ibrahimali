@@ -1,12 +1,16 @@
 import { supabase } from '../lib/supabase';
 
+export interface TreeVariety {
+  type: string;
+  count: number;
+}
+
 export interface FarmOfferData {
   ownerName: string;
   phone: string;
   email?: string;
   location: string;
-  treeType: string;
-  treeCount: number;
+  treeVarieties: TreeVariety[];
   hasLegalDocs: 'yes' | 'no' | 'partial';
   offerType: 'sale' | 'full_lease' | 'partnership';
   proposedPrice?: number;
@@ -23,6 +27,8 @@ export interface FarmOffer {
   location: string;
   current_crop_type: string;
   tree_count: number;
+  tree_varieties: TreeVariety[];
+  total_tree_count: number;
   has_legal_docs: 'yes' | 'no' | 'partial';
   offer_type: 'sale' | 'full_lease' | 'partnership';
   proposed_price?: number;
@@ -50,6 +56,9 @@ export interface FarmOfferTimeline {
 export const farmOfferService = {
   async submitOffer(data: FarmOfferData): Promise<{ success: boolean; offer?: FarmOffer; error?: string }> {
     try {
+      const totalTreeCount = data.treeVarieties.reduce((sum, variety) => sum + variety.count, 0);
+      const firstTreeType = data.treeVarieties.length > 0 ? data.treeVarieties[0].type : '';
+
       const { data: offer, error } = await supabase
         .from('farm_offers')
         .insert([{
@@ -57,8 +66,10 @@ export const farmOfferService = {
           phone: data.phone,
           email: data.email,
           location: data.location,
-          current_crop_type: data.treeType,
-          tree_count: data.treeCount,
+          current_crop_type: firstTreeType,
+          tree_count: totalTreeCount,
+          tree_varieties: data.treeVarieties,
+          total_tree_count: totalTreeCount,
           has_legal_docs: data.hasLegalDocs,
           offer_type: data.offerType,
           proposed_price: data.proposedPrice,

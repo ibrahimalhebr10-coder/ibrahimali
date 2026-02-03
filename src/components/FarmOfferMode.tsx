@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sprout, CheckCircle, MapPin, Phone, Mail, FileText, Home } from 'lucide-react';
+import { X, Sprout, CheckCircle, MapPin, Phone, Mail, FileText, Home, Plus, Trash2 } from 'lucide-react';
 import { useOfferMode } from '../contexts/OfferModeContext';
-import { farmOfferService, type FarmOfferData, type FarmOffer } from '../services/farmOfferService';
+import { farmOfferService, type FarmOfferData, type FarmOffer, type TreeVariety } from '../services/farmOfferService';
 
 type Stage = 'intro' | 'form' | 'success';
 type OfferType = 'sale' | 'full_lease' | 'partnership';
+
+const TREE_TYPES = ['زيتون', 'نخيل', 'حمضيات', 'تفاح', 'رمان', 'عنب', 'لوز', 'أخرى'];
 
 export default function FarmOfferMode() {
   const { exitOfferMode } = useOfferMode();
@@ -18,8 +20,7 @@ export default function FarmOfferMode() {
     phone: '',
     email: '',
     location: '',
-    treeType: '',
-    treeCount: 0,
+    treeVarieties: [{ type: '', count: 0 }],
     hasLegalDocs: 'no',
     offerType: 'sale',
     proposedPrice: undefined,
@@ -47,6 +48,17 @@ export default function FarmOfferMode() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const hasEmptyVariety = formData.treeVarieties.some(v => !v.type || v.count <= 0);
+    if (hasEmptyVariety) {
+      alert('يجب إدخال نوع الأشجار وعددها لجميع الأنواع المضافة');
+      return;
+    }
+
+    if (getTotalTreeCount() === 0) {
+      alert('يجب إضافة عدد من الأشجار');
+      return;
+    }
 
     if (formData.offerType === 'partnership' && !formData.partnershipAcknowledgment) {
       alert('يجب الموافقة على إقرار المشاركة للمتابعة');
@@ -78,6 +90,39 @@ export default function FarmOfferMode() {
       proposedPrice: undefined,
       partnershipAcknowledgment: type === 'partnership' ? false : undefined
     });
+  };
+
+  const addTreeVariety = () => {
+    setFormData({
+      ...formData,
+      treeVarieties: [...formData.treeVarieties, { type: '', count: 0 }]
+    });
+  };
+
+  const removeTreeVariety = (index: number) => {
+    if (formData.treeVarieties.length > 1) {
+      setFormData({
+        ...formData,
+        treeVarieties: formData.treeVarieties.filter((_, i) => i !== index)
+      });
+    }
+  };
+
+  const updateTreeVariety = (index: number, field: 'type' | 'count', value: string | number) => {
+    const newVarieties = [...formData.treeVarieties];
+    if (field === 'type') {
+      newVarieties[index].type = value as string;
+    } else {
+      newVarieties[index].count = parseInt(value as string) || 0;
+    }
+    setFormData({
+      ...formData,
+      treeVarieties: newVarieties
+    });
+  };
+
+  const getTotalTreeCount = () => {
+    return formData.treeVarieties.reduce((sum, variety) => sum + variety.count, 0);
   };
 
   if (stage === 'intro') {
@@ -213,6 +258,149 @@ export default function FarmOfferMode() {
             </div>
 
             <div>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-medium text-gray-700">
+                  أنواع الأشجار في المزرعة *
+                </label>
+                <button
+                  type="button"
+                  onClick={addTreeVariety}
+                  className="flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-all text-sm font-medium"
+                >
+                  <Plus className="w-4 h-4" />
+                  إضافة نوع آخر
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {formData.treeVarieties.map((variety, index) => (
+                  <div key={index} className="flex gap-3 items-start p-4 bg-gray-50 rounded-xl border border-gray-200">
+                    <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          نوع الشجرة
+                        </label>
+                        <select
+                          required
+                          value={variety.type}
+                          onChange={(e) => updateTreeVariety(index, 'type', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-sm"
+                        >
+                          <option value="">اختر النوع</option>
+                          {TREE_TYPES.map(type => (
+                            <option key={type} value={type}>{type}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-600 mb-1">
+                          العدد
+                        </label>
+                        <input
+                          type="number"
+                          required
+                          min="1"
+                          value={variety.count || ''}
+                          onChange={(e) => updateTreeVariety(index, 'count', e.target.value)}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-sm"
+                          placeholder="مثال: 200"
+                        />
+                      </div>
+                    </div>
+                    {formData.treeVarieties.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeTreeVariety(index)}
+                        className="mt-6 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        title="حذف هذا النوع"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {getTotalTreeCount() > 0 && (
+                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm font-bold text-green-800">
+                    إجمالي عدد الأشجار: <span className="text-lg">{getTotalTreeCount()}</span> شجرة
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent my-6"></div>
+
+            <div>
+              <h3 className="text-lg font-bold text-gray-800 mb-4">معلومات المزرعة</h3>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                موقع المزرعة (المنطقة / المدينة) *
+              </label>
+              <div className="relative">
+                <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  required
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder="مثال: الرياض - الخرج"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                حالة المزرعة (التوثيق القانوني) *
+              </label>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hasLegalDocs"
+                    value="yes"
+                    checked={formData.hasLegalDocs === 'yes'}
+                    onChange={(e) => setFormData({ ...formData, hasLegalDocs: e.target.value as 'yes' | 'no' | 'partial' })}
+                    className="w-4 h-4 text-green-600 focus:ring-green-500"
+                  />
+                  <span className="text-sm text-gray-700">مكتملة</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hasLegalDocs"
+                    value="partial"
+                    checked={formData.hasLegalDocs === 'partial'}
+                    onChange={(e) => setFormData({ ...formData, hasLegalDocs: e.target.value as 'yes' | 'no' | 'partial' })}
+                    className="w-4 h-4 text-green-600 focus:ring-green-500"
+                  />
+                  <span className="text-sm text-gray-700">جزئية</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hasLegalDocs"
+                    value="no"
+                    checked={formData.hasLegalDocs === 'no'}
+                    onChange={(e) => setFormData({ ...formData, hasLegalDocs: e.target.value as 'yes' | 'no' | 'partial' })}
+                    className="w-4 h-4 text-green-600 focus:ring-green-500"
+                  />
+                  <span className="text-sm text-gray-700">غير موثقة</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent my-6"></div>
+
+            <div>
+              <h3 className="text-lg font-bold text-gray-800 mb-4">معلومات المالك</h3>
+            </div>
+
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 الاسم الكامل *
               </label>
@@ -256,99 +444,6 @@ export default function FarmOfferMode() {
                   className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
                   placeholder="example@email.com"
                 />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                موقع المزرعة (المنطقة / المدينة) *
-              </label>
-              <div className="relative">
-                <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  required
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                  placeholder="مثال: الرياض - الخرج"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                نوع الأشجار *
-              </label>
-              <select
-                required
-                value={formData.treeType}
-                onChange={(e) => setFormData({ ...formData, treeType: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-              >
-                <option value="">اختر نوع الأشجار</option>
-                <option value="زيتون">زيتون</option>
-                <option value="نخيل">نخيل</option>
-                <option value="حمضيات">حمضيات</option>
-                <option value="تفاح">تفاح</option>
-                <option value="رمان">رمان</option>
-                <option value="أخرى">أخرى</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                عدد الأشجار *
-              </label>
-              <input
-                type="number"
-                required
-                min="1"
-                value={formData.treeCount || ''}
-                onChange={(e) => setFormData({ ...formData, treeCount: parseInt(e.target.value) || 0 })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                placeholder="مثال: 500"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                حالة المزرعة (التوثيق القانوني) *
-              </label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="hasLegalDocs"
-                    value="yes"
-                    checked={formData.hasLegalDocs === 'yes'}
-                    onChange={(e) => setFormData({ ...formData, hasLegalDocs: e.target.value as 'yes' | 'no' | 'partial' })}
-                    className="w-4 h-4 text-green-600 focus:ring-green-500"
-                  />
-                  <span className="text-sm text-gray-700">مكتملة</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="hasLegalDocs"
-                    value="partial"
-                    checked={formData.hasLegalDocs === 'partial'}
-                    onChange={(e) => setFormData({ ...formData, hasLegalDocs: e.target.value as 'yes' | 'no' | 'partial' })}
-                    className="w-4 h-4 text-green-600 focus:ring-green-500"
-                  />
-                  <span className="text-sm text-gray-700">جزئية</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="hasLegalDocs"
-                    value="no"
-                    checked={formData.hasLegalDocs === 'no'}
-                    onChange={(e) => setFormData({ ...formData, hasLegalDocs: e.target.value as 'yes' | 'no' | 'partial' })}
-                    className="w-4 h-4 text-green-600 focus:ring-green-500"
-                  />
-                  <span className="text-sm text-gray-700">غير موثقة</span>
-                </label>
               </div>
             </div>
 
@@ -400,7 +495,7 @@ export default function FarmOfferMode() {
                   />
                   <div>
                     <span className="text-base font-medium text-gray-800">مشاركة</span>
-                    <p className="text-sm text-gray-600 mt-1">الدخول في شراكة مع المنصة</p>
+                    <p className="text-sm text-gray-600 mt-1">الدخول بمزرعتي بمشاركتها مع المنصة</p>
                   </div>
                 </label>
               </div>
