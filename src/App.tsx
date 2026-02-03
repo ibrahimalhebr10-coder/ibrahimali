@@ -1,4 +1,4 @@
-import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings } from 'lucide-react';
+import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
@@ -8,7 +8,6 @@ import AccountProfile from './components/AccountProfile';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
 import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
 import Header from './components/Header';
-import Footer from './components/Footer';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
 import InvestmentFarmPage from './components/InvestmentFarmPage';
@@ -912,6 +911,22 @@ function App() {
           </button>
 
           <button
+            onClick={handleMyAccountClick}
+            className="flex flex-col items-center gap-2 px-8 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.08) 0%, rgba(58,161,126,0.12) 100%)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <TreePine className="w-7 h-7 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
+            <span className="text-base font-bold text-darkgreen">مزرعتي</span>
+          </button>
+
+          <button
             onClick={() => setShowAssistant(true)}
             className="flex flex-col items-center gap-2 px-8 py-3 rounded-2xl transition-all duration-300 hover:scale-105 relative group"
             onMouseEnter={(e) => {
@@ -982,7 +997,7 @@ function App() {
           }
         }}
       >
-        <div className="flex items-center justify-around px-3 relative" style={{ height: '4.5rem' }}>
+        <div className="flex items-center justify-around px-2 relative" style={{ height: '4.5rem' }}>
           <button className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform">
             <div
               className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
@@ -995,6 +1010,23 @@ function App() {
               <Home className="w-6 h-6 text-darkgreen transition-all duration-300 group-active:scale-110" />
             </div>
             <span className="text-[10px] font-bold text-darkgreen/80">الرئيسية</span>
+          </button>
+
+          <button
+            onClick={handleMyAccountClick}
+            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
+          >
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
+              style={{
+                background: 'linear-gradient(145deg, rgba(58,161,126,0.15) 0%, rgba(58,161,126,0.08) 100%)',
+                boxShadow: '0 8px 16px rgba(58,161,126,0.3), inset 0 2px 4px rgba(255,255,255,0.9)',
+                border: '2.5px solid #3AA17E'
+              }}
+            >
+              <TreePine className="w-6 h-6 text-darkgreen transition-all duration-300 group-active:scale-110" />
+            </div>
+            <span className="text-[10px] font-black text-darkgreen">مزرعتي</span>
           </button>
 
           <button
@@ -1122,13 +1154,6 @@ function App() {
             />
           )}
         </>
-      )}
-
-      {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && (
-        <Footer
-          identity={identity}
-          onClick={handleMyAccountClick}
-        />
       )}
 
       </div>
