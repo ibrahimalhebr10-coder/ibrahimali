@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { Sprout, TreePine, Users, Calendar, Package } from 'lucide-react';
-import AgriculturalPackagesManager from './AgriculturalPackagesManager';
+import { Sprout, TreePine, Users, Calendar } from 'lucide-react';
 
-type AgriculturalTab = 'packages' | 'my-trees' | 'harvest' | 'users' | 'schedule';
+type AgriculturalTab = 'my-trees' | 'harvest' | 'users' | 'schedule';
 
 const AgriculturalSection: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<AgriculturalTab>('packages');
+  const [activeTab, setActiveTab] = useState<AgriculturalTab>('my-trees');
 
   const tabs = [
-    { id: 'packages' as AgriculturalTab, label: 'إدارة الباقات', icon: Package },
     { id: 'my-trees' as AgriculturalTab, label: 'متابعة أشجاري', icon: TreePine },
     { id: 'harvest' as AgriculturalTab, label: 'الحصاد', icon: Sprout },
     { id: 'users' as AgriculturalTab, label: 'المستخدمين', icon: Users },
@@ -16,10 +14,6 @@ const AgriculturalSection: React.FC = () => {
   ];
 
   const renderContent = () => {
-    if (activeTab === 'packages') {
-      return <AgriculturalPackagesManager />;
-    }
-
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
         <div className="text-center max-w-md mx-auto py-8">

@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
-import { TrendingUp, TreePine, DollarSign, Users, BarChart, Package } from 'lucide-react';
-import InvestmentPackagesManager from './InvestmentPackagesManager';
+import { TreePine, DollarSign, Users, BarChart } from 'lucide-react';
 
-type InvestmentTab = 'packages' | 'my-trees' | 'returns' | 'investors' | 'analytics';
+type InvestmentTab = 'my-trees' | 'returns' | 'investors' | 'analytics';
 
 const InvestmentSection: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<InvestmentTab>('packages');
+  const [activeTab, setActiveTab] = useState<InvestmentTab>('my-trees');
 
   const tabs = [
-    { id: 'packages' as InvestmentTab, label: 'إدارة الباقات', icon: Package },
     { id: 'my-trees' as InvestmentTab, label: 'متابعة أشجاري', icon: TreePine },
     { id: 'returns' as InvestmentTab, label: 'العوائد', icon: DollarSign },
     { id: 'investors' as InvestmentTab, label: 'المستثمرين', icon: Users },
@@ -16,10 +14,6 @@ const InvestmentSection: React.FC = () => {
   ];
 
   const renderContent = () => {
-    if (activeTab === 'packages') {
-      return <InvestmentPackagesManager />;
-    }
-
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
         <div className="text-center max-w-md mx-auto py-8">
