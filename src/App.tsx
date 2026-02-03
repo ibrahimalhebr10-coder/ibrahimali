@@ -1197,6 +1197,7 @@ function App() {
         }}
         onStartInvestment={() => {
           setShowAccountProfile(false);
+          setShowMyReservations(true);
         }}
       />
 
