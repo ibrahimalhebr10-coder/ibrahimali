@@ -49,7 +49,8 @@ const contractsService = {
           contract_start_date,
           contract_end_date
         `)
-        .in('status', ['active', 'confirmed', 'completed']);
+        .in('status', ['active', 'confirmed', 'completed'])
+        .not('user_id', 'is', null);
 
       if (error) throw error;
 
@@ -116,12 +117,13 @@ const contractsService = {
             tree_types,
             contract_start_date,
             contract_end_date,
-            user_profiles (
+            user_profiles:user_id (
               full_name
             )
           `)
           .eq('farm_id', farm.id)
-          .in('status', ['active', 'confirmed', 'completed']);
+          .in('status', ['active', 'confirmed', 'completed'])
+          .not('user_id', 'is', null);
 
         if (reservationsError) throw reservationsError;
 
@@ -167,7 +169,7 @@ const contractsService = {
             end_date: reservation.contract_end_date,
             status,
             farm_name: farm.name_ar,
-            user_name: (reservation.user_profiles as any)?.full_name || 'غير محدد'
+            user_name: reservation.user_profiles?.full_name || 'غير محدد'
           });
         });
 
