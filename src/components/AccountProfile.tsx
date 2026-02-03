@@ -15,7 +15,7 @@ interface AccountProfileProps {
 
 type AppMode = 'agricultural' | 'investment';
 
-export default function AccountProfile({ isOpen, currentContext, onClose, onOpenAuth, onStartInvestment }: AccountProfileProps) {
+export default function AccountProfile({ isOpen, currentContext, onClose, onOpenAuth, onOpenReservations, onStartInvestment }: AccountProfileProps) {
   const { user, signOut } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [primaryIdentity, setPrimaryIdentity] = useState<IdentityType | null>(null);
