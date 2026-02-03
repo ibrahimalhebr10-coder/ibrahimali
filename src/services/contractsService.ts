@@ -77,11 +77,12 @@ const contractsService = {
             stats.needsAttention++;
           } else {
             stats.active++;
-            if (reservation.contract_type === 'agricultural') {
-              stats.activeByType.agricultural++;
-            } else {
-              stats.activeByType.investment++;
-            }
+          }
+
+          if (reservation.contract_type === 'agricultural') {
+            stats.activeByType.agricultural++;
+          } else {
+            stats.activeByType.investment++;
           }
         }
       });
@@ -97,8 +98,7 @@ const contractsService = {
     try {
       const { data: farms, error: farmsError } = await supabase
         .from('farms')
-        .select('id, name, location')
-        .eq('is_open_for_booking', true);
+        .select('id, name, location');
 
       if (farmsError) throw farmsError;
 
