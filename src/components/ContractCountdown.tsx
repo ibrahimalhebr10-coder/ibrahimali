@@ -18,6 +18,8 @@ interface TimeRemaining {
   months: number;
   days: number;
   hours: number;
+  minutes: number;
+  seconds: number;
   totalDays: number;
   phase: ContractPhase;
   stage: ContractStage;
@@ -72,6 +74,8 @@ export default function ContractCountdown({
           months: 0,
           days: 0,
           hours: 0,
+          minutes: 0,
+          seconds: 0,
           totalDays: 0,
           phase: 'expired',
           stage: 'completion',
@@ -90,6 +94,8 @@ export default function ContractCountdown({
       const months = Math.floor(remainingDaysAfterYears / 30);
       const days = remainingDaysAfterYears % 30;
       const hours = totalHours % 24;
+      const minutes = totalMinutes % 60;
+      const seconds = totalSeconds % 60;
 
       let phase: ContractPhase = 'active';
       let stage: ContractStage = 'growth';
@@ -115,6 +121,8 @@ export default function ContractCountdown({
         months,
         days,
         hours,
+        minutes,
+        seconds,
         totalDays,
         phase,
         stage,
@@ -205,9 +213,6 @@ export default function ContractCountdown({
   const stageInfo = stageConfig[timeRemaining.stage];
   const Icon = config.icon;
   const StageIcon = stageInfo.icon;
-
-  const minutes = Math.floor((currentTime.getTime() - Math.floor(currentTime.getTime() / (1000 * 60 * 60)) * (1000 * 60 * 60)) / (1000 * 60)) % 60;
-  const seconds = Math.floor((currentTime.getTime() / 1000) % 60);
 
   return (
     <div className="space-y-3">
@@ -305,7 +310,7 @@ export default function ContractCountdown({
               {/* الدقائق */}
               <div className="flex flex-col items-center">
                 <div className={`text-2xl font-black tabular-nums bg-gradient-to-br ${config.gradient} bg-clip-text text-transparent`}>
-                  {String(minutes).padStart(2, '0')}
+                  {String(timeRemaining.minutes).padStart(2, '0')}
                 </div>
                 <div className="text-[10px] text-gray-500 font-medium">دقيقة</div>
               </div>
@@ -315,7 +320,7 @@ export default function ContractCountdown({
               {/* الثواني */}
               <div className="flex flex-col items-center">
                 <div className={`text-2xl font-black tabular-nums bg-gradient-to-br ${config.gradient} bg-clip-text text-transparent`}>
-                  {String(seconds).padStart(2, '0')}
+                  {String(timeRemaining.seconds).padStart(2, '0')}
                 </div>
                 <div className="text-[10px] text-gray-500 font-medium">ثانية</div>
               </div>
