@@ -283,23 +283,46 @@ export default function ContractCountdown({
         </div>
 
         {/* العداد الرقمي الديناميكي - ساعات ودقائق وثواني */}
-        <div className={`px-4 py-3 bg-gradient-to-br ${config.gradient} bg-opacity-10 border-t-2 ${config.borderColor}`}>
-          <div className="flex items-center justify-center gap-2">
-            <Clock className={`w-4 h-4 ${config.color} opacity-50`} />
-            <div className="flex items-center gap-1">
-              <div className={`text-lg font-bold ${config.color} tabular-nums`}>
-                {String(timeRemaining.hours).padStart(2, '0')}
+        <div className="px-4 py-4 bg-white/50 backdrop-blur-sm border-t-2 border-white/60">
+          <div className="flex items-center justify-center gap-3">
+            {/* أيقونة الساعة النابضة */}
+            <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${config.gradient} shadow-lg flex items-center justify-center animate-pulse`}>
+              <Clock className="w-5 h-5 text-white" />
+            </div>
+
+            {/* العداد الرقمي */}
+            <div className="flex items-center gap-1.5">
+              {/* الساعات */}
+              <div className="flex flex-col items-center">
+                <div className={`text-2xl font-black tabular-nums bg-gradient-to-br ${config.gradient} bg-clip-text text-transparent`}>
+                  {String(timeRemaining.hours).padStart(2, '0')}
+                </div>
+                <div className="text-[10px] text-gray-500 font-medium">ساعة</div>
               </div>
-              <span className={`text-xs ${config.color} opacity-40`}>:</span>
-              <div className={`text-lg font-bold ${config.color} tabular-nums`}>
-                {String(minutes).padStart(2, '0')}
+
+              <div className="text-2xl font-bold text-gray-400 animate-pulse">:</div>
+
+              {/* الدقائق */}
+              <div className="flex flex-col items-center">
+                <div className={`text-2xl font-black tabular-nums bg-gradient-to-br ${config.gradient} bg-clip-text text-transparent`}>
+                  {String(minutes).padStart(2, '0')}
+                </div>
+                <div className="text-[10px] text-gray-500 font-medium">دقيقة</div>
               </div>
-              <span className={`text-xs ${config.color} opacity-40`}>:</span>
-              <div className={`text-lg font-bold ${config.color} tabular-nums`}>
-                {String(seconds).padStart(2, '0')}
+
+              <div className="text-2xl font-bold text-gray-400 animate-pulse">:</div>
+
+              {/* الثواني */}
+              <div className="flex flex-col items-center">
+                <div className={`text-2xl font-black tabular-nums bg-gradient-to-br ${config.gradient} bg-clip-text text-transparent`}>
+                  {String(seconds).padStart(2, '0')}
+                </div>
+                <div className="text-[10px] text-gray-500 font-medium">ثانية</div>
               </div>
             </div>
-            <div className={`text-xs ${config.color} opacity-60`}>
+
+            {/* شارة "متبقي" */}
+            <div className={`px-3 py-1.5 rounded-full bg-gradient-to-r ${config.gradient} text-white text-xs font-bold shadow-md`}>
               متبقي
             </div>
           </div>
