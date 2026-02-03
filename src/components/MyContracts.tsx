@@ -1,43 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FileText,
   ChevronDown,
   ChevronUp,
   Calendar,
   TreePine,
-  MapPin,
   Clock,
   Award,
-  Leaf
+  Leaf,
+  Grape,
+  Apple,
+  Wheat,
+  Sparkles,
+  TrendingUp
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import ContractCountdown from './ContractCountdown';
 
 interface Contract {
   id: string;
   farm_id: string;
   farm_name: string;
-  contract_type: 'agricultural' | 'investment';
-  number_of_trees: number;
-  tree_types: string[];
-  contract_start_date: string;
-  contract_end_date: string;
+  contract_name: string | null;
+  total_trees: number;
+  tree_types: string | null;
+  contract_start_date: string | null;
+  duration_years: number | null;
+  bonus_years: number | null;
   status: string;
+  created_at: string;
 }
 
-interface FarmWithMyContracts {
+interface FarmWithContracts {
   farm_id: string;
   farm_name: string;
-  location: string;
   contracts_count: number;
   contracts: Contract[];
 }
 
 const MyContracts: React.FC = () => {
-  const { user } = useAuth();
-  const [farmsWithContracts, setFarmsWithContracts] = useState<FarmWithMyContracts[]>([]);
+  const { user, identity } = useAuth();
+  const [farmsWithContracts, setFarmsWithContracts] = useState<FarmWithContracts[]>([]);
   const [expandedFarms, setExpandedFarms] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [totalContracts, setTotalContracts] = useState(0);
 
   useEffect(() => {
     if (user) {
@@ -53,39 +60,23 @@ const MyContracts: React.FC = () => {
 
       const { data: reservations, error } = await supabase
         .from('reservations')
-        .select(`
-          id,
-          farm_id,
-          contract_type,
-          number_of_trees,
-          tree_types,
-          contract_start_date,
-          contract_end_date,
-          status,
-          farms (
-            id,
-            name,
-            location
-          )
-        `)
+        .select('*')
         .eq('user_id', user.id)
-        .in('status', ['active', 'completed', 'waiting_for_payment']);
+        .in('status', ['confirmed', 'completed'])
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      const farmMap = new Map<string, FarmWithMyContracts>();
+      const farmMap = new Map<string, FarmWithContracts>();
 
       reservations?.forEach((reservation: any) => {
-        const farm = reservation.farms;
-        if (!farm) return;
-
-        const farmId = farm.id;
+        const farmId = reservation.farm_id;
+        const farmName = reservation.farm_name;
 
         if (!farmMap.has(farmId)) {
           farmMap.set(farmId, {
             farm_id: farmId,
-            farm_name: farm.name,
-            location: farm.location || 'غير محدد',
+            farm_name: farmName,
             contracts_count: 0,
             contracts: []
           });
@@ -96,25 +87,29 @@ const MyContracts: React.FC = () => {
         farmData.contracts.push({
           id: reservation.id,
           farm_id: farmId,
-          farm_name: farm.name,
-          contract_type: reservation.contract_type || 'agricultural',
-          number_of_trees: reservation.number_of_trees || 0,
-          tree_types: reservation.tree_types || [],
+          farm_name: farmName,
+          contract_name: reservation.contract_name,
+          total_trees: reservation.total_trees,
+          tree_types: reservation.tree_types,
           contract_start_date: reservation.contract_start_date,
-          contract_end_date: reservation.contract_end_date,
-          status: reservation.status
+          duration_years: reservation.duration_years,
+          bonus_years: reservation.bonus_years,
+          status: reservation.status,
+          created_at: reservation.created_at
         });
       });
 
-      setFarmsWithContracts(Array.from(farmMap.values()));
-    } catch (error) {
-      console.error('Error loading my contracts:', error);
+      const farmsArray = Array.from(farmMap.values());
+      setFarmsWithContracts(farmsArray);
+      setTotalContracts(reservations?.length || 0);
+    } catch (error: any) {
+      console.error('Error loading contracts:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const toggleFarm = (farmId: string) => {
+  const toggleFarmExpansion = (farmId: string) => {
     const newExpanded = new Set(expandedFarms);
     if (newExpanded.has(farmId)) {
       newExpanded.delete(farmId);
@@ -124,270 +119,274 @@ const MyContracts: React.FC = () => {
     setExpandedFarms(newExpanded);
   };
 
-  const calculateDaysRemaining = (endDate: string): number => {
-    const end = new Date(endDate);
-    const now = new Date();
-    const diffTime = end.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+  const getTreeIcon = (treeType: string) => {
+    const type = treeType.toLowerCase();
+    if (type.includes('نخيل') || type.includes('palm')) return Wheat;
+    if (type.includes('زيتون') || type.includes('olive')) return Leaf;
+    if (type.includes('عنب') || type.includes('grape')) return Grape;
+    if (type.includes('تفاح') || type.includes('apple')) return Apple;
+    return TreePine;
   };
 
-  const calculateProgress = (startDate: string, endDate: string): number => {
+  const getContractTypeBadge = (contractName: string | null) => {
+    if (!contractName) {
+      return { label: 'عقد زراعي', color: 'from-green-500 to-emerald-600' };
+    }
+    if (contractName.toLowerCase().includes('investment') || contractName.toLowerCase().includes('استثماري')) {
+      return { label: 'عقد استثماري', color: 'from-amber-500 to-yellow-600' };
+    }
+    return { label: 'عقد زراعي', color: 'from-green-500 to-emerald-600' };
+  };
+
+  const getStatusBadge = (status: string) => {
+    if (status === 'confirmed' || status === 'completed') {
+      return { label: 'نشط', icon: Sparkles, color: 'text-green-600 bg-green-100' };
+    }
+    return { label: status, icon: Clock, color: 'text-gray-600 bg-gray-100' };
+  };
+
+  const calculateProgress = (startDate: string | null, durationYears: number | null) => {
+    if (!startDate || !durationYears) return 0;
+
     const start = new Date(startDate);
-    const end = new Date(endDate);
     const now = new Date();
-
-    const totalDuration = end.getTime() - start.getTime();
+    const totalDuration = durationYears * 365 * 24 * 60 * 60 * 1000;
     const elapsed = now.getTime() - start.getTime();
+    const progress = Math.min((elapsed / totalDuration) * 100, 100);
 
-    const progress = (elapsed / totalDuration) * 100;
-    return Math.min(Math.max(progress, 0), 100);
+    return Math.max(0, progress);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-700 border-green-200';
-      case 'waiting_for_payment':
-        return 'bg-yellow-100 text-yellow-700 border-yellow-200';
-      case 'completed':
-        return 'bg-gray-100 text-gray-700 border-gray-200';
-      default:
-        return 'bg-gray-100 text-gray-700 border-gray-200';
-    }
+  const calculateDaysRemaining = (startDate: string | null, durationYears: number | null, bonusYears: number | null) => {
+    if (!startDate || !durationYears) return null;
+
+    const totalYears = durationYears + (bonusYears || 0);
+    const start = new Date(startDate);
+    const end = new Date(start);
+    end.setFullYear(end.getFullYear() + totalYears);
+
+    const now = new Date();
+    const remaining = end.getTime() - now.getTime();
+    const daysRemaining = Math.ceil(remaining / (24 * 60 * 60 * 1000));
+
+    return Math.max(0, daysRemaining);
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'نشط';
-      case 'waiting_for_payment':
-        return 'بانتظار الدفع';
-      case 'completed':
-        return 'مكتمل';
-      default:
-        return status;
-    }
+  const parseTreeTypes = (treeTypes: string | null): string[] => {
+    if (!treeTypes) return [];
+    return treeTypes.split(',').map(t => t.trim()).filter(t => t.length > 0);
   };
 
-  const getProgressColor = (daysRemaining: number) => {
-    if (daysRemaining < 0) return 'bg-gray-500';
-    if (daysRemaining < 180) return 'bg-red-500';
-    if (daysRemaining < 365) return 'bg-orange-500';
-    return 'bg-green-500';
-  };
-
-  const getTotalContracts = () => {
-    return farmsWithContracts.reduce((sum, farm) => sum + farm.contracts_count, 0);
-  };
+  const isAgriculturalMode = identity === 'agricultural';
+  const primaryColor = isAgriculturalMode ? 'green' : 'amber';
+  const gradientFrom = isAgriculturalMode ? 'from-green-500' : 'from-amber-500';
+  const gradientTo = isAgriculturalMode ? 'to-emerald-600' : 'to-yellow-600';
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">جاري تحميل عقودي...</p>
+      <div className="p-6">
+        <div className="flex items-center justify-center gap-3 py-12">
+          <div className="animate-spin rounded-full h-8 w-8 border-3 border-green-200 border-t-green-600"></div>
+          <p className="text-sm text-gray-600 font-semibold">جاري تحميل العقود...</p>
         </div>
       </div>
     );
   }
 
-  if (farmsWithContracts.length === 0) {
+  if (totalContracts === 0) {
     return (
-      <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-100">
-        <div className="w-20 h-20 bg-gradient-to-br from-green-100 to-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <FileText className="w-10 h-10 text-green-600" />
+      <div className="p-6">
+        <div className="bg-white rounded-3xl p-8 border-2 border-gray-200 text-center">
+          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FileText className="w-10 h-10 text-gray-400" />
+          </div>
+          <h3 className="text-xl font-bold text-gray-800 mb-2">لا توجد عقود بعد</h3>
+          <p className="text-sm text-gray-600">ابدأ رحلتك بحجز أشجارك الأولى</p>
         </div>
-        <h3 className="text-xl font-bold text-gray-900 mb-2">لا توجد عقود بعد</h3>
-        <p className="text-sm text-gray-600 mb-6">
-          عندما تحجز أشجارك، ستظهر عقودك هنا
-        </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 border-2 border-green-200 shadow-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-              <FileText className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-900">عقودي</h3>
-              <p className="text-sm text-green-700">جميع عقودك في مكان واحد</p>
-            </div>
-          </div>
-          <div className="text-center">
-            <div className="text-3xl font-bold text-green-700">{getTotalContracts()}</div>
-            <div className="text-xs text-green-600 font-medium">عقد نشط</div>
-          </div>
+    <div className="p-4 lg:p-6 space-y-4">
+      <div
+        className="rounded-3xl p-6 text-center shadow-xl border-2"
+        style={{
+          background: `linear-gradient(135deg, ${isAgriculturalMode ? 'rgba(16,185,129,0.1)' : 'rgba(251,191,36,0.1)'} 0%, ${isAgriculturalMode ? 'rgba(5,150,105,0.15)' : 'rgba(245,158,11,0.15)'} 100%)`,
+          borderColor: isAgriculturalMode ? 'rgba(16,185,129,0.3)' : 'rgba(251,191,36,0.3)'
+        }}
+      >
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <FileText className={`w-8 h-8 text-${primaryColor}-600`} strokeWidth={2.5} />
+          <h2 className={`text-3xl font-black text-${primaryColor}-800`}>عقودي</h2>
         </div>
+        <div className="flex items-center justify-center gap-2">
+          <Award className={`w-5 h-5 text-${primaryColor}-600`} />
+          <p className={`text-lg font-bold text-${primaryColor}-700`}>
+            {totalContracts} {totalContracts === 1 ? 'عقد' : 'عقود'}
+          </p>
+        </div>
+        <p className="text-sm text-gray-600 mt-2">جميع عقودك في مكان واحد</p>
       </div>
 
-      <div className="space-y-4">
-        {farmsWithContracts.map((farm) => (
-          <div
-            key={farm.farm_id}
-            className="bg-white rounded-2xl shadow-sm border-2 border-gray-200 overflow-hidden hover:shadow-lg transition-all hover:border-green-300"
-          >
-            <button
-              onClick={() => toggleFarm(farm.farm_id)}
-              className="w-full p-6 flex items-center justify-between hover:bg-gradient-to-r hover:from-green-50 hover:to-transparent transition-colors"
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <TreePine className="w-7 h-7 text-white" />
-                </div>
-                <div className="text-right">
-                  <h3 className="text-xl font-bold text-gray-900">{farm.farm_name}</h3>
-                  <div className="flex items-center gap-2 text-sm text-gray-500 mt-1">
-                    <MapPin className="w-4 h-4" />
-                    <span>{farm.location}</span>
+      <div className="space-y-3">
+        {farmsWithContracts.map((farm) => {
+          const isExpanded = expandedFarms.has(farm.farm_id);
+
+          return (
+            <div key={farm.farm_id} className="space-y-2">
+              <button
+                onClick={() => toggleFarmExpansion(farm.farm_id)}
+                className="w-full rounded-2xl p-4 transition-all hover:scale-[1.01] active:scale-[0.99] shadow-lg"
+                style={{
+                  background: `linear-gradient(135deg, ${isAgriculturalMode ? 'rgba(16,185,129,0.15)' : 'rgba(251,191,36,0.15)'} 0%, ${isAgriculturalMode ? 'rgba(5,150,105,0.2)' : 'rgba(245,158,11,0.2)'} 100%)`,
+                  border: `2px solid ${isAgriculturalMode ? 'rgba(16,185,129,0.4)' : 'rgba(251,191,36,0.4)'}`
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradientFrom} ${gradientTo} flex items-center justify-center shadow-md`}
+                    >
+                      <TreePine className="w-6 h-6 text-white" strokeWidth={2.5} />
+                    </div>
+                    <div className="text-right">
+                      <h3 className={`text-lg font-black text-${primaryColor}-800`}>
+                        {farm.farm_name}
+                      </h3>
+                      <p className="text-sm text-gray-600 font-semibold">
+                        {farm.contracts_count} {farm.contracts_count === 1 ? 'عقد' : 'عقود'}
+                      </p>
+                    </div>
+                  </div>
+                  <div
+                    className={`w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md transition-transform ${
+                      isExpanded ? 'rotate-180' : ''
+                    }`}
+                  >
+                    <ChevronDown className={`w-5 h-5 text-${primaryColor}-600`} strokeWidth={3} />
                   </div>
                 </div>
-              </div>
+              </button>
 
-              <div className="flex items-center gap-4">
-                <div className="px-6 py-2.5 bg-green-100 text-green-700 rounded-full font-bold border-2 border-green-200 shadow-sm">
-                  {farm.contracts_count} {farm.contracts_count === 1 ? 'عقد' : 'عقود'}
-                </div>
-                <div>
-                  {expandedFarms.has(farm.farm_id) ? (
-                    <ChevronUp className="w-6 h-6 text-gray-400" />
-                  ) : (
-                    <ChevronDown className="w-6 h-6 text-gray-400" />
-                  )}
-                </div>
-              </div>
-            </button>
-
-            {expandedFarms.has(farm.farm_id) && (
-              <div className="border-t-2 border-gray-100 p-6 bg-gradient-to-br from-gray-50 to-white">
-                <div className="space-y-4">
-                  {farm.contracts.map((contract) => {
-                    const daysRemaining = calculateDaysRemaining(contract.contract_end_date);
-                    const progress = calculateProgress(contract.contract_start_date, contract.contract_end_date);
+              {isExpanded && (
+                <div className="space-y-3 pr-4 animate-fadeIn">
+                  {farm.contracts.map((contract, index) => {
+                    const badge = getContractTypeBadge(contract.contract_name);
+                    const statusBadge = getStatusBadge(contract.status);
+                    const StatusIcon = statusBadge.icon;
+                    const progress = calculateProgress(contract.contract_start_date, contract.duration_years);
+                    const daysRemaining = calculateDaysRemaining(
+                      contract.contract_start_date,
+                      contract.duration_years,
+                      contract.bonus_years
+                    );
+                    const treeTypesList = parseTreeTypes(contract.tree_types);
 
                     return (
                       <div
                         key={contract.id}
-                        className="bg-white rounded-xl p-6 border-2 border-gray-200 hover:border-green-300 transition-all shadow-sm hover:shadow-md"
+                        className="rounded-2xl overflow-hidden shadow-lg border-2 border-gray-200 bg-white transition-all hover:shadow-xl"
                       >
-                        <div className="flex items-start justify-between mb-5">
-                          <div className="flex items-center gap-3">
-                            <div className={`
-                              w-12 h-12 rounded-xl flex items-center justify-center shadow-md
-                              ${contract.contract_type === 'agricultural'
-                                ? 'bg-gradient-to-br from-green-400 to-green-600'
-                                : 'bg-gradient-to-br from-blue-400 to-blue-600'
-                              }
-                            `}>
-                              {contract.contract_type === 'agricultural' ? (
-                                <Leaf className="w-6 h-6 text-white" />
-                              ) : (
-                                <Award className="w-6 h-6 text-white" />
+                        <div
+                          className={`bg-gradient-to-r ${badge.color} p-3 flex items-center justify-between`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-white" strokeWidth={2.5} />
+                            <span className="text-base font-black text-white">{badge.label}</span>
+                          </div>
+                          <div className={`px-3 py-1 rounded-full ${statusBadge.color} flex items-center gap-1`}>
+                            <StatusIcon className="w-3 h-3" strokeWidth={2.5} />
+                            <span className="text-xs font-bold">{statusBadge.label}</span>
+                          </div>
+                        </div>
+
+                        <div className="p-4 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-gray-500 font-semibold">
+                              #{contract.id.substring(0, 8).toUpperCase()}
+                            </span>
+                            {contract.contract_start_date && (
+                              <div className="flex items-center gap-1 text-xs text-gray-600">
+                                <Calendar className="w-3 h-3" />
+                                <span className="font-semibold">
+                                  {new Date(contract.contract_start_date).toLocaleDateString('ar-SA')}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2 bg-green-50 rounded-xl p-3 border border-green-200">
+                            <TreePine className="w-5 h-5 text-green-600" strokeWidth={2.5} />
+                            <span className="text-2xl font-black text-green-700">{contract.total_trees}</span>
+                            <span className="text-sm font-bold text-green-600">شجرة</span>
+                          </div>
+
+                          {treeTypesList.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {treeTypesList.slice(0, 3).map((treeType, idx) => {
+                                const TreeIcon = getTreeIcon(treeType);
+                                return (
+                                  <div
+                                    key={idx}
+                                    className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300"
+                                  >
+                                    <TreeIcon className="w-3 h-3 text-green-700" strokeWidth={2.5} />
+                                    <span className="text-xs font-bold text-green-800">{treeType}</span>
+                                  </div>
+                                );
+                              })}
+                              {treeTypesList.length > 3 && (
+                                <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-300">
+                                  <span className="text-xs font-bold text-gray-700">
+                                    +{treeTypesList.length - 3}
+                                  </span>
+                                </div>
                               )}
                             </div>
-                            <div>
-                              <div className="font-bold text-gray-900 text-lg">
-                                {contract.contract_type === 'agricultural' ? 'عقد زراعي' : 'عقد استثماري'}
-                              </div>
-                              <div className="text-sm text-gray-500 font-mono">#{contract.id.slice(0, 8)}</div>
-                            </div>
-                          </div>
+                          )}
 
-                          <div className={`px-4 py-2 rounded-full text-sm font-bold border-2 shadow-sm ${getStatusColor(contract.status)}`}>
-                            {getStatusLabel(contract.status)}
-                          </div>
+                          {contract.contract_start_date && contract.duration_years && (
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-1">
+                                  <Clock className="w-3 h-3 text-blue-600" />
+                                  <span className="font-bold text-blue-700">
+                                    {contract.duration_years} سنوات
+                                    {contract.bonus_years && contract.bonus_years > 0 && (
+                                      <span className="text-green-600 mr-1">
+                                        + {contract.bonus_years} مجانًا
+                                      </span>
+                                    )}
+                                  </span>
+                                </div>
+                                {daysRemaining !== null && (
+                                  <span className="font-bold text-gray-600">{daysRemaining} يوم متبقي</span>
+                                )}
+                              </div>
+
+                              <div className="space-y-1">
+                                <div className="h-2.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500 rounded-full"
+                                    style={{ width: `${progress}%` }}
+                                  />
+                                </div>
+                                <p className="text-xs font-bold text-center text-gray-600">
+                                  {progress.toFixed(0)}% مكتمل
+                                </p>
+                              </div>
+                            </div>
+                          )}
                         </div>
-
-                        <div className="grid grid-cols-2 gap-4 mb-5 bg-gradient-to-br from-gray-50 to-green-50 rounded-xl p-4 border border-gray-200">
-                          <div className="flex items-center gap-2 text-sm">
-                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm border border-green-200">
-                              <TreePine className="w-5 h-5 text-green-600" />
-                            </div>
-                            <div>
-                              <div className="text-xs text-gray-500">عدد الأشجار</div>
-                              <div className="font-bold text-gray-900 text-lg">{contract.number_of_trees}</div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2 text-sm">
-                            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm border border-blue-200">
-                              <Calendar className="w-5 h-5 text-blue-600" />
-                            </div>
-                            <div>
-                              <div className="text-xs text-gray-500">تاريخ البداية</div>
-                              <div className="font-bold text-gray-900">
-                                {new Date(contract.contract_start_date).toLocaleDateString('ar-SA')}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        {contract.tree_types && contract.tree_types.length > 0 && (
-                          <div className="mb-5">
-                            <div className="text-xs text-gray-600 mb-2 font-bold flex items-center gap-2">
-                              <Leaf className="w-4 h-4 text-green-600" />
-                              أنواع أشجاري:
-                            </div>
-                            <div className="flex flex-wrap gap-2">
-                              {contract.tree_types.map((type, idx) => (
-                                <span
-                                  key={idx}
-                                  className="px-3 py-1.5 bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 rounded-lg text-xs font-bold border-2 border-green-200 shadow-sm"
-                                >
-                                  {type}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {contract.status === 'active' && (
-                          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border-2 border-blue-200">
-                            <div className="flex items-center justify-between text-sm mb-3">
-                              <div className="flex items-center gap-2 text-gray-700 font-bold">
-                                <Clock className="w-5 h-5 text-blue-600" />
-                                <span>المدة المتبقية</span>
-                              </div>
-                              <div className={`font-bold text-lg ${
-                                daysRemaining < 0
-                                  ? 'text-gray-600'
-                                  : daysRemaining < 180
-                                  ? 'text-red-600'
-                                  : daysRemaining < 365
-                                  ? 'text-orange-600'
-                                  : 'text-green-600'
-                              }`}>
-                                {daysRemaining < 0 ? 'منتهي' : `${daysRemaining} يوم`}
-                              </div>
-                            </div>
-
-                            <div className="relative">
-                              <div className="w-full h-5 bg-gray-200 rounded-full overflow-hidden shadow-inner border-2 border-gray-300">
-                                <div
-                                  className={`h-full transition-all duration-500 ${getProgressColor(daysRemaining)}`}
-                                  style={{ width: `${Math.min(progress, 100)}%` }}
-                                ></div>
-                              </div>
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-xs font-bold text-white drop-shadow-[0_2px_3px_rgba(0,0,0,0.9)]">
-                                  {Math.round(progress)}%
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
                       </div>
                     );
                   })}
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
