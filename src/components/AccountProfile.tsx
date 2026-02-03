@@ -214,65 +214,47 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
             ) : (
               <div className="space-y-6">
                 <div
-                  className="rounded-3xl p-8 shadow-2xl text-white relative overflow-hidden"
+                  className="rounded-3xl p-6 shadow-2xl text-white relative overflow-hidden"
                   style={{ background: config.gradient }}
                 >
                   <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-20 translate-x-20"></div>
                   <div className="absolute bottom-0 left-0 w-32 h-32 bg-white/10 rounded-full translate-y-16 -translate-x-16"></div>
 
                   <div className="relative z-10 text-center">
-                    <div className="relative inline-block mb-6">
+                    <div className="relative inline-block mb-4">
                       <div
-                        className="w-24 h-24 rounded-full flex items-center justify-center shadow-xl"
+                        className="w-20 h-20 rounded-full flex items-center justify-center shadow-xl"
                         style={{ background: 'rgba(255,255,255,0.2)' }}
                       >
-                        <IdentityIcon className="w-12 h-12 text-white" />
+                        <IdentityIcon className="w-10 h-10 text-white" />
                       </div>
-                      <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-lg">
-                        <span className="text-lg">{appMode === 'agricultural' ? '🌿' : '💼'}</span>
+                      <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-lg">
+                        <span className="text-base">{appMode === 'agricultural' ? '🌿' : '💼'}</span>
                       </div>
                     </div>
 
                     <div
-                      className="inline-block px-6 py-2 rounded-full mb-4"
+                      className="inline-block px-5 py-1.5 rounded-full mb-3"
                       style={{ background: 'rgba(255,255,255,0.2)' }}
                     >
-                      <span className="text-lg font-bold">
+                      <span className="text-base font-bold">
                         {config.label}
                       </span>
                     </div>
 
-                    <h2 className="text-2xl font-bold mb-2">
+                    <h2 className="text-xl font-bold mb-1">
                       {user.user_metadata?.full_name || user.email?.split('@')[0]}
                     </h2>
 
-                    <p className="text-sm opacity-90 mb-2">
+                    <p className="text-sm opacity-90">
                       {config.description}
                     </p>
-
-                    {primaryIdentity && (
-                      <div className="text-xs opacity-80 mb-6">
-                        <p>هويتك الأساسية: {identityService.getIdentityLabel(primaryIdentity)}</p>
-                      </div>
-                    )}
-
-                    <button
-                      onClick={config.buttonAction}
-                      className="w-full py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2"
-                      style={{
-                        background: 'rgba(255,255,255,0.95)',
-                        color: config.color
-                      }}
-                    >
-                      <Sparkles className="w-5 h-5" />
-                      <span>{config.buttonText}</span>
-                    </button>
                   </div>
                 </div>
 
-                <IdentityManager />
-
                 <MyContracts />
+
+                <IdentityManager />
 
                 <div className="text-center text-gray-500 text-sm py-6">
                   <p>المزيد من المزايا قريباً</p>

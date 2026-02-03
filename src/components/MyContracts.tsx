@@ -12,7 +12,12 @@ import {
   Apple,
   Wheat,
   Sparkles,
-  TrendingUp
+  TrendingUp,
+  MapPin,
+  CalendarCheck,
+  Hash,
+  Shield,
+  Scroll
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -195,198 +200,211 @@ const MyContracts: React.FC = () => {
 
   if (totalContracts === 0) {
     return (
-      <div className="p-6">
-        <div className="bg-white rounded-3xl p-8 border-2 border-gray-200 text-center">
-          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FileText className="w-10 h-10 text-gray-400" />
+      <div className="space-y-4">
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 border-2 border-gray-200 text-center shadow-lg">
+          <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
+            <Scroll className="w-12 h-12 text-gray-400" />
           </div>
-          <h3 className="text-xl font-bold text-gray-800 mb-2">لا توجد عقود بعد</h3>
-          <p className="text-sm text-gray-600">ابدأ رحلتك بحجز أشجارك الأولى</p>
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">لا توجد عقود بعد</h3>
+          <p className="text-sm text-gray-600 mb-4">ابدأ رحلتك بحجز أشجارك الأولى</p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-2 border-gray-300">
+            <Shield className="w-4 h-4 text-gray-500" />
+            <span className="text-xs font-bold text-gray-600">ستظهر عقودك هنا بعد الحجز</span>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 lg:p-6 space-y-4">
-      <div
-        className="rounded-3xl p-6 text-center shadow-xl border-2"
-        style={{
-          background: `linear-gradient(135deg, ${isAgriculturalMode ? 'rgba(16,185,129,0.1)' : 'rgba(251,191,36,0.1)'} 0%, ${isAgriculturalMode ? 'rgba(5,150,105,0.15)' : 'rgba(245,158,11,0.15)'} 100%)`,
-          borderColor: isAgriculturalMode ? 'rgba(16,185,129,0.3)' : 'rgba(251,191,36,0.3)'
-        }}
-      >
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <FileText className={`w-8 h-8 text-${primaryColor}-600`} strokeWidth={2.5} />
-          <h2 className={`text-3xl font-black text-${primaryColor}-800`}>عقودي</h2>
-        </div>
-        <div className="flex items-center justify-center gap-2">
-          <Award className={`w-5 h-5 text-${primaryColor}-600`} />
-          <p className={`text-lg font-bold text-${primaryColor}-700`}>
-            {totalContracts} {totalContracts === 1 ? 'عقد' : 'عقود'}
-          </p>
-        </div>
-        <p className="text-sm text-gray-600 mt-2">جميع عقودك في مكان واحد</p>
-      </div>
+    <div className="space-y-4">
+      <div className="space-y-4">
+        {farmsWithContracts.map((farm) => (
+          <div key={farm.farm_id} className="space-y-4">
+            {farm.contracts.map((contract) => {
+              const badge = getContractTypeBadge(contract.contract_name);
+              const statusBadge = getStatusBadge(contract.status);
+              const StatusIcon = statusBadge.icon;
+              const treeTypesList = parseTreeTypes(contract.tree_types);
+              const isAgriculturalContract = badge.label === 'عقد زراعي';
 
-      <div className="space-y-3">
-        {farmsWithContracts.map((farm) => {
-          const isExpanded = expandedFarms.has(farm.farm_id);
-
-          return (
-            <div key={farm.farm_id} className="space-y-2">
-              <button
-                onClick={() => toggleFarmExpansion(farm.farm_id)}
-                className="w-full rounded-2xl p-4 transition-all hover:scale-[1.01] active:scale-[0.99] shadow-lg"
-                style={{
-                  background: `linear-gradient(135deg, ${isAgriculturalMode ? 'rgba(16,185,129,0.15)' : 'rgba(251,191,36,0.15)'} 0%, ${isAgriculturalMode ? 'rgba(5,150,105,0.2)' : 'rgba(245,158,11,0.2)'} 100%)`,
-                  border: `2px solid ${isAgriculturalMode ? 'rgba(16,185,129,0.4)' : 'rgba(251,191,36,0.4)'}`
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradientFrom} ${gradientTo} flex items-center justify-center shadow-md`}
-                    >
-                      <TreePine className="w-6 h-6 text-white" strokeWidth={2.5} />
-                    </div>
-                    <div className="text-right">
-                      <h3 className={`text-lg font-black text-${primaryColor}-800`}>
-                        {farm.farm_name}
-                      </h3>
-                      <p className="text-sm text-gray-600 font-semibold">
-                        {farm.contracts_count} {farm.contracts_count === 1 ? 'عقد' : 'عقود'}
-                      </p>
-                    </div>
-                  </div>
+              return (
+                <div
+                  key={contract.id}
+                  className="rounded-3xl overflow-hidden shadow-2xl border-4 bg-white transition-all hover:shadow-3xl"
+                  style={{
+                    borderImage: `linear-gradient(135deg, ${isAgriculturalContract ? '#10b981' : '#f59e0b'} 0%, ${isAgriculturalContract ? '#059669' : '#d97706'} 100%) 1`,
+                    borderImageSlice: 1
+                  }}
+                >
                   <div
-                    className={`w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md transition-transform ${
-                      isExpanded ? 'rotate-180' : ''
-                    }`}
+                    className="relative overflow-hidden"
+                    style={{
+                      background: `linear-gradient(135deg, ${isAgriculturalContract ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)'} 0%, ${isAgriculturalContract ? 'rgba(5,150,105,0.12)' : 'rgba(217,119,6,0.12)'} 100%)`
+                    }}
                   >
-                    <ChevronDown className={`w-5 h-5 text-${primaryColor}-600`} strokeWidth={3} />
-                  </div>
-                </div>
-              </button>
+                    <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
+                      <Scroll className="w-full h-full" strokeWidth={0.5} />
+                    </div>
+                    <div className="absolute bottom-0 left-0 w-48 h-48 opacity-5">
+                      <Shield className="w-full h-full" strokeWidth={0.5} />
+                    </div>
 
-              {isExpanded && (
-                <div className="space-y-3 pr-4 animate-fadeIn">
-                  {farm.contracts.map((contract, index) => {
-                    const badge = getContractTypeBadge(contract.contract_name);
-                    const statusBadge = getStatusBadge(contract.status);
-                    const StatusIcon = statusBadge.icon;
-                    const progress = calculateProgress(contract.contract_start_date, contract.duration_years);
-                    const daysRemaining = calculateDaysRemaining(
-                      contract.contract_start_date,
-                      contract.duration_years,
-                      contract.bonus_years
-                    );
-                    const treeTypesList = parseTreeTypes(contract.tree_types);
-
-                    return (
-                      <div
-                        key={contract.id}
-                        className="rounded-2xl overflow-hidden shadow-lg border-2 border-gray-200 bg-white transition-all hover:shadow-xl"
-                      >
-                        <div
-                          className={`bg-gradient-to-r ${badge.color} p-3 flex items-center justify-between`}
-                        >
-                          <div className="flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-white" strokeWidth={2.5} />
-                            <span className="text-base font-black text-white">{badge.label}</span>
-                          </div>
-                          <div className={`px-3 py-1 rounded-full ${statusBadge.color} flex items-center gap-1`}>
-                            <StatusIcon className="w-3 h-3" strokeWidth={2.5} />
-                            <span className="text-xs font-bold">{statusBadge.label}</span>
-                          </div>
-                        </div>
-
-                        <div className="p-4 space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-xs text-gray-500 font-semibold">
-                              #{contract.id.substring(0, 8).toUpperCase()}
-                            </span>
-                            {contract.contract_start_date && (
-                              <div className="flex items-center gap-1 text-xs text-gray-600">
-                                <Calendar className="w-3 h-3" />
-                                <span className="font-semibold">
-                                  {new Date(contract.contract_start_date).toLocaleDateString('ar-SA')}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2 bg-green-50 rounded-xl p-3 border border-green-200">
-                            <TreePine className="w-5 h-5 text-green-600" strokeWidth={2.5} />
-                            <span className="text-2xl font-black text-green-700">{contract.total_trees}</span>
-                            <span className="text-sm font-bold text-green-600">شجرة</span>
-                          </div>
-
-                          {treeTypesList.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                              {treeTypesList.slice(0, 3).map((treeType, idx) => {
-                                const TreeIcon = getTreeIcon(treeType);
-                                return (
-                                  <div
-                                    key={idx}
-                                    className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-green-100 to-emerald-100 border border-green-300"
-                                  >
-                                    <TreeIcon className="w-3 h-3 text-green-700" strokeWidth={2.5} />
-                                    <span className="text-xs font-bold text-green-800">{treeType}</span>
-                                  </div>
-                                );
-                              })}
-                              {treeTypesList.length > 3 && (
-                                <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gray-100 border border-gray-300">
-                                  <span className="text-xs font-bold text-gray-700">
-                                    +{treeTypesList.length - 3}
-                                  </span>
-                                </div>
-                              )}
+                    <div className="relative z-10 p-6 space-y-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div
+                              className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${badge.color} flex items-center justify-center shadow-xl`}
+                            >
+                              <Scroll className="w-8 h-8 text-white" strokeWidth={2.5} />
                             </div>
-                          )}
-
-                          {contract.contract_start_date && contract.duration_years && (
-                            <div className="space-y-2">
-                              <div className="flex items-center justify-between text-xs">
-                                <div className="flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-blue-600" />
-                                  <span className="font-bold text-blue-700">
-                                    {contract.duration_years} سنوات
-                                    {contract.bonus_years && contract.bonus_years > 0 && (
-                                      <span className="text-green-600 mr-1">
-                                        + {contract.bonus_years} مجانًا
-                                      </span>
-                                    )}
-                                  </span>
+                            <div>
+                              <h2 className="text-2xl font-black mb-1" style={{ color: isAgriculturalContract ? '#059669' : '#d97706' }}>
+                                {badge.label}
+                              </h2>
+                              <div className="flex items-center gap-2">
+                                <div className={`px-3 py-1 rounded-full ${statusBadge.color} flex items-center gap-1 shadow-md`}>
+                                  <StatusIcon className="w-4 h-4" strokeWidth={2.5} />
+                                  <span className="text-sm font-bold">{statusBadge.label}</span>
                                 </div>
-                                {daysRemaining !== null && (
-                                  <span className="font-bold text-gray-600">{daysRemaining} يوم متبقي</span>
-                                )}
-                              </div>
-
-                              <div className="space-y-1">
-                                <div className="h-2.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                                  <div
-                                    className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500 rounded-full"
-                                    style={{ width: `${progress}%` }}
-                                  />
-                                </div>
-                                <p className="text-xs font-bold text-center text-gray-600">
-                                  {progress.toFixed(0)}% مكتمل
-                                </p>
                               </div>
                             </div>
-                          )}
+                          </div>
                         </div>
                       </div>
-                    );
-                  })}
+
+                      <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 border-2 border-gray-200 shadow-md">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Hash className="w-5 h-5 text-gray-600" />
+                            <span className="text-sm font-bold text-gray-600">رقم العقد</span>
+                          </div>
+                          <p className="text-lg font-black text-gray-900 font-mono">
+                            {contract.id.substring(0, 8).toUpperCase()}
+                          </p>
+                        </div>
+
+                        <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 border-2 border-gray-200 shadow-md">
+                          <div className="flex items-center gap-2 mb-2">
+                            <MapPin className="w-5 h-5 text-gray-600" />
+                            <span className="text-sm font-bold text-gray-600">المزرعة</span>
+                          </div>
+                          <p className="text-lg font-black text-gray-900">
+                            {farm.farm_name}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div
+                        className="rounded-2xl p-5 shadow-lg border-2"
+                        style={{
+                          background: isAgriculturalContract ? 'linear-gradient(135deg, rgba(16,185,129,0.15) 0%, rgba(5,150,105,0.2) 100%)' : 'linear-gradient(135deg, rgba(245,158,11,0.15) 0%, rgba(217,119,6,0.2) 100%)',
+                          borderColor: isAgriculturalContract ? 'rgba(16,185,129,0.4)' : 'rgba(245,158,11,0.4)'
+                        }}
+                      >
+                        <div className="flex items-center gap-3 mb-3">
+                          <TreePine className={`w-6 h-6 ${isAgriculturalContract ? 'text-green-700' : 'text-amber-700'}`} strokeWidth={2.5} />
+                          <span className="text-sm font-bold text-gray-700">الأشجار المتعاقد عليها</span>
+                        </div>
+                        <div className="flex items-baseline gap-2 mb-3">
+                          <span className={`text-5xl font-black ${isAgriculturalContract ? 'text-green-700' : 'text-amber-700'}`}>{contract.total_trees}</span>
+                          <span className={`text-xl font-bold ${isAgriculturalContract ? 'text-green-600' : 'text-amber-600'}`}>شجرة</span>
+                        </div>
+                        {treeTypesList.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {treeTypesList.map((treeType, idx) => {
+                              const TreeIcon = getTreeIcon(treeType);
+                              return (
+                                <div
+                                  key={idx}
+                                  className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border-2 shadow-sm"
+                                  style={{
+                                    borderColor: isAgriculturalContract ? 'rgba(16,185,129,0.4)' : 'rgba(245,158,11,0.4)'
+                                  }}
+                                >
+                                  <TreeIcon className={`w-4 h-4 ${isAgriculturalContract ? 'text-green-700' : 'text-amber-700'}`} strokeWidth={2.5} />
+                                  <span className={`text-sm font-bold ${isAgriculturalContract ? 'text-green-800' : 'text-amber-800'}`}>{treeType}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+
+                      {contract.contract_start_date && contract.duration_years && (
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 border-2 border-gray-200 shadow-md">
+                            <div className="flex items-center gap-2 mb-2">
+                              <CalendarCheck className="w-5 h-5 text-blue-600" />
+                              <span className="text-sm font-bold text-gray-600">تاريخ البدء</span>
+                            </div>
+                            <p className="text-base font-black text-gray-900">
+                              {new Date(contract.contract_start_date).toLocaleDateString('ar-SA', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric'
+                              })}
+                            </p>
+                          </div>
+
+                          <div className="bg-white/70 backdrop-blur-sm rounded-2xl p-4 border-2 border-gray-200 shadow-md">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Clock className="w-5 h-5 text-purple-600" />
+                              <span className="text-sm font-bold text-gray-600">مدة الإيجار</span>
+                            </div>
+                            <p className="text-base font-black text-gray-900">
+                              {contract.duration_years} سنوات
+                              {contract.bonus_years && contract.bonus_years > 0 && (
+                                <span className="text-green-600 text-sm mr-2">
+                                  + {contract.bonus_years} مجانًا
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {contract.contract_start_date && contract.duration_years && (
+                        <>
+                          <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+
+                          <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-1 shadow-2xl">
+                            <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-4">
+                              <div className="flex items-center gap-2 mb-4">
+                                <div
+                                  className={`w-10 h-10 rounded-xl bg-gradient-to-br ${badge.color} flex items-center justify-center shadow-lg`}
+                                >
+                                  <Clock className="w-5 h-5 text-white" strokeWidth={2.5} />
+                                </div>
+                                <h3 className="text-lg font-black text-gray-800">العداد الزمني للعقد</h3>
+                              </div>
+                              <ContractCountdown
+                                contractStartDate={contract.contract_start_date}
+                                durationYears={contract.duration_years}
+                                bonusYears={contract.bonus_years || 0}
+                                status={contract.status}
+                                userType={isAgriculturalContract ? 'farmer' : 'investor'}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+
+                      <div className="flex items-center justify-center gap-2 pt-4">
+                        <Shield className="w-4 h-4 text-gray-400" />
+                        <p className="text-xs text-gray-500 font-bold">هذه وثيقة رسمية محفوظة إلكترونياً</p>
+                        <Shield className="w-4 h-4 text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+        ))}
       </div>
     </div>
   );
