@@ -55,6 +55,7 @@ function AppContent() {
   const [showInvestmentMyFarm, setShowInvestmentMyFarm] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [selectedInvestmentFarm, setSelectedInvestmentFarm] = useState<FarmProject | null>(null);
+  const [selectedFarmMode, setSelectedFarmMode] = useState<AppMode | null>(null);
 
   const handleAppModeChange = async (mode: AppMode) => {
     await updateIdentity(mode);
@@ -776,6 +777,7 @@ function AppContent() {
                       key={farm.id}
                       onClick={() => {
                         setSelectedInvestmentFarm(farm);
+                        setSelectedFarmMode(appMode);
                       }}
                       className="flex-shrink-0 w-[90%] lg:w-[calc(50%-1rem)] xl:w-[calc(33.333%-1rem)] rounded-xl lg:rounded-2xl overflow-hidden text-right backdrop-blur-xl relative cursor-pointer transition-all duration-500 group animate-fadeIn snap-center"
                       style={{
@@ -1280,16 +1282,22 @@ function AppContent() {
 
       {selectedInvestmentFarm && (
         <>
-          {appMode === 'investment' ? (
+          {selectedFarmMode === 'investment' ? (
             <InvestmentFarmPage
               farm={selectedInvestmentFarm}
-              onClose={() => setSelectedInvestmentFarm(null)}
+              onClose={() => {
+                setSelectedInvestmentFarm(null);
+                setSelectedFarmMode(null);
+              }}
               onGoToAccount={() => setShowAccountProfile(true)}
             />
           ) : (
             <AgriculturalFarmPage
               farm={selectedInvestmentFarm}
-              onClose={() => setSelectedInvestmentFarm(null)}
+              onClose={() => {
+                setSelectedInvestmentFarm(null);
+                setSelectedFarmMode(null);
+              }}
               onGoToAccount={() => setShowAccountProfile(true)}
             />
           )}
