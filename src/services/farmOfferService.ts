@@ -5,9 +5,12 @@ export interface FarmOfferData {
   phone: string;
   email?: string;
   location: string;
-  areaHectares: number;
-  currentCropType?: string;
+  treeType: string;
+  treeCount: number;
   hasLegalDocs: 'yes' | 'no' | 'partial';
+  offerType: 'sale' | 'full_lease' | 'partnership';
+  proposedPrice?: number;
+  partnershipAcknowledgment?: boolean;
   additionalNotes?: string;
 }
 
@@ -18,9 +21,12 @@ export interface FarmOffer {
   phone: string;
   email?: string;
   location: string;
-  area_hectares: number;
-  current_crop_type?: string;
+  current_crop_type: string;
+  tree_count: number;
   has_legal_docs: 'yes' | 'no' | 'partial';
+  offer_type: 'sale' | 'full_lease' | 'partnership';
+  proposed_price?: number;
+  partnership_acknowledgment: boolean;
   additional_notes?: string;
   status: 'submitted' | 'under_review' | 'technical_eval' | 'field_visit_scheduled' | 'field_visit_done' | 'approved' | 'rejected';
   submitted_at: string;
@@ -51,11 +57,13 @@ export const farmOfferService = {
           phone: data.phone,
           email: data.email,
           location: data.location,
-          area_hectares: data.areaHectares,
-          current_crop_type: data.currentCropType,
+          current_crop_type: data.treeType,
+          tree_count: data.treeCount,
           has_legal_docs: data.hasLegalDocs,
-          additional_notes: data.additionalNotes,
-          status: 'submitted'
+          offer_type: data.offerType,
+          proposed_price: data.proposedPrice,
+          partnership_acknowledgment: data.partnershipAcknowledgment || false,
+          additional_notes: data.additionalNotes
         }])
         .select()
         .single();

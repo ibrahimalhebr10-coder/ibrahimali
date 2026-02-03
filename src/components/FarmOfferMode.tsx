@@ -4,6 +4,7 @@ import { useOfferMode } from '../contexts/OfferModeContext';
 import { farmOfferService, type FarmOfferData, type FarmOffer } from '../services/farmOfferService';
 
 type Stage = 'intro' | 'form' | 'success';
+type OfferType = 'sale' | 'full_lease' | 'partnership';
 
 export default function FarmOfferMode() {
   const { exitOfferMode } = useOfferMode();
@@ -17,9 +18,12 @@ export default function FarmOfferMode() {
     phone: '',
     email: '',
     location: '',
-    areaHectares: 0,
-    currentCropType: '',
+    treeType: '',
+    treeCount: 0,
     hasLegalDocs: 'no',
+    offerType: 'sale',
+    proposedPrice: undefined,
+    partnershipAcknowledgment: false,
     additionalNotes: ''
   });
 
@@ -43,6 +47,12 @@ export default function FarmOfferMode() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.offerType === 'partnership' && !formData.partnershipAcknowledgment) {
+      alert('يجب الموافقة على إقرار المشاركة للمتابعة');
+      return;
+    }
+
     setLoading(true);
 
     const result = await farmOfferService.submitOffer(formData);
@@ -61,6 +71,15 @@ export default function FarmOfferMode() {
     exitOfferMode();
   };
 
+  const handleOfferTypeChange = (type: OfferType) => {
+    setFormData({
+      ...formData,
+      offerType: type,
+      proposedPrice: undefined,
+      partnershipAcknowledgment: type === 'partnership' ? false : undefined
+    });
+  };
+
   if (stage === 'intro') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-amber-50 flex items-center justify-center p-4">
@@ -70,7 +89,7 @@ export default function FarmOfferMode() {
           </div>
 
           <h1 className="text-4xl font-bold text-gray-800 mb-6">
-            نحن نبحث عن مزارع استثنائية
+            نستقبل عروض المزارع
           </h1>
 
           <p className="text-xl text-gray-600 mb-8">
@@ -102,7 +121,7 @@ export default function FarmOfferMode() {
               </div>
 
               <h1 className="text-4xl font-bold text-gray-800 mb-4">
-                تم استلام عرضك بنجاح
+                تم استلام عرض مزرعتك بنجاح
               </h1>
 
               <div className="inline-block bg-green-100 px-6 py-3 rounded-full mb-6">
@@ -114,86 +133,15 @@ export default function FarmOfferMode() {
               <div className="h-px bg-gradient-to-r from-transparent via-green-300 to-transparent my-8"></div>
             </div>
 
-            <div className="mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                <FileText className="w-6 h-6 text-green-600" />
-                ما التالي؟
-              </h2>
-
-              <div className="space-y-4">
-                <div className="flex gap-4 p-4 bg-green-50 rounded-xl">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center font-bold">
-                      1
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 mb-1">المراجعة الأولية</h3>
-                    <p className="text-sm text-gray-600">⏱️ 2-3 أيام عمل</p>
-                    <p className="text-sm text-gray-700 mt-1">سنراجع بياناتك الأولية</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 p-4 bg-amber-50 rounded-xl">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold">
-                      2
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 mb-1">التواصل الأولي</h3>
-                    <p className="text-sm text-gray-600">📞 إن استوفيت المعايير الأولية</p>
-                    <p className="text-sm text-gray-700 mt-1">سنتصل بك لتحديد موعد الزيارة</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 p-4 bg-blue-50 rounded-xl">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
-                      3
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 mb-1">الزيارة الميدانية</h3>
-                    <p className="text-sm text-gray-600">👨‍🌾 تقييم شامل للمزرعة</p>
-                    <p className="text-sm text-gray-700 mt-1">تتم بالتنسيق معك</p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4 p-4 bg-green-50 rounded-xl">
-                  <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center font-bold">
-                      4
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 mb-1">القرار النهائي</h3>
-                    <p className="text-sm text-gray-600">🤝 قبول أو رفض مع الأسباب</p>
-                    <p className="text-sm text-gray-700 mt-1">شفافية كاملة في القرار</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="h-px bg-gradient-to-r from-transparent via-green-300 to-transparent my-8"></div>
-
-            <div className="bg-green-50 rounded-xl p-6 mb-8">
-              <h3 className="font-bold text-gray-800 mb-4 text-center">💌 ستصلك رسالة تأكيد على:</h3>
-              <div className="flex justify-center gap-8">
-                <div className="text-center">
-                  <Mail className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-700">البريد الإلكتروني</p>
-                </div>
-                <div className="text-center">
-                  <Phone className="w-6 h-6 text-green-600 mx-auto mb-2" />
-                  <p className="text-sm text-gray-700">رقم الهاتف (WhatsApp)</p>
-                </div>
-              </div>
+            <div className="bg-blue-50 border-r-4 border-blue-500 rounded-lg p-6 mb-8">
+              <p className="text-base text-gray-800 leading-relaxed">
+                في حال القبول المبدئي، سيتم التواصل معك هاتفيًا بعد اعتماد الإدارة.
+              </p>
             </div>
 
             <div className="bg-amber-50 border-r-4 border-amber-500 rounded-lg p-4 mb-8">
               <p className="text-sm text-gray-700">
-                💡 <span className="font-bold">نصيحة:</span> احتفظ برقم المرجع للمتابعة
+                <span className="font-bold">ملاحظة مهمة:</span> احتفظ برقم المرجع للمتابعة
               </p>
             </div>
 
@@ -243,47 +191,25 @@ export default function FarmOfferMode() {
             </div>
 
             <h1 className="text-4xl font-bold text-gray-800 mb-4">
-              هل تملك مزرعة استثنائية؟
+              اعرض مزرعتك
             </h1>
 
-            <p className="text-xl text-gray-600 mb-2">
-              نحن نبحث عن شركاء زراعيين متميزين
+            <p className="text-xl text-gray-600 mb-4">
+              نستقبل عروض مزارع للبيع، الإيجار الكامل، أو المشاركة
             </p>
-            <p className="text-lg text-gray-500">
-              لإضافتهم إلى منصة FARMVEST
-            </p>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6 max-w-2xl mx-auto">
+              <p className="text-sm text-gray-700 leading-relaxed">
+                جميع العروض يتم تقييمها من الإدارة، ولا يترتب عليها أي التزام حتى القبول المبدئي.
+              </p>
+            </div>
 
             <div className="h-px bg-gradient-to-r from-transparent via-green-300 to-transparent my-8"></div>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-green-50 p-4 rounded-xl text-center">
-              <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-              <p className="text-sm font-medium text-gray-700">معايير صارمة للجودة</p>
-            </div>
-            <div className="bg-green-50 p-4 rounded-xl text-center">
-              <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-              <p className="text-sm font-medium text-gray-700">عقود شفافة وعادلة</p>
-            </div>
-            <div className="bg-green-50 p-4 rounded-xl text-center">
-              <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-              <p className="text-sm font-medium text-gray-700">شراكة طويلة الأمد</p>
-            </div>
-          </div>
-
-          <div className="bg-amber-50 border-r-4 border-amber-500 rounded-lg p-6 mb-8">
-            <h3 className="font-bold text-gray-800 mb-4">⚠️ ملاحظة مهمة:</h3>
-            <div className="space-y-2 text-sm text-gray-700">
-              <p>• نقبل حالياً <span className="font-bold text-green-700">مزارع محدودة</span> فقط هذا الربع</p>
-              {acceptanceStats.total > 0 && (
-                <p>• معدل القبول: <span className="font-bold text-green-700">{acceptanceStats.rate.toFixed(0)}%</span> من الطلبات</p>
-              )}
-            </div>
-          </div>
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-4">📝 نموذج التقديم الأولي</h2>
+              <h2 className="text-2xl font-bold text-gray-800 mb-4">نموذج التقديم</h2>
             </div>
 
             <div>
@@ -335,7 +261,7 @@ export default function FarmOfferMode() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                موقع المزرعة (المدينة/المنطقة) *
+                موقع المزرعة (المنطقة / المدينة) *
               </label>
               <div className="relative">
                 <MapPin className="absolute right-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -352,42 +278,42 @@ export default function FarmOfferMode() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                المساحة الإجمالية (هكتار) *
-              </label>
-              <input
-                type="number"
-                required
-                min="0"
-                step="0.1"
-                value={formData.areaHectares || ''}
-                onChange={(e) => setFormData({ ...formData, areaHectares: parseFloat(e.target.value) || 0 })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                placeholder="مثال: 10"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                نوع الزراعة الحالية
+                نوع الأشجار *
               </label>
               <select
-                value={formData.currentCropType}
-                onChange={(e) => setFormData({ ...formData, currentCropType: e.target.value })}
+                required
+                value={formData.treeType}
+                onChange={(e) => setFormData({ ...formData, treeType: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
               >
-                <option value="">اختر نوع الزراعة</option>
+                <option value="">اختر نوع الأشجار</option>
                 <option value="زيتون">زيتون</option>
                 <option value="نخيل">نخيل</option>
                 <option value="حمضيات">حمضيات</option>
-                <option value="خضروات">خضروات</option>
-                <option value="محاصيل حقلية">محاصيل حقلية</option>
+                <option value="تفاح">تفاح</option>
+                <option value="رمان">رمان</option>
                 <option value="أخرى">أخرى</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                هل تملك توثيق قانوني كامل؟ *
+                عدد الأشجار *
+              </label>
+              <input
+                type="number"
+                required
+                min="1"
+                value={formData.treeCount || ''}
+                onChange={(e) => setFormData({ ...formData, treeCount: parseInt(e.target.value) || 0 })}
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                placeholder="مثال: 500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                حالة المزرعة (التوثيق القانوني) *
               </label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
@@ -399,18 +325,7 @@ export default function FarmOfferMode() {
                     onChange={(e) => setFormData({ ...formData, hasLegalDocs: e.target.value as 'yes' | 'no' | 'partial' })}
                     className="w-4 h-4 text-green-600 focus:ring-green-500"
                   />
-                  <span className="text-sm text-gray-700">نعم</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="hasLegalDocs"
-                    value="no"
-                    checked={formData.hasLegalDocs === 'no'}
-                    onChange={(e) => setFormData({ ...formData, hasLegalDocs: e.target.value as 'yes' | 'no' | 'partial' })}
-                    className="w-4 h-4 text-green-600 focus:ring-green-500"
-                  />
-                  <span className="text-sm text-gray-700">لا</span>
+                  <span className="text-sm text-gray-700">مكتملة</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -421,10 +336,115 @@ export default function FarmOfferMode() {
                     onChange={(e) => setFormData({ ...formData, hasLegalDocs: e.target.value as 'yes' | 'no' | 'partial' })}
                     className="w-4 h-4 text-green-600 focus:ring-green-500"
                   />
-                  <span className="text-sm text-gray-700">جزئي</span>
+                  <span className="text-sm text-gray-700">جزئية</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="hasLegalDocs"
+                    value="no"
+                    checked={formData.hasLegalDocs === 'no'}
+                    onChange={(e) => setFormData({ ...formData, hasLegalDocs: e.target.value as 'yes' | 'no' | 'partial' })}
+                    className="w-4 h-4 text-green-600 focus:ring-green-500"
+                  />
+                  <span className="text-sm text-gray-700">غير موثقة</span>
                 </label>
               </div>
             </div>
+
+            <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent my-6"></div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-3">
+                نوع العرض *
+              </label>
+              <div className="space-y-3">
+                <label className="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-500 transition-all">
+                  <input
+                    type="radio"
+                    name="offerType"
+                    value="sale"
+                    checked={formData.offerType === 'sale'}
+                    onChange={() => handleOfferTypeChange('sale')}
+                    className="w-5 h-5 text-green-600 focus:ring-green-500 mt-0.5"
+                  />
+                  <div>
+                    <span className="text-base font-medium text-gray-800">بيع</span>
+                    <p className="text-sm text-gray-600 mt-1">بيع المزرعة بالكامل</p>
+                  </div>
+                </label>
+
+                <label className="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-500 transition-all">
+                  <input
+                    type="radio"
+                    name="offerType"
+                    value="full_lease"
+                    checked={formData.offerType === 'full_lease'}
+                    onChange={() => handleOfferTypeChange('full_lease')}
+                    className="w-5 h-5 text-green-600 focus:ring-green-500 mt-0.5"
+                  />
+                  <div>
+                    <span className="text-base font-medium text-gray-800">إيجار كامل</span>
+                    <p className="text-sm text-gray-600 mt-1">تأجير المزرعة بالكامل</p>
+                  </div>
+                </label>
+
+                <label className="flex items-start gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-500 transition-all">
+                  <input
+                    type="radio"
+                    name="offerType"
+                    value="partnership"
+                    checked={formData.offerType === 'partnership'}
+                    onChange={() => handleOfferTypeChange('partnership')}
+                    className="w-5 h-5 text-green-600 focus:ring-green-500 mt-0.5"
+                  />
+                  <div>
+                    <span className="text-base font-medium text-gray-800">مشاركة</span>
+                    <p className="text-sm text-gray-600 mt-1">الدخول في شراكة مع المنصة</p>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            {(formData.offerType === 'sale' || formData.offerType === 'full_lease') && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  السعر المقترح (ريال سعودي) *
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  value={formData.proposedPrice || ''}
+                  onChange={(e) => setFormData({ ...formData, proposedPrice: parseFloat(e.target.value) || undefined })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                  placeholder={formData.offerType === 'sale' ? 'مثال: 500000' : 'مثال: 50000 (سنوياً)'}
+                />
+              </div>
+            )}
+
+            {formData.offerType === 'partnership' && (
+              <div className="space-y-4">
+                <div className="bg-blue-50 border-r-4 border-blue-500 rounded-lg p-4">
+                  <p className="text-sm font-medium text-gray-800">
+                    نسبة المشاركة المعتمدة: 30% من إيرادات إيجارات المزارعين والمستثمرين
+                  </p>
+                </div>
+
+                <label className="flex items-start gap-3 p-4 border-2 border-green-200 bg-green-50 rounded-xl cursor-pointer">
+                  <input
+                    type="checkbox"
+                    required
+                    checked={formData.partnershipAcknowledgment || false}
+                    onChange={(e) => setFormData({ ...formData, partnershipAcknowledgment: e.target.checked })}
+                    className="w-5 h-5 text-green-600 focus:ring-green-500 rounded mt-0.5"
+                  />
+                  <span className="text-sm text-gray-800 leading-relaxed">
+                    أقر بأن مشاركتي تقتصر على العائد المالي من إيرادات الإيجارات فقط، وأن التشغيل والإدارة بالكامل للمنصة.
+                  </span>
+                </label>
+              </div>
+            )}
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -439,22 +459,16 @@ export default function FarmOfferMode() {
               />
             </div>
 
-            <div className="bg-blue-50 border-r-4 border-blue-500 rounded-lg p-4">
-              <p className="text-sm text-gray-700">
-                ⚠️ <span className="font-bold">ملاحظة:</span> هذا تقديم أولي فقط. سيتم التواصل معك لترتيب زيارة ميدانية إن استوفيت المعايير الأولية.
-              </p>
-            </div>
-
             <button
               type="submit"
               disabled={loading}
               className="w-full bg-gradient-to-l from-green-600 to-green-700 text-white py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'جاري الإرسال...' : 'تقديم العرض الآن'}
+              {loading ? 'جاري الإرسال...' : 'تقديم العرض'}
             </button>
 
             <p className="text-center text-sm text-gray-500">
-              🔒 بياناتك محمية ولن تُستخدم إلا للتقييم
+              بياناتك محمية ولن تُستخدم إلا للتقييم
             </p>
           </form>
         </div>
