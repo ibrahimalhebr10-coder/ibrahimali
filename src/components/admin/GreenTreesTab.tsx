@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Calendar, FileText, Image, Video, DollarSign, Edit, Trash2, Eye, Save, X, Link, Unlink, Package } from 'lucide-react';
 import { operationsService, MaintenanceFullDetails, MaintenanceStage, MaintenanceMedia, GroupedFeeWithRecords } from '../../services/operationsService';
+import MaintenanceRecordWizard from './MaintenanceRecordWizard';
 
 export default function GreenTreesTab() {
   const [records, setRecords] = useState<MaintenanceFullDetails[]>([]);
@@ -82,22 +83,16 @@ export default function GreenTreesTab() {
     }
   };
 
-  const handleCreateRecord = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreateRecord = async (data: any) => {
     try {
-      await operationsService.createMaintenanceRecord(formData);
-      alert('تم إنشاء سجل الصيانة بنجاح');
+      await operationsService.createFullMaintenanceRecord(data);
+      alert('تم إنشاء سجل الصيانة بنجاح مع جميع التفاصيل');
       setShowAddForm(false);
-      setFormData({
-        farm_id: '',
-        maintenance_type: 'periodic',
-        maintenance_date: new Date().toISOString().split('T')[0],
-        status: 'draft'
-      });
       loadData();
     } catch (error) {
       console.error('Error creating record:', error);
       alert('خطأ في إنشاء السجل');
+      throw error;
     }
   };
 
@@ -353,80 +348,11 @@ export default function GreenTreesTab() {
       </div>
 
       {showAddForm && !selectedRecord && (
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-          <h4 className="text-lg font-bold text-gray-900 mb-6">إنشاء سجل صيانة جديد</h4>
-          <form onSubmit={handleCreateRecord} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">المزرعة *</label>
-              <select
-                value={formData.farm_id}
-                onChange={(e) => setFormData({ ...formData, farm_id: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                required
-              >
-                <option value="">اختر المزرعة</option>
-                {farms.map(farm => (
-                  <option key={farm.id} value={farm.id}>
-                    {farm.name_ar} ({farm.total_trees} شجرة)
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">نوع الصيانة *</label>
-              <select
-                value={formData.maintenance_type}
-                onChange={(e) => setFormData({ ...formData, maintenance_type: e.target.value as any })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option value="periodic">دورية</option>
-                <option value="seasonal">موسمية</option>
-                <option value="emergency">طارئة</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">تاريخ الصيانة *</label>
-              <input
-                type="date"
-                value={formData.maintenance_date}
-                onChange={(e) => setFormData({ ...formData, maintenance_date: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">الحالة *</label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option value="draft">مسودة</option>
-                <option value="published">منشور</option>
-                <option value="completed">مكتمل</option>
-              </select>
-            </div>
-
-            <div className="flex gap-3 pt-4">
-              <button
-                type="submit"
-                className="flex-1 bg-green-600 text-white py-3 rounded-xl hover:bg-green-700 transition-colors"
-              >
-                إنشاء السجل
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowAddForm(false)}
-                className="px-6 bg-gray-200 text-gray-700 py-3 rounded-xl hover:bg-gray-300 transition-colors"
-              >
-                إلغاء
-              </button>
-            </div>
-          </form>
-        </div>
+        <MaintenanceRecordWizard
+          farms={farms}
+          onSubmit={handleCreateRecord}
+          onCancel={() => setShowAddForm(false)}
+        />
       )}
 
       {!selectedRecord ? (

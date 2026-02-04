@@ -449,5 +449,60 @@ export const operationsService = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  async createFullMaintenanceRecord(data: {
+    farm_id: string;
+    maintenance_type: 'periodic' | 'seasonal' | 'emergency';
+    maintenance_date: string;
+    status: 'draft' | 'published' | 'completed';
+    stages: Array<{
+      stage_title: string;
+      stage_note: string;
+      stage_date: string;
+    }>;
+    mediaFiles: Array<{
+      file: File;
+      type: 'image' | 'video';
+    }>;
+    total_amount?: string;
+  }) {
+    const record = await this.createMaintenanceRecord({
+      farm_id: data.farm_id,
+      maintenance_type: data.maintenance_type,
+      maintenance_date: data.maintenance_date,
+      status: data.status
+    });
+
+    const maintenanceId = record.id;
+
+    if (data.stages.length > 0) {
+      await Promise.all(
+        data.stages.map(stage =>
+          this.createMaintenanceStage({
+            maintenance_id: maintenanceId,
+            ...stage
+          })
+        )
+      );
+    }
+
+    if (data.mediaFiles.length > 0) {
+      await Promise.all(
+        data.mediaFiles.map(media =>
+          this.uploadMaintenanceMedia(media.file, maintenanceId, media.type)
+        )
+      );
+    }
+
+    if (data.total_amount && parseFloat(data.total_amount) > 0) {
+      await this.createMaintenanceFee({
+        maintenance_id: maintenanceId,
+        farm_id: data.farm_id,
+        total_amount: parseFloat(data.total_amount)
+      });
+    }
+
+    return record;
   }
 };
