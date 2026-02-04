@@ -1,13 +1,14 @@
-import { Sprout, Plus, Home } from 'lucide-react';
+import { Sprout, Plus, Home, Sparkles } from 'lucide-react';
 import { type IdentityType } from '../services/identityService';
 
 interface FooterProps {
   identity: IdentityType;
   onMyFarmClick: () => void;
   onOfferFarmClick: () => void;
+  onGoldenTreesClick: () => void;
 }
 
-export default function Footer({ identity, onMyFarmClick, onOfferFarmClick }: FooterProps) {
+export default function Footer({ identity, onMyFarmClick, onOfferFarmClick, onGoldenTreesClick }: FooterProps) {
   const isAgricultural = identity === 'agricultural';
 
   const color = isAgricultural ? '#3aa17e' : '#d4af37';
@@ -34,6 +35,29 @@ export default function Footer({ identity, onMyFarmClick, onOfferFarmClick }: Fo
           >
             <Home className="w-6 h-6" />
             <span>{buttonLabel}</span>
+          </button>
+
+          {/* زر أشجاري الذهبية - تجربة استثمارية فخمة */}
+          <button
+            onClick={onGoldenTreesClick}
+            className="group relative w-full py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 overflow-hidden border-2"
+            style={{
+              background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%)',
+              borderColor: '#DAA520',
+              color: '#000'
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
+
+            <div className="relative flex items-center justify-center gap-3">
+              <Sparkles className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" style={{ color: '#B8860B' }} />
+              <span className="group-hover:scale-105 transition-transform duration-300">أشجاري الذهبية</span>
+            </div>
+
+            <div className="absolute inset-0 pointer-events-none">
+              <div className="absolute top-2 right-4 w-2 h-2 bg-white/40 rounded-full animate-pulse"></div>
+              <div className="absolute bottom-3 left-6 w-1.5 h-1.5 bg-white/30 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+            </div>
           </button>
 
           {/* زر اعرض مزرعتك - الجديد الذهبي */}

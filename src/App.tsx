@@ -9,6 +9,7 @@ import StandaloneAccountRegistration from './components/StandaloneAccountRegistr
 import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
 import MyReservations from './components/MyReservations';
 import MyGreenTrees from './components/MyGreenTrees';
+import AshjariGoldExperience from './components/AshjariGoldExperience';
 import MaintenancePaymentPage from './components/MaintenancePaymentPage';
 import MaintenancePaymentResult from './components/MaintenancePaymentResult';
 import Header from './components/Header';
@@ -52,6 +53,7 @@ function AppContent() {
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
   const [showMyGreenTrees, setShowMyGreenTrees] = useState(false);
+  const [showAshjariGold, setShowAshjariGold] = useState(false);
   const [showMaintenancePayment, setShowMaintenancePayment] = useState(false);
   const [selectedMaintenanceId, setSelectedMaintenanceId] = useState<string | null>(null);
   const [showPaymentResult, setShowPaymentResult] = useState(false);
@@ -458,6 +460,15 @@ function AppContent() {
     }
 
     setShowMyGreenTrees(true);
+  };
+
+  const handleGoldenTreesClick = () => {
+    if (!user) {
+      enterDemoMode('golden');
+    } else if (isDemoMode) {
+      exitDemoMode();
+    }
+    setShowAshjariGold(true);
   };
 
   const handleOfferFarmClick = () => {
@@ -993,6 +1004,32 @@ function AppContent() {
           </button>
 
           <button
+            onClick={handleGoldenTreesClick}
+            className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%)',
+              boxShadow: '0 6px 16px rgba(255,215,0,0.4), inset 0 2px 4px rgba(255,255,255,0.9)',
+              border: '2px solid #DAA520'
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.boxShadow = '0 10px 28px rgba(255,215,0,0.6), inset 0 2px 4px rgba(255,255,255,0.9)';
+              e.currentTarget.style.transform = 'scale(1.08)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.boxShadow = '0 6px 16px rgba(255,215,0,0.4), inset 0 2px 4px rgba(255,255,255,0.9)';
+              e.currentTarget.style.transform = 'scale(1)';
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
+            <Sparkles className="w-6 h-6 relative transition-transform duration-300 group-hover:rotate-12" style={{ color: '#B8860B' }} />
+            <span className="text-sm font-bold relative" style={{ color: '#000' }}>أشجاري الذهبية</span>
+            <div className="absolute top-2 left-3 w-2 h-2 rounded-full animate-pulse" style={{
+              background: 'rgba(255, 255, 255, 0.6)',
+              boxShadow: '0 0 8px rgba(255,255,255,0.8)'
+            }}></div>
+          </button>
+
+          <button
             onClick={handleMyFarmClick}
             className="flex flex-col items-center gap-2 px-8 py-4 rounded-3xl transition-all duration-300 hover:scale-105 group relative"
             style={{
@@ -1125,6 +1162,31 @@ function AppContent() {
               />
             </div>
             <span className="text-[9px] font-bold text-darkgreen/70">المساعد</span>
+          </button>
+
+          <button
+            onClick={handleGoldenTreesClick}
+            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
+          >
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 relative group-active:scale-90 overflow-hidden"
+              style={{
+                background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 50%, #FFD700 100%)',
+                boxShadow: '0 6px 16px rgba(255,215,0,0.5), inset 0 2px 4px rgba(255,255,255,0.9)',
+                border: '2px solid #DAA520'
+              }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
+              <Sparkles className="w-5 h-5 relative transition-all duration-300 group-active:rotate-12" style={{ color: '#B8860B' }} />
+              <div
+                className="absolute top-1 left-1 w-2 h-2 rounded-full animate-pulse"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.6)',
+                  boxShadow: '0 0 6px rgba(255,255,255,0.8)'
+                }}
+              />
+            </div>
+            <span className="text-[9px] font-bold" style={{ color: '#B8860B' }}>ذهبية</span>
           </button>
 
           <button
@@ -1302,6 +1364,28 @@ function AppContent() {
               }
             }}
           />
+        </div>
+      )}
+
+      {showAshjariGold && (
+        <div className="fixed inset-0 z-50 overflow-auto" style={{
+          background: 'linear-gradient(135deg, #FFF8DC 0%, #FFE4B5 100%)'
+        }}>
+          <button
+            onClick={() => {
+              setShowAshjariGold(false);
+              if (isDemoMode) {
+                exitDemoMode();
+              }
+            }}
+            className="fixed top-4 left-4 z-50 w-12 h-12 rounded-full shadow-xl flex items-center justify-center hover:scale-110 transition-all"
+            style={{
+              background: 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'
+            }}
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+          <AshjariGoldExperience />
         </div>
       )}
 
