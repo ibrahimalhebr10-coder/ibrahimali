@@ -501,20 +501,22 @@ export const operationsService = {
 
     if (data.stages.length > 0) {
       await Promise.all(
-        data.stages.map(stage =>
-          this.createMaintenanceStage({
+        data.stages.map(stage => {
+          const { id, ...stageData } = stage as any;
+          return this.createMaintenanceStage({
             maintenance_id: maintenanceId,
-            ...stage
-          })
-        )
+            ...stageData
+          });
+        })
       );
     }
 
     if (data.mediaFiles.length > 0) {
       await Promise.all(
-        data.mediaFiles.map(media =>
-          this.uploadMaintenanceMedia(media.file, maintenanceId, media.type)
-        )
+        data.mediaFiles.map(media => {
+          const { id, preview, ...mediaData } = media as any;
+          return this.uploadMaintenanceMedia(mediaData.file, maintenanceId, mediaData.type);
+        })
       );
     }
 
