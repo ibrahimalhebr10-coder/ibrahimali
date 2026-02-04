@@ -17,6 +17,14 @@ export default function DemoActionModal({ onClose, onLogin, onRegister }: DemoAc
     ? 'linear-gradient(135deg, #3aa17e 0%, #2f8266 100%)'
     : 'linear-gradient(135deg, #d4af37 0%, #b8942f 100%)';
 
+  const title = isGreen ? 'هذه خطوة حقيقية' : 'هذه خطوة استثمارية حقيقية';
+  const description1 = isGreen
+    ? 'لتصبح رحلتك فعلية، سجّل دخولك'
+    : 'دخولك يفتح لك التفاصيل والتنفيذ';
+  const description2 = isGreen
+    ? 'وستنتقل من التجربة إلى الواقع'
+    : 'وتصبح جزءاً من هذا الأصل';
+
   return (
     <div className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
       <div
@@ -38,16 +46,16 @@ export default function DemoActionModal({ onClose, onLogin, onRegister }: DemoAc
           className="text-2xl font-bold mb-3"
           style={{ color }}
         >
-          هذه خطوة حقيقية
+          {title}
         </h2>
 
         {/* Description */}
         <div className="bg-gray-50 rounded-2xl p-6 mb-6 text-right">
           <p className="text-gray-700 leading-relaxed">
-            لتصبح رحلتك <span className="font-bold">فعلية</span>، سجّل دخولك
+            {description1}
           </p>
           <p className="text-gray-600 leading-relaxed mt-2">
-            وستنتقل من التجربة إلى الواقع
+            {description2}
           </p>
         </div>
 

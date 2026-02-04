@@ -111,10 +111,10 @@ export const getDemoGreenTreesData = () => {
 
 export const getDemoGoldenTreesData = () => {
   return {
-    farmName: 'مزرعة النخيل الاستثمارية',
-    farmNickname: 'استثماري الذهبي',
+    farmName: 'محفظة النخيل الاستثمارية',
+    farmNickname: 'أصلي الذهبي',
     treeCount: 50,
-    treeType: 'نخيل',
+    treeType: 'نخيل مجدول',
     contractStartDate: '2024-01-01',
     contractDuration: 10,
     totalInvested: 75000,
@@ -122,40 +122,26 @@ export const getDemoGoldenTreesData = () => {
     roi: 10,
     expectedAnnualReturn: 15,
     nextDividendDate: '2025-01-01',
-    maintenanceRecords: [
-      {
-        id: 'demo-inv-m1',
-        maintenance_type: 'periodic',
-        maintenance_date: '2024-11-01',
-        status: 'published',
-        description: 'صيانة دورية متقدمة',
-        cost_per_tree: 80,
-        total_amount: 4000,
-        client_tree_count: 50,
-        client_due_amount: 4000,
-        payment_status: 'pending',
-        images: [
-          'https://images.pexels.com/photos/2933243/pexels-photo-2933243.jpeg'
-        ],
-        videos: []
-      },
-      {
-        id: 'demo-inv-m2',
-        maintenance_type: 'pruning',
-        maintenance_date: '2024-10-01',
-        status: 'published',
-        description: 'تقليم وتشذيب',
-        cost_per_tree: 60,
-        total_amount: 3000,
-        client_tree_count: 50,
-        client_due_amount: 3000,
-        payment_status: 'paid',
-        images: [
-          'https://images.pexels.com/photos/1327838/pexels-photo-1327838.jpeg'
-        ],
-        videos: []
-      }
-    ],
+    heroMessage: {
+      title: 'هنا تتحول الأشجار إلى أصول',
+      subtitle: 'والوقت إلى قيمة',
+      cta: 'استكشف التجربة'
+    },
+    assetStatus: {
+      condition: 'نشط ومستقر',
+      performance: 'نمو متدرج',
+      diversification: 'منتجات متعددة'
+    },
+    valueInsights: {
+      statement: 'القيمة لا تأتي من مصدر واحد',
+      sources: [
+        { name: 'التمور الفاخرة', contribution: 'عائد موسمي' },
+        { name: 'المنتجات الثانوية', contribution: 'دخل إضافي' },
+        { name: 'النمو العضوي', contribution: 'تقدير قيمة' }
+      ]
+    },
+    historicalNote: 'هذا الأصل حقق عوائد مستقرة خلال مواسم سابقة',
+    maintenanceRecords: [],
     analytics: {
       monthlyGrowth: [
         { month: 'يناير', value: 72000 },

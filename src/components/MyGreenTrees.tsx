@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useDemoMode } from '../contexts/DemoModeContext';
 import { getDemoGreenTreesData, getDemoGoldenTreesData, sortMaintenanceRecordsByPriority, getMaintenanceTypeLabel } from '../services/demoDataService';
 import DemoActionModal from './DemoActionModal';
+import InvestmentAssetsView from './InvestmentAssetsView';
 
 interface MyGreenTreesProps {
   onNavigateToPayment?: (maintenanceId: string) => void;
@@ -474,6 +475,10 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
   }
 
   const isAgricultural = identity === 'agricultural';
+
+  if (!isAgricultural || (isDemoMode && demoType === 'gold')) {
+    return <InvestmentAssetsView onShowAuth={onShowAuth} />;
+  }
 
   return (
     <div
