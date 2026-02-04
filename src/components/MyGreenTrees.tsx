@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Sprout, Calendar, DollarSign, Image as ImageIcon, Video, CheckCircle, AlertCircle, Eye, X, Play } from 'lucide-react';
+import { Sprout, Calendar, DollarSign, Image as ImageIcon, Video, CheckCircle, AlertCircle, Eye, X, Play, Heart } from 'lucide-react';
 import { clientMaintenanceService, ClientMaintenanceRecord, MaintenanceDetails } from '../services/clientMaintenanceService';
 import { useAuth } from '../contexts/AuthContext';
 import { useDemoMode } from '../contexts/DemoModeContext';
-import { getDemoGreenTreesData, getDemoGoldenTreesData } from '../services/demoDataService';
+import { getDemoGreenTreesData, getDemoGoldenTreesData, sortMaintenanceRecordsByPriority, getMaintenanceTypeLabel } from '../services/demoDataService';
 import DemoActionModal from './DemoActionModal';
 
 interface MyGreenTreesProps {
@@ -21,6 +21,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
   const [showDemoActionModal, setShowDemoActionModal] = useState(false);
+  const [generalStatus, setGeneralStatus] = useState<any>(null);
 
   const loadingRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -47,7 +48,9 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
           ? getDemoGreenTreesData()
           : getDemoGoldenTreesData();
 
-        const demoRecords: ClientMaintenanceRecord[] = demoData.maintenanceRecords.map((record: any) => ({
+        setGeneralStatus(demoData.generalStatus || null);
+
+        let demoRecords: ClientMaintenanceRecord[] = demoData.maintenanceRecords.map((record: any) => ({
           maintenance_id: record.id,
           farm_id: 'demo-farm-id',
           farm_name: demoData.farmName,
@@ -62,6 +65,10 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
           payment_id: record.payment_status === 'paid' ? 'demo-payment-id' : null
         }));
 
+        if (demoType === 'green') {
+          demoRecords = sortMaintenanceRecordsByPriority(demoRecords);
+        }
+
         setRecords(demoRecords);
         setLoading(false);
         return;
@@ -69,7 +76,12 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
 
       const pathType = identity === 'agricultural' ? 'agricultural' : 'investment';
       const data = await clientMaintenanceService.getClientMaintenanceRecords(pathType);
-      setRecords(data);
+
+      if (identity === 'agricultural') {
+        setRecords(sortMaintenanceRecordsByPriority(data));
+      } else {
+        setRecords(data);
+      }
     } catch (error) {
       console.error('Error loading maintenance records:', error);
       alert('خطأ في تحميل بيانات الصيانة');
@@ -186,12 +198,18 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
   };
 
   const getTypeBadge = (type: string) => {
-    const colors = {
+    const colors: Record<string, string> = {
+      pruning: 'bg-green-100 text-green-800',
+      fertilization: 'bg-emerald-100 text-emerald-800',
+      irrigation: 'bg-blue-100 text-blue-800',
+      pest_control: 'bg-amber-100 text-amber-800',
+      seasonal_pruning: 'bg-teal-100 text-teal-800',
+      soil_improvement: 'bg-brown-100 text-brown-800',
       periodic: 'bg-emerald-100 text-emerald-800',
       seasonal: 'bg-amber-100 text-amber-800',
       emergency: 'bg-rose-100 text-rose-800'
     };
-    return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800';
+    return colors[type] || 'bg-gray-100 text-gray-800';
   };
 
   const closeDetails = useCallback(() => {
@@ -485,6 +503,28 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
           <p className="text-xl text-gray-600">تابع صيانة أشجارك وتحديثات المزرعة</p>
         </div>
 
+        {generalStatus && isAgricultural && (
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl shadow-lg p-8 mb-8 border-2 border-green-200">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Heart className="w-8 h-8 text-green-600" />
+              <h2 className="text-2xl font-bold text-green-900">{generalStatus.overall}</h2>
+            </div>
+            <p className="text-xl text-center text-green-800 font-semibold mb-3">
+              {generalStatus.message}
+            </p>
+            <div className="flex items-center justify-center gap-6 text-sm text-green-700">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span>الصحة: {generalStatus.healthLevel}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                <span>{generalStatus.careStage}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         {records.length === 0 ? (
           <div className="bg-white rounded-3xl shadow-xl p-12 text-center">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -506,8 +546,11 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="text-xl font-bold mb-2">{record.farm_name}</h3>
-                      <span className={`inline-block px-3 py-1 rounded-full text-sm ${getTypeBadge(record.maintenance_type)}`}>
-                        {clientMaintenanceService.getMaintenanceTypeLabel(record.maintenance_type)}
+                      <span className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${getTypeBadge(record.maintenance_type)}`}>
+                        {identity === 'agricultural'
+                          ? getMaintenanceTypeLabel(record.maintenance_type)
+                          : clientMaintenanceService.getMaintenanceTypeLabel(record.maintenance_type)
+                        }
                       </span>
                     </div>
                     <div className="text-right">

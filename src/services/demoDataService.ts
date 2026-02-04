@@ -7,18 +7,25 @@ export const getDemoGreenTreesData = () => {
     contractStartDate: '2024-06-01',
     contractDuration: 5,
     nextMaintenanceDate: '2024-12-15',
+    generalStatus: {
+      overall: 'مطمئنة',
+      message: 'أشجارك تمر بمرحلة عناية مستمرة',
+      healthLevel: 'ممتاز',
+      careStage: 'رعاية نشطة'
+    },
     maintenanceRecords: [
       {
         id: 'demo-m1',
-        maintenance_type: 'periodic',
-        maintenance_date: '2024-11-01',
+        maintenance_type: 'pruning',
+        maintenance_date: '2024-11-20',
         status: 'published',
-        description: 'صيانة دورية شاملة',
-        cost_per_tree: 50,
-        total_amount: 1250,
+        description: 'قص وتشذيب الأغصان',
+        cost_per_tree: 35,
+        total_amount: 875,
         client_tree_count: 25,
-        client_due_amount: 1250,
+        client_due_amount: 875,
         payment_status: 'pending',
+        priority: 1,
         images: [
           'https://images.pexels.com/photos/2933243/pexels-photo-2933243.jpeg'
         ],
@@ -26,39 +33,75 @@ export const getDemoGreenTreesData = () => {
       },
       {
         id: 'demo-m2',
-        maintenance_type: 'irrigation',
-        maintenance_date: '2024-10-15',
+        maintenance_type: 'fertilization',
+        maintenance_date: '2024-11-10',
         status: 'published',
-        description: 'ري وعناية',
+        description: 'تسميد عضوي متوازن',
+        cost_per_tree: 40,
+        total_amount: 1000,
+        client_tree_count: 25,
+        client_due_amount: 1000,
+        payment_status: 'paid',
+        priority: 1,
+        images: [
+          'https://images.pexels.com/photos/1112080/pexels-photo-1112080.jpeg'
+        ],
+        videos: []
+      },
+      {
+        id: 'demo-m3',
+        maintenance_type: 'irrigation',
+        maintenance_date: '2024-10-25',
+        status: 'published',
+        description: 'ري منتظم وعناية يومية',
         cost_per_tree: 30,
         total_amount: 750,
         client_tree_count: 25,
         client_due_amount: 750,
         payment_status: 'paid',
+        priority: 1,
         images: [
           'https://images.pexels.com/photos/1327838/pexels-photo-1327838.jpeg'
         ],
         videos: []
       },
       {
-        id: 'demo-m3',
-        maintenance_type: 'fertilization',
-        maintenance_date: '2024-09-20',
+        id: 'demo-m4',
+        maintenance_type: 'pest_control',
+        maintenance_date: '2024-09-15',
         status: 'published',
-        description: 'تسميد عضوي',
-        cost_per_tree: 40,
-        total_amount: 1000,
+        description: 'مكافحة الآفات الموسمية',
+        cost_per_tree: 45,
+        total_amount: 1125,
         client_tree_count: 25,
-        client_due_amount: 1000,
+        client_due_amount: 1125,
         payment_status: 'paid',
+        priority: 2,
+        images: [
+          'https://images.pexels.com/photos/2933243/pexels-photo-2933243.jpeg'
+        ],
+        videos: []
+      },
+      {
+        id: 'demo-m5',
+        maintenance_type: 'soil_improvement',
+        maintenance_date: '2024-08-20',
+        status: 'published',
+        description: 'تحسين جودة التربة',
+        cost_per_tree: 50,
+        total_amount: 1250,
+        client_tree_count: 25,
+        client_due_amount: 1250,
+        payment_status: 'paid',
+        priority: 2,
         images: [
           'https://images.pexels.com/photos/1112080/pexels-photo-1112080.jpeg'
         ],
         videos: []
       }
     ],
-    totalPaid: 1750,
-    totalPending: 1250,
+    totalPaid: 4125,
+    totalPending: 875,
     nextPaymentDue: '2024-12-10',
     growthProgress: 45,
     healthStatus: 'ممتاز',
@@ -163,4 +206,47 @@ export const isDemoAction = (action: string): boolean => {
   ];
 
   return demoActions.includes(action.toLowerCase());
+};
+
+export const getMaintenanceTypePriority = (type: string): number => {
+  const priorities: Record<string, number> = {
+    'pruning': 1,
+    'fertilization': 2,
+    'irrigation': 3,
+    'pest_control': 4,
+    'seasonal_pruning': 5,
+    'soil_improvement': 6,
+    'periodic': 7,
+    'emergency': 8
+  };
+
+  return priorities[type] || 99;
+};
+
+export const getMaintenanceTypeLabel = (type: string): string => {
+  const labels: Record<string, string> = {
+    'pruning': '🌿 قص',
+    'fertilization': '🌱 تسميد',
+    'irrigation': '💧 ري',
+    'pest_control': '🛡️ مكافحة آفات',
+    'seasonal_pruning': '✂️ تقليم موسمي',
+    'soil_improvement': '🌍 تحسين تربة',
+    'periodic': '🔄 صيانة دورية',
+    'emergency': '⚠️ صيانة طارئة'
+  };
+
+  return labels[type] || type;
+};
+
+export const sortMaintenanceRecordsByPriority = (records: any[]): any[] => {
+  return [...records].sort((a, b) => {
+    const priorityA = getMaintenanceTypePriority(a.maintenance_type);
+    const priorityB = getMaintenanceTypePriority(b.maintenance_type);
+
+    if (priorityA !== priorityB) {
+      return priorityA - priorityB;
+    }
+
+    return new Date(b.maintenance_date).getTime() - new Date(a.maintenance_date).getTime();
+  });
 };
