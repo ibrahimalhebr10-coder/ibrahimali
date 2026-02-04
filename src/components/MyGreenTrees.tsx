@@ -11,6 +11,7 @@ export default function MyGreenTrees() {
   const [maintenanceDetails, setMaintenanceDetails] = useState<MaintenanceDetails | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [processingPayment, setProcessingPayment] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadMaintenanceRecords();
@@ -44,7 +45,9 @@ export default function MyGreenTrees() {
   };
 
   const handleViewDetails = async (record: ClientMaintenanceRecord) => {
+    if (loadingDetails) return;
     setSelectedRecord(record.maintenance_id);
+    setMaintenanceDetails(null);
     await loadMaintenanceDetails(record.maintenance_id);
   };
 
@@ -128,6 +131,11 @@ export default function MyGreenTrees() {
   const closeDetails = () => {
     setSelectedRecord(null);
     setMaintenanceDetails(null);
+    setImageErrors(new Set());
+  };
+
+  const handleImageError = (mediaId: string) => {
+    setImageErrors(prev => new Set(prev).add(mediaId));
   };
 
   if (loading) {
@@ -173,34 +181,49 @@ export default function MyGreenTrees() {
             </div>
 
             <div className="p-8 space-y-8">
-              {maintenanceDetails.media && maintenanceDetails.media.length > 0 && (
+              {loadingDetails ? (
+                <div className="text-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-green-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">جاري تحميل التفاصيل...</p>
+                </div>
+              ) : maintenanceDetails.media && maintenanceDetails.media.length > 0 ? (
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <ImageIcon className="w-6 h-6 text-blue-600" />
-                    صور وفيديوهات
+                    صور وفيديوهات الصيانة
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {maintenanceDetails.media.map((media) => (
                       <div
                         key={media.id}
-                        className="bg-gray-50 rounded-xl overflow-hidden border border-gray-200"
+                        className="bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
                       >
                         {media.media_type === 'image' ? (
-                          <div className="aspect-video bg-gray-200 flex items-center justify-center">
-                            {media.media_url ? (
-                              <img
-                                src={media.media_url}
-                                alt="صورة الصيانة"
-                                className="w-full h-full object-cover"
-                              />
+                          <div className="aspect-video bg-gray-200 flex items-center justify-center relative group">
+                            {media.media_url && !imageErrors.has(media.id) ? (
+                              <>
+                                <img
+                                  src={media.media_url}
+                                  alt="صورة الصيانة"
+                                  className="w-full h-full object-cover"
+                                  onError={() => handleImageError(media.id)}
+                                  loading="lazy"
+                                />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all" />
+                              </>
                             ) : (
-                              <ImageIcon className="w-12 h-12 text-gray-400" />
+                              <div className="flex flex-col items-center gap-2 text-gray-400">
+                                <ImageIcon className="w-12 h-12" />
+                                <span className="text-sm">الصورة غير متوفرة</span>
+                              </div>
                             )}
                           </div>
                         ) : (
-                          <div className="aspect-video bg-gray-900 flex items-center justify-center relative">
-                            <Play className="w-16 h-16 text-white opacity-80" />
-                            <span className="absolute bottom-2 right-2 bg-black/70 text-white px-3 py-1 rounded-lg text-sm">
+                          <div className="aspect-video bg-gray-900 flex items-center justify-center relative group cursor-pointer">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Play className="w-16 h-16 text-white opacity-80 group-hover:opacity-100 transition-opacity" />
+                            </div>
+                            <span className="absolute bottom-3 right-3 bg-black/70 text-white px-3 py-1.5 rounded-lg text-sm font-semibold">
                               فيديو
                             </span>
                           </div>
@@ -209,12 +232,12 @@ export default function MyGreenTrees() {
                     ))}
                   </div>
                 </div>
-              )}
-
-              {!maintenanceDetails.media?.length && (
+              ) : (
                 <div className="text-center py-12">
-                  <AlertCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">لا توجد صور أو فيديوهات لهذه الصيانة</p>
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <AlertCircle className="w-10 h-10 text-gray-400" />
+                  </div>
+                  <p className="text-gray-600 text-lg">لا توجد صور أو فيديوهات لهذه الصيانة</p>
                 </div>
               )}
             </div>
