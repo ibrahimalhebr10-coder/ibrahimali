@@ -633,5 +633,33 @@ export const operationsService = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  async getFarmsWithPathStats() {
+    const { data, error } = await supabase.rpc('get_farms_with_path_stats');
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getFarmPathPaymentSummary(farmId: string, pathType: 'agricultural' | 'investment') {
+    const { data, error } = await supabase.rpc('get_farm_path_payment_summary', {
+      p_farm_id: farmId,
+      p_path_type: pathType
+    });
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getFarmPathPaymentsDetail(farmId: string, pathType: 'agricultural' | 'investment', statusFilter: 'all' | 'paid' | 'pending' = 'all') {
+    const { data, error } = await supabase.rpc('get_farm_path_payments_detail', {
+      p_farm_id: farmId,
+      p_path_type: pathType,
+      p_status_filter: statusFilter
+    });
+
+    if (error) throw error;
+    return data || [];
   }
 };
