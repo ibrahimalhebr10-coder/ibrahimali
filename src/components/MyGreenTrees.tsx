@@ -235,6 +235,8 @@ export default function MyGreenTrees() {
       );
     }
 
+    const currentRecord = records.find(r => r.maintenance_id === selectedRecord);
+
     return (
       <div
         key={`details-${selectedRecord}-${maintenanceDetails.id}`}
@@ -256,21 +258,113 @@ export default function MyGreenTrees() {
                 <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
                   <Sprout className="w-8 h-8" />
                 </div>
-                <div>
-                  <h1 className="text-3xl font-bold">تفاصيل الصيانة</h1>
-                  <p className="text-green-100 mt-1">
+                <div className="flex-1">
+                  <h1 className="text-3xl font-bold mb-1">تفاصيل الصيانة</h1>
+                  <p className="text-green-100">
                     {clientMaintenanceService.getMaintenanceTypeLabel(maintenanceDetails.maintenance_type)}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 text-green-100">
-                <Calendar className="w-5 h-5" />
-                <span>{maintenanceDetails.maintenance_date}</span>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center gap-2 text-green-100">
+                  <Calendar className="w-4 h-4" />
+                  <span>{maintenanceDetails.maintenance_date}</span>
+                </div>
+                <div className="flex items-center gap-2 text-green-100">
+                  <Sprout className="w-4 h-4" />
+                  <span>مزرعة {maintenanceDetails.farm_name}</span>
+                </div>
+                <div className="flex items-center gap-2 text-green-100">
+                  <Sprout className="w-4 h-4" />
+                  <span>{maintenanceDetails.client_tree_count} شجرة</span>
+                </div>
               </div>
             </div>
 
             <div className="p-8 space-y-8">
-              {maintenanceDetails.media && maintenanceDetails.media.length > 0 ? (
+              {maintenanceDetails.cost_per_tree && maintenanceDetails.maintenance_fee_id && (
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+                        <DollarSign className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900">رسوم الصيانة</h3>
+                        <p className="text-sm text-gray-600">تفاصيل التكلفة المستحقة</p>
+                      </div>
+                    </div>
+                    {maintenanceDetails.payment_status === 'paid' ? (
+                      <span className="flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-lg font-bold">
+                        <CheckCircle className="w-5 h-5" />
+                        مسدد
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-2 rounded-lg font-bold">
+                        <AlertCircle className="w-5 h-5" />
+                        غير مسدد
+                      </span>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    <div className="bg-white rounded-lg p-4">
+                      <div className="text-sm text-gray-600 mb-1">تكلفة الشجرة</div>
+                      <div className="text-2xl font-bold text-gray-900">{maintenanceDetails.cost_per_tree} ر.س</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4">
+                      <div className="text-sm text-gray-600 mb-1">عدد أشجارك</div>
+                      <div className="text-2xl font-bold text-gray-900">{maintenanceDetails.client_tree_count}</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4">
+                      <div className="text-sm text-gray-600 mb-1">المبلغ المستحق</div>
+                      <div className="text-2xl font-bold text-blue-600">{maintenanceDetails.client_due_amount} ر.س</div>
+                    </div>
+                  </div>
+                  {maintenanceDetails.payment_status === 'pending' && currentRecord && (
+                    <button
+                      onClick={() => currentRecord && handlePayFee(currentRecord)}
+                      disabled={processingPayment}
+                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <DollarSign className="w-6 h-6" />
+                      {processingPayment ? 'جاري المعالجة...' : 'سداد الرسوم الآن'}
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {maintenanceDetails.stages && maintenanceDetails.stages.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <Calendar className="w-6 h-6 text-purple-600" />
+                    مراحل الصيانة
+                  </h3>
+                  <div className="space-y-4">
+                    {maintenanceDetails.stages.map((stage, index) => (
+                      <div
+                        key={stage.id}
+                        className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-5 border border-purple-100"
+                      >
+                        <div className="flex items-start gap-4">
+                          <div className="flex-shrink-0 w-10 h-10 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold">
+                            {index + 1}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-lg font-bold text-gray-900 mb-1">{stage.stage_title}</h4>
+                            <p className="text-gray-700 mb-2">{stage.stage_note}</p>
+                            <div className="flex items-center gap-2 text-sm text-purple-600">
+                              <Calendar className="w-4 h-4" />
+                              <span>{stage.stage_date}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {maintenanceDetails.media && maintenanceDetails.media.length > 0 && (
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <ImageIcon className="w-6 h-6 text-blue-600" />
@@ -316,12 +410,15 @@ export default function MyGreenTrees() {
                     ))}
                   </div>
                 </div>
-              ) : (
+              )}
+
+              {(!maintenanceDetails.media || maintenanceDetails.media.length === 0) &&
+               (!maintenanceDetails.stages || maintenanceDetails.stages.length === 0) && (
                 <div className="text-center py-12">
                   <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <AlertCircle className="w-10 h-10 text-gray-400" />
                   </div>
-                  <p className="text-gray-600 text-lg">لا توجد صور أو فيديوهات لهذه الصيانة</p>
+                  <p className="text-gray-600 text-lg">لا توجد تفاصيل إضافية لهذه الصيانة</p>
                 </div>
               )}
             </div>

@@ -21,9 +21,15 @@ export interface ClientMaintenanceRecord {
 export interface MaintenanceDetails {
   id: string;
   farm_id: string;
+  farm_name: string;
   maintenance_type: string;
   maintenance_date: string;
   status: string;
+  client_tree_count: number;
+  cost_per_tree: number | null;
+  client_due_amount: number | null;
+  payment_status: 'pending' | 'paid';
+  maintenance_fee_id: string | null;
   stages: MaintenanceStage[];
   media: MaintenanceMedia[];
 }
@@ -69,10 +75,24 @@ export const clientMaintenanceService = {
   },
 
   async getMaintenanceDetails(maintenanceId: string): Promise<MaintenanceDetails> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
     const [recordResult, mediaResult, stagesResult] = await Promise.all([
       supabase
         .from('maintenance_records')
-        .select('*')
+        .select(`
+          *,
+          farms:farm_id (
+            name_ar
+          ),
+          maintenance_fees (
+            id,
+            total_amount,
+            cost_per_tree,
+            fees_status
+          )
+        `)
         .eq('id', maintenanceId)
         .eq('status', 'published')
         .single(),
@@ -83,6 +103,34 @@ export const clientMaintenanceService = {
     ]);
 
     if (recordResult.error) throw recordResult.error;
+
+    const reservationResult = await supabase
+      .from('reservations')
+      .select('total_trees')
+      .eq('farm_id', recordResult.data.farm_id)
+      .eq('user_id', user.id)
+      .in('status', ['confirmed', 'active'])
+      .single();
+
+    const clientTreeCount = reservationResult.data?.total_trees || 0;
+    const fee = recordResult.data.maintenance_fees?.[0];
+    const costPerTree = fee?.cost_per_tree || null;
+    const clientDueAmount = fee && costPerTree ? costPerTree * clientTreeCount : null;
+    const maintenanceFeeId = fee?.id || null;
+
+    let paymentStatus: 'pending' | 'paid' = 'pending';
+    if (maintenanceFeeId) {
+      const paymentResult = await supabase
+        .from('maintenance_payments')
+        .select('payment_status')
+        .eq('user_id', user.id)
+        .eq('maintenance_fee_id', maintenanceFeeId)
+        .maybeSingle();
+
+      if (paymentResult.data?.payment_status === 'paid') {
+        paymentStatus = 'paid';
+      }
+    }
 
     const media = mediaResult.data || [];
     const mediaWithUrls = await Promise.all(
@@ -95,7 +143,17 @@ export const clientMaintenanceService = {
     );
 
     return {
-      ...recordResult.data,
+      id: recordResult.data.id,
+      farm_id: recordResult.data.farm_id,
+      farm_name: recordResult.data.farms?.name_ar || 'غير معروف',
+      maintenance_type: recordResult.data.maintenance_type,
+      maintenance_date: recordResult.data.maintenance_date,
+      status: recordResult.data.status,
+      client_tree_count: clientTreeCount,
+      cost_per_tree: costPerTree,
+      client_due_amount: clientDueAmount,
+      payment_status: paymentStatus,
+      maintenance_fee_id: maintenanceFeeId,
       stages: stagesResult.data || [],
       media: mediaWithUrls
     };
