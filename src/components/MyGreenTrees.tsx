@@ -2,26 +2,32 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Sprout, Calendar, DollarSign, Image as ImageIcon, Video, CheckCircle, AlertCircle, Eye, X, Play } from 'lucide-react';
 import { clientMaintenanceService, ClientMaintenanceRecord, MaintenanceDetails } from '../services/clientMaintenanceService';
 import { useAuth } from '../contexts/AuthContext';
+import { useDemoMode } from '../contexts/DemoModeContext';
+import { getDemoGreenTreesData, getDemoGoldenTreesData } from '../services/demoDataService';
+import DemoActionModal from './DemoActionModal';
 
 interface MyGreenTreesProps {
   onNavigateToPayment?: (maintenanceId: string) => void;
+  onShowAuth?: (mode: 'login' | 'register') => void;
 }
 
-export default function MyGreenTrees({ onNavigateToPayment }: MyGreenTreesProps) {
+export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGreenTreesProps) {
   const { identity, user } = useAuth();
+  const { isDemoMode, demoType } = useDemoMode();
   const [records, setRecords] = useState<ClientMaintenanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecord, setSelectedRecord] = useState<string | null>(null);
   const [maintenanceDetails, setMaintenanceDetails] = useState<MaintenanceDetails | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
+  const [showDemoActionModal, setShowDemoActionModal] = useState(false);
 
   const loadingRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     loadMaintenanceRecords();
-  }, [identity]);
+  }, [identity, isDemoMode]);
 
   useEffect(() => {
     return () => {
@@ -35,6 +41,32 @@ export default function MyGreenTrees({ onNavigateToPayment }: MyGreenTreesProps)
   const loadMaintenanceRecords = async () => {
     try {
       setLoading(true);
+
+      if (isDemoMode) {
+        const demoData = demoType === 'green'
+          ? getDemoGreenTreesData()
+          : getDemoGoldenTreesData();
+
+        const demoRecords: ClientMaintenanceRecord[] = demoData.maintenanceRecords.map((record: any) => ({
+          maintenance_id: record.id,
+          farm_id: 'demo-farm-id',
+          farm_name: demoData.farmName,
+          maintenance_type: record.maintenance_type,
+          maintenance_date: record.maintenance_date,
+          status: record.status,
+          total_amount: record.total_amount,
+          cost_per_tree: record.cost_per_tree,
+          client_tree_count: record.client_tree_count,
+          client_due_amount: record.client_due_amount,
+          payment_status: record.payment_status,
+          payment_id: record.payment_status === 'paid' ? 'demo-payment-id' : null
+        }));
+
+        setRecords(demoRecords);
+        setLoading(false);
+        return;
+      }
+
       const pathType = identity === 'agricultural' ? 'agricultural' : 'investment';
       const data = await clientMaintenanceService.getClientMaintenanceRecords(pathType);
       setRecords(data);
@@ -61,6 +93,41 @@ export default function MyGreenTrees({ onNavigateToPayment }: MyGreenTreesProps)
 
     try {
       setLoadingDetails(true);
+
+      if (isDemoMode) {
+        const demoData = demoType === 'green'
+          ? getDemoGreenTreesData()
+          : getDemoGoldenTreesData();
+
+        const record = demoData.maintenanceRecords.find((r: any) => r.id === maintenanceId);
+
+        if (record) {
+          const details: MaintenanceDetails = {
+            maintenance_id: record.id,
+            farm_name: demoData.farmName,
+            maintenance_type: record.maintenance_type,
+            maintenance_date: record.maintenance_date,
+            status: record.status,
+            description: record.description,
+            cost_per_tree: record.cost_per_tree,
+            total_amount: record.total_amount,
+            client_tree_count: record.client_tree_count,
+            client_due_amount: record.client_due_amount,
+            payment_status: record.payment_status,
+            images: record.images.map((url: string, idx: number) => ({
+              id: `demo-img-${idx}`,
+              media_url: url,
+              media_type: 'image'
+            })),
+            videos: record.videos || []
+          };
+          setMaintenanceDetails(details);
+        }
+        setLoadingDetails(false);
+        loadingRef.current = false;
+        return;
+      }
+
       const details = await clientMaintenanceService.getMaintenanceDetails(maintenanceId);
 
       if (!abortControllerRef.current?.signal.aborted) {
@@ -77,7 +144,7 @@ export default function MyGreenTrees({ onNavigateToPayment }: MyGreenTreesProps)
       }
       loadingRef.current = false;
     }
-  }, []);
+  }, [isDemoMode, demoType]);
 
   const handleViewDetails = useCallback(async (record: ClientMaintenanceRecord) => {
     if (loadingRef.current) {
@@ -93,6 +160,11 @@ export default function MyGreenTrees({ onNavigateToPayment }: MyGreenTreesProps)
   }, [loadMaintenanceDetails]);
 
   const handlePayFee = (record: ClientMaintenanceRecord) => {
+    if (isDemoMode) {
+      setShowDemoActionModal(true);
+      return;
+    }
+
     if (!user) {
       alert('يجب تسجيل الدخول أولاً');
       return;
@@ -514,6 +586,24 @@ export default function MyGreenTrees({ onNavigateToPayment }: MyGreenTreesProps)
           </div>
         )}
       </div>
+
+      {showDemoActionModal && (
+        <DemoActionModal
+          onClose={() => setShowDemoActionModal(false)}
+          onLogin={() => {
+            setShowDemoActionModal(false);
+            if (onShowAuth) {
+              onShowAuth('login');
+            }
+          }}
+          onRegister={() => {
+            setShowDemoActionModal(false);
+            if (onShowAuth) {
+              onShowAuth('register');
+            }
+          }}
+        />
+      )}
     </div>
   );
 }

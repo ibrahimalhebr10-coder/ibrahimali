@@ -25,12 +25,15 @@ import { getUnreadCount } from './services/messagesService';
 import { useAuth } from './contexts/AuthContext';
 import { useAdminAuth } from './contexts/AdminAuthContext';
 import { OfferModeProvider, useOfferMode } from './contexts/OfferModeContext';
+import { useDemoMode } from './contexts/DemoModeContext';
+import DemoWelcomeScreen from './components/DemoWelcomeScreen';
 import { initializeSupabase } from './lib/supabase';
 
 function AppContent() {
   const { user, identity, updateIdentity } = useAuth();
   const { admin } = useAdminAuth();
   const { isOfferMode, enterOfferMode } = useOfferMode();
+  const { isDemoMode, demoType, enterDemoMode, exitDemoMode, showDemoWelcome, setShowDemoWelcome } = useDemoMode();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const farmsSliderRef = useRef<HTMLDivElement>(null);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
@@ -444,8 +447,14 @@ function AppContent() {
 
   const handleMyFarmClick = () => {
     if (!user) {
-      alert('يرجى تسجيل الدخول أولاً');
+      const demoType = identity === 'agricultural' ? 'green' : 'golden';
+      enterDemoMode(demoType);
+      setShowMyGreenTrees(true);
       return;
+    }
+
+    if (isDemoMode) {
+      exitDemoMode();
     }
 
     setShowMyGreenTrees(true);
@@ -1264,10 +1273,15 @@ function AppContent() {
         onClose={() => setShowMyReservations(false)}
       />
 
-      {showMyGreenTrees && user && (
+      {showMyGreenTrees && (
         <div className="fixed inset-0 z-50 bg-white overflow-auto">
           <button
-            onClick={() => setShowMyGreenTrees(false)}
+            onClick={() => {
+              setShowMyGreenTrees(false);
+              if (isDemoMode) {
+                exitDemoMode();
+              }
+            }}
             className="fixed top-4 left-4 z-50 w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center hover:bg-gray-50 transition-colors"
           >
             <X className="w-6 h-6 text-gray-700" />
@@ -1278,8 +1292,25 @@ function AppContent() {
               setShowMyGreenTrees(false);
               setShowMaintenancePayment(true);
             }}
+            onShowAuth={(mode) => {
+              setShowMyGreenTrees(false);
+              exitDemoMode();
+              if (mode === 'login') {
+                setShowAccountProfile(true);
+              } else {
+                setShowStandaloneRegistration(true);
+              }
+            }}
           />
         </div>
+      )}
+
+      {showDemoWelcome && (
+        <DemoWelcomeScreen
+          onStart={() => {
+            setShowDemoWelcome(false);
+          }}
+        />
       )}
 
       {showMaintenancePayment && selectedMaintenanceId && (
