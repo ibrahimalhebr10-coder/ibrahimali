@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Leaf, Receipt, ArrowLeft } from 'lucide-react';
+import { Leaf, Receipt, ArrowLeft, TrendingUp } from 'lucide-react';
 import GreenTreesTab from './GreenTreesTab';
 import MaintenancePaymentsTab from './MaintenancePaymentsTab';
+import GoldenTreesInvestmentTab from './GoldenTreesInvestmentTab';
 
 export default function OperationsSection() {
-  const [activeSection, setActiveSection] = useState<'green-trees' | 'payments'>('green-trees');
+  const [activeSection, setActiveSection] = useState<'green-trees' | 'golden-trees' | 'payments'>('green-trees');
 
   return (
     <div className="space-y-6">
@@ -44,6 +45,23 @@ export default function OperationsSection() {
             )}
           </button>
           <button
+            onClick={() => setActiveSection('golden-trees')}
+            className={`flex items-center justify-center gap-3 px-8 py-4 font-semibold transition-all relative ${
+              activeSection === 'golden-trees'
+                ? 'bg-gradient-to-b from-amber-50 to-white text-amber-700'
+                : 'text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            <TrendingUp className="w-5 h-5" />
+            <div className="flex flex-col items-start">
+              <span>أشجاري الذهبية</span>
+              <span className="text-xs text-gray-500 font-normal">دورات الاستثمار الذكية</span>
+            </div>
+            {activeSection === 'golden-trees' && (
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-600"></div>
+            )}
+          </button>
+          <button
             onClick={() => setActiveSection('payments')}
             className={`flex items-center justify-center gap-3 px-8 py-4 font-semibold transition-all relative ${
               activeSection === 'payments'
@@ -64,6 +82,7 @@ export default function OperationsSection() {
 
         <div className="p-6">
           {activeSection === 'green-trees' && <GreenTreesTab />}
+          {activeSection === 'golden-trees' && <GoldenTreesInvestmentTab />}
           {activeSection === 'payments' && <MaintenancePaymentsTab />}
         </div>
       </div>
