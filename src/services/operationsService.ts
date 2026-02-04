@@ -243,5 +243,56 @@ export const operationsService = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  async getMaintenancePaymentsSummary() {
+    const { data, error } = await supabase
+      .from('maintenance_payments_summary')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getMaintenancePaymentsByFee(feeId: string) {
+    const { data, error } = await supabase
+      .from('maintenance_payments')
+      .select(`
+        *,
+        user_profiles:user_id (
+          full_name,
+          phone,
+          email
+        )
+      `)
+      .eq('maintenance_fee_id', feeId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async updatePaymentStatus(paymentId: string, amountPaid: number) {
+    const { data, error } = await supabase
+      .from('maintenance_payments')
+      .update({
+        amount_paid: amountPaid,
+        payment_status: 'paid',
+        payment_date: new Date().toISOString()
+      })
+      .eq('id', paymentId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getPaymentStats() {
+    const { data, error } = await supabase.rpc('get_maintenance_payment_stats');
+
+    if (error) throw error;
+    return data;
   }
 };
