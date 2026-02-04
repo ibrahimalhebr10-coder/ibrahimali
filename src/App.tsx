@@ -1256,7 +1256,7 @@ function AppContent() {
         onClose={() => setShowMyReservations(false)}
       />
 
-      {showMyGreenTrees && user && identity === 'investment' && (
+      {showMyGreenTrees && user && identity === 'agricultural' && (
         <div className="fixed inset-0 z-50 bg-white overflow-auto">
           <button
             onClick={() => setShowMyGreenTrees(false)}
