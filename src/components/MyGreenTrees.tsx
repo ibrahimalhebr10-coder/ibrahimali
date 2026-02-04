@@ -49,7 +49,7 @@ export default function MyGreenTrees() {
   };
 
   const handlePayFee = async (record: ClientMaintenanceRecord) => {
-    if (!record.total_amount || !record.cost_per_tree) {
+    if (!record.total_amount || !record.cost_per_tree || !record.maintenance_fee_id) {
       alert('هذه الصيانة لا تحتوي على رسوم');
       return;
     }
@@ -63,7 +63,7 @@ export default function MyGreenTrees() {
       setProcessingPayment(true);
 
       const existingPayment = await clientMaintenanceService.checkExistingPayment(
-        record.maintenance_id
+        record.maintenance_fee_id
       );
 
       if (existingPayment) {
@@ -92,7 +92,7 @@ export default function MyGreenTrees() {
 
         if (confirmPayment) {
           const payment = await clientMaintenanceService.createMaintenancePayment(
-            record.maintenance_id,
+            record.maintenance_fee_id,
             record.farm_id,
             record.client_tree_count,
             record.client_due_amount!
@@ -291,7 +291,7 @@ export default function MyGreenTrees() {
                 </div>
 
                 <div className="p-6 space-y-4">
-                  {record.total_amount && record.cost_per_tree && (
+                  {record.total_amount && record.cost_per_tree && record.maintenance_fee_id && (
                     <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2 text-gray-700">
@@ -339,7 +339,7 @@ export default function MyGreenTrees() {
                       عرض التفاصيل
                     </button>
 
-                    {record.total_amount && record.cost_per_tree && record.payment_status === 'pending' && (
+                    {record.total_amount && record.cost_per_tree && record.maintenance_fee_id && record.payment_status === 'pending' && (
                       <button
                         onClick={() => handlePayFee(record)}
                         disabled={processingPayment}

@@ -2,6 +2,7 @@ import { supabase } from '../lib/supabase';
 
 export interface ClientMaintenanceRecord {
   maintenance_id: string;
+  maintenance_fee_id: string | null;
   farm_id: string;
   farm_name: string;
   maintenance_type: 'periodic' | 'seasonal' | 'emergency';
