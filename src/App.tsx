@@ -429,7 +429,7 @@ function AppContent() {
   };
 
   const handleMyFarmClick = () => {
-    alert('قريباً: قسم مزرعتي');
+    alert('قريباً: قسم أشجاري');
   };
 
   const handleOfferFarmClick = () => {
