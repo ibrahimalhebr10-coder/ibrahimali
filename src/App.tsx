@@ -436,11 +436,7 @@ function AppContent() {
       return;
     }
 
-    if (identity === 'investment') {
-      setShowMyGreenTrees(true);
-    } else {
-      setShowMyReservations(true);
-    }
+    setShowMyGreenTrees(true);
   };
 
   const handleOfferFarmClick = () => {

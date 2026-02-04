@@ -274,3 +274,34 @@ const data = await clientMaintenanceService.getClientMaintenanceRecords(pathType
 **التاريخ:** 4 فبراير 2026
 **البناء:** نجح بدون أخطاء ✅
 **الاختبار:** جاهز للتطبيق ✅
+
+---
+
+## تحديث: تصحيح زر أشجاري الخضراء في Footer
+
+### المشكلة الثالثة المكتشفة ❌
+عند الضغط على زر "أشجاري الخضراء" في Footer للمسار الزراعي، كان يظهر مكون `MyReservations` (العقود) بدلاً من `MyGreenTrees` (الصيانة).
+
+### السبب
+في `App.tsx` الدالة `handleMyFarmClick` كانت:
+```typescript
+// ❌ خطأ
+if (identity === 'investment') {
+  setShowMyGreenTrees(true);
+} else {
+  setShowMyReservations(true); // خطأ!
+}
+```
+
+### الحل ✅
+```typescript
+// ✅ صحيح
+setShowMyGreenTrees(true); // للمسارين معاً
+```
+
+### النتيجة
+- ✅ زر "أشجاري الخضراء" يعمل بشكل صحيح للمسار الزراعي
+- ✅ زر "أشجاري الذهبية" يعمل بشكل صحيح للمسار الاستثماري
+- ✅ كلاهما يعرضان `MyGreenTrees` الذي يتكيف تلقائياً حسب المسار
+
+**انظر:** `MY_FARM_BUTTON_FIX_COMPLETE.md` للتفاصيل الكاملة
