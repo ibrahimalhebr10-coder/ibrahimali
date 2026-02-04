@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Sprout, Calendar, DollarSign, Image as ImageIcon, Video, CheckCircle, AlertCircle, Eye, X, Play } from 'lucide-react';
 import { clientMaintenanceService, ClientMaintenanceRecord, MaintenanceDetails } from '../services/clientMaintenanceService';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,9 +13,21 @@ export default function MyGreenTrees() {
   const [processingPayment, setProcessingPayment] = useState(false);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
+  const loadingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   useEffect(() => {
     loadMaintenanceRecords();
   }, [identity]);
+
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      loadingRef.current = false;
+    };
+  }, []);
 
   const loadMaintenanceRecords = async () => {
     try {
@@ -31,25 +43,51 @@ export default function MyGreenTrees() {
     }
   };
 
-  const loadMaintenanceDetails = async (maintenanceId: string) => {
+  const loadMaintenanceDetails = useCallback(async (maintenanceId: string) => {
+    if (loadingRef.current) {
+      console.log('Already loading, skipping...');
+      return;
+    }
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    abortControllerRef.current = new AbortController();
+    loadingRef.current = true;
+
     try {
       setLoadingDetails(true);
       const details = await clientMaintenanceService.getMaintenanceDetails(maintenanceId);
-      setMaintenanceDetails(details);
-    } catch (error) {
-      console.error('Error loading maintenance details:', error);
-      alert('خطأ في تحميل تفاصيل الصيانة');
-    } finally {
-      setLoadingDetails(false);
-    }
-  };
 
-  const handleViewDetails = async (record: ClientMaintenanceRecord) => {
-    if (loadingDetails) return;
+      if (!abortControllerRef.current?.signal.aborted) {
+        setMaintenanceDetails(details);
+      }
+    } catch (error: any) {
+      if (error?.name !== 'AbortError' && !abortControllerRef.current?.signal.aborted) {
+        console.error('Error loading maintenance details:', error);
+        alert('خطأ في تحميل تفاصيل الصيانة');
+      }
+    } finally {
+      if (!abortControllerRef.current?.signal.aborted) {
+        setLoadingDetails(false);
+      }
+      loadingRef.current = false;
+    }
+  }, []);
+
+  const handleViewDetails = useCallback(async (record: ClientMaintenanceRecord) => {
+    if (loadingRef.current) {
+      console.log('Still loading previous details, please wait...');
+      return;
+    }
+
     setSelectedRecord(record.maintenance_id);
     setMaintenanceDetails(null);
+    setImageErrors(new Set());
+
     await loadMaintenanceDetails(record.maintenance_id);
-  };
+  }, [loadMaintenanceDetails]);
 
   const handlePayFee = async (record: ClientMaintenanceRecord) => {
     if (!record.total_amount || !record.cost_per_tree || !record.maintenance_fee_id) {
@@ -128,15 +166,21 @@ export default function MyGreenTrees() {
     return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800';
   };
 
-  const closeDetails = () => {
+  const closeDetails = useCallback(() => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
     setSelectedRecord(null);
     setMaintenanceDetails(null);
     setImageErrors(new Set());
-  };
+    setLoadingDetails(false);
+    loadingRef.current = false;
+  }, []);
 
-  const handleImageError = (mediaId: string) => {
+  const handleImageError = useCallback((mediaId: string) => {
     setImageErrors(prev => new Set(prev).add(mediaId));
-  };
+  }, []);
 
   if (loading) {
     return (
@@ -149,9 +193,54 @@ export default function MyGreenTrees() {
     );
   }
 
-  if (selectedRecord && maintenanceDetails) {
+  if (selectedRecord) {
+    if (loadingDetails || !maintenanceDetails) {
+      return (
+        <div
+          key="loading-details"
+          className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4"
+          dir="rtl"
+        >
+          <div className="max-w-4xl mx-auto">
+            <button
+              onClick={closeDetails}
+              className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+            >
+              <X className="w-5 h-5" />
+              العودة للقائمة
+            </button>
+
+            <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+              <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-8 text-white">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                    <Sprout className="w-8 h-8 animate-pulse" />
+                  </div>
+                  <div>
+                    <h1 className="text-3xl font-bold">تفاصيل الصيانة</h1>
+                    <p className="text-green-100 mt-1">جاري التحميل...</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8">
+                <div className="text-center py-16">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-green-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600 text-lg">جاري تحميل التفاصيل...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4" dir="rtl">
+      <div
+        key={`details-${selectedRecord}-${maintenanceDetails.id}`}
+        className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4"
+        dir="rtl"
+      >
         <div className="max-w-4xl mx-auto">
           <button
             onClick={closeDetails}
@@ -181,12 +270,7 @@ export default function MyGreenTrees() {
             </div>
 
             <div className="p-8 space-y-8">
-              {loadingDetails ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-green-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">جاري تحميل التفاصيل...</p>
-                </div>
-              ) : maintenanceDetails.media && maintenanceDetails.media.length > 0 ? (
+              {maintenanceDetails.media && maintenanceDetails.media.length > 0 ? (
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                     <ImageIcon className="w-6 h-6 text-blue-600" />
