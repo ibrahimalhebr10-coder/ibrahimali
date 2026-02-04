@@ -306,9 +306,6 @@ export const operationsService = {
         payment_status,
         payment_date,
         created_at,
-        user_profiles:user_id (
-          full_name
-        ),
         farms:farm_id (
           farm_name
         ),
@@ -327,18 +324,36 @@ export const operationsService = {
       throw error;
     }
 
-    const formatted = (data || []).map((payment: any) => ({
-      id: payment.id,
-      full_name: payment.user_profiles?.full_name || 'غير معروف',
-      farm_name: payment.farms?.farm_name || 'غير معروف',
-      maintenance_type: payment.maintenance_fees?.maintenance_records?.maintenance_type || 'periodic',
-      maintenance_date: payment.maintenance_fees?.maintenance_records?.maintenance_date || '',
-      tree_count: payment.tree_count,
-      amount_due: payment.amount_due,
-      amount_paid: payment.amount_paid || 0,
-      payment_status: payment.payment_status,
-      payment_date: payment.payment_date,
-      created_at: payment.created_at
+    const formatted = await Promise.all((data || []).map(async (payment: any) => {
+      let full_name = 'غير معروف';
+
+      try {
+        const { data: profileData } = await supabase
+          .from('user_profiles')
+          .select('full_name')
+          .eq('id', payment.user_id)
+          .maybeSingle();
+
+        if (profileData?.full_name) {
+          full_name = profileData.full_name;
+        }
+      } catch (err) {
+        console.warn('Could not fetch user profile:', err);
+      }
+
+      return {
+        id: payment.id,
+        full_name,
+        farm_name: payment.farms?.farm_name || 'غير معروف',
+        maintenance_type: payment.maintenance_fees?.maintenance_records?.maintenance_type || 'periodic',
+        maintenance_date: payment.maintenance_fees?.maintenance_records?.maintenance_date || '',
+        tree_count: payment.tree_count,
+        amount_due: payment.amount_due,
+        amount_paid: payment.amount_paid || 0,
+        payment_status: payment.payment_status,
+        payment_date: payment.payment_date,
+        created_at: payment.created_at
+      };
     }));
 
     return formatted;
@@ -347,19 +362,34 @@ export const operationsService = {
   async getMaintenancePaymentsByFee(feeId: string) {
     const { data, error } = await supabase
       .from('maintenance_payments')
-      .select(`
-        *,
-        user_profiles:user_id (
-          full_name,
-          phone,
-          email
-        )
-      `)
+      .select('*')
       .eq('maintenance_fee_id', feeId)
       .order('created_at', { ascending: false });
 
     if (error) throw error;
-    return data || [];
+
+    const enriched = await Promise.all((data || []).map(async (payment: any) => {
+      try {
+        const { data: profileData } = await supabase
+          .from('user_profiles')
+          .select('full_name, phone, email')
+          .eq('id', payment.user_id)
+          .maybeSingle();
+
+        return {
+          ...payment,
+          user_profiles: profileData || { full_name: 'غير معروف', phone: null, email: null }
+        };
+      } catch (err) {
+        console.warn('Could not fetch user profile:', err);
+        return {
+          ...payment,
+          user_profiles: { full_name: 'غير معروف', phone: null, email: null }
+        };
+      }
+    }));
+
+    return enriched;
   },
 
   async updatePaymentStatus(paymentId: string, amountPaid: number) {

@@ -162,7 +162,7 @@ export const maintenancePaymentService = {
       .from('maintenance_payments')
       .select(`
         *,
-        maintenance_fees (
+        maintenance_fees:maintenance_fee_id (
           id,
           cost_per_tree,
           created_at
@@ -184,7 +184,7 @@ export const maintenancePaymentService = {
       .from('maintenance_payments')
       .select(`
         *,
-        maintenance_fees (
+        maintenance_fees:maintenance_fee_id (
           id,
           cost_per_tree
         )
