@@ -436,7 +436,11 @@ function AppContent() {
       return;
     }
 
-    setShowMyGreenTrees(true);
+    if (identity === 'agricultural') {
+      setShowMyGreenTrees(true);
+    } else {
+      setShowMyReservations(true);
+    }
   };
 
   const handleOfferFarmClick = () => {
