@@ -9,7 +9,8 @@ import {
   LogOut,
   Menu,
   X,
-  ClipboardList
+  ClipboardList,
+  Wrench
 } from 'lucide-react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import DashboardOverview from './DashboardOverview';
@@ -19,11 +20,13 @@ import MarketingManagement from './MarketingManagement';
 import ContentManagement from './ContentManagement';
 import GeneralSettings from './GeneralSettings';
 import FarmOffersManager from './FarmOffersManager';
+import OperationsSection from './OperationsSection';
 
 type AdminSection =
   | 'overview'
   | 'farms'
   | 'farm-offers'
+  | 'operations'
   | 'packages'
   | 'marketing'
   | 'content'
@@ -38,6 +41,7 @@ const AdminDashboard: React.FC = () => {
     { id: 'overview' as AdminSection, label: 'الرئيسية', icon: LayoutDashboard, color: 'blue' },
     { id: 'farms' as AdminSection, label: 'المزارع', icon: Layers, color: 'green' },
     { id: 'farm-offers' as AdminSection, label: 'عروض المزارع', icon: ClipboardList, color: 'emerald' },
+    { id: 'operations' as AdminSection, label: 'التشغيل', icon: Wrench, color: 'orange' },
     { id: 'packages' as AdminSection, label: 'الباقات', icon: Package, color: 'purple' },
     { id: 'marketing' as AdminSection, label: 'التسويق', icon: Megaphone, color: 'pink' },
     { id: 'content' as AdminSection, label: 'المحتوى', icon: MessageSquare, color: 'indigo' },
@@ -65,6 +69,8 @@ const AdminDashboard: React.FC = () => {
         return <FarmCardsManagement />;
       case 'farm-offers':
         return <FarmOffersManager />;
+      case 'operations':
+        return <OperationsSection />;
       case 'packages':
         return <PackagesManagement />;
       case 'marketing':
