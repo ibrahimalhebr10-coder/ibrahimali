@@ -271,19 +271,26 @@ export default function GreenTreesTab() {
   };
 
   const getStatusBadge = (status: string) => {
-    const colors = {
-      draft: 'bg-gray-100 text-gray-800',
-      published: 'bg-blue-100 text-blue-800',
-      completed: 'bg-green-100 text-green-800'
-    };
-    const labels = {
-      draft: 'مسودة',
-      published: 'منشور',
-      completed: 'مكتمل'
-    };
+    if (status === 'published') {
+      return (
+        <span className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-green-500 to-green-600 text-white shadow-md">
+          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+          منشور للعملاء
+        </span>
+      );
+    }
+    if (status === 'draft') {
+      return (
+        <span className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 border-2 border-gray-300">
+          <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
+          مسودة داخلية
+        </span>
+      );
+    }
     return (
-      <span className={`px-3 py-1 rounded-full text-sm ${colors[status as keyof typeof colors]}`}>
-        {labels[status as keyof typeof labels]}
+      <span className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-blue-100 text-blue-700 border-2 border-blue-300">
+        <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
+        مكتمل ومؤرشف
       </span>
     );
   };
@@ -357,62 +364,114 @@ export default function GreenTreesTab() {
 
       {!selectedRecord ? (
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">المزرعة</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">النوع</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">التاريخ</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">الحالة</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">الرسوم</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">المراحل</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">الملفات</th>
-                  <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">الإجراءات</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {records.map((record) => (
-                  <tr key={record.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 text-sm text-gray-900">{record.farm_name}</td>
-                    <td className="px-6 py-4">{getTypeBadge(record.maintenance_type)}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{record.maintenance_date}</td>
-                    <td className="px-6 py-4">{getStatusBadge(record.status)}</td>
-                    <td className="px-6 py-4 text-sm">
-                      {record.total_amount ? (
-                        <div>
-                          <div className="font-semibold text-green-600">{record.total_amount} ر.س</div>
-                          <div className="text-xs text-gray-500">{record.cost_per_tree} ر.س/شجرة</div>
-                        </div>
-                      ) : (
-                        <span className="text-gray-400">لم يتم تحديد</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{record.stages_count}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{record.media_count}</td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleViewRecord(record.id)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                          title="عرض التفاصيل"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteRecord(record.id)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="حذف"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
+          {records.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-50 mb-4">
+                <Leaf className="w-10 h-10 text-green-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">لا توجد سجلات صيانة بعد</h3>
+              <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                ابدأ بإنشاء سجل صيانة جديد لتوثيق الأعمال التشغيلية وإنشاء الالتزامات المالية
+              </p>
+              <button
+                onClick={() => setShowAddForm(true)}
+                className="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-3 rounded-xl hover:bg-green-700 transition-colors font-semibold"
+              >
+                <Plus className="w-5 h-5" />
+                إنشاء سجل صيانة جديد
+              </button>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gradient-to-b from-gray-50 to-gray-100 border-b-2 border-gray-200">
+                  <tr>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">المزرعة</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">نوع الصيانة</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">التاريخ</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">حالة النشر</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">المراحل</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">التوثيق</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">الرسوم المرتبطة</th>
+                    <th className="px-6 py-4 text-right text-sm font-bold text-gray-900">الإجراءات</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {records.map((record) => (
+                    <tr key={record.id} className="hover:bg-green-50/30 transition-colors">
+                      <td className="px-6 py-4">
+                        <div className="font-semibold text-gray-900">{record.farm_name}</div>
+                        <div className="text-xs text-gray-500 mt-1">{record.total_trees} شجرة</div>
+                      </td>
+                      <td className="px-6 py-4">{getTypeBadge(record.maintenance_type)}</td>
+                      <td className="px-6 py-4">
+                        <div className="text-sm text-gray-900">{record.maintenance_date}</div>
+                      </td>
+                      <td className="px-6 py-4">{getStatusBadge(record.status)}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <div className={`flex items-center justify-center w-10 h-10 rounded-lg ${
+                            record.stages_count > 0 ? 'bg-orange-100' : 'bg-gray-100'
+                          }`}>
+                            <span className={`text-sm font-bold ${
+                              record.stages_count > 0 ? 'text-orange-600' : 'text-gray-400'
+                            }`}>
+                              {record.stages_count}
+                            </span>
+                          </div>
+                          <span className="text-xs text-gray-500">مرحلة</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <div className={`flex items-center justify-center w-10 h-10 rounded-lg ${
+                            record.media_count > 0 ? 'bg-blue-100' : 'bg-gray-100'
+                          }`}>
+                            <span className={`text-sm font-bold ${
+                              record.media_count > 0 ? 'text-blue-600' : 'text-gray-400'
+                            }`}>
+                              {record.media_count}
+                            </span>
+                          </div>
+                          <span className="text-xs text-gray-500">ملف</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        {record.total_amount ? (
+                          <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+                            <div className="font-bold text-green-700">{record.total_amount} ر.س</div>
+                            <div className="text-xs text-green-600 mt-0.5">{record.cost_per_tree} ر.س/شجرة</div>
+                          </div>
+                        ) : (
+                          <div className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 text-center">
+                            <span className="text-xs text-gray-500">لا توجد رسوم</span>
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => handleViewRecord(record.id)}
+                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                            title="عرض التفاصيل"
+                          >
+                            <Eye className="w-5 h-5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteRecord(record.id)}
+                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                            title="حذف"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       ) : (
         <div className="space-y-6">
