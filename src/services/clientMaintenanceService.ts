@@ -58,7 +58,7 @@ export const clientMaintenanceService = {
     const { data, error } = await supabase
       .rpc('get_client_maintenance_records', {
         client_user_id: user.id,
-        path_type: pathType
+        filter_path_type: pathType
       });
 
     if (error) throw error;
