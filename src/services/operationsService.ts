@@ -25,6 +25,7 @@ export interface MaintenanceMedia {
   media_type: 'image' | 'video';
   file_path: string;
   uploaded_at: string;
+  visible_to_client: boolean;
 }
 
 export interface MaintenanceFee {
@@ -33,6 +34,7 @@ export interface MaintenanceFee {
   farm_id: string;
   total_amount: number;
   cost_per_tree: number;
+  fees_status: 'active' | 'inactive' | 'paid';
   created_at: string;
 }
 
@@ -73,6 +75,23 @@ export interface MaintenanceFullDetails {
   cost_per_tree: number | null;
   stages_count: number;
   media_count: number;
+}
+
+export interface ClientMaintenanceRecord {
+  id: string;
+  farm_id: string;
+  farm_name: string;
+  maintenance_type: string;
+  maintenance_date: string;
+  status: string;
+  created_at: string;
+  stages_count: number;
+  media_count: number;
+  visible_media_count: number;
+  has_fees: boolean;
+  total_amount: number | null;
+  cost_per_tree: number | null;
+  fees_status: string | null;
 }
 
 export const operationsService = {
@@ -186,7 +205,8 @@ export const operationsService = {
       .insert([{
         maintenance_id: maintenanceId,
         media_type: mediaType,
-        file_path: fileName
+        file_path: fileName,
+        visible_to_client: true
       }])
       .select()
       .single();
@@ -227,10 +247,13 @@ export const operationsService = {
     return data;
   },
 
-  async createMaintenanceFee(fee: Omit<MaintenanceFee, 'id' | 'created_at' | 'cost_per_tree'>) {
+  async createMaintenanceFee(fee: Omit<MaintenanceFee, 'id' | 'created_at' | 'cost_per_tree' | 'fees_status'>) {
     const { data, error } = await supabase
       .from('maintenance_fees')
-      .insert([fee])
+      .insert([{
+        ...fee,
+        fees_status: 'active'
+      }])
       .select()
       .single();
 
@@ -504,5 +527,37 @@ export const operationsService = {
     }
 
     return record;
+  },
+
+  async getClientMaintenanceRecords(userId: string): Promise<ClientMaintenanceRecord[]> {
+    const { data, error } = await supabase.rpc('get_client_maintenance_records', {
+      p_user_id: userId
+    });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getClientMaintenanceMedia(maintenanceId: string): Promise<MaintenanceMedia[]> {
+    const { data, error } = await supabase
+      .from('maintenance_media')
+      .select('*')
+      .eq('maintenance_id', maintenanceId)
+      .eq('visible_to_client', true)
+      .order('uploaded_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getClientMaintenanceStages(maintenanceId: string): Promise<MaintenanceStage[]> {
+    const { data, error } = await supabase
+      .from('maintenance_stages')
+      .select('*')
+      .eq('maintenance_id', maintenanceId)
+      .order('stage_date', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
   }
 };

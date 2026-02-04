@@ -9,10 +9,12 @@ export interface ClientMaintenanceRecord {
   status: string;
   total_amount: number | null;
   cost_per_tree: number | null;
+  fees_status: string | null;
   client_tree_count: number;
   client_due_amount: number | null;
   payment_status: 'pending' | 'paid';
   payment_id: string | null;
+  visible_media_count: number;
 }
 
 export interface MaintenanceDetails {
@@ -66,7 +68,7 @@ export const clientMaintenanceService = {
   },
 
   async getMaintenanceDetails(maintenanceId: string): Promise<MaintenanceDetails> {
-    const [recordResult, mediaResult] = await Promise.all([
+    const [recordResult, mediaResult, stagesResult] = await Promise.all([
       supabase
         .from('maintenance_records')
         .select('*')
@@ -74,18 +76,16 @@ export const clientMaintenanceService = {
         .eq('status', 'published')
         .single(),
 
-      supabase
-        .from('maintenance_media')
-        .select('id, media_type, file_path')
-        .eq('maintenance_id', maintenanceId)
-        .order('uploaded_at', { ascending: false })
+      supabase.rpc('get_client_visible_media', { p_maintenance_id: maintenanceId }),
+
+      supabase.rpc('get_client_maintenance_stages', { p_maintenance_id: maintenanceId })
     ]);
 
     if (recordResult.error) throw recordResult.error;
 
     const media = mediaResult.data || [];
     const mediaWithUrls = await Promise.all(
-      media.map(async (m) => {
+      media.map(async (m: any) => {
         const { data } = supabase.storage
           .from('maintenance-media')
           .getPublicUrl(m.file_path);
@@ -95,7 +95,7 @@ export const clientMaintenanceService = {
 
     return {
       ...recordResult.data,
-      stages: [],
+      stages: stagesResult.data || [],
       media: mediaWithUrls
     };
   },
