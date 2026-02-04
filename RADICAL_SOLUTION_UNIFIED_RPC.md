@@ -1,6 +1,6 @@
 # الحل الجذري - دالة موحدة للمسارين
 التاريخ: 4 فبراير 2026
-الحالة: تم التطبيق بنجاح ✅
+الحالة: تم التطبيق والتصحيح بنجاح ✅
 
 ---
 
@@ -239,3 +239,39 @@ const data = await clientMaintenanceService.getClientMaintenanceRecords(pathType
 **البناء:** نجح بدون أخطاء ✅
 
 **ملاحظة:** هذا هو الحل الجذري الصحيح - دالة واحدة موحدة للمسارين!
+
+---
+
+## المشكلة الثانية: خطأ في اسم الجدول ❌
+
+### الخطأ:
+```
+POST /rest/v1/rpc/get_client_maintenance_records 404 (Not Found)
+Error: {code: '42P01', message: 'relation "investment_assets" does not exist'}
+```
+
+### السبب الجذري:
+- الدالة الموحدة كانت تبحث عن جدول: `investment_assets`
+- لكن الجدول الحقيقي اسمه: `investment_agricultural_assets`
+- اسم الجدول خاطئ في الدالة!
+
+### الحل:
+تصحيح اسم الجدول في الدالة الموحدة:
+
+**قبل:**
+```sql
+JOIN investment_assets ia ON ia.farm_id = mr.farm_id
+```
+
+**بعد:**
+```sql
+JOIN investment_agricultural_assets ia ON ia.farm_id = mr.farm_id
+```
+
+### النتيجة:
+- ✅ الدالة تعمل بنجاح
+- ✅ لا أخطاء في الـ database
+- ✅ البناء نجح بدون مشاكل
+
+### الملف المصحح:
+- `supabase/migrations/fix_unified_function_correct_table_name.sql`
