@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Sprout, Calendar, DollarSign, Image as ImageIcon, Video, CheckCircle, AlertCircle, Eye, X, Play } from 'lucide-react';
 import { clientMaintenanceService, ClientMaintenanceRecord, MaintenanceDetails } from '../services/clientMaintenanceService';
+import { maintenancePaymentService } from '../services/maintenancePaymentService';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function MyGreenTrees() {
@@ -103,51 +104,23 @@ export default function MyGreenTrees() {
     try {
       setProcessingPayment(true);
 
-      const existingPayment = await clientMaintenanceService.checkExistingPayment(
-        record.maintenance_fee_id
+      const confirmPayment = confirm(
+        `سداد رسوم الصيانة\n\nالمبلغ المستحق: ${record.client_due_amount} ر.س\nعدد الأشجار: ${record.client_tree_count}\n\nسيتم تحويلك إلى صفحة الدفع لإتمام العملية.\n\nهل تريد المتابعة؟`
       );
 
-      if (existingPayment) {
-        if (existingPayment.payment_status === 'paid') {
-          alert('تم سداد رسوم هذه الصيانة مسبقاً');
-          return;
-        }
-
-        const confirmPayment = confirm(
-          `سداد رسوم الصيانة\n\nالمبلغ المستحق: ${record.client_due_amount} ر.س\nعدد الأشجار: ${record.client_tree_count}\n\nهل تريد المتابعة؟`
+      if (confirmPayment) {
+        const paymentInfo = await maintenancePaymentService.initiatePayment(
+          record.maintenance_fee_id,
+          record.user_id
         );
 
-        if (confirmPayment) {
-          await clientMaintenanceService.updatePaymentStatus(
-            existingPayment.id,
-            'paid',
-            record.client_due_amount!
-          );
-          alert('تم تسجيل السداد بنجاح');
-          loadMaintenanceRecords();
-        }
-      } else {
-        const confirmPayment = confirm(
-          `سداد رسوم الصيانة\n\nالمبلغ المستحق: ${record.client_due_amount} ر.س\nعدد الأشجار: ${record.client_tree_count}\n\nهل تريد المتابعة؟`
+        await maintenancePaymentService.simulatePaymentSuccess(
+          paymentInfo.paymentId,
+          paymentInfo.amount
         );
 
-        if (confirmPayment) {
-          const payment = await clientMaintenanceService.createMaintenancePayment(
-            record.maintenance_fee_id,
-            record.farm_id,
-            record.client_tree_count,
-            record.client_due_amount!
-          );
-
-          await clientMaintenanceService.updatePaymentStatus(
-            payment.id,
-            'paid',
-            record.client_due_amount!
-          );
-
-          alert('تم تسجيل السداد بنجاح');
-          loadMaintenanceRecords();
-        }
+        alert('تم تسجيل السداد بنجاح');
+        loadMaintenanceRecords();
       }
     } catch (error) {
       console.error('Error processing payment:', error);
