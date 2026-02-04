@@ -259,7 +259,7 @@ export default function InvestmentCycleWizard({ cycleId, onClose, onSuccess }: I
               <option value="">اختر المزرعة</option>
               {farms.map(farm => (
                 <option key={farm.id} value={farm.id}>
-                  {farm.name} ({farm.total_trees} شجرة)
+                  {farm.name_ar} ({farm.total_trees} شجرة)
                 </option>
               ))}
             </select>

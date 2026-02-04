@@ -41,7 +41,7 @@ export const investmentCyclesService = {
   async getAllCycles() {
     const { data, error } = await supabase
       .from('investment_cycles')
-      .select('*, farms(name, total_trees)')
+      .select('*, farms(name_ar, total_trees)')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -51,7 +51,7 @@ export const investmentCyclesService = {
   async getCycleById(id: string) {
     const { data, error } = await supabase
       .from('investment_cycles')
-      .select('*, farms(name, total_trees)')
+      .select('*, farms(name_ar, total_trees)')
       .eq('id', id)
       .maybeSingle();
 

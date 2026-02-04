@@ -149,7 +149,7 @@ export default function GoldenTreesInvestmentTab() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h4 className="text-xl font-bold text-gray-900">
-                          {cycle.farms?.name || 'مزرعة غير محددة'}
+                          {cycle.farms?.name_ar || 'مزرعة غير محددة'}
                         </h4>
                         <span
                           className={`px-3 py-1 rounded-full text-sm font-medium ${
