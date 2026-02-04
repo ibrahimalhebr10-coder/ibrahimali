@@ -198,7 +198,7 @@ export default function MyGreenTrees() {
       return (
         <div
           key="loading-details"
-          className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4"
+          className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4 pb-32"
           dir="rtl"
         >
           <div className="max-w-4xl mx-auto">
@@ -240,7 +240,7 @@ export default function MyGreenTrees() {
     return (
       <div
         key={`details-${selectedRecord}-${maintenanceDetails.id}`}
-        className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4"
+        className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4 pb-32"
         dir="rtl"
       >
         <div className="max-w-4xl mx-auto">
@@ -432,7 +432,7 @@ export default function MyGreenTrees() {
 
   return (
     <div
-      className={`min-h-screen py-8 px-4 ${
+      className={`min-h-screen py-8 px-4 pb-32 ${
         isAgricultural
           ? 'bg-gradient-to-br from-green-50 via-white to-emerald-50'
           : 'bg-gradient-to-br from-amber-50 via-white to-blue-50'
