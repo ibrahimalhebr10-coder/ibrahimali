@@ -109,7 +109,8 @@ export const maintenancePaymentService = {
 
   async initiatePayment(
     maintenanceFeeId: string,
-    userId: string
+    userId: string,
+    useSimulation: boolean = true
   ): Promise<{
     paymentId: string;
     paymentUrl: string;
@@ -117,10 +118,16 @@ export const maintenancePaymentService = {
   }> {
     const paymentRecord = await this.createPaymentRecord(maintenanceFeeId, userId);
 
-    const returnUrl = `${window.location.origin}/payment-result?payment_id=${paymentRecord.payment_id}`;
-    const cancelUrl = `${window.location.origin}/my-green-trees`;
+    let paymentUrl: string;
 
-    const paymentUrl = `/api/payment/initiate?payment_id=${paymentRecord.payment_id}&amount=${paymentRecord.total_amount}&return_url=${encodeURIComponent(returnUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
+    if (useSimulation) {
+      const transactionId = `SIM-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      paymentUrl = `${window.location.origin}?payment_id=${paymentRecord.payment_id}&status=success&transaction_id=${transactionId}`;
+    } else {
+      const returnUrl = `${window.location.origin}?payment_id=${paymentRecord.payment_id}`;
+      const cancelUrl = `${window.location.origin}`;
+      paymentUrl = `/api/payment/initiate?payment_id=${paymentRecord.payment_id}&amount=${paymentRecord.total_amount}&return_url=${encodeURIComponent(returnUrl)}&cancel_url=${encodeURIComponent(cancelUrl)}`;
+    }
 
     return {
       paymentId: paymentRecord.payment_id,

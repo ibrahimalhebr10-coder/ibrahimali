@@ -91,13 +91,13 @@ export default function MyGreenTrees() {
   }, [loadMaintenanceDetails]);
 
   const handlePayFee = async (record: ClientMaintenanceRecord) => {
-    if (!user?.id) {
+    if (!user) {
       alert('يجب تسجيل الدخول أولاً');
       return;
     }
 
-    if (!record.total_amount || !record.cost_per_tree || !record.maintenance_fee_id) {
-      alert('هذه الصيانة لا تحتوي على رسوم');
+    if (!record.maintenance_fee_id) {
+      alert('هذه الصيانة لا تحتوي على معرف رسوم صالح');
       return;
     }
 
@@ -109,6 +109,17 @@ export default function MyGreenTrees() {
     try {
       setProcessingPayment(true);
 
+      const paymentStatus = await maintenancePaymentService.checkPaymentStatus(
+        record.maintenance_fee_id,
+        user.id
+      );
+
+      if (paymentStatus.has_payment && paymentStatus.status === 'paid') {
+        alert('تم سداد رسوم هذه الصيانة مسبقاً');
+        await loadMaintenanceRecords();
+        return;
+      }
+
       const confirmPayment = confirm(
         `سداد رسوم الصيانة\n\nالمبلغ المستحق: ${record.client_due_amount} ر.س\nعدد الأشجار: ${record.client_tree_count}\n\nسيتم تحويلك إلى صفحة الدفع لإتمام العملية.\n\nهل تريد المتابعة؟`
       );
@@ -119,17 +130,11 @@ export default function MyGreenTrees() {
           user.id
         );
 
-        await maintenancePaymentService.simulatePaymentSuccess(
-          paymentInfo.paymentId,
-          paymentInfo.amount
-        );
-
-        alert('تم تسجيل السداد بنجاح');
-        loadMaintenanceRecords();
+        window.location.href = paymentInfo.paymentUrl;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error processing payment:', error);
-      alert('خطأ في معالجة السداد');
+      alert(error?.message || 'خطأ في معالجة السداد');
     } finally {
       setProcessingPayment(false);
     }

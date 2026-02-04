@@ -9,6 +9,7 @@ import StandaloneAccountRegistration from './components/StandaloneAccountRegistr
 import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
 import MyReservations from './components/MyReservations';
 import MyGreenTrees from './components/MyGreenTrees';
+import MaintenancePaymentResult from './components/MaintenancePaymentResult';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
@@ -47,6 +48,7 @@ function AppContent() {
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
   const [showMyGreenTrees, setShowMyGreenTrees] = useState(false);
+  const [showPaymentResult, setShowPaymentResult] = useState(false);
   const [showStandaloneRegistration, setShowStandaloneRegistration] = useState(false);
   const [showWelcomeToAccount, setShowWelcomeToAccount] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
@@ -58,6 +60,13 @@ function AppContent() {
   const handleAppModeChange = async (mode: AppMode) => {
     await updateIdentity(mode);
   };
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('payment_id')) {
+      setShowPaymentResult(true);
+    }
+  }, []);
 
   useEffect(() => {
     let retryCount = 0;
@@ -1261,6 +1270,18 @@ function AppContent() {
             <X className="w-6 h-6 text-gray-700" />
           </button>
           <MyGreenTrees />
+        </div>
+      )}
+
+      {showPaymentResult && (
+        <div className="fixed inset-0 z-50 bg-white overflow-auto">
+          <MaintenancePaymentResult
+            onReturnHome={() => {
+              setShowPaymentResult(false);
+              setShowMyGreenTrees(true);
+              window.history.replaceState({}, '', window.location.pathname);
+            }}
+          />
         </div>
       )}
 
