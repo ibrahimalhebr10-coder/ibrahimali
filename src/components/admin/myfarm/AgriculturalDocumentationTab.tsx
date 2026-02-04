@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, Image, Video, Link2, Trash2, Search } from 'lucide-react';
+import { Upload, Image, Video, Trash2, Search, FileVideo, X } from 'lucide-react';
 import { supabase } from '../../../lib/supabase';
 
 interface Documentation {
@@ -39,10 +39,13 @@ const AgriculturalDocumentationTab: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   const [formData, setFormData] = useState({
     media_type: 'صورة' as Documentation['media_type'],
-    media_url: '',
     linked_to_type: 'operation' as Documentation['linked_to_type'],
     linked_to_id: '',
     caption: '',
@@ -105,44 +108,133 @@ const AgriculturalDocumentationTab: React.FC = () => {
     if (data) setGrowthStages(data);
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+
+    if (files.length === 0) return;
+
+    if (formData.media_type === 'فيديو') {
+      const videoFile = files[0];
+      if (videoFile.size > 50 * 1024 * 1024) {
+        alert('حجم الفيديو يجب أن يكون أقل من 50 ميجابايت');
+        return;
+      }
+      setSelectedFiles([videoFile]);
+      const previewUrl = URL.createObjectURL(videoFile);
+      setPreviewUrls([previewUrl]);
+    } else {
+      const imageFiles = files.filter(f => f.type.startsWith('image/'));
+      setSelectedFiles(imageFiles);
+      const previews = imageFiles.map(file => URL.createObjectURL(file));
+      setPreviewUrls(previews);
+    }
+  };
+
+  const removeFile = (index: number) => {
+    const newFiles = selectedFiles.filter((_, i) => i !== index);
+    const newPreviews = previewUrls.filter((_, i) => i !== index);
+
+    URL.revokeObjectURL(previewUrls[index]);
+
+    setSelectedFiles(newFiles);
+    setPreviewUrls(newPreviews);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFarmId || !formData.linked_to_id) return;
+    if (!selectedFarmId || !formData.linked_to_id || selectedFiles.length === 0) {
+      alert('الرجاء اختيار ملف واحد على الأقل');
+      return;
+    }
+
+    setUploading(true);
+    setUploadProgress(0);
 
     const { data: { user } } = await supabase.auth.getUser();
 
-    const payload = {
-      ...formData,
-      farm_id: selectedFarmId,
-      uploaded_by: user?.id,
-    };
+    try {
+      const totalFiles = selectedFiles.length;
 
-    await supabase
-      .from('agricultural_documentation')
-      .insert([payload]);
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${selectedFarmId}/${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-    resetForm();
-    loadDocumentation();
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('agricultural-documentation')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('agricultural-documentation')
+          .getPublicUrl(fileName);
+
+        const payload = {
+          media_type: formData.media_type,
+          media_url: publicUrl,
+          linked_to_type: formData.linked_to_type,
+          linked_to_id: formData.linked_to_id,
+          caption: formData.caption || null,
+          farm_id: selectedFarmId,
+          uploaded_by: user?.id,
+        };
+
+        await supabase
+          .from('agricultural_documentation')
+          .insert([payload]);
+
+        setUploadProgress(Math.round(((i + 1) / totalFiles) * 100));
+      }
+
+      resetForm();
+      loadDocumentation();
+      alert(`تم رفع ${totalFiles} ملف بنجاح!`);
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      alert('حدث خطأ أثناء رفع الملفات');
+    } finally {
+      setUploading(false);
+      setUploadProgress(0);
+    }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, mediaUrl: string) => {
     if (confirm('هل أنت متأكد من حذف هذا التوثيق؟')) {
-      await supabase
-        .from('agricultural_documentation')
-        .delete()
-        .eq('id', id);
-      loadDocumentation();
+      try {
+        const filePath = mediaUrl.split('/agricultural-documentation/')[1];
+
+        if (filePath) {
+          await supabase.storage
+            .from('agricultural-documentation')
+            .remove([filePath]);
+        }
+
+        await supabase
+          .from('agricultural_documentation')
+          .delete()
+          .eq('id', id);
+
+        loadDocumentation();
+      } catch (error) {
+        console.error('Error deleting documentation:', error);
+        alert('حدث خطأ أثناء الحذف');
+      }
     }
   };
 
   const resetForm = () => {
     setFormData({
       media_type: 'صورة',
-      media_url: '',
       linked_to_type: 'operation',
       linked_to_id: '',
       caption: '',
     });
+
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    setUploadProgress(0);
     setShowAddForm(false);
   };
 
@@ -242,43 +334,40 @@ const AgriculturalDocumentationTab: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredDocumentation.map((doc) => (
-                <div key={doc.id} className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${doc.media_type === 'صورة' ? 'bg-amber-100' : 'bg-blue-100'}`}>
-                      {doc.media_type === 'صورة' ? (
-                        <Image className={`w-6 h-6 ${doc.media_type === 'صورة' ? 'text-amber-600' : 'text-blue-600'}`} />
-                      ) : (
-                        <Video className="w-6 h-6 text-blue-600" />
-                      )}
-                    </div>
+                <div key={doc.id} className="bg-white rounded-lg border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                  <div className="relative">
+                    {doc.media_type === 'صورة' ? (
+                      <img
+                        src={doc.media_url}
+                        alt={doc.caption || 'صورة زراعية'}
+                        className="w-full h-48 object-cover"
+                      />
+                    ) : (
+                      <video
+                        src={doc.media_url}
+                        controls
+                        className="w-full h-48 bg-black"
+                      />
+                    )}
                     <button
-                      onClick={() => handleDelete(doc.id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      onClick={() => handleDelete(doc.id, doc.media_url)}
+                      className="absolute top-2 left-2 p-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors shadow-lg"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-medium">
+                    <div className="absolute top-2 right-2 flex gap-2">
+                      <span className="px-2 py-1 bg-white/90 backdrop-blur-sm text-gray-700 rounded text-xs font-medium shadow-sm">
                         {doc.media_type}
                       </span>
-                      <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-medium">
-                        {doc.linked_to_type === 'operation' ? 'عملية زراعية' : 'مرحلة نمو'}
+                      <span className="px-2 py-1 bg-green-600/90 backdrop-blur-sm text-white rounded text-xs font-medium shadow-sm">
+                        {doc.linked_to_type === 'operation' ? 'عملية' : 'مرحلة'}
                       </span>
                     </div>
+                  </div>
+                  <div className="p-4 space-y-2">
                     {doc.caption && (
-                      <p className="text-sm text-gray-700">{doc.caption}</p>
+                      <p className="text-sm text-gray-700 line-clamp-2">{doc.caption}</p>
                     )}
-                    <a
-                      href={doc.media_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700"
-                    >
-                      <Link2 className="w-4 h-4" />
-                      <span>عرض الملف</span>
-                    </a>
                     <p className="text-xs text-gray-500">
                       {new Date(doc.upload_date).toLocaleDateString('ar-SA')}
                     </p>
@@ -309,25 +398,101 @@ const AgriculturalDocumentationTab: React.FC = () => {
                 <select
                   required
                   value={formData.media_type}
-                  onChange={(e) => setFormData({ ...formData, media_type: e.target.value as Documentation['media_type'] })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, media_type: e.target.value as Documentation['media_type'] });
+                    setSelectedFiles([]);
+                    previewUrls.forEach(url => URL.revokeObjectURL(url));
+                    setPreviewUrls([]);
+                  }}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
-                  <option value="صورة">صورة</option>
-                  <option value="فيديو">فيديو</option>
+                  <option value="صورة">صورة (يمكن اختيار عدة صور)</option>
+                  <option value="فيديو">فيديو (ملف واحد فقط)</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">رابط الملف *</label>
-                <input
-                  type="url"
-                  required
-                  value={formData.media_url}
-                  onChange={(e) => setFormData({ ...formData, media_url: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                  placeholder="https://..."
-                />
+                <label className="block text-sm font-medium text-gray-700 mb-2">اختر الملف *</label>
+                <div className="relative">
+                  <input
+                    type="file"
+                    onChange={handleFileSelect}
+                    accept={formData.media_type === 'صورة' ? 'image/*' : 'video/*'}
+                    multiple={formData.media_type === 'صورة'}
+                    className="hidden"
+                    id="file-upload"
+                    disabled={uploading}
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className={`flex items-center justify-center gap-2 w-full px-4 py-8 border-2 border-dashed ${
+                      selectedFiles.length > 0 ? 'border-amber-500 bg-amber-50' : 'border-gray-300 bg-gray-50'
+                    } rounded-lg cursor-pointer hover:bg-amber-50 hover:border-amber-500 transition-colors ${
+                      uploading ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                  >
+                    {formData.media_type === 'صورة' ? (
+                      <Image className="w-8 h-8 text-amber-600" />
+                    ) : (
+                      <FileVideo className="w-8 h-8 text-blue-600" />
+                    )}
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-gray-700">
+                        {selectedFiles.length > 0
+                          ? `تم اختيار ${selectedFiles.length} ملف`
+                          : formData.media_type === 'صورة'
+                          ? 'اضغط لاختيار صور'
+                          : 'اضغط لاختيار فيديو'}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
+                        {formData.media_type === 'صورة'
+                          ? 'JPG, PNG, WebP (عدة صور)'
+                          : 'MP4, MOV (حد أقصى 50MB)'}
+                      </p>
+                    </div>
+                  </label>
+                </div>
               </div>
+
+              {previewUrls.length > 0 && (
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">المعاينة:</label>
+                  <div className={`grid ${formData.media_type === 'صورة' ? 'grid-cols-3' : 'grid-cols-1'} gap-3`}>
+                    {previewUrls.map((url, index) => (
+                      <div key={index} className="relative rounded-lg overflow-hidden border border-gray-200">
+                        {formData.media_type === 'صورة' ? (
+                          <img src={url} alt={`معاينة ${index + 1}`} className="w-full h-32 object-cover" />
+                        ) : (
+                          <video src={url} className="w-full h-48" controls />
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeFile(index)}
+                          className="absolute top-1 left-1 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
+                          disabled={uploading}
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {uploading && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-700">جاري الرفع...</span>
+                    <span className="text-amber-600 font-medium">{uploadProgress}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="bg-amber-600 h-full transition-all duration-300"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">ربط بـ *</label>
@@ -392,14 +557,24 @@ const AgriculturalDocumentationTab: React.FC = () => {
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors font-medium"
+                  disabled={uploading || selectedFiles.length === 0}
+                  className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    uploading || selectedFiles.length === 0
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-amber-600 text-white hover:bg-amber-700'
+                  }`}
                 >
-                  رفع
+                  {uploading ? 'جاري الرفع...' : `رفع ${selectedFiles.length > 1 ? `${selectedFiles.length} ملفات` : 'الملف'}`}
                 </button>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+                  disabled={uploading}
+                  className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+                    uploading
+                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
                 >
                   إلغاء
                 </button>
