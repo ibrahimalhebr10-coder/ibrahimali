@@ -93,6 +93,13 @@ export const investorMyFarmService = {
         productYields: [],
         wasteYields: [],
         expansionOpportunities: [],
+        operatingCosts: [],
+        operatingCostsSummary: {
+          totalCost: 0,
+          operationsCount: 0,
+          averageCostPerOperation: 0,
+          mostExpensiveOperation: null,
+        },
       };
     }
 
