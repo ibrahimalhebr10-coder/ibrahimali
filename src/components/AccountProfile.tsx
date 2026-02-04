@@ -12,11 +12,12 @@ interface AccountProfileProps {
   onOpenAuth: () => void;
   onOpenReservations: () => void;
   onStartInvestment?: () => void;
+  onOpenGreenTrees?: () => void;
 }
 
 type AppMode = 'agricultural' | 'investment';
 
-export default function AccountProfile({ isOpen, currentContext, onClose, onOpenAuth, onOpenReservations, onStartInvestment }: AccountProfileProps) {
+export default function AccountProfile({ isOpen, currentContext, onClose, onOpenAuth, onOpenReservations, onStartInvestment, onOpenGreenTrees }: AccountProfileProps) {
   const { user, signOut } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [primaryIdentity, setPrimaryIdentity] = useState<IdentityType | null>(null);
@@ -253,6 +254,26 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
                 </div>
 
                 <MyContracts />
+
+                {appMode === 'investment' && onOpenGreenTrees && (
+                  <button
+                    onClick={onOpenGreenTrees}
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all active:scale-98 mb-6"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
+                          <Sprout className="w-7 h-7 text-white" />
+                        </div>
+                        <div className="text-right">
+                          <h3 className="text-xl font-bold mb-1">أشجاري الخضراء</h3>
+                          <p className="text-sm text-green-100">تابع صيانة أشجارك ورسوم الصيانة</p>
+                        </div>
+                      </div>
+                      <div className="text-3xl">🌳</div>
+                    </div>
+                  </button>
+                )}
 
                 <IdentityManager />
 

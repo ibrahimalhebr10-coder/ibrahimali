@@ -1,4 +1,4 @@
-import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus } from 'lucide-react';
+import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
@@ -8,6 +8,7 @@ import AccountProfile from './components/AccountProfile';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
 import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
 import MyReservations from './components/MyReservations';
+import MyGreenTrees from './components/MyGreenTrees';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
@@ -45,6 +46,7 @@ function AppContent() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
+  const [showMyGreenTrees, setShowMyGreenTrees] = useState(false);
   const [showStandaloneRegistration, setShowStandaloneRegistration] = useState(false);
   const [showWelcomeToAccount, setShowWelcomeToAccount] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
@@ -1186,6 +1188,10 @@ function AppContent() {
           setShowAccountProfile(false);
           setShowMyReservations(true);
         }}
+        onOpenGreenTrees={() => {
+          setShowAccountProfile(false);
+          setShowMyGreenTrees(true);
+        }}
       />
 
 
@@ -1232,6 +1238,18 @@ function AppContent() {
         isOpen={showMyReservations}
         onClose={() => setShowMyReservations(false)}
       />
+
+      {showMyGreenTrees && user && identity === 'investment' && (
+        <div className="fixed inset-0 z-50 bg-white overflow-auto">
+          <button
+            onClick={() => setShowMyGreenTrees(false)}
+            className="fixed top-4 left-4 z-50 w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center hover:bg-gray-50 transition-colors"
+          >
+            <X className="w-6 h-6 text-gray-700" />
+          </button>
+          <MyGreenTrees />
+        </div>
+      )}
 
       </div>
     </ErrorBoundary>
