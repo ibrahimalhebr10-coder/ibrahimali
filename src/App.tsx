@@ -996,32 +996,6 @@ function AppContent() {
               }
             }}
           >
-            <div
-              className="absolute inset-0 rounded-3xl animate-pulse pointer-events-none"
-              style={{
-                background: appMode === 'agricultural'
-                  ? 'radial-gradient(circle at center, rgba(58,161,126,0.2) 0%, transparent 70%)'
-                  : 'radial-gradient(circle at center, rgba(212,175,55,0.2) 0%, transparent 70%)',
-                opacity: 0.6
-              }}
-            />
-            <TreePine
-              className="w-9 h-9 transition-transform duration-300 group-hover:scale-110 relative z-10"
-              style={{
-                color: appMode === 'agricultural' ? '#3AA17E' : '#D4AF37',
-                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
-              }}
-              strokeWidth={2.5}
-            />
-            <span
-              className="text-lg font-black relative z-10"
-              style={{
-                color: appMode === 'agricultural' ? '#2D7A5F' : '#B8942F',
-                textShadow: '0 1px 2px rgba(255,255,255,0.8)'
-              }}
-            >
-              {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
-            </span>
           </button>
 
           <NotificationCenter
@@ -1137,33 +1111,7 @@ function AppContent() {
                 border: appMode === 'agricultural' ? '3px solid rgba(58,161,126,0.5)' : '3px solid rgba(212,175,55,0.5)'
               }}
             >
-              <div
-                className="absolute inset-0 rounded-3xl animate-pulse pointer-events-none"
-                style={{
-                  background: appMode === 'agricultural'
-                    ? 'radial-gradient(circle at center, rgba(58,161,126,0.25) 0%, transparent 70%)'
-                    : 'radial-gradient(circle at center, rgba(212,175,55,0.25) 0%, transparent 70%)',
-                  opacity: 0.7
-                }}
-              />
-              <TreePine
-                className="w-8 h-8 transition-all duration-300 group-active:scale-110 relative z-10"
-                style={{
-                  color: appMode === 'agricultural' ? '#3AA17E' : '#D4AF37',
-                  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
-                }}
-                strokeWidth={2.5}
-              />
             </div>
-            <span
-              className="text-[11px] font-black relative z-10"
-              style={{
-                color: appMode === 'agricultural' ? '#2D7A5F' : '#B8942F',
-                textShadow: '0 1px 2px rgba(255,255,255,0.8)'
-              }}
-            >
-              {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
-            </span>
           </button>
 
           <NotificationCenter
