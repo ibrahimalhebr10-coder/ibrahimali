@@ -431,7 +431,16 @@ function AppContent() {
   };
 
   const handleMyFarmClick = () => {
-    alert('قريباً: قسم أشجاري');
+    if (!user) {
+      alert('يرجى تسجيل الدخول أولاً');
+      return;
+    }
+
+    if (identity === 'investment') {
+      setShowMyGreenTrees(true);
+    } else {
+      setShowMyReservations(true);
+    }
   };
 
   const handleOfferFarmClick = () => {
@@ -998,6 +1007,10 @@ function AppContent() {
               }
             }}
           >
+            <Home className="w-7 h-7 transition-transform duration-300 group-hover:scale-110" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37' }} />
+            <span className="text-sm font-bold" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37' }}>
+              {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
+            </span>
           </button>
 
           <NotificationCenter
@@ -1113,7 +1126,11 @@ function AppContent() {
                 border: appMode === 'agricultural' ? '3px solid rgba(58,161,126,0.5)' : '3px solid rgba(212,175,55,0.5)'
               }}
             >
+              <Home className="w-7 h-7 transition-all duration-300 group-active:scale-110" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37' }} />
             </div>
+            <span className="text-[10px] font-black" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#b8942f' }}>
+              {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
+            </span>
           </button>
 
           <NotificationCenter
