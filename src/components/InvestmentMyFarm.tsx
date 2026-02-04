@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, TreeDeciduous, Clock, DollarSign, Recycle, ArrowRight, Target, Droplets, Leaf, Plus, Loader } from 'lucide-react';
+import { TrendingUp, TreeDeciduous, Clock, DollarSign, Recycle, ArrowRight, Target, Droplets, Leaf, Plus, Loader, Wallet, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { investorMyFarmService, InvestorMyFarmData } from '../services/investorMyFarmService';
 
@@ -434,6 +434,130 @@ export default function InvestmentMyFarm() {
                   </p>
                 </div>
               ))}
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-xl p-6 border border-orange-100">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center shadow-lg">
+              <Wallet className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-800">تكاليف التشغيل</h2>
+              <p className="text-sm text-gray-500">نصيبك من تكاليف العمليات الزراعية</p>
+            </div>
+          </div>
+
+          {!isVisitor && farmData && farmData.operatingCosts.length > 0 && (
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              <div className="bg-gradient-to-br from-orange-50 to-amber-50 rounded-xl p-4 border border-orange-200">
+                <p className="text-xs text-gray-600 mb-1">إجمالي التكاليف</p>
+                <p className="text-lg font-bold text-orange-700">
+                  {farmData.operatingCostsSummary.totalCost.toLocaleString('ar-SA')} ريال
+                </p>
+              </div>
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-200">
+                <p className="text-xs text-gray-600 mb-1">عدد العمليات</p>
+                <p className="text-lg font-bold text-blue-700">
+                  {farmData.operatingCostsSummary.operationsCount}
+                </p>
+              </div>
+              <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-4 border border-purple-200">
+                <p className="text-xs text-gray-600 mb-1">متوسط التكلفة</p>
+                <p className="text-lg font-bold text-purple-700">
+                  {farmData.operatingCostsSummary.averageCostPerOperation.toLocaleString('ar-SA', { maximumFractionDigits: 0 })} ريال
+                </p>
+              </div>
+            </div>
+          )}
+
+          {isVisitor || (farmData?.operatingCosts.length || 0) === 0 ? (
+            <div className="space-y-3">
+              {[
+                { icon: Droplets, label: 'ري شامل', date: '2026-01-15', cost: '150 ريال', farm: 'مزرعة السلام' },
+                { icon: TreeDeciduous, label: 'تقليم الأشجار', date: '2026-01-10', cost: '85 ريال', farm: 'مزرعة السلام' },
+                { icon: Leaf, label: 'تسميد', date: '2025-12-20', cost: '120 ريال', farm: 'مزرعة السلام' }
+              ].map((cost, index) => {
+                const CostIcon = cost.icon;
+                return (
+                  <button
+                    key={index}
+                    onClick={handleActionClick}
+                    className="group w-full bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-4 border border-orange-200 hover:shadow-lg transition-all text-right"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-sm border border-orange-200">
+                        <CostIcon className="w-5 h-5 text-orange-600" />
+                      </div>
+
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-800 text-sm">{cost.label}</p>
+                        <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                          <Calendar className="w-3 h-3" />
+                          <span>{cost.date}</span>
+                          <span>•</span>
+                          <span>{cost.farm}</span>
+                        </div>
+                      </div>
+
+                      <div className="text-right">
+                        <p className="font-bold text-orange-700 text-sm">{cost.cost}</p>
+                        <p className="text-xs text-gray-500">نصيبك</p>
+                      </div>
+
+                      <ArrowRight className="w-4 h-4 text-orange-400 group-hover:text-orange-600 group-hover:translate-x-1 transition-all" />
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {farmData?.operatingCosts.map((cost) => {
+                const operationIcons: Record<string, any> = {
+                  'ري': Droplets,
+                  'تقليم': TreeDeciduous,
+                  'تسميد': Leaf,
+                  'مكافحة آفات': Target,
+                };
+                const CostIcon = operationIcons[cost.operation_type] || DollarSign;
+
+                return (
+                  <div
+                    key={cost.id}
+                    className="bg-gradient-to-r from-orange-50 to-amber-50 rounded-xl p-4 border border-orange-200"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-white flex items-center justify-center shadow-sm border border-orange-200">
+                        <CostIcon className="w-5 h-5 text-orange-600" />
+                      </div>
+
+                      <div className="flex-1">
+                        <p className="font-bold text-gray-800 text-sm">{cost.operation_type}</p>
+                        <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                          <Calendar className="w-3 h-3" />
+                          <span>{new Date(cost.operation_date).toLocaleDateString('ar-SA')}</span>
+                          <span>•</span>
+                          <span>{cost.farm_name}</span>
+                        </div>
+                        {cost.description && (
+                          <p className="text-xs text-gray-600 mt-1">{cost.description}</p>
+                        )}
+                      </div>
+
+                      <div className="text-right">
+                        <p className="font-bold text-orange-700 text-sm">
+                          {cost.investor_cost.toLocaleString('ar-SA')} ريال
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {cost.investor_trees} شجرة × {cost.cost_per_tree} ريال
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

@@ -47,6 +47,25 @@ export interface ExpansionOpportunity {
   is_active: boolean;
 }
 
+export interface OperatingCost {
+  id: string;
+  farm_id: string;
+  farm_name: string;
+  operation_type: string;
+  operation_date: string;
+  description: string;
+  cost_per_tree: number;
+  investor_trees: number;
+  investor_cost: number;
+}
+
+export interface OperatingCostsSummary {
+  totalCost: number;
+  operationsCount: number;
+  averageCostPerOperation: number;
+  mostExpensiveOperation: string | null;
+}
+
 export interface InvestorMyFarmData {
   assets: InvestorAsset[];
   totalTrees: number;
@@ -54,6 +73,8 @@ export interface InvestorMyFarmData {
   productYields: ProductYield[];
   wasteYields: WasteYield[];
   expansionOpportunities: ExpansionOpportunity[];
+  operatingCosts: OperatingCost[];
+  operatingCostsSummary: OperatingCostsSummary;
 }
 
 export const investorMyFarmService = {
@@ -75,15 +96,17 @@ export const investorMyFarmService = {
       };
     }
 
-    const [assetsData, contractsData, productsData, wasteData, expansionData] = await Promise.all([
+    const [assetsData, contractsData, productsData, wasteData, expansionData, operatingCostsData] = await Promise.all([
       this.getAssets(userProfile.id),
       this.getContracts(userProfile.id),
       this.getProductYields(userProfile.id),
       this.getWasteYields(userProfile.id),
       this.getExpansionOpportunities(userProfile.id),
+      this.getOperatingCosts(userProfile.id),
     ]);
 
     const totalTrees = assetsData.reduce((sum, asset) => sum + asset.quantity, 0);
+    const operatingCostsSummary = this.calculateOperatingCostsSummary(operatingCostsData);
 
     return {
       assets: assetsData,
@@ -92,6 +115,8 @@ export const investorMyFarmService = {
       productYields: productsData,
       wasteYields: wasteData,
       expansionOpportunities: expansionData,
+      operatingCosts: operatingCostsData,
+      operatingCostsSummary,
     };
   },
 
@@ -242,5 +267,92 @@ export const investorMyFarmService = {
       }
       return acc;
     }, {} as Record<string, number>);
+  },
+
+  async getOperatingCosts(userProfileId: string): Promise<OperatingCost[]> {
+    const { data: assets } = await supabase
+      .from('investment_agricultural_assets')
+      .select('farm_id, quantity')
+      .eq('user_id', userProfileId);
+
+    if (!assets || assets.length === 0) {
+      return [];
+    }
+
+    const assetsByFarm = assets.reduce((acc, asset) => {
+      if (acc[asset.farm_id]) {
+        acc[asset.farm_id] += asset.quantity;
+      } else {
+        acc[asset.farm_id] = asset.quantity;
+      }
+      return acc;
+    }, {} as Record<string, number>);
+
+    const farmIds = Object.keys(assetsByFarm);
+
+    const { data: operations, error } = await supabase
+      .from('agricultural_operations')
+      .select(`
+        id,
+        farm_id,
+        operation_type,
+        operation_date,
+        description,
+        cost_per_tree,
+        farms:farm_id (
+          name_ar
+        )
+      `)
+      .in('farm_id', farmIds)
+      .order('operation_date', { ascending: false })
+      .limit(10);
+
+    if (error) {
+      console.error('Error fetching operating costs:', error);
+      return [];
+    }
+
+    return (operations || []).map((op: any) => {
+      const investorTrees = assetsByFarm[op.farm_id] || 0;
+      const investorCost = investorTrees * (op.cost_per_tree || 0);
+
+      return {
+        id: op.id,
+        farm_id: op.farm_id,
+        farm_name: op.farms?.name_ar || 'مزرعة',
+        operation_type: op.operation_type,
+        operation_date: op.operation_date,
+        description: op.description || '',
+        cost_per_tree: op.cost_per_tree || 0,
+        investor_trees: investorTrees,
+        investor_cost: investorCost,
+      };
+    });
+  },
+
+  calculateOperatingCostsSummary(costs: OperatingCost[]): OperatingCostsSummary {
+    if (costs.length === 0) {
+      return {
+        totalCost: 0,
+        operationsCount: 0,
+        averageCostPerOperation: 0,
+        mostExpensiveOperation: null,
+      };
+    }
+
+    const totalCost = costs.reduce((sum, cost) => sum + cost.investor_cost, 0);
+    const operationsCount = costs.length;
+    const averageCostPerOperation = totalCost / operationsCount;
+
+    const mostExpensive = costs.reduce((max, cost) =>
+      cost.investor_cost > max.investor_cost ? cost : max
+    );
+
+    return {
+      totalCost,
+      operationsCount,
+      averageCostPerOperation,
+      mostExpensiveOperation: mostExpensive.operation_type,
+    };
   },
 };
