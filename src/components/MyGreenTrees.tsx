@@ -5,7 +5,7 @@ import { maintenancePaymentService } from '../services/maintenancePaymentService
 import { useAuth } from '../contexts/AuthContext';
 
 export default function MyGreenTrees() {
-  const { identity } = useAuth();
+  const { identity, user } = useAuth();
   const [records, setRecords] = useState<ClientMaintenanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecord, setSelectedRecord] = useState<string | null>(null);
@@ -91,6 +91,11 @@ export default function MyGreenTrees() {
   }, [loadMaintenanceDetails]);
 
   const handlePayFee = async (record: ClientMaintenanceRecord) => {
+    if (!user?.id) {
+      alert('يجب تسجيل الدخول أولاً');
+      return;
+    }
+
     if (!record.total_amount || !record.cost_per_tree || !record.maintenance_fee_id) {
       alert('هذه الصيانة لا تحتوي على رسوم');
       return;
@@ -111,7 +116,7 @@ export default function MyGreenTrees() {
       if (confirmPayment) {
         const paymentInfo = await maintenancePaymentService.initiatePayment(
           record.maintenance_fee_id,
-          record.user_id
+          user.id
         );
 
         await maintenancePaymentService.simulatePaymentSuccess(

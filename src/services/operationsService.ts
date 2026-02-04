@@ -294,12 +294,54 @@ export const operationsService = {
 
   async getMaintenancePaymentsSummary() {
     const { data, error } = await supabase
-      .from('maintenance_payments_summary')
-      .select('*')
+      .from('maintenance_payments')
+      .select(`
+        id,
+        user_id,
+        maintenance_fee_id,
+        farm_id,
+        tree_count,
+        amount_due,
+        amount_paid,
+        payment_status,
+        payment_date,
+        created_at,
+        user_profiles:user_id (
+          full_name
+        ),
+        farms:farm_id (
+          farm_name
+        ),
+        maintenance_fees:maintenance_fee_id (
+          id,
+          maintenance_records:maintenance_id (
+            maintenance_type,
+            maintenance_date
+          )
+        )
+      `)
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
-    return data || [];
+    if (error) {
+      console.error('Error fetching payments summary:', error);
+      throw error;
+    }
+
+    const formatted = (data || []).map((payment: any) => ({
+      id: payment.id,
+      full_name: payment.user_profiles?.full_name || 'غير معروف',
+      farm_name: payment.farms?.farm_name || 'غير معروف',
+      maintenance_type: payment.maintenance_fees?.maintenance_records?.maintenance_type || 'periodic',
+      maintenance_date: payment.maintenance_fees?.maintenance_records?.maintenance_date || '',
+      tree_count: payment.tree_count,
+      amount_due: payment.amount_due,
+      amount_paid: payment.amount_paid || 0,
+      payment_status: payment.payment_status,
+      payment_date: payment.payment_date,
+      created_at: payment.created_at
+    }));
+
+    return formatted;
   },
 
   async getMaintenancePaymentsByFee(feeId: string) {
