@@ -27,6 +27,20 @@ export default function MaintenancePaymentResult({ onReturnHome }: MaintenancePa
           return;
         }
 
+        if (status === 'cancelled') {
+          setSuccess(false);
+          setMessage('تم إلغاء عملية الدفع');
+          setLoading(false);
+          return;
+        }
+
+        if (status === 'failed') {
+          setSuccess(false);
+          setMessage('فشلت عملية الدفع');
+          setLoading(false);
+          return;
+        }
+
         if (status === 'success' && transactionId) {
           const result = await maintenancePaymentService.completePayment(
             paymentId,
@@ -40,27 +54,35 @@ export default function MaintenancePaymentResult({ onReturnHome }: MaintenancePa
             transaction_id: transactionId,
             amount: result.amount_paid || 0
           });
-        } else if (status === 'cancelled') {
-          setSuccess(false);
-          setMessage('تم إلغاء عملية الدفع');
-        } else if (status === 'failed') {
-          setSuccess(false);
-          setMessage('فشلت عملية الدفع');
         } else {
           const paymentRecord = await maintenancePaymentService.getPaymentById(paymentId);
 
-          await maintenancePaymentService.simulatePaymentSuccess(
-            paymentId,
-            paymentRecord.total_amount || 0
-          );
+          if (paymentRecord.payment_status === 'paid') {
+            setSuccess(true);
+            setMessage('تم السداد مسبقاً');
+            setPaymentDetails({
+              payment_id: paymentId,
+              transaction_id: paymentRecord.transaction_id || 'غير متوفر',
+              amount: paymentRecord.amount_paid || paymentRecord.amount_due || 0
+            });
+          } else {
+            const transId = `SIM-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const result = await maintenancePaymentService.completePayment(
+              paymentId,
+              transId,
+              paymentRecord.amount_due,
+              'simulation',
+              { simulated: true, timestamp: new Date().toISOString() }
+            );
 
-          setSuccess(true);
-          setMessage('تم معالجة الدفع بنجاح');
-          setPaymentDetails({
-            payment_id: paymentId,
-            transaction_id: 'محاكاة',
-            amount: paymentRecord.total_amount || 0
-          });
+            setSuccess(true);
+            setMessage('تم معالجة الدفع بنجاح');
+            setPaymentDetails({
+              payment_id: paymentId,
+              transaction_id: transId,
+              amount: result.amount_paid || 0
+            });
+          }
         }
       } catch (error: any) {
         console.error('Error processing payment result:', error);

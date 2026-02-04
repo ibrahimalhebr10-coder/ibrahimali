@@ -34,6 +34,8 @@ export interface PaymentResult {
   payment_id: string;
   paid_at: string;
   amount_paid: number;
+  transaction_id?: string;
+  already_paid?: boolean;
 }
 
 export const maintenancePaymentService = {
@@ -162,8 +164,6 @@ export const maintenancePaymentService = {
         *,
         maintenance_fees (
           id,
-          title,
-          description,
           cost_per_tree,
           created_at
         )
@@ -186,17 +186,19 @@ export const maintenancePaymentService = {
         *,
         maintenance_fees (
           id,
-          title,
-          description,
           cost_per_tree
         )
       `)
       .eq('id', paymentId)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error('Error getting payment:', error);
       throw new Error(error.message || 'فشل في الحصول على بيانات الدفع');
+    }
+
+    if (!data) {
+      throw new Error('سجل الدفع غير موجود');
     }
 
     return data;
