@@ -10,10 +10,11 @@ import InvestmentStatusTab from './myfarm/InvestmentStatusTab';
 import InvestmentProductsWasteTab from './myfarm/InvestmentProductsWasteTab';
 import InvestmentExpansionTab from './myfarm/InvestmentExpansionTab';
 import InvestmentExperienceBuilderTab from './myfarm/InvestmentExperienceBuilderTab';
+import OperatingCostsTab from '../investment/OperatingCostsTab';
 
 type FarmPath = 'agricultural' | 'investment';
 type AgriculturalTab = 'trees-map' | 'operations' | 'documentation' | 'growth-stages' | 'experience-builder';
-type InvestmentTab = 'assets' | 'status' | 'products-waste' | 'expansion' | 'experience-builder';
+type InvestmentTab = 'assets' | 'status' | 'operating-costs' | 'products-waste' | 'expansion' | 'experience-builder';
 
 const MyFarmManagement: React.FC = () => {
   const [selectedPath, setSelectedPath] = useState<FarmPath | null>(null);
@@ -195,6 +196,7 @@ const MyFarmManagement: React.FC = () => {
     const tabs = [
       { id: 'assets' as InvestmentTab, label: 'الأصول الزراعية', icon: TreePine, color: 'blue' },
       { id: 'status' as InvestmentTab, label: 'حالة الاستثمار', icon: Activity, color: 'green' },
+      { id: 'operating-costs' as InvestmentTab, label: 'تكاليف التشغيل', icon: DollarSign, color: 'emerald' },
       { id: 'products-waste' as InvestmentTab, label: 'المنتجات والمخلفات', icon: Apple, color: 'amber' },
       { id: 'expansion' as InvestmentTab, label: 'فرص التوسعة', icon: TrendingUp, color: 'violet' },
       { id: 'experience-builder' as InvestmentTab, label: 'Experience Builder', icon: Eye, color: 'sky' },
@@ -204,6 +206,7 @@ const MyFarmManagement: React.FC = () => {
       const colors = {
         blue: 'text-blue-600',
         green: 'text-green-600',
+        emerald: 'text-emerald-600',
         amber: 'text-amber-600',
         violet: 'text-violet-600',
         sky: 'text-sky-600',
@@ -265,6 +268,7 @@ const MyFarmManagement: React.FC = () => {
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           {investmentTab === 'assets' && <InvestmentAssetsTab />}
           {investmentTab === 'status' && <InvestmentStatusTab />}
+          {investmentTab === 'operating-costs' && <OperatingCostsTab />}
           {investmentTab === 'products-waste' && <InvestmentProductsWasteTab />}
           {investmentTab === 'expansion' && <InvestmentExpansionTab />}
           {investmentTab === 'experience-builder' && <InvestmentExperienceBuilderTab />}
