@@ -55,12 +55,11 @@ export const clientMaintenanceService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
-    const rpcFunction = pathType === 'agricultural'
-      ? 'get_agricultural_client_maintenance_records'
-      : 'get_client_maintenance_records';
-
     const { data, error } = await supabase
-      .rpc(rpcFunction, { client_user_id: user.id });
+      .rpc('get_client_maintenance_records', {
+        client_user_id: user.id,
+        path_type: pathType
+      });
 
     if (error) throw error;
     return data || [];
