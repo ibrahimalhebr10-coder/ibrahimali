@@ -1020,7 +1020,7 @@ function AppContent() {
                 textShadow: '0 1px 2px rgba(255,255,255,0.8)'
               }}
             >
-              مزرعتي
+              {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
             </span>
           </button>
 
@@ -1162,7 +1162,7 @@ function AppContent() {
                 textShadow: '0 1px 2px rgba(255,255,255,0.8)'
               }}
             >
-              مزرعتي
+              {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
             </span>
           </button>
 
