@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Calendar, FileText, Image, Video, DollarSign, Edit, Trash2, Eye, Save, X } from 'lucide-react';
-import { operationsService, MaintenanceFullDetails, MaintenanceStage, MaintenanceMedia } from '../../services/operationsService';
+import { Plus, Calendar, FileText, Image, Video, DollarSign, Edit, Trash2, Eye, Save, X, Link, Unlink, Package } from 'lucide-react';
+import { operationsService, MaintenanceFullDetails, MaintenanceStage, MaintenanceMedia, GroupedFeeWithRecords } from '../../services/operationsService';
 
 export default function GreenTreesTab() {
   const [records, setRecords] = useState<MaintenanceFullDetails[]>([]);
@@ -8,11 +8,15 @@ export default function GreenTreesTab() {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'list' | 'stages' | 'media' | 'fees'>('list');
+  const [activeTab, setActiveTab] = useState<'list' | 'stages' | 'media' | 'fees' | 'grouped-fees'>('list');
 
   const [stages, setStages] = useState<MaintenanceStage[]>([]);
   const [mediaFiles, setMediaFiles] = useState<MaintenanceMedia[]>([]);
   const [fee, setFee] = useState<any>(null);
+
+  const [groupedFees, setGroupedFees] = useState<GroupedFeeWithRecords[]>([]);
+  const [linkedFees, setLinkedFees] = useState<GroupedFeeWithRecords[]>([]);
+  const [showCreateGroupedFee, setShowCreateGroupedFee] = useState(false);
 
   const [formData, setFormData] = useState({
     farm_id: '',
@@ -29,6 +33,13 @@ export default function GreenTreesTab() {
 
   const [feeForm, setFeeForm] = useState({
     total_amount: ''
+  });
+
+  const [groupedFeeForm, setGroupedFeeForm] = useState({
+    fee_title: '',
+    fee_period: '',
+    total_amount: '',
+    status: 'draft' as 'draft' | 'published' | 'paid'
   });
 
   useEffect(() => {
@@ -54,14 +65,18 @@ export default function GreenTreesTab() {
 
   const loadRecordDetails = async (recordId: string) => {
     try {
-      const [stagesData, mediaData, feeData] = await Promise.all([
+      const [stagesData, mediaData, feeData, linkedFeesData, groupedFeesData] = await Promise.all([
         operationsService.getMaintenanceStages(recordId),
         operationsService.getMaintenanceMedia(recordId),
-        operationsService.getMaintenanceFee(recordId)
+        operationsService.getMaintenanceFee(recordId),
+        operationsService.getMaintenanceLinkedFees(recordId),
+        operationsService.getGroupedFees()
       ]);
       setStages(stagesData);
       setMediaFiles(mediaData);
       setFee(feeData);
+      setLinkedFees(linkedFeesData);
+      setGroupedFees(groupedFeesData);
     } catch (error) {
       console.error('Error loading record details:', error);
     }
@@ -199,6 +214,65 @@ export default function GreenTreesTab() {
     setSelectedRecord(recordId);
     setActiveTab('stages');
     loadRecordDetails(recordId);
+  };
+
+  const handleCreateGroupedFee = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedRecord) return;
+
+    const record = records.find(r => r.id === selectedRecord);
+    if (!record) return;
+
+    try {
+      const newFee = await operationsService.createGroupedFee({
+        fee_title: groupedFeeForm.fee_title,
+        fee_period: groupedFeeForm.fee_period || null,
+        total_amount: parseFloat(groupedFeeForm.total_amount),
+        status: groupedFeeForm.status
+      }, record.farm_id);
+
+      await operationsService.linkMaintenanceToFee(newFee.id, selectedRecord);
+
+      alert('تم إنشاء التجميع المالي وربط السجل به');
+      setShowCreateGroupedFee(false);
+      setGroupedFeeForm({
+        fee_title: '',
+        fee_period: '',
+        total_amount: '',
+        status: 'draft'
+      });
+      loadRecordDetails(selectedRecord);
+    } catch (error) {
+      console.error('Error creating grouped fee:', error);
+      alert('خطأ في إنشاء التجميع المالي');
+    }
+  };
+
+  const handleLinkToExistingFee = async (feeId: string) => {
+    if (!selectedRecord) return;
+
+    try {
+      await operationsService.linkMaintenanceToFee(feeId, selectedRecord);
+      alert('تم ربط السجل بالتجميع المالي');
+      loadRecordDetails(selectedRecord);
+    } catch (error) {
+      console.error('Error linking to fee:', error);
+      alert('خطأ في الربط');
+    }
+  };
+
+  const handleUnlinkFromFee = async (feeId: string) => {
+    if (!selectedRecord) return;
+    if (!confirm('هل تريد فك الارتباط من هذا التجميع المالي؟')) return;
+
+    try {
+      await operationsService.unlinkMaintenanceFromFee(feeId, selectedRecord);
+      alert('تم فك الارتباط');
+      loadRecordDetails(selectedRecord);
+    } catch (error) {
+      console.error('Error unlinking:', error);
+      alert('خطأ في فك الارتباط');
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -461,6 +535,17 @@ export default function GreenTreesTab() {
                 <DollarSign className="w-4 h-4 inline ml-2" />
                 رسوم الصيانة
               </button>
+              <button
+                onClick={() => setActiveTab('grouped-fees')}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  activeTab === 'grouped-fees'
+                    ? 'text-green-600 border-b-2 border-green-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Package className="w-4 h-4 inline ml-2" />
+                التجميع المالي ({linkedFees.length})
+              </button>
             </div>
 
             {activeTab === 'stages' && (
@@ -646,6 +731,168 @@ export default function GreenTreesTab() {
                       <Save className="w-4 h-4 inline ml-2" />
                       حفظ الرسوم
                     </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'grouped-fees' && (
+              <div className="space-y-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
+                  <h5 className="font-semibold text-blue-900 mb-2">التجميع المالي</h5>
+                  <p className="text-sm text-blue-700">
+                    يمكنك ربط هذا السجل مع سجلات صيانة أخرى تحت رسوم واحدة. مثال: رسوم شهر يناير تشمل (ري + تسميد + تقليم)
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h5 className="font-semibold text-gray-900">الرسوم المرتبطة</h5>
+                    <button
+                      onClick={() => setShowCreateGroupedFee(!showCreateGroupedFee)}
+                      className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm"
+                    >
+                      <Plus className="w-4 h-4" />
+                      {showCreateGroupedFee ? 'إلغاء' : 'إنشاء تجميع جديد'}
+                    </button>
+                  </div>
+
+                  {showCreateGroupedFee && (
+                    <form onSubmit={handleCreateGroupedFee} className="bg-white rounded-lg p-4 mb-4 border border-gray-200 space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">عنوان التجميع *</label>
+                        <input
+                          type="text"
+                          placeholder="مثال: رسوم صيانة يناير 2024"
+                          value={groupedFeeForm.fee_title}
+                          onChange={(e) => setGroupedFeeForm({ ...groupedFeeForm, fee_title: e.target.value })}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">الفترة</label>
+                        <input
+                          type="text"
+                          placeholder="مثال: يناير 2024"
+                          value={groupedFeeForm.fee_period}
+                          onChange={(e) => setGroupedFeeForm({ ...groupedFeeForm, fee_period: e.target.value })}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">إجمالي المبلغ (ريال) *</label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          value={groupedFeeForm.total_amount}
+                          onChange={(e) => setGroupedFeeForm({ ...groupedFeeForm, total_amount: e.target.value })}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                          required
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          تكلفة الشجرة: {groupedFeeForm.total_amount && records.find(r => r.id === selectedRecord)?.total_trees
+                            ? `${(parseFloat(groupedFeeForm.total_amount) / records.find(r => r.id === selectedRecord)!.total_trees).toFixed(2)} ر.س`
+                            : '---'}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+                        <select
+                          value={groupedFeeForm.status}
+                          onChange={(e) => setGroupedFeeForm({ ...groupedFeeForm, status: e.target.value as any })}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                        >
+                          <option value="draft">مسودة</option>
+                          <option value="published">منشور</option>
+                          <option value="paid">مدفوع</option>
+                        </select>
+                      </div>
+                      <button
+                        type="submit"
+                        className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition-colors"
+                      >
+                        إنشاء وربط
+                      </button>
+                    </form>
+                  )}
+
+                  {linkedFees.length > 0 ? (
+                    <div className="space-y-3">
+                      {linkedFees.map((linkedFee) => (
+                        <div key={linkedFee.fee_id} className="bg-white rounded-lg p-4 border border-gray-200">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <h6 className="font-semibold text-gray-900">{linkedFee.fee_title}</h6>
+                              {linkedFee.fee_period && (
+                                <p className="text-sm text-gray-600 mt-1">{linkedFee.fee_period}</p>
+                              )}
+                              <div className="flex items-center gap-4 mt-2">
+                                <span className="text-sm">
+                                  <span className="font-semibold text-green-600">{linkedFee.total_amount}</span> ر.س
+                                </span>
+                                <span className="text-sm text-gray-600">
+                                  {linkedFee.cost_per_tree} ر.س/شجرة
+                                </span>
+                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                  {linkedFee.records_count} سجل
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => handleUnlinkFromFee(linkedFee.fee_id)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="فك الارتباط"
+                            >
+                              <Unlink className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-gray-500 py-4">لا توجد رسوم مرتبطة</p>
+                  )}
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-6">
+                  <h5 className="font-semibold text-gray-900 mb-4">ربط بتجميع موجود</h5>
+                  <div className="space-y-3">
+                    {groupedFees
+                      .filter(gf => !linkedFees.some(lf => lf.fee_id === gf.id))
+                      .filter(gf => gf.farm_id === records.find(r => r.id === selectedRecord)?.farm_id)
+                      .map((gf) => (
+                        <div key={gf.id} className="bg-white rounded-lg p-4 border border-gray-200">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <h6 className="font-semibold text-gray-900">{gf.fee_title}</h6>
+                              {gf.fee_period && (
+                                <p className="text-xs text-gray-600">{gf.fee_period}</p>
+                              )}
+                              <div className="flex items-center gap-3 mt-1">
+                                <span className="text-sm text-green-600 font-semibold">{gf.total_amount} ر.س</span>
+                                <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                                  {gf.records_count} سجل
+                                </span>
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => handleLinkToExistingFee(gf.id)}
+                              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm"
+                            >
+                              <Link className="w-4 h-4" />
+                              ربط
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    {groupedFees.filter(gf =>
+                      !linkedFees.some(lf => lf.fee_id === gf.id) &&
+                      gf.farm_id === records.find(r => r.id === selectedRecord)?.farm_id
+                    ).length === 0 && (
+                      <p className="text-center text-gray-500 py-4">لا توجد تجميعات متاحة للربط</p>
+                    )}
                   </div>
                 </div>
               </div>

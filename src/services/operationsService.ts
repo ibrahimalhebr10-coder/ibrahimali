@@ -36,6 +36,30 @@ export interface MaintenanceFee {
   created_at: string;
 }
 
+export interface MaintenanceFeeGrouped {
+  id: string;
+  farm_id: string;
+  fee_title: string;
+  fee_period: string | null;
+  total_amount: number;
+  cost_per_tree: number;
+  status: 'draft' | 'published' | 'paid';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface MaintenanceFeeRecord {
+  id: string;
+  fee_id: string;
+  maintenance_id: string;
+  created_at: string;
+}
+
+export interface GroupedFeeWithRecords extends MaintenanceFeeGrouped {
+  records_count: number;
+  maintenance_records?: MaintenanceRecord[];
+}
+
 export interface MaintenanceFullDetails {
   id: string;
   farm_id: string;
@@ -294,5 +318,136 @@ export const operationsService = {
 
     if (error) throw error;
     return data;
+  },
+
+  async getGroupedFees(farmId?: string): Promise<GroupedFeeWithRecords[]> {
+    let query = supabase
+      .from('maintenance_fees_grouped')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (farmId) {
+      query = query.eq('farm_id', farmId);
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+
+    const feesWithCounts = await Promise.all(
+      (data || []).map(async (fee) => {
+        const { count } = await supabase
+          .from('maintenance_fee_records')
+          .select('*', { count: 'exact', head: true })
+          .eq('fee_id', fee.id);
+
+        return {
+          ...fee,
+          records_count: count || 0
+        };
+      })
+    );
+
+    return feesWithCounts;
+  },
+
+  async createGroupedFee(fee: Omit<MaintenanceFeeGrouped, 'id' | 'created_at' | 'updated_at' | 'cost_per_tree'>, farmId: string) {
+    const farm = await supabase
+      .from('farms')
+      .select('total_trees')
+      .eq('id', farmId)
+      .single();
+
+    if (!farm.data) throw new Error('Farm not found');
+
+    const costPerTree = fee.total_amount / farm.data.total_trees;
+
+    const { data, error } = await supabase
+      .from('maintenance_fees_grouped')
+      .insert([{
+        ...fee,
+        farm_id: farmId,
+        cost_per_tree: costPerTree
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async updateGroupedFee(id: string, updates: Partial<MaintenanceFeeGrouped>) {
+    if (updates.total_amount && updates.farm_id) {
+      const farm = await supabase
+        .from('farms')
+        .select('total_trees')
+        .eq('id', updates.farm_id)
+        .single();
+
+      if (farm.data) {
+        updates.cost_per_tree = updates.total_amount / farm.data.total_trees;
+      }
+    }
+
+    const { data, error } = await supabase
+      .from('maintenance_fees_grouped')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteGroupedFee(id: string) {
+    const { error } = await supabase
+      .from('maintenance_fees_grouped')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+  },
+
+  async linkMaintenanceToFee(feeId: string, maintenanceId: string) {
+    const { data, error } = await supabase
+      .from('maintenance_fee_records')
+      .insert([{
+        fee_id: feeId,
+        maintenance_id: maintenanceId
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  async unlinkMaintenanceFromFee(feeId: string, maintenanceId: string) {
+    const { error } = await supabase
+      .from('maintenance_fee_records')
+      .delete()
+      .eq('fee_id', feeId)
+      .eq('maintenance_id', maintenanceId);
+
+    if (error) throw error;
+  },
+
+  async getMaintenanceLinkedFees(maintenanceId: string): Promise<GroupedFeeWithRecords[]> {
+    const { data, error } = await supabase.rpc('get_maintenance_record_fees', {
+      p_maintenance_id: maintenanceId
+    });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async getFeeMaintenanceRecords(feeId: string) {
+    const { data, error } = await supabase.rpc('get_fee_maintenance_records', {
+      p_fee_id: feeId
+    });
+
+    if (error) throw error;
+    return data || [];
   }
 };
