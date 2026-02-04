@@ -35,7 +35,7 @@ const AgriculturalSection: React.FC = () => {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">محصولي الزراعي</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">أشجاري الخضراء</h1>
         <p className="text-gray-600">إدارة ومتابعة القسم الزراعي</p>
       </div>
 

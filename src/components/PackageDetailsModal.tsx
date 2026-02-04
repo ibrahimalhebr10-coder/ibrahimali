@@ -142,7 +142,7 @@ export default function PackageDetailsModal({
             className="w-full py-4 bg-gradient-to-r from-darkgreen to-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
           >
             <Sprout className="w-5 h-5" />
-            <span>اختيار هذه الباقة وبدء محصولي الزراعي</span>
+            <span>اختيار هذه الباقة وبدء أشجاري الخضراء</span>
           </button>
         </div>
       </div>

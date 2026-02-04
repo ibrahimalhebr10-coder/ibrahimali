@@ -571,7 +571,7 @@ const InvestmentPackagesManager: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">باقات محصولي الاستثماري</h2>
+          <h2 className="text-2xl font-bold text-gray-900">باقات أشجاري الذهبية</h2>
           <p className="text-gray-600 mt-1">إدارة باقات الاستثمار الزراعي</p>
         </div>
         <button

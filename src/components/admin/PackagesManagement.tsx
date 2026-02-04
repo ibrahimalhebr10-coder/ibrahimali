@@ -13,7 +13,7 @@ const PackagesManagement: React.FC = () => {
       {/* Header */}
       <div className="mb-6 md:mb-8">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">الباقات والعروض</h1>
-        <p className="text-sm md:text-base text-gray-600">إدارة باقات محصولي الزراعي والاستثماري</p>
+        <p className="text-sm md:text-base text-gray-600">إدارة باقات أشجاري الخضراء والذهبية</p>
       </div>
 
       {/* Tabs */}
@@ -29,7 +29,7 @@ const PackagesManagement: React.FC = () => {
           `}
         >
           <Sprout className="w-4 h-4 md:w-5 md:h-5" />
-          <span>باقات محصولي الزراعي</span>
+          <span>باقات أشجاري الخضراء</span>
         </button>
 
         <button
@@ -43,7 +43,7 @@ const PackagesManagement: React.FC = () => {
           `}
         >
           <TrendingUp className="w-4 h-4 md:w-5 md:h-5" />
-          <span>باقات محصولي الاستثماري</span>
+          <span>باقات أشجاري الذهبية</span>
         </button>
       </div>
 

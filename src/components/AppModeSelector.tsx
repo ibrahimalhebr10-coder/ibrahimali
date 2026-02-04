@@ -11,7 +11,7 @@ export default function AppModeSelector({ activeMode, onModeChange }: AppModeSel
   const modes = [
     {
       id: 'agricultural' as AppMode,
-      label: 'محصولي الزراعي',
+      label: 'أشجاري الخضراء',
       icon: Sprout,
       gradient: 'linear-gradient(135deg, #3aa17e 0%, #2f8266 25%, #3aa17e 50%, #2f8266 75%, #3aa17e 100%)',
       inactiveGradient: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,245,0.9) 50%, rgba(255,255,255,0.95) 100%)',
@@ -22,7 +22,7 @@ export default function AppModeSelector({ activeMode, onModeChange }: AppModeSel
     },
     {
       id: 'investment' as AppMode,
-      label: 'محصولي الاستثماري',
+      label: 'أشجاري الذهبية',
       icon: TrendingUp,
       gradient: 'linear-gradient(135deg, #d4af37 0%, #b8942f 25%, #d4af37 50%, #b8942f 75%, #d4af37 100%)',
       inactiveGradient: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(245,245,245,0.9) 50%, rgba(255,255,255,0.95) 100%)',

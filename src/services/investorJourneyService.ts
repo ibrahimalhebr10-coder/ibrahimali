@@ -133,7 +133,7 @@ class InvestorJourneyService {
           latestReceipt,
           canProceed: false,
           nextAction: 'wait_harvest_transfer',
-          message: 'تم تأكيد سدادك بنجاح! جاري نقل أشجارك إلى محصولي'
+          message: 'تم تأكيد سدادك بنجاح! جاري نقل أشجارك إلى مزرعتي'
         };
 
       case 'transferred_to_harvest':
@@ -143,7 +143,7 @@ class InvestorJourneyService {
           latestReceipt,
           canProceed: true,
           nextAction: 'view_harvest',
-          message: 'مبروك! أشجارك الآن في محصولي ويمكنك متابعتها'
+          message: 'مبروك! أشجارك الآن في مزرعتي ويمكنك متابعتها'
         };
 
       case 'cancelled':
@@ -225,7 +225,7 @@ class InvestorJourneyService {
       waiting_for_payment: 'بانتظار السداد',
       payment_submitted: 'تم رفع الإيصال',
       paid: 'مدفوع',
-      transferred_to_harvest: 'في محصولي',
+      transferred_to_harvest: 'في مزرعتي',
       cancelled: 'ملغي'
     };
     return labels[status] || status;

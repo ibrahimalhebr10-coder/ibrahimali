@@ -481,7 +481,7 @@ const AgriculturalPackagesManager: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">باقات محصولي الزراعي</h2>
+          <h2 className="text-2xl font-bold text-gray-900">باقات أشجاري الخضراء</h2>
           <p className="text-gray-600 mt-1">إدارة باقات الانتفاع الزراعي</p>
         </div>
         <button

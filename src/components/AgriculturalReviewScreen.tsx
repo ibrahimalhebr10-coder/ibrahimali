@@ -109,7 +109,7 @@ export default function AgriculturalReviewScreen({
             <div className="bg-gradient-to-br from-amber-50 to-yellow-50 rounded-xl p-5 border-2 border-amber-200">
               <div className="flex items-center gap-2 text-sm text-amber-900 mb-3">
                 <Sprout className="w-4 h-4" />
-                <span className="font-bold">محصولك الزراعي:</span>
+                <span className="font-bold">أشجارك الخضراء:</span>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center gap-2 text-sm text-amber-800">

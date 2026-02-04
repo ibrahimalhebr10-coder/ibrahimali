@@ -328,7 +328,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           >
             <ArrowLeft className="w-5 h-5 text-darkgreen" />
           </button>
-          <h1 className="text-lg font-bold text-darkgreen">محصولي الزراعي</h1>
+          <h1 className="text-lg font-bold text-darkgreen">أشجاري الخضراء</h1>
           <div className="w-9 h-9"></div>
         </div>
       </div>
@@ -391,7 +391,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         {/* Agricultural Packages Slider */}
         <div className="mt-3 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 rounded-2xl border border-green-200/50 shadow-md py-4 mx-4">
           <div className="px-4 mb-3 flex items-center justify-between">
-            <h3 className="text-base font-bold text-darkgreen">باقات محصولي الزراعي</h3>
+            <h3 className="text-base font-bold text-darkgreen">باقات أشجاري الخضراء</h3>
             {packages.length > 1 && (
               <div className="flex gap-2">
                 <button
@@ -701,7 +701,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               <div className="bg-green-50 rounded-xl p-4 border border-green-200">
                 <h4 className="font-bold text-darkgreen mb-2 flex items-center gap-2">
                   <Sprout className="w-3 h-3 text-darkgreen" />
-                  ما هو محصولي الزراعي؟
+                  ما هي أشجاري الخضراء؟
                 </h4>
                 <p className="text-sm text-gray-700 leading-relaxed">
                   {farm.description || 'امتلك أشجارك الخاصة في مزرعة حقيقية واستفد من محاصيلها السنوية. نحن نهتم بالزراعة والصيانة، وأنت تتمتع بثمار أشجارك.'}
