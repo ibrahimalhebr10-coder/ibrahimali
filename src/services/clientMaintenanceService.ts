@@ -63,19 +63,13 @@ export const clientMaintenanceService = {
   },
 
   async getMaintenanceDetails(maintenanceId: string): Promise<MaintenanceDetails> {
-    const [recordResult, stagesResult, mediaResult] = await Promise.all([
+    const [recordResult, mediaResult] = await Promise.all([
       supabase
         .from('maintenance_records')
         .select('*')
         .eq('id', maintenanceId)
         .eq('status', 'published')
         .single(),
-
-      supabase
-        .from('maintenance_stages')
-        .select('id, stage_title, stage_note, stage_date')
-        .eq('maintenance_id', maintenanceId)
-        .order('stage_date', { ascending: true }),
 
       supabase
         .from('maintenance_media')
@@ -98,7 +92,7 @@ export const clientMaintenanceService = {
 
     return {
       ...recordResult.data,
-      stages: stagesResult.data || [],
+      stages: [],
       media: mediaWithUrls
     };
   },

@@ -170,39 +170,6 @@ export default function MyGreenTrees() {
             </div>
 
             <div className="p-8 space-y-8">
-              {maintenanceDetails.stages && maintenanceDetails.stages.length > 0 && (
-                <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <CheckCircle className="w-6 h-6 text-green-600" />
-                    مراحل التنفيذ
-                  </h3>
-                  <div className="space-y-3">
-                    {maintenanceDetails.stages.map((stage) => (
-                      <div
-                        key={stage.id}
-                        className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100"
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
-                            <CheckCircle className="w-5 h-5 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-900">{stage.stage_title}</h4>
-                            {stage.stage_note && (
-                              <p className="text-gray-600 text-sm mt-1">{stage.stage_note}</p>
-                            )}
-                            <div className="flex items-center gap-2 text-sm text-gray-500 mt-2">
-                              <Calendar className="w-4 h-4" />
-                              {stage.stage_date}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               {maintenanceDetails.media && maintenanceDetails.media.length > 0 && (
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -241,10 +208,10 @@ export default function MyGreenTrees() {
                 </div>
               )}
 
-              {!maintenanceDetails.stages?.length && !maintenanceDetails.media?.length && (
+              {!maintenanceDetails.media?.length && (
                 <div className="text-center py-12">
                   <AlertCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">لا توجد تفاصيل إضافية لهذه الصيانة</p>
+                  <p className="text-gray-500">لا توجد صور أو فيديوهات لهذه الصيانة</p>
                 </div>
               )}
             </div>
