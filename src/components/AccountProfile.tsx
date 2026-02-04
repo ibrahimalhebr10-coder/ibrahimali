@@ -255,10 +255,14 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
 
                 <MyContracts />
 
-                {appMode === 'investment' && onOpenGreenTrees && (
+                {onOpenGreenTrees && (
                   <button
                     onClick={onOpenGreenTrees}
-                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all active:scale-98 mb-6"
+                    className={`w-full text-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all active:scale-98 mb-6 ${
+                      appMode === 'agricultural'
+                        ? 'bg-gradient-to-r from-green-600 to-emerald-600'
+                        : 'bg-gradient-to-r from-amber-600 to-yellow-600'
+                    }`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
@@ -266,11 +270,15 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
                           <Sprout className="w-7 h-7 text-white" />
                         </div>
                         <div className="text-right">
-                          <h3 className="text-xl font-bold mb-1">أشجاري الخضراء</h3>
-                          <p className="text-sm text-green-100">تابع صيانة أشجارك ورسوم الصيانة</p>
+                          <h3 className="text-xl font-bold mb-1">
+                            {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
+                          </h3>
+                          <p className={`text-sm ${appMode === 'agricultural' ? 'text-green-100' : 'text-amber-100'}`}>
+                            تابع صيانة أشجارك ورسوم الصيانة
+                          </p>
                         </div>
                       </div>
-                      <div className="text-3xl">🌳</div>
+                      <div className="text-3xl">{appMode === 'agricultural' ? '🌳' : '🌟'}</div>
                     </div>
                   </button>
                 )}

@@ -436,11 +436,7 @@ function AppContent() {
       return;
     }
 
-    if (identity === 'agricultural') {
-      setShowMyGreenTrees(true);
-    } else {
-      setShowMyReservations(true);
-    }
+    setShowMyGreenTrees(true);
   };
 
   const handleOfferFarmClick = () => {
@@ -1256,7 +1252,7 @@ function AppContent() {
         onClose={() => setShowMyReservations(false)}
       />
 
-      {showMyGreenTrees && user && identity === 'agricultural' && (
+      {showMyGreenTrees && user && (
         <div className="fixed inset-0 z-50 bg-white overflow-auto">
           <button
             onClick={() => setShowMyGreenTrees(false)}
