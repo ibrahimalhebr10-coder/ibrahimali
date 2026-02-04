@@ -45,7 +45,7 @@ export default function MaintenanceRecordWizard({ farms, onSubmit, onCancel }: P
     farm_id: '',
     maintenance_type: 'periodic',
     maintenance_date: new Date().toISOString().split('T')[0],
-    status: 'draft',
+    status: 'published',
     stages: [],
     mediaFiles: [],
     total_amount: ''
