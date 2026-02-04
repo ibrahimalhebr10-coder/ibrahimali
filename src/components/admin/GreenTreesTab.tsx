@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Calendar, FileText, Image, Video, DollarSign, Edit, Trash2, Eye, Save, X, Link, Unlink, Package } from 'lucide-react';
+import { Plus, Calendar, FileText, Image, Video, DollarSign, Edit, Trash2, Eye, Save, X, Link, Unlink, Package, Leaf } from 'lucide-react';
 import { operationsService, MaintenanceFullDetails, MaintenanceStage, MaintenanceMedia, GroupedFeeWithRecords } from '../../services/operationsService';
 import MaintenanceRecordWizard from './MaintenanceRecordWizard';
 
