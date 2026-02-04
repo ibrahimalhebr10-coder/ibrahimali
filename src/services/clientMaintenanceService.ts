@@ -51,12 +51,16 @@ export interface MaintenancePayment {
 }
 
 export const clientMaintenanceService = {
-  async getClientMaintenanceRecords(): Promise<ClientMaintenanceRecord[]> {
+  async getClientMaintenanceRecords(pathType: 'agricultural' | 'investment' = 'agricultural'): Promise<ClientMaintenanceRecord[]> {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
 
+    const rpcFunction = pathType === 'agricultural'
+      ? 'get_agricultural_client_maintenance_records'
+      : 'get_client_maintenance_records';
+
     const { data, error } = await supabase
-      .rpc('get_client_maintenance_records', { client_user_id: user.id });
+      .rpc(rpcFunction, { client_user_id: user.id });
 
     if (error) throw error;
     return data || [];

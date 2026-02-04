@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Sprout, Calendar, DollarSign, Image as ImageIcon, Video, CheckCircle, AlertCircle, Eye, X, Play } from 'lucide-react';
 import { clientMaintenanceService, ClientMaintenanceRecord, MaintenanceDetails } from '../services/clientMaintenanceService';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function MyGreenTrees() {
+  const { identity } = useAuth();
   const [records, setRecords] = useState<ClientMaintenanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecord, setSelectedRecord] = useState<string | null>(null);
@@ -12,12 +14,13 @@ export default function MyGreenTrees() {
 
   useEffect(() => {
     loadMaintenanceRecords();
-  }, []);
+  }, [identity]);
 
   const loadMaintenanceRecords = async () => {
     try {
       setLoading(true);
-      const data = await clientMaintenanceService.getClientMaintenanceRecords();
+      const pathType = identity === 'agricultural' ? 'agricultural' : 'investment';
+      const data = await clientMaintenanceService.getClientMaintenanceRecords(pathType);
       setRecords(data);
     } catch (error) {
       console.error('Error loading maintenance records:', error);
@@ -221,16 +224,33 @@ export default function MyGreenTrees() {
     );
   }
 
+  const isAgricultural = identity === 'agricultural';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4" dir="rtl">
+    <div
+      className={`min-h-screen py-8 px-4 ${
+        isAgricultural
+          ? 'bg-gradient-to-br from-green-50 via-white to-emerald-50'
+          : 'bg-gradient-to-br from-amber-50 via-white to-blue-50'
+      }`}
+      dir="rtl"
+    >
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-4 mb-4">
-            <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-emerald-600 rounded-3xl flex items-center justify-center shadow-lg">
+            <div
+              className={`w-20 h-20 rounded-3xl flex items-center justify-center shadow-lg ${
+                isAgricultural
+                  ? 'bg-gradient-to-br from-green-600 to-emerald-600'
+                  : 'bg-gradient-to-br from-amber-600 to-yellow-600'
+              }`}
+            >
               <Sprout className="w-10 h-10 text-white" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">أشجاري الخضراء</h1>
+          <h1 className="text-4xl font-bold text-gray-900 mb-3">
+            {isAgricultural ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
+          </h1>
           <p className="text-xl text-gray-600">تابع صيانة أشجارك وتحديثات المزرعة</p>
         </div>
 
