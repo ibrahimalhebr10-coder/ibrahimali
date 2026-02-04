@@ -307,7 +307,7 @@ export const operationsService = {
         payment_date,
         created_at,
         farms:farm_id (
-          farm_name
+          name_ar
         ),
         maintenance_fees:maintenance_fee_id (
           id,
@@ -344,7 +344,7 @@ export const operationsService = {
       return {
         id: payment.id,
         full_name,
-        farm_name: payment.farms?.farm_name || 'غير معروف',
+        farm_name: payment.farms?.name_ar || 'غير معروف',
         maintenance_type: payment.maintenance_fees?.maintenance_records?.maintenance_type || 'periodic',
         maintenance_date: payment.maintenance_fees?.maintenance_records?.maintenance_date || '',
         tree_count: payment.tree_count,
