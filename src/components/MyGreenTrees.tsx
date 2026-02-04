@@ -1,17 +1,19 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Sprout, Calendar, DollarSign, Image as ImageIcon, Video, CheckCircle, AlertCircle, Eye, X, Play } from 'lucide-react';
 import { clientMaintenanceService, ClientMaintenanceRecord, MaintenanceDetails } from '../services/clientMaintenanceService';
-import { maintenancePaymentService } from '../services/maintenancePaymentService';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function MyGreenTrees() {
+interface MyGreenTreesProps {
+  onNavigateToPayment?: (maintenanceId: string) => void;
+}
+
+export default function MyGreenTrees({ onNavigateToPayment }: MyGreenTreesProps) {
   const { identity, user } = useAuth();
   const [records, setRecords] = useState<ClientMaintenanceRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecord, setSelectedRecord] = useState<string | null>(null);
   const [maintenanceDetails, setMaintenanceDetails] = useState<MaintenanceDetails | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
-  const [processingPayment, setProcessingPayment] = useState(false);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   const loadingRef = useRef(false);
@@ -90,14 +92,14 @@ export default function MyGreenTrees() {
     await loadMaintenanceDetails(record.maintenance_id);
   }, [loadMaintenanceDetails]);
 
-  const handlePayFee = async (record: ClientMaintenanceRecord) => {
+  const handlePayFee = (record: ClientMaintenanceRecord) => {
     if (!user) {
       alert('يجب تسجيل الدخول أولاً');
       return;
     }
 
-    if (!record.maintenance_fee_id) {
-      alert('هذه الصيانة لا تحتوي على معرف رسوم صالح');
+    if (!record.maintenance_id) {
+      alert('معرف الصيانة غير صالح');
       return;
     }
 
@@ -106,37 +108,8 @@ export default function MyGreenTrees() {
       return;
     }
 
-    try {
-      setProcessingPayment(true);
-
-      const paymentStatus = await maintenancePaymentService.checkPaymentStatus(
-        record.maintenance_fee_id,
-        user.id
-      );
-
-      if (paymentStatus.has_payment && paymentStatus.status === 'paid') {
-        alert('تم سداد رسوم هذه الصيانة مسبقاً');
-        await loadMaintenanceRecords();
-        return;
-      }
-
-      const confirmPayment = confirm(
-        `سداد رسوم الصيانة\n\nالمبلغ المستحق: ${record.client_due_amount} ر.س\nعدد الأشجار: ${record.client_tree_count}\n\nسيتم تحويلك إلى صفحة الدفع لإتمام العملية.\n\nهل تريد المتابعة؟`
-      );
-
-      if (confirmPayment) {
-        const paymentInfo = await maintenancePaymentService.initiatePayment(
-          record.maintenance_fee_id,
-          user.id
-        );
-
-        window.location.href = paymentInfo.paymentUrl;
-      }
-    } catch (error: any) {
-      console.error('Error processing payment:', error);
-      alert(error?.message || 'خطأ في معالجة السداد');
-    } finally {
-      setProcessingPayment(false);
+    if (onNavigateToPayment) {
+      onNavigateToPayment(record.maintenance_id);
     }
   };
 

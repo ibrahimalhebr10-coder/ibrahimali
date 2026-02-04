@@ -9,6 +9,7 @@ import StandaloneAccountRegistration from './components/StandaloneAccountRegistr
 import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
 import MyReservations from './components/MyReservations';
 import MyGreenTrees from './components/MyGreenTrees';
+import MaintenancePaymentPage from './components/MaintenancePaymentPage';
 import MaintenancePaymentResult from './components/MaintenancePaymentResult';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -48,6 +49,8 @@ function AppContent() {
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
   const [showMyGreenTrees, setShowMyGreenTrees] = useState(false);
+  const [showMaintenancePayment, setShowMaintenancePayment] = useState(false);
+  const [selectedMaintenanceId, setSelectedMaintenanceId] = useState<string | null>(null);
   const [showPaymentResult, setShowPaymentResult] = useState(false);
   const [showStandaloneRegistration, setShowStandaloneRegistration] = useState(false);
   const [showWelcomeToAccount, setShowWelcomeToAccount] = useState(false);
@@ -1269,7 +1272,31 @@ function AppContent() {
           >
             <X className="w-6 h-6 text-gray-700" />
           </button>
-          <MyGreenTrees />
+          <MyGreenTrees
+            onNavigateToPayment={(maintenanceId) => {
+              setSelectedMaintenanceId(maintenanceId);
+              setShowMyGreenTrees(false);
+              setShowMaintenancePayment(true);
+            }}
+          />
+        </div>
+      )}
+
+      {showMaintenancePayment && selectedMaintenanceId && (
+        <div className="fixed inset-0 z-50 bg-white overflow-auto">
+          <MaintenancePaymentPage
+            maintenanceId={selectedMaintenanceId}
+            onClose={() => {
+              setShowMaintenancePayment(false);
+              setSelectedMaintenanceId(null);
+              setShowMyGreenTrees(true);
+            }}
+            onSuccess={() => {
+              setShowMaintenancePayment(false);
+              setSelectedMaintenanceId(null);
+              setShowPaymentResult(true);
+            }}
+          />
         </div>
       )}
 
