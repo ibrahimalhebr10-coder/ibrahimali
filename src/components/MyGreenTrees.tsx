@@ -279,11 +279,10 @@ export default function MyGreenTrees({ onNavigateToPayment }: MyGreenTreesProps)
                   {maintenanceDetails.payment_status === 'pending' && currentRecord && (
                     <button
                       onClick={() => currentRecord && handlePayFee(currentRecord)}
-                      disabled={processingPayment}
-                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all font-bold text-lg"
                     >
                       <DollarSign className="w-6 h-6" />
-                      {processingPayment ? 'جاري المعالجة...' : 'سداد الرسوم الآن'}
+                      سداد الرسوم الآن
                     </button>
                   )}
                 </div>
@@ -502,8 +501,7 @@ export default function MyGreenTrees({ onNavigateToPayment }: MyGreenTreesProps)
                     {record.total_amount && record.cost_per_tree && record.maintenance_fee_id && record.payment_status === 'pending' && (
                       <button
                         onClick={() => handlePayFee(record)}
-                        disabled={processingPayment}
-                        className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all font-semibold"
                       >
                         <DollarSign className="w-5 h-5" />
                         سداد الرسوم
