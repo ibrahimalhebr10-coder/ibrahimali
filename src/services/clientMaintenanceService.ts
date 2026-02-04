@@ -109,10 +109,9 @@ export const clientMaintenanceService = {
       .select('total_trees')
       .eq('farm_id', recordResult.data.farm_id)
       .eq('user_id', user.id)
-      .in('status', ['confirmed', 'active'])
-      .single();
+      .in('status', ['confirmed', 'active']);
 
-    const clientTreeCount = reservationResult.data?.total_trees || 0;
+    const clientTreeCount = reservationResult.data?.reduce((sum, res) => sum + (res.total_trees || 0), 0) || 0;
     const fee = recordResult.data.maintenance_fees?.[0];
     const costPerTree = fee?.cost_per_tree || null;
     const clientDueAmount = fee && costPerTree ? costPerTree * clientTreeCount : null;
