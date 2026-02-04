@@ -14,6 +14,7 @@ export default function Footer({ identity, onMyFarmClick, onOfferFarmClick }: Fo
   const gradient = isAgricultural
     ? 'linear-gradient(135deg, #3aa17e 0%, #2f8266 100%)'
     : 'linear-gradient(135deg, #d4af37 0%, #b8942f 100%)';
+  const buttonLabel = isAgricultural ? 'أشجاري الخضراء' : 'أشجاري الذهبية';
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30 pb-safe">
@@ -32,7 +33,7 @@ export default function Footer({ identity, onMyFarmClick, onOfferFarmClick }: Fo
             style={{ background: gradient }}
           >
             <Home className="w-6 h-6" />
-            <span>مزرعتي</span>
+            <span>{buttonLabel}</span>
           </button>
 
           {/* زر اعرض مزرعتك - الجديد الذهبي */}
