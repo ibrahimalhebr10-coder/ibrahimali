@@ -1,12 +1,11 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Sprout, Calendar, DollarSign, Image as ImageIcon, Video, CheckCircle, AlertCircle, Eye, X, Play, Heart, TrendingUp } from 'lucide-react';
 import { clientMaintenanceService, ClientMaintenanceRecord, MaintenanceDetails } from '../services/clientMaintenanceService';
-import { investmentCyclesService, InvestmentCycle } from '../services/investmentCyclesService';
+import { investmentCyclesService } from '../services/investmentCyclesService';
 import { useAuth } from '../contexts/AuthContext';
 import { useDemoMode } from '../contexts/DemoModeContext';
 import { getDemoGreenTreesData, getDemoGoldenTreesData, sortMaintenanceRecordsByPriority, getMaintenanceTypeLabel } from '../services/demoDataService';
 import DemoActionModal from './DemoActionModal';
-import InvestmentAssetsView from './InvestmentAssetsView';
 
 interface MyGreenTreesProps {
   onNavigateToPayment?: (maintenanceId: string) => void;
@@ -31,6 +30,40 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
   const abortControllerRef = useRef<AbortController | null>(null);
   const [selectedFarm, setSelectedFarm] = useState<string | null>(null);
 
+  const isInvestment = identity === 'investment';
+  const headerColor = isInvestment
+    ? 'from-amber-600 to-yellow-600'
+    : 'from-green-600 to-emerald-600';
+  const bgColor = isInvestment
+    ? 'from-amber-50 via-white to-yellow-50'
+    : 'from-green-50 via-white to-emerald-50';
+
+  const farmGroups = isInvestment
+    ? investmentCycles.reduce((acc: any, cycle: any) => {
+        const farmId = cycle.farm_id;
+        if (!acc[farmId]) {
+          acc[farmId] = {
+            farm_id: farmId,
+            farm_name: cycle.farms?.name_ar || 'مزرعة',
+            tree_count: cycle.user_tree_count || 0,
+            cycles: []
+          };
+        }
+        acc[farmId].cycles.push(cycle);
+        return acc;
+      }, {})
+    : {};
+
+  const farms = Object.values(farmGroups);
+  const selectedFarmData = selectedFarm ? farmGroups[selectedFarm] : null;
+  const selectedFarmCycles = selectedFarmData?.cycles || [];
+
+  useEffect(() => {
+    if (farms.length > 0 && !selectedFarm) {
+      setSelectedFarm((farms[0] as any).farm_id);
+    }
+  }, [farms.length, selectedFarm]);
+
   useEffect(() => {
     loadMaintenanceRecords();
   }, [identity, isDemoMode]);
@@ -53,9 +86,9 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
           ? getDemoGreenTreesData()
           : getDemoGoldenTreesData();
 
-        setGeneralStatus(demoData.generalStatus || null);
+        setGeneralStatus((demoData as any).generalStatus || null);
 
-        let demoRecords: ClientMaintenanceRecord[] = demoData.maintenanceRecords.map((record: any) => ({
+        let demoRecords: ClientMaintenanceRecord[] = (demoData.maintenanceRecords || []).map((record: any) => ({
           maintenance_id: record.id,
           farm_id: 'demo-farm-id',
           farm_name: demoData.farmName,
@@ -66,8 +99,11 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
           cost_per_tree: record.cost_per_tree,
           client_tree_count: record.client_tree_count,
           client_due_amount: record.client_due_amount,
-          payment_status: record.payment_status,
-          payment_id: record.payment_status === 'paid' ? 'demo-payment-id' : null
+          payment_status: record.payment_status as 'pending' | 'paid',
+          payment_id: record.payment_status === 'paid' ? 'demo-payment-id' : null,
+          maintenance_fee_id: record.maintenance_fee_id || null,
+          fees_status: record.fees_status || 'pending',
+          visible_media_count: record.visible_media_count || 0
         }));
 
         if (demoType === 'green') {
@@ -133,7 +169,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
           ? getDemoGreenTreesData()
           : getDemoGoldenTreesData();
 
-        const record = demoData.maintenanceRecords.find((r: any) => r.id === maintenanceId);
+        const record = (demoData.maintenanceRecords || []).find((r: any) => r.id === maintenanceId);
 
         if (record) {
           const details: MaintenanceDetails = {
@@ -147,8 +183,8 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
             total_amount: record.total_amount,
             client_tree_count: record.client_tree_count,
             client_due_amount: record.client_due_amount,
-            payment_status: record.payment_status,
-            images: record.images.map((url: string, idx: number) => ({
+            payment_status: record.payment_status as 'pending' | 'paid',
+            images: (record.images || []).map((url: string, idx: number) => ({
               id: `demo-img-${idx}`,
               media_url: url,
               media_type: 'image'
@@ -642,41 +678,6 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
       </div>
     );
   }
-
-  const isInvestment = identity === 'investment';
-  const headerColor = isInvestment
-    ? 'from-amber-600 to-yellow-600'
-    : 'from-green-600 to-emerald-600';
-  const bgColor = isInvestment
-    ? 'from-amber-50 via-white to-yellow-50'
-    : 'from-green-50 via-white to-emerald-50';
-
-  const farmGroups = isInvestment
-    ? investmentCycles.reduce((acc: any, cycle: any) => {
-        const farmId = cycle.farm_id;
-        if (!acc[farmId]) {
-          acc[farmId] = {
-            farm_id: farmId,
-            farm_name: cycle.farms?.name_ar || 'مزرعة',
-            tree_count: cycle.user_tree_count || 0,
-            cycles: []
-          };
-        }
-        acc[farmId].cycles.push(cycle);
-        return acc;
-      }, {})
-    : {};
-
-  const farms = Object.values(farmGroups);
-
-  useEffect(() => {
-    if (farms.length > 0 && !selectedFarm) {
-      setSelectedFarm((farms[0] as any).farm_id);
-    }
-  }, [farms.length, selectedFarm]);
-
-  const selectedFarmData = selectedFarm ? farmGroups[selectedFarm] : null;
-  const selectedFarmCycles = selectedFarmData?.cycles || [];
 
   return (
     <div
