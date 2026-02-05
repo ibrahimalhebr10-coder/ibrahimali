@@ -32,6 +32,7 @@ export interface MaintenanceFee {
   id: string;
   maintenance_id: string;
   farm_id: string;
+  path_type: 'agricultural' | 'investment';
   total_amount: number;
   cost_per_tree: number;
   fees_status: 'active' | 'inactive' | 'paid';
@@ -248,10 +249,23 @@ export const operationsService = {
   },
 
   async createMaintenanceFee(fee: Omit<MaintenanceFee, 'id' | 'created_at' | 'cost_per_tree' | 'fees_status'>) {
+    if (!fee.path_type) {
+      throw new Error('path_type is required');
+    }
+
+    const reservedTrees = await this.getReservedTreesCount(fee.farm_id, fee.path_type);
+
+    if (reservedTrees <= 0) {
+      throw new Error('No reserved trees in this path');
+    }
+
+    const costPerTree = fee.total_amount / reservedTrees;
+
     const { data, error } = await supabase
       .from('maintenance_fees')
       .insert([{
         ...fee,
+        cost_per_tree: costPerTree,
         fees_status: 'active'
       }])
       .select()
@@ -290,6 +304,20 @@ export const operationsService = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  async getReservedTreesCount(farmId: string, pathType: 'agricultural' | 'investment'): Promise<number> {
+    const { data, error } = await supabase
+      .from('reservations')
+      .select('total_trees')
+      .eq('farm_id', farmId)
+      .eq('path_type', pathType)
+      .eq('status', 'confirmed');
+
+    if (error) throw error;
+
+    const total = (data || []).reduce((sum, reservation) => sum + (reservation.total_trees || 0), 0);
+    return total;
   },
 
   async getMaintenancePaymentsSummary() {
@@ -446,16 +474,18 @@ export const operationsService = {
     return feesWithCounts;
   },
 
-  async createGroupedFee(fee: Omit<MaintenanceFeeGrouped, 'id' | 'created_at' | 'updated_at' | 'cost_per_tree'>, farmId: string) {
-    const farm = await supabase
-      .from('farms')
-      .select('total_trees')
-      .eq('id', farmId)
-      .single();
+  async createGroupedFee(fee: Omit<MaintenanceFeeGrouped, 'id' | 'created_at' | 'updated_at' | 'cost_per_tree'>, farmId: string, pathType: 'agricultural' | 'investment') {
+    if (!pathType) {
+      throw new Error('path_type is required');
+    }
 
-    if (!farm.data) throw new Error('Farm not found');
+    const reservedTrees = await this.getReservedTreesCount(farmId, pathType);
 
-    const costPerTree = fee.total_amount / farm.data.total_trees;
+    if (reservedTrees <= 0) {
+      throw new Error('No reserved trees in this path');
+    }
+
+    const costPerTree = fee.total_amount / reservedTrees;
 
     const { data, error } = await supabase
       .from('maintenance_fees_grouped')
@@ -471,17 +501,19 @@ export const operationsService = {
     return data;
   },
 
-  async updateGroupedFee(id: string, updates: Partial<MaintenanceFeeGrouped>) {
+  async updateGroupedFee(id: string, updates: Partial<MaintenanceFeeGrouped>, pathType?: 'agricultural' | 'investment') {
     if (updates.total_amount && updates.farm_id) {
-      const farm = await supabase
-        .from('farms')
-        .select('total_trees')
-        .eq('id', updates.farm_id)
-        .single();
-
-      if (farm.data) {
-        updates.cost_per_tree = updates.total_amount / farm.data.total_trees;
+      if (!pathType) {
+        throw new Error('path_type is required when updating amount');
       }
+
+      const reservedTrees = await this.getReservedTreesCount(updates.farm_id, pathType);
+
+      if (reservedTrees <= 0) {
+        throw new Error('No reserved trees in this path');
+      }
+
+      updates.cost_per_tree = updates.total_amount / reservedTrees;
     }
 
     const { data, error } = await supabase
@@ -548,6 +580,7 @@ export const operationsService = {
 
   async createFullMaintenanceRecord(data: {
     farm_id: string;
+    path_type: 'agricultural' | 'investment';
     maintenance_type: 'periodic' | 'seasonal' | 'emergency';
     maintenance_date: string;
     status: 'draft' | 'published' | 'completed';
@@ -562,6 +595,10 @@ export const operationsService = {
     }>;
     total_amount?: string;
   }) {
+    if (!data.path_type) {
+      throw new Error('path_type is required');
+    }
+
     const record = await this.createMaintenanceRecord({
       farm_id: data.farm_id,
       maintenance_type: data.maintenance_type,
@@ -596,6 +633,7 @@ export const operationsService = {
       await this.createMaintenanceFee({
         maintenance_id: maintenanceId,
         farm_id: data.farm_id,
+        path_type: data.path_type,
         total_amount: parseFloat(data.total_amount)
       });
     }
