@@ -29,13 +29,6 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   }, [farm.id, farm.name]);
 
   useEffect(() => {
-    const storedCode = sessionStorage.getItem('influencer_code');
-    if (storedCode) {
-      setInfluencerCode(storedCode);
-    }
-  }, []);
-
-  useEffect(() => {
     const loadFeaturedPackageSettings = async () => {
       try {
         const settings = await influencerMarketingService.getFeaturedPackageSettings();
@@ -51,13 +44,20 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   }, []);
 
   useEffect(() => {
-    const handlePageHide = () => {
-      setShowFeaturedPackage(false);
+    const handleBeforeUnload = () => {
+      sessionStorage.removeItem('influencer_code');
+      sessionStorage.removeItem('influencer_activated_at');
       sessionStorage.removeItem('featured_package_active');
     };
 
-    window.addEventListener('pagehide', handlePageHide);
-    return () => window.removeEventListener('pagehide', handlePageHide);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handleBeforeUnload);
+      handleBeforeUnload();
+    };
   }, []);
   const [packages, setPackages] = useState<AgriculturalPackage[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<AgriculturalPackage | null>(null);
@@ -477,15 +477,13 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           </div>
         </div>
 
-        {/* Influencer Code Input */}
-        {!influencerCode && (
-          <div className="mt-3 mx-4">
-            <InfluencerCodeInput
-              onCodeEntered={handleInfluencerCodeEntered}
-              featuredColor={featuredColor}
-            />
-          </div>
-        )}
+        {/* Influencer Code Input - Always Visible */}
+        <div className="mt-3 mx-4">
+          <InfluencerCodeInput
+            onCodeEntered={handleInfluencerCodeEntered}
+            featuredColor={featuredColor}
+          />
+        </div>
 
         {/* Featured Package Overlay - Temporary Marketing Element */}
         {showFeaturedPackage && featuredPackageSettings && (

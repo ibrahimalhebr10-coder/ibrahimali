@@ -11,6 +11,7 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
   const [showCongrats, setShowCongrats] = useState(false);
   const [enteredName, setEnteredName] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [hasEnteredCode, setHasEnteredCode] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +20,7 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
 
     const code = inputValue.trim();
     setEnteredName(code);
+    setHasEnteredCode(true);
 
     sessionStorage.setItem('influencer_code', code);
     sessionStorage.setItem('influencer_activated_at', new Date().toISOString());
@@ -36,6 +38,15 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
     setShowCongrats(false);
   };
 
+  const handleReset = () => {
+    setInputValue('');
+    setEnteredName('');
+    setHasEnteredCode(false);
+    sessionStorage.removeItem('influencer_code');
+    sessionStorage.removeItem('influencer_activated_at');
+    sessionStorage.removeItem('featured_package_active');
+  };
+
   return (
     <>
       <div className="w-full bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 border-2 border-amber-200 rounded-2xl p-6 shadow-lg">
@@ -48,38 +59,63 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
               هل لديك كود من شريك المسيرة؟
             </h3>
             <p className="text-sm text-slate-600">
-              أدخل الكود للحصول على باقة مميزة بمزايا إضافية
+              {hasEnteredCode
+                ? `تم تفعيل الكود: ${enteredName}`
+                : 'أدخل الكود للحصول على باقة مميزة بمزايا إضافية'
+              }
             </p>
           </div>
+          {hasEnteredCode && (
+            <button
+              onClick={handleReset}
+              className="px-3 py-2 bg-white border-2 border-amber-300 rounded-lg hover:bg-amber-50 transition-colors text-amber-700 font-medium text-sm flex items-center gap-1"
+            >
+              <X className="w-4 h-4" />
+              مسح
+            </button>
+          )}
         </div>
 
-        <form onSubmit={handleSubmit} className="flex gap-2">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="مثال: احمد_المزارع"
-            className="flex-1 px-4 py-3 border-2 border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white text-slate-800 placeholder-slate-400 font-medium"
-            dir="rtl"
-          />
-          <button
-            type="submit"
-            disabled={!inputValue.trim()}
-            className={`px-6 py-3 rounded-xl font-bold text-white transition-all duration-300 flex items-center gap-2 ${
-              inputValue.trim()
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transform hover:scale-105'
-                : 'bg-slate-300 cursor-not-allowed'
-            }`}
-          >
-            <Sparkles className="w-5 h-5" />
-            إدخال
-          </button>
-        </form>
+        {!hasEnteredCode && (
+          <>
+            <form onSubmit={handleSubmit} className="flex gap-2">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                placeholder="مثال: احمد_المزارع"
+                className="flex-1 px-4 py-3 border-2 border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white text-slate-800 placeholder-slate-400 font-medium"
+                dir="rtl"
+              />
+              <button
+                type="submit"
+                disabled={!inputValue.trim()}
+                className={`px-6 py-3 rounded-xl font-bold text-white transition-all duration-300 flex items-center gap-2 ${
+                  inputValue.trim()
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transform hover:scale-105'
+                    : 'bg-slate-300 cursor-not-allowed'
+                }`}
+              >
+                <Sparkles className="w-5 h-5" />
+                إدخال
+              </button>
+            </form>
 
-        <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
-          <CheckCircle className="w-4 h-4 text-emerald-500" />
-          <span>يمكنك إدخال الكود في أي وقت</span>
-        </div>
+            <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
+              <CheckCircle className="w-4 h-4 text-emerald-500" />
+              <span>يمكنك إدخال الكود في أي وقت</span>
+            </div>
+          </>
+        )}
+
+        {hasEnteredCode && (
+          <div className="flex items-center gap-2 text-sm bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-3">
+            <CheckCircle className="w-5 h-5 text-emerald-600" />
+            <span className="text-emerald-700 font-medium">
+              تم تفعيل الباقة المميزة! تحقق من العرض أدناه
+            </span>
+          </div>
+        )}
       </div>
 
       {showCongrats && (
