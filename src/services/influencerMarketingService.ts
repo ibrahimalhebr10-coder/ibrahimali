@@ -22,9 +22,21 @@ export interface InfluencerSettings {
   congratulation_message_ar: string;
   congratulation_message_en: string;
   featured_package_color: string;
+  featured_package_border_style: string;
+  featured_package_congratulation_text: string;
+  featured_package_benefit_description: string;
+  featured_package_benefit_type: string;
   auto_activate_partners: boolean;
   updated_at: string;
   updated_by: string | null;
+}
+
+export interface FeaturedPackageSettings {
+  color: string;
+  borderStyle: 'solid' | 'dashed' | 'double' | 'gradient';
+  congratulationText: string;
+  benefitDescription: string;
+  benefitType: 'free_shipping' | 'discount' | 'bonus_trees' | 'priority_support' | 'custom';
 }
 
 export interface CreateInfluencerPartnerData {
@@ -252,5 +264,53 @@ export const influencerMarketingService = {
     }
 
     return !!data;
+  },
+
+  async getFeaturedPackageSettings(): Promise<FeaturedPackageSettings | null> {
+    const { data, error } = await supabase
+      .from('influencer_settings')
+      .select('featured_package_color, featured_package_border_style, featured_package_congratulation_text, featured_package_benefit_description, featured_package_benefit_type')
+      .limit(1)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null;
+      }
+      throw error;
+    }
+
+    return {
+      color: data.featured_package_color,
+      borderStyle: data.featured_package_border_style,
+      congratulationText: data.featured_package_congratulation_text,
+      benefitDescription: data.featured_package_benefit_description,
+      benefitType: data.featured_package_benefit_type
+    };
+  },
+
+  async updateFeaturedPackageSettings(settings: Partial<FeaturedPackageSettings>): Promise<void> {
+    const updateData: any = {};
+
+    if (settings.color !== undefined) updateData.featured_package_color = settings.color;
+    if (settings.borderStyle !== undefined) updateData.featured_package_border_style = settings.borderStyle;
+    if (settings.congratulationText !== undefined) updateData.featured_package_congratulation_text = settings.congratulationText;
+    if (settings.benefitDescription !== undefined) updateData.featured_package_benefit_description = settings.benefitDescription;
+    if (settings.benefitType !== undefined) updateData.featured_package_benefit_type = settings.benefitType;
+
+    const { data: currentSettings } = await supabase
+      .from('influencer_settings')
+      .select('id')
+      .limit(1)
+      .single();
+
+    if (currentSettings) {
+      const { error } = await supabase
+        .from('influencer_settings')
+        .update(updateData)
+        .eq('id', currentSettings.id);
+
+      if (error) throw error;
+    }
   }
 };

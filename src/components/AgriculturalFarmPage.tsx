@@ -11,6 +11,8 @@ import PaymentSuccessScreen from './PaymentSuccessScreen';
 import PackageDetailsModal from './PackageDetailsModal';
 import { usePageTracking } from '../hooks/useLeadTracking';
 import InfluencerCodeInput from './InfluencerCodeInput';
+import FeaturedPackageOverlay from './FeaturedPackageOverlay';
+import { influencerMarketingService, type FeaturedPackageSettings } from '../services/influencerMarketingService';
 
 interface AgriculturalFarmPageProps {
   farm: FarmProject;
@@ -31,6 +33,31 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     if (storedCode) {
       setInfluencerCode(storedCode);
     }
+  }, []);
+
+  useEffect(() => {
+    const loadFeaturedPackageSettings = async () => {
+      try {
+        const settings = await influencerMarketingService.getFeaturedPackageSettings();
+        if (settings) {
+          setFeaturedPackageSettings(settings);
+        }
+      } catch (error) {
+        console.error('خطأ في تحميل إعدادات الباقة المميزة:', error);
+      }
+    };
+
+    loadFeaturedPackageSettings();
+  }, []);
+
+  useEffect(() => {
+    const handlePageHide = () => {
+      setShowFeaturedPackage(false);
+      sessionStorage.removeItem('featured_package_active');
+    };
+
+    window.addEventListener('pagehide', handlePageHide);
+    return () => window.removeEventListener('pagehide', handlePageHide);
   }, []);
   const [packages, setPackages] = useState<AgriculturalPackage[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<AgriculturalPackage | null>(null);
@@ -53,6 +80,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const packagesScrollRef = useRef<HTMLDivElement>(null);
   const [influencerCode, setInfluencerCode] = useState<string | null>(null);
   const [featuredColor] = useState('#FFD700');
+  const [showFeaturedPackage, setShowFeaturedPackage] = useState(false);
+  const [featuredPackageSettings, setFeaturedPackageSettings] = useState<FeaturedPackageSettings | null>(null);
 
   useEffect(() => {
     console.log('🏢 عقود المزرعة المُحمّلة:', farm.contracts?.map(c => ({
@@ -201,7 +230,14 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
   const handleInfluencerCodeEntered = (code: string) => {
     setInfluencerCode(code);
+    setShowFeaturedPackage(true);
+    sessionStorage.setItem('featured_package_active', 'true');
     console.log('كود المؤثر تم إدخاله:', code);
+  };
+
+  const handleDismissFeaturedPackage = () => {
+    setShowFeaturedPackage(false);
+    sessionStorage.removeItem('featured_package_active');
   };
 
   const scrollToPackage = (index: number) => {
@@ -447,6 +483,16 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             <InfluencerCodeInput
               onCodeEntered={handleInfluencerCodeEntered}
               featuredColor={featuredColor}
+            />
+          </div>
+        )}
+
+        {/* Featured Package Overlay - Temporary Marketing Element */}
+        {showFeaturedPackage && featuredPackageSettings && (
+          <div className="mt-3 mx-4">
+            <FeaturedPackageOverlay
+              settings={featuredPackageSettings}
+              onDismiss={handleDismissFeaturedPackage}
             />
           </div>
         )}
