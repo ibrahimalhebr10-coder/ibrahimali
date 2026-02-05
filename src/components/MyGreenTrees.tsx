@@ -538,7 +538,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
                 </div>
                 <div className="flex items-center gap-2 text-amber-100">
                   <Sprout className="w-4 h-4" />
-                  <span>{selectedCycle.farms?.reserved_investment_trees || 0} شجرة</span>
+                  <span>{selectedCycle.user_tree_count || 0} شجرة</span>
                 </div>
                 <div className="flex items-center gap-2 text-amber-100">
                   <TrendingUp className="w-4 h-4" />
@@ -755,7 +755,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
                     </div>
                     <div className="text-right">
                       <div className="text-sm text-amber-100">أشجارك</div>
-                      <div className="text-3xl font-bold">{cycle.farms?.reserved_investment_trees || 0}</div>
+                      <div className="text-3xl font-bold">{cycle.user_tree_count || 0}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 text-amber-100">

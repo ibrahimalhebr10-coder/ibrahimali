@@ -74,24 +74,30 @@ export const investmentCyclesService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');
 
-    const { data: userFarms, error: farmsError } = await supabase
+    const { data: userReservations, error: reservationsError } = await supabase
       .from('reservations')
-      .select('farm_id')
+      .select('farm_id, total_trees')
       .eq('user_id', user.id)
-      .eq('status', 'active')
+      .in('status', ['active', 'confirmed', 'paid'])
       .eq('path_type', 'investment');
 
-    if (farmsError) {
-      console.error('[InvestmentCycles] Error loading user farms:', farmsError);
-      throw farmsError;
+    if (reservationsError) {
+      console.error('[InvestmentCycles] Error loading user reservations:', reservationsError);
+      throw reservationsError;
     }
 
-    const farmIds = userFarms?.map(r => r.farm_id) || [];
-
-    if (farmIds.length === 0) {
-      console.log('[InvestmentCycles] No farms found for user');
+    if (!userReservations || userReservations.length === 0) {
+      console.log('[InvestmentCycles] No investment reservations found for user');
       return [];
     }
+
+    const farmTreesMap = userReservations.reduce((acc, r) => {
+      acc[r.farm_id] = (acc[r.farm_id] || 0) + (r.total_trees || 0);
+      return acc;
+    }, {} as Record<string, number>);
+
+    const farmIds = Object.keys(farmTreesMap);
+    console.log('[InvestmentCycles] User farms with tree counts:', farmTreesMap);
 
     const { data, error } = await supabase
       .from('investment_cycles')
@@ -100,8 +106,7 @@ export const investmentCyclesService = {
         farms(
           id,
           name_ar,
-          total_trees,
-          reserved_investment_trees
+          total_trees
         )
       `)
       .eq('status', 'published')
@@ -114,8 +119,13 @@ export const investmentCyclesService = {
       throw error;
     }
 
-    console.log('[InvestmentCycles] Loaded cycles for client:', data?.length || 0);
-    return data || [];
+    const cyclesWithTreeCount = (data || []).map(cycle => ({
+      ...cycle,
+      user_tree_count: farmTreesMap[cycle.farm_id] || 0
+    }));
+
+    console.log('[InvestmentCycles] Loaded cycles for client:', cyclesWithTreeCount.length);
+    return cyclesWithTreeCount;
   },
 
   async createCycle(cycle: Omit<InvestmentCycle, 'id' | 'cost_per_tree' | 'created_at' | 'updated_at'>) {
