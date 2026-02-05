@@ -1,8 +1,14 @@
-import React, { useState } from 'react';
-import { TrendingUp, Shield, Sprout, ArrowRight, Lock } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, Shield, Sprout, ArrowRight, Lock, Package, Sparkles } from 'lucide-react';
 import { getDemoGoldenTreesData } from '../services/demoDataService';
 import { useDemoMode } from '../contexts/DemoModeContext';
 import DemoActionModal from './DemoActionModal';
+import {
+  determineGoldenTreesMode,
+  getGoldenTreeAssets,
+  getGoldenTreeMaintenanceFees,
+  type GoldenTreesMode
+} from '../services/goldenTreesService';
 
 interface InvestmentAssetsViewProps {
   onShowAuth?: () => void;
@@ -11,10 +17,39 @@ interface InvestmentAssetsViewProps {
 export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsViewProps) {
   const { isDemoMode } = useDemoMode();
   const [showDemoActionModal, setShowDemoActionModal] = useState(false);
+  const [mode, setMode] = useState<GoldenTreesMode>('demo');
+  const [loading, setLoading] = useState(true);
+  const [assets, setAssets] = useState<any[]>([]);
+  const [fees, setFees] = useState<any[]>([]);
   const data = getDemoGoldenTreesData();
 
+  useEffect(() => {
+    loadGoldenTreesData();
+  }, []);
+
+  const loadGoldenTreesData = async () => {
+    setLoading(true);
+    try {
+      const context = await determineGoldenTreesMode();
+      setMode(context.mode);
+
+      if (context.mode === 'active') {
+        const [assetsData, feesData] = await Promise.all([
+          getGoldenTreeAssets(),
+          getGoldenTreeMaintenanceFees()
+        ]);
+        setAssets(assetsData);
+        setFees(feesData);
+      }
+    } catch (error) {
+      console.error('Error loading golden trees data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleInvestmentAction = () => {
-    if (isDemoMode) {
+    if (mode === 'demo') {
       setShowDemoActionModal(true);
     }
   };
@@ -39,39 +74,92 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
         />
       )}
 
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent"></div>
-
-        <div className="relative max-w-6xl mx-auto px-4 py-24 text-center">
-          <div className="flex items-center justify-center mb-8">
-            <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center shadow-2xl">
-              <Sprout className="w-12 h-12 text-white" />
+      {mode === 'demo' && (
+        <div className="max-w-4xl mx-auto px-4 pt-8 pb-4">
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-6 backdrop-blur-sm">
+            <div className="flex items-start gap-4">
+              <Sparkles className="w-7 h-7 text-amber-400 flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-amber-200 mb-2">
+                  وضع العرض التوضيحي
+                </h3>
+                <p className="text-amber-100/80 mb-4">
+                  هذه نظرة عامة على التجربة. للوصول الكامل والسداد، يرجى تسجيل الدخول
+                </p>
+                <button
+                  onClick={handleInvestmentAction}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl transition-all"
+                >
+                  <Lock className="w-4 h-4" />
+                  <span>تسجيل الدخول</span>
+                </button>
+              </div>
             </div>
           </div>
-
-          <div className="space-y-6 mb-12">
-            <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-              {data.heroMessage.title}
-            </h1>
-            <p className="text-3xl text-amber-200/90 font-light">
-              {data.heroMessage.subtitle}
-            </p>
-          </div>
-
-          <button
-            onClick={handleInvestmentAction}
-            className="inline-flex items-center gap-3 px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-2xl text-lg font-medium transition-all duration-300 border border-white/20"
-          >
-            <span>{data.heroMessage.cta}</span>
-            <ArrowRight className="w-5 h-5" />
-          </button>
         </div>
-      </div>
+      )}
 
-      <div className="max-w-7xl mx-auto px-4 space-y-16">
-        <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-800/50 to-slate-900/50 rounded-3xl"></div>
-          <div className="relative h-96 rounded-3xl overflow-hidden">
+      {mode === 'no-assets' && (
+        <div className="max-w-4xl mx-auto px-4 pt-8 pb-4">
+          <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 backdrop-blur-sm">
+            <div className="flex items-start gap-4">
+              <Package className="w-7 h-7 text-slate-400 flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-slate-200 mb-2">
+                  لا توجد أصول استثمارية
+                </h3>
+                <p className="text-slate-400 mb-4">
+                  أنت مسجل دخول لكن لا تملك أشجار ذهبية حالياً. ابدأ رحلتك الاستثمارية الآن
+                </p>
+                <button
+                  onClick={handleInvestmentAction}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-xl transition-all"
+                >
+                  <Sprout className="w-4 h-4" />
+                  <span>ابدأ الاستثمار</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {mode === 'demo' && (
+        <div className="relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 to-transparent"></div>
+
+          <div className="relative max-w-6xl mx-auto px-4 py-24 text-center">
+            <div className="flex items-center justify-center mb-8">
+              <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-amber-500 to-yellow-600 flex items-center justify-center shadow-2xl">
+                <Sprout className="w-12 h-12 text-white" />
+              </div>
+            </div>
+
+            <div className="space-y-6 mb-12">
+              <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+                {data.heroMessage.title}
+              </h1>
+              <p className="text-3xl text-amber-200/90 font-light">
+                {data.heroMessage.subtitle}
+              </p>
+            </div>
+
+            <button
+              onClick={handleInvestmentAction}
+              className="inline-flex items-center gap-3 px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-2xl text-lg font-medium transition-all duration-300 border border-white/20"
+            >
+              <span>{data.heroMessage.cta}</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {mode === 'demo' && (
+        <div className="max-w-7xl mx-auto px-4 space-y-16">
+          <div className="relative">
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-800/50 to-slate-900/50 rounded-3xl"></div>
+            <div className="relative h-96 rounded-3xl overflow-hidden">
             <img
               src="https://images.pexels.com/photos/2132250/pexels-photo-2132250.jpeg"
               alt="أصل زراعي"
@@ -168,19 +256,121 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
           </div>
         </div>
 
-        <div className="text-center space-y-6">
-          <button
-            onClick={handleInvestmentAction}
-            className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 rounded-2xl text-lg font-semibold transition-all duration-300 shadow-2xl shadow-amber-500/20"
-          >
-            <span>ابدأ رحلتك الاستثمارية</span>
-            <ArrowRight className="w-5 h-5" />
-          </button>
-          <p className="text-slate-500 text-sm">
-            التسجيل يفتح لك التفاصيل الكاملة والتنفيذ الفعلي
-          </p>
+          <div className="text-center space-y-6">
+            <button
+              onClick={handleInvestmentAction}
+              className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 rounded-2xl text-lg font-semibold transition-all duration-300 shadow-2xl shadow-amber-500/20"
+            >
+              <span>ابدأ رحلتك الاستثمارية</span>
+              <ArrowRight className="w-5 h-5" />
+            </button>
+            <p className="text-slate-500 text-sm">
+              التسجيل يفتح لك التفاصيل الكاملة والتنفيذ الفعلي
+            </p>
+          </div>
         </div>
-      </div>
+      )}
+
+      {mode === 'active' && assets.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 py-16 space-y-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-amber-200 mb-4">أصولك الاستثمارية</h2>
+            <p className="text-xl text-slate-400">أشجارك الذهبية النشطة</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {assets.map((asset) => (
+              <div
+                key={asset.id}
+                className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold text-amber-200">{asset.tree_type}</h3>
+                  <div className="px-3 py-1 bg-green-500/20 border border-green-500/40 rounded-full">
+                    <span className="text-sm font-bold text-green-400">نشط</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">المزرعة</span>
+                    <span className="text-white font-medium">{asset.farm_name}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">عدد الأشجار</span>
+                    <span className="text-amber-200 font-bold">{asset.trees_count}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">المدة</span>
+                    <span className="text-white font-medium">{asset.contract_duration} سنوات</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">الاستثمار</span>
+                    <span className="text-amber-300 font-bold">{asset.total_price.toLocaleString()} ر.س</span>
+                  </div>
+                  <div className="flex justify-between text-xs pt-2 border-t border-slate-700">
+                    <span className="text-slate-500">تاريخ البداية</span>
+                    <span className="text-slate-400">{new Date(asset.contract_start_date).toLocaleDateString('ar-SA')}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {fees.length > 0 && (
+            <div className="mt-16">
+              <div className="text-center mb-8">
+                <h3 className="text-3xl font-bold text-amber-200 mb-2">رسوم الصيانة</h3>
+                <p className="text-slate-400">الرسوم المستحقة للأشجار الذهبية</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {fees.map((fee) => (
+                  <div
+                    key={fee.id}
+                    className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20"
+                  >
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h4 className="text-lg font-bold text-amber-200 mb-1">{fee.fee_title}</h4>
+                        <p className="text-2xl font-black text-amber-400">{fee.amount_due.toLocaleString()} ر.س</p>
+                      </div>
+                      <div
+                        className={`px-3 py-1 rounded-full ${
+                          fee.payment_status === 'paid'
+                            ? 'bg-green-500/20 border border-green-500/40'
+                            : 'bg-amber-500/20 border border-amber-500/40'
+                        }`}
+                      >
+                        <span className={`text-sm font-bold ${
+                          fee.payment_status === 'paid' ? 'text-green-400' : 'text-amber-300'
+                        }`}>
+                          {fee.payment_status === 'paid' ? 'مسدد' : 'معلق'}
+                        </span>
+                      </div>
+                    </div>
+
+                    {fee.payment_status === 'pending' && (
+                      <>
+                        <div className="text-sm text-slate-400 mb-4">
+                          تاريخ الاستحقاق: {new Date(fee.due_date).toLocaleDateString('ar-SA')}
+                        </div>
+                        <button
+                          onClick={() => alert('سيتم توجيهك إلى صفحة السداد')}
+                          className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 rounded-xl font-bold text-black transition-all flex items-center justify-center gap-2"
+                        >
+                          <span>سداد الآن</span>
+                          <ArrowRight className="w-5 h-5" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
