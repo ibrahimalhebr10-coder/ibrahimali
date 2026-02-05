@@ -7,9 +7,9 @@ import DemoActionModal from './DemoActionModal';
 import {
   determineGoldenTreesMode,
   getGoldenTreeAssets,
-  getGoldenTreeMaintenanceFees,
   type GoldenTreesMode
 } from '../services/goldenTreesService';
+import { clientMaintenanceService, type ClientMaintenanceRecord } from '../services/clientMaintenanceService';
 
 interface InvestmentAssetsViewProps {
   onShowAuth?: (mode: 'login' | 'register') => void;
@@ -22,7 +22,7 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
   const [mode, setMode] = useState<GoldenTreesMode>('demo');
   const [loading, setLoading] = useState(true);
   const [assets, setAssets] = useState<any[]>([]);
-  const [fees, setFees] = useState<any[]>([]);
+  const [maintenanceRecords, setMaintenanceRecords] = useState<ClientMaintenanceRecord[]>([]);
   const data = getDemoGoldenTreesData();
 
   useEffect(() => {
@@ -37,12 +37,12 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
       setMode(context.mode);
 
       if (context.mode === 'active' && userId) {
-        const [assetsData, feesData] = await Promise.all([
+        const [assetsData, maintenanceData] = await Promise.all([
           getGoldenTreeAssets(userId),
-          getGoldenTreeMaintenanceFees(userId)
+          clientMaintenanceService.getClientMaintenanceRecords('investment')
         ]);
         setAssets(assetsData);
-        setFees(feesData);
+        setMaintenanceRecords(maintenanceData);
       }
     } catch (error) {
       console.error('Error loading golden trees data:', error);
@@ -320,52 +320,56 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
             ))}
           </div>
 
-          {fees.length > 0 && (
+          {maintenanceRecords.length > 0 && (
             <div className="mt-16">
               <div className="text-center mb-8">
-                <h3 className="text-3xl font-bold text-amber-200 mb-2">رسوم الصيانة</h3>
-                <p className="text-slate-400">الرسوم المستحقة للأشجار الذهبية</p>
+                <h3 className="text-3xl font-bold text-amber-200 mb-2">سجلات الصيانة</h3>
+                <p className="text-slate-400">الصيانة والرسوم المستحقة لأشجارك الذهبية</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {fees.map((fee) => (
+                {maintenanceRecords.map((record) => (
                   <div
-                    key={fee.id}
+                    key={record.maintenance_id}
                     className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div>
-                        <h4 className="text-lg font-bold text-amber-200 mb-1">{fee.fee_title}</h4>
-                        <p className="text-2xl font-black text-amber-400">{fee.amount_due.toLocaleString()} ر.س</p>
+                        <h4 className="text-lg font-bold text-amber-200 mb-1">{record.farm_name}</h4>
+                        <p className="text-sm text-slate-400 mb-2">{clientMaintenanceService.getMaintenanceTypeLabel(record.maintenance_type)}</p>
+                        <p className="text-2xl font-black text-amber-400">{(record.client_due_amount || 0).toLocaleString()} ر.س</p>
+                        <p className="text-xs text-slate-500 mt-1">
+                          {record.client_tree_count} {record.client_tree_count === 1 ? 'شجرة' : record.client_tree_count === 2 ? 'شجرتان' : 'أشجار'}
+                          {record.cost_per_tree && ` × ${record.cost_per_tree.toLocaleString()} ر.س`}
+                        </p>
                       </div>
                       <div
                         className={`px-3 py-1 rounded-full ${
-                          fee.payment_status === 'paid'
+                          record.payment_status === 'paid'
                             ? 'bg-green-500/20 border border-green-500/40'
                             : 'bg-amber-500/20 border border-amber-500/40'
                         }`}
                       >
                         <span className={`text-sm font-bold ${
-                          fee.payment_status === 'paid' ? 'text-green-400' : 'text-amber-300'
+                          record.payment_status === 'paid' ? 'text-green-400' : 'text-amber-300'
                         }`}>
-                          {fee.payment_status === 'paid' ? 'مسدد' : 'معلق'}
+                          {record.payment_status === 'paid' ? 'مسدد' : 'معلق'}
                         </span>
                       </div>
                     </div>
 
-                    {fee.payment_status === 'pending' && (
-                      <>
-                        <div className="text-sm text-slate-400 mb-4">
-                          تاريخ الاستحقاق: {new Date(fee.due_date).toLocaleDateString('ar-SA')}
-                        </div>
-                        <button
-                          onClick={() => alert('سيتم توجيهك إلى صفحة السداد')}
-                          className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 rounded-xl font-bold text-black transition-all flex items-center justify-center gap-2"
-                        >
-                          <span>سداد الآن</span>
-                          <ArrowRight className="w-5 h-5" />
-                        </button>
-                      </>
+                    <div className="text-sm text-slate-400 mb-4">
+                      تاريخ الصيانة: {new Date(record.maintenance_date).toLocaleDateString('ar-SA')}
+                    </div>
+
+                    {record.payment_status === 'pending' && record.client_due_amount && (
+                      <button
+                        onClick={() => alert('سيتم توجيهك إلى صفحة السداد')}
+                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 rounded-xl font-bold text-black transition-all flex items-center justify-center gap-2"
+                      >
+                        <span>سداد الآن</span>
+                        <ArrowRight className="w-5 h-5" />
+                      </button>
                     )}
                   </div>
                 ))}
