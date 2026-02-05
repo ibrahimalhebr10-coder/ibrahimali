@@ -650,36 +650,51 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
     ? 'from-amber-50 via-white to-yellow-50'
     : 'from-green-50 via-white to-emerald-50';
 
+  const farmGroups = isInvestment
+    ? investmentCycles.reduce((acc: any, cycle: any) => {
+        const farmId = cycle.farm_id;
+        if (!acc[farmId]) {
+          acc[farmId] = {
+            farm_id: farmId,
+            farm_name: cycle.farms?.name_ar || 'مزرعة',
+            tree_count: cycle.user_tree_count || 0,
+            cycles: []
+          };
+        }
+        acc[farmId].cycles.push(cycle);
+        return acc;
+      }, {})
+    : {};
+
+  const farms = Object.values(farmGroups);
+  const [selectedFarm, setSelectedFarm] = useState<string | null>(
+    farms.length > 0 ? (farms[0] as any).farm_id : null
+  );
+
+  const selectedFarmData = selectedFarm ? farmGroups[selectedFarm] : null;
+  const selectedFarmCycles = selectedFarmData?.cycles || [];
+
   return (
     <div
-      className={`py-8 px-4 bg-gradient-to-br ${bgColor}`}
+      className={`py-6 px-0 bg-gradient-to-br ${bgColor}`}
       dir="rtl"
-      style={{ paddingBottom: '200px', minHeight: '100%' }}
+      style={{ paddingBottom: '200px', minHeight: '100vh' }}
     >
       <div className="max-w-6xl mx-auto">
-        <div className={`bg-gradient-to-r ${headerColor} rounded-3xl shadow-2xl p-8 mb-8 text-white`}>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
-              <Sprout className="w-8 h-8" />
+        <div className={`bg-gradient-to-r ${headerColor} rounded-none md:rounded-3xl shadow-2xl p-6 md:p-8 mb-6 text-white`}>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+              <Sprout className="w-7 h-7" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold mb-1">
+              <h1 className="text-2xl md:text-3xl font-bold mb-1">
                 {isInvestment ? 'أشجاري الذهبية' : 'أشجاري الخضراء'}
               </h1>
-              <p className="text-white/90 text-lg">
-                {isInvestment
-                  ? 'تتبع دورات الاستثمار وعوائد أشجارك الذهبية'
-                  : 'متابعة أعمال الصيانة والعناية بأشجارك'}
+              <p className="text-white/90 text-sm md:text-base">
+                أشجارك في هذا المسار
               </p>
             </div>
           </div>
-          {isInvestment && (
-            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-              <p className="text-white/90 text-sm leading-relaxed">
-                هنا يمكنك متابعة جميع الدورات الاستثمارية والعوائد المتعلقة بأشجارك في المسار الاستثماري
-              </p>
-            </div>
-          )}
         </div>
 
         {generalStatus && (
@@ -705,7 +720,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
         )}
 
         {(isInvestment ? investmentCycles.length === 0 : records.length === 0) ? (
-          <div className="bg-white rounded-3xl shadow-xl p-12 text-center">
+          <div className="bg-white rounded-3xl shadow-xl p-12 text-center mx-4">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Sprout className="w-12 h-12 text-gray-400" />
             </div>
@@ -719,22 +734,69 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
           </div>
         ) : (
           <>
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+            {isInvestment && farms.length > 0 && (
+              <div className="mb-6 px-4">
+                <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                  {farms.map((farm: any) => (
+                    <button
+                      key={farm.farm_id}
+                      onClick={() => setSelectedFarm(farm.farm_id)}
+                      className={`flex-shrink-0 w-36 snap-start transition-all duration-300 ${
+                        selectedFarm === farm.farm_id
+                          ? 'bg-gradient-to-br from-amber-500 to-yellow-600 shadow-2xl scale-105'
+                          : 'bg-white shadow-lg hover:shadow-xl'
+                      } rounded-2xl p-4 border-2 ${
+                        selectedFarm === farm.farm_id ? 'border-amber-300' : 'border-gray-100'
+                      }`}
+                    >
+                      <div className="text-center">
+                        <div className={`w-12 h-12 mx-auto mb-2 rounded-xl flex items-center justify-center ${
+                          selectedFarm === farm.farm_id ? 'bg-white/20' : 'bg-amber-50'
+                        }`}>
+                          <Sprout className={`w-6 h-6 ${
+                            selectedFarm === farm.farm_id ? 'text-white' : 'text-amber-600'
+                          }`} />
+                        </div>
+                        <h3 className={`text-sm font-bold mb-1 line-clamp-2 ${
+                          selectedFarm === farm.farm_id ? 'text-white' : 'text-gray-900'
+                        }`}>
+                          {farm.farm_name}
+                        </h3>
+                        <div className={`text-2xl font-bold ${
+                          selectedFarm === farm.farm_id ? 'text-white' : 'text-amber-600'
+                        }`}>
+                          {farm.tree_count}
+                        </div>
+                        <div className={`text-xs ${
+                          selectedFarm === farm.farm_id ? 'text-white/80' : 'text-gray-500'
+                        }`}>
+                          شجرة
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mb-6 px-4">
+              <h2 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-3">
                 <div className={`w-10 h-10 bg-gradient-to-br ${headerColor} rounded-xl flex items-center justify-center`}>
                   <Sprout className="w-5 h-5 text-white" />
                 </div>
-                {isInvestment ? 'الدورات الاستثمارية' : 'سجلات الصيانة'}
+                {isInvestment ? 'دورات المزرعة' : 'سجلات الصيانة'}
               </h2>
               <p className="text-gray-600 text-sm mr-13">
                 {isInvestment
-                  ? `عدد الدورات: ${investmentCycles.length}`
+                  ? selectedFarmData
+                    ? `${selectedFarmCycles.length} دورة متاحة`
+                    : 'اختر مزرعة لعرض دوراتها'
                   : `عدد أعمال الصيانة: ${records.length}`
                 }
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {isInvestment ? investmentCycles.map((cycle) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
+            {isInvestment ? selectedFarmCycles.map((cycle: any) => (
               <div
                 key={cycle.id}
                 className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
