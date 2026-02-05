@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Wallet, TrendingUp, Heart, Calendar, Building } from 'lucide-react';
+import { Wallet, TrendingUp, Heart, Calendar, Building, RefreshCw } from 'lucide-react';
 import { platformWalletService, WalletSummary } from '../../services/platformWalletService';
 
 export default function PlatformWallet() {
   const [summary, setSummary] = useState<WalletSummary | null>(null);
   const [transfers, setTransfers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -18,12 +19,29 @@ export default function PlatformWallet() {
         platformWalletService.getWalletSummary(),
         platformWalletService.getTransferHistory()
       ]);
+
+      console.log('🔍 محفظة الأرباح - البيانات المحملة:', {
+        summary: summaryData,
+        transfersCount: transfersData?.length || 0,
+        transfers: transfersData
+      });
+
       setSummary(summaryData);
-      setTransfers(transfersData);
+      setTransfers(transfersData || []);
     } catch (error) {
-      console.error('Error loading wallet data:', error);
+      console.error('❌ خطأ في تحميل بيانات المحفظة:', error);
+      alert('حدث خطأ في تحميل بيانات المحفظة. يرجى المحاولة مرة أخرى.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRefresh = async () => {
+    try {
+      setRefreshing(true);
+      await loadData();
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -38,9 +56,19 @@ export default function PlatformWallet() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900">محفظة الأرباح</h2>
-        <p className="text-sm text-gray-600 mt-1">إدارة الفوائض المالية المحولة من المزارع</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">محفظة الأرباح</h2>
+          <p className="text-sm text-gray-600 mt-1">إدارة الفوائض المالية المحولة من المزارع</p>
+        </div>
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+          <span>{refreshing ? 'جاري التحديث...' : 'تحديث'}</span>
+        </button>
       </div>
 
       {/* Summary Cards */}
@@ -57,7 +85,7 @@ export default function PlatformWallet() {
             </div>
           </div>
           <div className="text-3xl font-bold">
-            {summary?.total_transferred.toLocaleString() || 0}
+            {(summary?.total_transferred || 0).toLocaleString()}
             <span className="text-xl mr-2">ر.س</span>
           </div>
         </div>
@@ -74,7 +102,7 @@ export default function PlatformWallet() {
             </div>
           </div>
           <div className="text-3xl font-bold">
-            {summary?.platform_balance.toLocaleString() || 0}
+            {(summary?.platform_balance || 0).toLocaleString()}
             <span className="text-xl mr-2">ر.س</span>
           </div>
         </div>
@@ -91,7 +119,7 @@ export default function PlatformWallet() {
             </div>
           </div>
           <div className="text-3xl font-bold">
-            {summary?.charity_balance.toLocaleString() || 0}
+            {(summary?.charity_balance || 0).toLocaleString()}
             <span className="text-xl mr-2">ر.س</span>
           </div>
         </div>
@@ -115,10 +143,13 @@ export default function PlatformWallet() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {transfers.length === 0 ? (
+              {!transfers || transfers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                    لا توجد تحويلات حتى الآن
+                  <td colSpan={5} className="px-6 py-8 text-center">
+                    <div className="text-gray-500">لا توجد تحويلات حتى الآن</div>
+                    <div className="text-xs text-gray-400 mt-2">
+                      قم بتحويل فائض مالي من صفحة مالية أي مزرعة لعرضه هنا
+                    </div>
                   </td>
                 </tr>
               ) : (

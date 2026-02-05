@@ -87,15 +87,23 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
       const result = await platformWalletService.transferToWallet(farmId, amount);
 
       if (result.success) {
-        alert('تم التحويل بنجاح!');
+        const platformShare = (amount * 0.75).toFixed(2);
+        const charityShare = (amount * 0.25).toFixed(2);
+        alert(
+          `✓ تم التحويل بنجاح!\n\n` +
+          `المبلغ المحول: ${amount.toLocaleString()} ر.س\n` +
+          `• حصة المنصة (75%): ${parseFloat(platformShare).toLocaleString()} ر.س\n` +
+          `• حصة الخيرية (25%): ${parseFloat(charityShare).toLocaleString()} ر.س\n\n` +
+          `يمكنك الآن مراجعة الرصيد في قسم "محفظة الأرباح" من لوحة التحكم.`
+        );
         setShowTransferModal(false);
         loadData();
       } else {
-        alert(result.error || 'حدث خطأ أثناء التحويل');
+        alert('❌ ' + (result.error || 'حدث خطأ أثناء التحويل'));
       }
     } catch (error) {
       console.error('Error transferring to wallet:', error);
-      alert('حدث خطأ أثناء التحويل');
+      alert('❌ حدث خطأ أثناء التحويل. يرجى المحاولة مرة أخرى.');
     }
   };
 

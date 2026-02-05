@@ -21,8 +21,13 @@ export const platformWalletService = {
     const { data, error } = await supabase
       .rpc('get_platform_wallet_summary');
 
-    if (error) throw error;
-    return data[0] as WalletSummary;
+    if (error) {
+      console.error('خطأ في تحميل ملخص المحفظة:', error);
+      throw error;
+    }
+
+    console.log('✓ تم تحميل ملخص المحفظة:', data);
+    return data?.[0] as WalletSummary;
   },
 
   async getTransferHistory() {
@@ -34,8 +39,13 @@ export const platformWalletService = {
       `)
       .order('transferred_at', { ascending: false });
 
-    if (error) throw error;
-    return data;
+    if (error) {
+      console.error('خطأ في تحميل سجل التحويلات:', error);
+      throw error;
+    }
+
+    console.log('✓ تم تحميل سجل التحويلات:', data?.length || 0, 'تحويل');
+    return data || [];
   },
 
   async transferToWallet(farmId: string, amount: number, pathType?: 'agricultural' | 'investment') {
