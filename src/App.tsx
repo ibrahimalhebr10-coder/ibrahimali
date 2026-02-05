@@ -485,7 +485,7 @@ function AppContent() {
 
   const handleRegistrationSuccess = () => {
     setShowStandaloneRegistration(false);
-    setShowAccountProfile(true);
+    // لا نفتح أي صفحة - نترك المستخدم على الواجهة الرئيسية
   };
 
   if (isOfferMode) {
