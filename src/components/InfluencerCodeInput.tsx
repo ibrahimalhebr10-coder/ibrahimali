@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Gift, Sparkles, CheckCircle, X } from 'lucide-react';
+import { Gift, Sparkles, CheckCircle, X, AlertCircle } from 'lucide-react';
+import { influencerMarketingService } from '../services/influencerMarketingService';
 
 interface InfluencerCodeInputProps {
   onCodeEntered: (code: string) => void;
@@ -12,26 +13,46 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
   const [enteredName, setEnteredName] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
   const [hasEnteredCode, setHasEnteredCode] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!inputValue.trim()) return;
 
-    const code = inputValue.trim();
-    setEnteredName(code);
-    setHasEnteredCode(true);
+    setIsVerifying(true);
+    setErrorMessage(null);
 
-    sessionStorage.setItem('influencer_code', code);
-    sessionStorage.setItem('influencer_activated_at', new Date().toISOString());
+    try {
+      const result = await influencerMarketingService.verifyInfluencerCode(inputValue.trim());
 
-    setIsAnimating(true);
-    setShowCongrats(true);
+      if (!result.isValid) {
+        setErrorMessage(result.message);
+        setIsVerifying(false);
+        return;
+      }
 
-    setTimeout(() => {
-      onCodeEntered(code);
-      setIsAnimating(false);
-    }, 500);
+      const code = inputValue.trim();
+      setEnteredName(code);
+      setHasEnteredCode(true);
+
+      sessionStorage.setItem('influencer_code', code);
+      sessionStorage.setItem('influencer_activated_at', new Date().toISOString());
+
+      setIsAnimating(true);
+      setShowCongrats(true);
+
+      setTimeout(() => {
+        onCodeEntered(code);
+        setIsAnimating(false);
+      }, 500);
+    } catch (err) {
+      console.error('خطأ في التحقق من الكود:', err);
+      setErrorMessage('حدث خطأ أثناء التحقق من الكود، يرجى المحاولة مرة أخرى');
+    } finally {
+      setIsVerifying(false);
+    }
   };
 
   const handleCloseCongrats = () => {
@@ -42,6 +63,7 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
     setInputValue('');
     setEnteredName('');
     setHasEnteredCode(false);
+    setErrorMessage(null);
     sessionStorage.removeItem('influencer_code');
     sessionStorage.removeItem('influencer_activated_at');
     sessionStorage.removeItem('featured_package_active');
@@ -82,29 +104,55 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
               <input
                 type="text"
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={(e) => {
+                  setInputValue(e.target.value);
+                  setErrorMessage(null);
+                }}
                 placeholder="مثال: احمد_المزارع"
-                className="flex-1 px-4 py-3 border-2 border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-500 focus:border-amber-500 bg-white text-slate-800 placeholder-slate-400 font-medium"
+                className={`flex-1 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 bg-white text-slate-800 placeholder-slate-400 font-medium ${
+                  errorMessage
+                    ? 'border-red-300 focus:border-red-500'
+                    : 'border-amber-200 focus:border-amber-500'
+                }`}
                 dir="rtl"
+                disabled={isVerifying}
               />
               <button
                 type="submit"
-                disabled={!inputValue.trim()}
+                disabled={!inputValue.trim() || isVerifying}
                 className={`px-6 py-3 rounded-xl font-bold text-white transition-all duration-300 flex items-center gap-2 ${
-                  inputValue.trim()
+                  inputValue.trim() && !isVerifying
                     ? 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-lg hover:shadow-xl transform hover:scale-105'
                     : 'bg-slate-300 cursor-not-allowed'
                 }`}
               >
-                <Sparkles className="w-5 h-5" />
-                إدخال
+                {isVerifying ? (
+                  <>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    <span>جاري التحقق...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    إدخال
+                  </>
+                )}
               </button>
             </form>
 
-            <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
-              <CheckCircle className="w-4 h-4 text-emerald-500" />
-              <span>يمكنك إدخال الكود في أي وقت</span>
-            </div>
+            {errorMessage && (
+              <div className="mt-3 flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg animate-shake">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                <span className="text-sm font-medium text-red-700">{errorMessage}</span>
+              </div>
+            )}
+
+            {!errorMessage && (
+              <div className="mt-3 flex items-center gap-2 text-xs text-slate-500">
+                <CheckCircle className="w-4 h-4 text-emerald-500" />
+                <span>يمكنك إدخال الكود في أي وقت</span>
+              </div>
+            )}
           </>
         )}
 
@@ -241,8 +289,24 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
           }
         }
 
+        @keyframes shake {
+          0%, 100% {
+            transform: translateX(0);
+          }
+          10%, 30%, 50%, 70%, 90% {
+            transform: translateX(-5px);
+          }
+          20%, 40%, 60%, 80% {
+            transform: translateX(5px);
+          }
+        }
+
         .animate-fade-in {
           animation: fade-in 0.3s ease-out;
+        }
+
+        .animate-shake {
+          animation: shake 0.5s ease-in-out;
         }
       `}</style>
     </>

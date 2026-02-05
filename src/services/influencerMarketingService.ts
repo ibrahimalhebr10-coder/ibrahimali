@@ -80,6 +80,47 @@ export interface InfluencerActivityLog {
 }
 
 export const influencerMarketingService = {
+  async verifyInfluencerCode(code: string): Promise<{ isValid: boolean; partner: InfluencerPartner | null; message: string }> {
+    if (!code || !code.trim()) {
+      return {
+        isValid: false,
+        partner: null,
+        message: 'الرجاء إدخال كود صحيح'
+      };
+    }
+
+    const { data, error } = await supabase
+      .from('influencer_partners')
+      .select('*')
+      .eq('name', code.trim())
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return {
+          isValid: false,
+          partner: null,
+          message: 'الكود غير مسجل في النظام'
+        };
+      }
+      throw error;
+    }
+
+    if (!data.is_active) {
+      return {
+        isValid: false,
+        partner: null,
+        message: 'هذا الكود غير نشط، يرجى التواصل مع الإدارة'
+      };
+    }
+
+    return {
+      isValid: true,
+      partner: data,
+      message: 'تم التحقق من الكود بنجاح'
+    };
+  },
+
   async getAllPartners(): Promise<InfluencerPartner[]> {
     const { data, error } = await supabase
       .from('influencer_partners')
