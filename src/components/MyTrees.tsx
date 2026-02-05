@@ -55,49 +55,8 @@ export default function MyTrees({ onClose, onNavigateToPayment, onShowAuth }: My
     ? treesSummary?.greenTreesCount || 0
     : treesSummary?.goldenTreesCount || 0;
 
-  if (activePath === 'golden') {
-    return (
-      <div className="fixed inset-0 z-50 overflow-auto bg-slate-900">
-        <InvestmentAssetsView onClose={onClose} />
-      </div>
-    );
-  }
-
   return (
     <div className="fixed inset-0 z-50 bg-white overflow-hidden flex flex-col">
-      <div
-        className="px-4 py-6 border-b"
-        style={{
-          background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 252, 250, 0.98) 100%)',
-          borderColor: `${currentColor}20`
-        }}
-      >
-        <div className="flex items-center justify-between">
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X className="w-6 h-6 text-gray-600" />
-          </button>
-
-          <div className="flex flex-col items-center gap-1">
-            <div className="flex items-center gap-2">
-              <Leaf className="w-6 h-6" style={{ color: currentColor }} />
-              <h1 className="text-2xl font-bold" style={{ color: currentColor }}>
-                أشجاري الخضراء
-              </h1>
-            </div>
-            {!isDemoMode && treesSummary && (
-              <p className="text-sm text-gray-500">
-                {currentTreesCount} {currentTreesCount === 1 ? 'شجرة' : currentTreesCount === 2 ? 'شجرتان' : 'أشجار'}
-              </p>
-            )}
-          </div>
-
-          <div className="w-10"></div>
-        </div>
-      </div>
-
       <div className="flex-1 overflow-auto">
         {loading ? (
           <div className="flex items-center justify-center h-full">
@@ -116,6 +75,13 @@ export default function MyTrees({ onClose, onNavigateToPayment, onShowAuth }: My
           />
         )}
       </div>
+
+      <button
+        onClick={onClose}
+        className="fixed top-6 left-4 z-50 p-2 bg-white/90 backdrop-blur-sm hover:bg-gray-100 rounded-full transition-colors shadow-lg"
+      >
+        <X className="w-6 h-6 text-gray-600" />
+      </button>
     </div>
   );
 }
