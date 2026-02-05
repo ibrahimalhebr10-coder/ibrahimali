@@ -265,7 +265,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
       return (
         <div
           key="loading-details"
-          className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4 pb-32"
+          className={`min-h-screen bg-gradient-to-br ${bgColor} py-8 px-4 pb-32`}
           dir="rtl"
         >
           <div className="max-w-4xl mx-auto">
@@ -278,7 +278,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
             </button>
 
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-              <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-8 text-white">
+              <div className={`bg-gradient-to-r ${headerColor} p-8 text-white`}>
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
                     <Sprout className="w-8 h-8 animate-pulse" />
@@ -307,7 +307,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
     return (
       <div
         key={`details-${selectedRecord}-${maintenanceDetails.id}`}
-        className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 py-8 px-4 pb-32"
+        className={`min-h-screen bg-gradient-to-br ${bgColor} py-8 px-4 pb-32`}
         dir="rtl"
       >
         <div className="max-w-4xl mx-auto">
@@ -320,7 +320,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
           </button>
 
           <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-            <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-8 text-white">
+            <div className={`bg-gradient-to-r ${headerColor} p-8 text-white`}>
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
                   <Sprout className="w-8 h-8" />
@@ -494,12 +494,45 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
     );
   }
 
+  const isInvestment = identity === 'investment';
+  const headerColor = isInvestment
+    ? 'from-amber-600 to-yellow-600'
+    : 'from-green-600 to-emerald-600';
+  const bgColor = isInvestment
+    ? 'from-amber-50 via-white to-yellow-50'
+    : 'from-green-50 via-white to-emerald-50';
+
   return (
     <div
-      className="min-h-screen py-8 px-4 pb-32 bg-gradient-to-br from-green-50 via-white to-emerald-50"
+      className={`min-h-screen py-8 px-4 pb-32 bg-gradient-to-br ${bgColor}`}
       dir="rtl"
     >
       <div className="max-w-6xl mx-auto">
+        <div className={`bg-gradient-to-r ${headerColor} rounded-3xl shadow-2xl p-8 mb-8 text-white`}>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+              <Sprout className="w-8 h-8" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold mb-1">
+                {isInvestment ? 'أشجاري الذهبية' : 'أشجاري الخضراء'}
+              </h1>
+              <p className="text-white/90 text-lg">
+                {isInvestment
+                  ? 'تتبع دورات الاستثمار وعوائد أشجارك الذهبية'
+                  : 'متابعة أعمال الصيانة والعناية بأشجارك'}
+              </p>
+            </div>
+          </div>
+          {isInvestment && (
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
+              <p className="text-white/90 text-sm leading-relaxed">
+                هنا يمكنك متابعة جميع الدورات الاستثمارية والعوائد المتعلقة بأشجارك في المسار الاستثماري
+              </p>
+            </div>
+          )}
+        </div>
+
         {generalStatus && (
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl shadow-lg p-8 mb-8 border-2 border-green-200">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -529,17 +562,35 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
             </div>
             <h3 className="text-2xl font-bold text-gray-900 mb-3">لا توجد تحديثات حالياً</h3>
             <p className="text-gray-600 text-lg">
-              سيتم عرض تحديثات الصيانة والعناية بأشجارك هنا
+              {isInvestment
+                ? 'سيتم عرض الدورات الاستثمارية وعوائد أشجارك هنا'
+                : 'سيتم عرض تحديثات الصيانة والعناية بأشجارك هنا'
+              }
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <>
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+                <div className={`w-10 h-10 bg-gradient-to-br ${headerColor} rounded-xl flex items-center justify-center`}>
+                  <Sprout className="w-5 h-5 text-white" />
+                </div>
+                {isInvestment ? 'الدورات الاستثمارية' : 'سجلات الصيانة'}
+              </h2>
+              <p className="text-gray-600 text-sm mr-13">
+                {isInvestment
+                  ? `عدد الدورات: ${records.length}`
+                  : `عدد أعمال الصيانة: ${records.length}`
+                }
+              </p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {records.map((record) => (
               <div
                 key={record.maintenance_id}
                 className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
               >
-                <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-6 text-white">
+                <div className={`bg-gradient-to-r ${headerColor} p-6 text-white`}>
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <h3 className="text-xl font-bold mb-2">{record.farm_name}</h3>
@@ -604,7 +655,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
                   <div className="flex gap-3">
                     <button
                       onClick={() => handleViewDetails(record)}
-                      className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-3 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all font-semibold"
+                      className={`flex-1 flex items-center justify-center gap-2 bg-gradient-to-r ${headerColor} text-white py-3 rounded-xl hover:opacity-90 transition-all font-semibold`}
                     >
                       <Eye className="w-5 h-5" />
                       عرض التفاصيل
@@ -623,7 +674,8 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          </>
         )}
       </div>
 
