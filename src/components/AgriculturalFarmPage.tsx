@@ -135,12 +135,15 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   };
 
   const handlePackageDetailsClick = (pkg: AgriculturalPackage) => {
+    console.log('📦 [Agricultural Farm] Package details clicked:', pkg.package_name);
+    leadService.trackPackageView(pkg.id, pkg.package_name);
     setSelectedPackage(pkg);
     setShowPackageDetailsModal(true);
   };
 
   const handleSelectPackage = async (pkg: AgriculturalPackage) => {
     console.log('🎯 تم اختيار الباقة:', pkg.package_name, '- contract_id:', pkg.contract_id);
+    leadService.trackReservationStart(farm.id, pkg.min_trees);
 
     setIsLoadingContract(true);
     setSelectedPackage(pkg);

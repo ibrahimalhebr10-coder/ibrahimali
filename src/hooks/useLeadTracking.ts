@@ -8,6 +8,7 @@ export function useLeadTracking() {
 
   useEffect(() => {
     if (!initialized.current) {
+      console.log('🎬 [useLeadTracking] Initializing lead tracking...');
       leadScoringService.initialize();
       initialized.current = true;
     }
@@ -15,6 +16,7 @@ export function useLeadTracking() {
 
   useEffect(() => {
     if (user?.id) {
+      console.log('🔗 [useLeadTracking] Linking session to user:', user.id);
       leadScoringService.linkSessionToUser(user.id);
     }
   }, [user?.id]);

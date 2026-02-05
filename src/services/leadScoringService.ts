@@ -43,7 +43,13 @@ class LeadScoringService {
   }
 
   async initialize() {
-    if (this.initialized) return;
+    if (this.initialized) {
+      console.log('🔄 [Lead Tracking] Already initialized');
+      return;
+    }
+
+    console.log('🚀 [Lead Tracking] Initializing...');
+    console.log('📱 Session ID:', this.sessionId);
 
     await this.trackActivity('page_visit', {
       user_agent: navigator.userAgent,
@@ -52,6 +58,7 @@ class LeadScoringService {
     });
 
     this.initialized = true;
+    console.log('✅ [Lead Tracking] Initialized successfully');
   }
 
   async trackActivity(
@@ -60,7 +67,10 @@ class LeadScoringService {
     customPoints?: number
   ): Promise<void> {
     try {
+      console.log(`📊 [Lead Tracking] Tracking activity: ${activityType}`);
+
       const { data: { user } } = await supabase.auth.getUser();
+      console.log(`👤 [Lead Tracking] User ID: ${user?.id || 'Anonymous'}`);
 
       let points = customPoints;
       if (points === undefined) {
@@ -72,6 +82,7 @@ class LeadScoringService {
           .maybeSingle();
 
         points = rule?.points || 0;
+        console.log(`🎯 [Lead Tracking] Points for ${activityType}: ${points}`);
       }
 
       const activity: LeadActivity = {
@@ -83,11 +94,18 @@ class LeadScoringService {
         page_url: window.location.pathname
       };
 
-      await supabase.from('lead_activities').insert(activity);
+      console.log(`💾 [Lead Tracking] Inserting activity:`, activity);
+      const { data, error } = await supabase.from('lead_activities').insert(activity).select();
 
+      if (error) {
+        console.error('❌ [Lead Tracking] Database error:', error);
+        throw error;
+      }
+
+      console.log(`✅ [Lead Tracking] Activity saved successfully:`, data);
       console.log(`✅ Activity tracked: ${activityType} (+${points} points)`);
     } catch (error) {
-      console.error('Error tracking activity:', error);
+      console.error('❌ [Lead Tracking] Error tracking activity:', error);
     }
   }
 

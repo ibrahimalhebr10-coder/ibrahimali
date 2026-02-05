@@ -164,11 +164,16 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   };
 
   const handlePackageDetailsClick = (pkg: InvestmentPackage) => {
+    console.log('📦 [Investment Farm] Package details clicked:', pkg.name);
+    leadService.trackPackageView(pkg.id, pkg.name);
     setSelectedPackage(pkg);
     setShowPackageDetailsModal(true);
   };
 
   const handleSelectPackage = async (pkg: InvestmentPackage) => {
+    console.log('🎯 [Investment Farm] Package selected for reservation:', pkg.name);
+    leadService.trackReservationStart(farm.id, pkg.min_trees);
+
     setIsLoadingContract(true);
     setSelectedPackage(pkg);
 

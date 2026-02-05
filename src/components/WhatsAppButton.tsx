@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { systemSettingsService } from '../services/systemSettingsService';
+import { leadScoringService } from '../services/leadScoringService';
 
 interface WhatsAppButtonProps {
   investorName?: string;
@@ -71,6 +72,9 @@ export default function WhatsAppButton({
       alert('رقم واتساب غير متوفر حالياً');
       return;
     }
+
+    console.log('💬 [WhatsApp] Button clicked!');
+    leadScoringService.trackWhatsAppClick();
 
     const message = buildMessage();
     const encodedMessage = encodeURIComponent(message);
