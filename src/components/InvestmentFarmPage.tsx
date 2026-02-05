@@ -10,6 +10,7 @@ import PrePaymentRegistration from './PrePaymentRegistration';
 import PaymentSuccessScreen from './PaymentSuccessScreen';
 import InvestmentPackageDetailsModal from './InvestmentPackageDetailsModal';
 import { usePageTracking } from '../hooks/useLeadTracking';
+import InfluencerCodeInput from './InfluencerCodeInput';
 
 interface InvestmentFarmPageProps {
   farm: FarmProject;
@@ -24,6 +25,13 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   useEffect(() => {
     leadService.trackFarmView(farm.id, farm.name);
   }, [farm.id, farm.name]);
+
+  useEffect(() => {
+    const storedCode = sessionStorage.getItem('influencer_code');
+    if (storedCode) {
+      setInfluencerCode(storedCode);
+    }
+  }, []);
   const [packages, setPackages] = useState<InvestmentPackage[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<InvestmentPackage | null>(null);
   const [selectedContract, setSelectedContract] = useState<FarmContract | null>(null);
@@ -43,6 +51,8 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   const [isLoadingContract, setIsLoadingContract] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const packagesScrollRef = useRef<HTMLDivElement>(null);
+  const [influencerCode, setInfluencerCode] = useState<string | null>(null);
+  const [featuredColor] = useState('#FFD700');
 
   useEffect(() => {
     if (farm.contracts && farm.contracts.length > 0) {
@@ -208,6 +218,11 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: 'smooth' });
     }
+  };
+
+  const handleInfluencerCodeEntered = (code: string) => {
+    setInfluencerCode(code);
+    console.log('كود المؤثر تم إدخاله:', code);
   };
 
   const scrollToPackage = (index: number) => {
@@ -433,6 +448,16 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           </div>
         </div>
 
+        {/* Influencer Code Input */}
+        {!influencerCode && (
+          <div className="mt-3 mx-4">
+            <InfluencerCodeInput
+              onCodeEntered={handleInfluencerCodeEntered}
+              featuredColor={featuredColor}
+            />
+          </div>
+        )}
+
         {/* Investment Packages Slider - Scrollable with Page */}
         {packages.length > 0 && (
           <div className="mt-3 bg-gradient-to-br from-amber-50/95 via-yellow-50/90 to-orange-50/95 rounded-2xl border border-amber-200/50 shadow-md py-4 mx-4">
@@ -464,18 +489,35 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
               className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4"
               style={{ scrollPaddingLeft: '1rem' }}
             >
-              {packages.map((pkg) => {
+              {packages.map((pkg, index) => {
                 const isSelected = selectedPackage?.id === pkg.id;
+                const isFeatured = influencerCode && index === 0;
                 return (
                   <div
                     key={pkg.id}
                     onClick={() => handleSelectPackage(pkg)}
                     className={`relative flex-shrink-0 w-[85%] md:w-[48%] lg:w-[45%] xl:w-[30%] snap-center p-4 rounded-xl border-2 transition-all cursor-pointer active:scale-95 ${
-                      isSelected
+                      isFeatured
+                        ? 'bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-400 shadow-xl ring-2 ring-amber-400/50'
+                        : isSelected
                         ? 'bg-gradient-to-br from-amber-100/60 to-yellow-100/50 border-[#D4AF37] shadow-lg'
                         : 'bg-white/80 border-amber-200 hover:border-amber-400 hover:shadow-md'
                     }`}
+                    style={isFeatured ? {
+                      boxShadow: `0 0 30px ${featuredColor}40`
+                    } : {}}
                   >
+                    {/* Featured Badge */}
+                    {isFeatured && (
+                      <div
+                        className="absolute -top-3 right-1/2 transform translate-x-1/2 text-white text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg animate-pulse"
+                        style={{ backgroundColor: featuredColor }}
+                      >
+                        <Gift className="w-3.5 h-3.5" />
+                        <span>الباقة المميزة</span>
+                      </div>
+                    )}
+
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -489,7 +531,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
                       </span>
                     </button>
 
-                    {isSelected && (
+                    {isSelected && !isFeatured && (
                       <div className="absolute top-2 right-2 bg-[#D4AF37] text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
                         <span>✓</span>
                         <span>مختارة</span>
@@ -497,15 +539,30 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
                     )}
 
                     <div className="text-center space-y-2.5 pt-6">
-                      <h4 className="font-bold text-[#B8942F] text-sm">{pkg.package_name}</h4>
+                      <h4 className={`font-bold text-sm ${isFeatured ? 'text-amber-700' : 'text-[#B8942F]'}`}>
+                        {pkg.package_name}
+                      </h4>
 
-                      <div className="bg-gradient-to-br from-[#D4AF37] to-[#B8942F] text-white rounded-lg py-2 px-3">
+                      <div className={`${isFeatured ? 'bg-gradient-to-r from-amber-500 to-orange-600' : 'bg-gradient-to-br from-[#D4AF37] to-[#B8942F]'} text-white rounded-lg py-2 px-3`}>
                         <div className="text-xl font-bold">{pkg.price_per_tree} ر.س</div>
                         <div className="text-[10px] opacity-90">للشجرة الواحدة</div>
                       </div>
 
+                      {isFeatured && (
+                        <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-300 rounded-lg py-2 px-3 animate-bounce">
+                          <div className="flex items-center justify-center gap-2 text-amber-700">
+                            <Clock className="w-4 h-4" />
+                            <span className="font-bold text-sm">+6 أشهر إضافية مجاناً</span>
+                          </div>
+                        </div>
+                      )}
+
                       {pkg.motivational_text && (
-                        <div className="text-xs text-amber-700 font-semibold bg-amber-50 rounded-lg py-1.5 px-2">
+                        <div className={`text-xs font-semibold rounded-lg py-1.5 px-2 ${
+                          isFeatured
+                            ? 'text-amber-700 bg-amber-50 border border-amber-200'
+                            : 'text-amber-700 bg-amber-50'
+                        }`}>
                           {pkg.motivational_text}
                         </div>
                       )}

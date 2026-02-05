@@ -10,6 +10,7 @@ import PrePaymentRegistration from './PrePaymentRegistration';
 import PaymentSuccessScreen from './PaymentSuccessScreen';
 import PackageDetailsModal from './PackageDetailsModal';
 import { usePageTracking } from '../hooks/useLeadTracking';
+import InfluencerCodeInput from './InfluencerCodeInput';
 
 interface AgriculturalFarmPageProps {
   farm: FarmProject;
@@ -24,6 +25,13 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   useEffect(() => {
     leadService.trackFarmView(farm.id, farm.name);
   }, [farm.id, farm.name]);
+
+  useEffect(() => {
+    const storedCode = sessionStorage.getItem('influencer_code');
+    if (storedCode) {
+      setInfluencerCode(storedCode);
+    }
+  }, []);
   const [packages, setPackages] = useState<AgriculturalPackage[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<AgriculturalPackage | null>(null);
   const [selectedContract, setSelectedContract] = useState<FarmContract | null>(null);
@@ -43,6 +51,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [isLoadingContract, setIsLoadingContract] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const packagesScrollRef = useRef<HTMLDivElement>(null);
+  const [influencerCode, setInfluencerCode] = useState<string | null>(null);
+  const [featuredColor] = useState('#FFD700');
 
   useEffect(() => {
     console.log('🏢 عقود المزرعة المُحمّلة:', farm.contracts?.map(c => ({
@@ -187,6 +197,11 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTo({ top: scrollContainerRef.current.scrollHeight, behavior: 'smooth' });
     }
+  };
+
+  const handleInfluencerCodeEntered = (code: string) => {
+    setInfluencerCode(code);
+    console.log('كود المؤثر تم إدخاله:', code);
   };
 
   const scrollToPackage = (index: number) => {
@@ -400,6 +415,16 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           </div>
         </div>
 
+        {/* Influencer Code Input */}
+        {!influencerCode && (
+          <div className="mt-3 mx-4">
+            <InfluencerCodeInput
+              onCodeEntered={handleInfluencerCodeEntered}
+              featuredColor={featuredColor}
+            />
+          </div>
+        )}
+
         {/* Agricultural Packages Slider */}
         <div className="mt-3 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 rounded-2xl border border-green-200/50 shadow-md py-4 mx-4">
           <div className="px-4 mb-3 flex items-center justify-between">
@@ -431,17 +456,23 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4"
             style={{ scrollPaddingLeft: '1rem' }}
           >
-            {packages.map((pkg) => {
+            {packages.map((pkg, index) => {
               const isSelected = selectedPackage?.id === pkg.id;
+              const isFeatured = influencerCode && index === 0;
               return (
                 <div
                   key={pkg.id}
                   onClick={() => handleSelectPackage(pkg)}
                   className={`relative flex-shrink-0 w-[85%] md:w-[48%] lg:w-[45%] xl:w-[30%] snap-center p-4 rounded-xl border-2 transition-all cursor-pointer active:scale-95 ${
-                    isSelected
+                    isFeatured
+                      ? 'bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-400 shadow-xl ring-2 ring-amber-400/50'
+                      : isSelected
                       ? 'bg-gradient-to-br from-green-100/60 to-emerald-100/50 border-darkgreen shadow-lg'
                       : 'bg-white/80 border-green-200 hover:border-green-400 hover:shadow-md'
                   }`}
+                  style={isFeatured ? {
+                    boxShadow: `0 0 30px ${featuredColor}40`
+                  } : {}}
                 >
                   {/* Info Button - Top Left Corner with Text */}
                   <button
@@ -458,8 +489,19 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                     </span>
                   </button>
 
+                  {/* Featured Badge */}
+                  {isFeatured && (
+                    <div
+                      className="absolute -top-3 right-1/2 transform translate-x-1/2 text-white text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg animate-pulse"
+                      style={{ backgroundColor: featuredColor }}
+                    >
+                      <Gift className="w-3.5 h-3.5" />
+                      <span>الباقة المميزة</span>
+                    </div>
+                  )}
+
                   {/* Selected Badge - Top Left Corner */}
-                  {isSelected && (
+                  {isSelected && !isFeatured && (
                     <div className="absolute top-2 right-2 bg-darkgreen text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
                       <span>✓</span>
                       <span>مختارة</span>
@@ -467,15 +509,30 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                   )}
 
                   <div className="text-center space-y-2.5 pt-6">
-                    <h4 className="font-bold text-darkgreen text-sm">{pkg.package_name}</h4>
+                    <h4 className={`font-bold text-sm ${isFeatured ? 'text-amber-700' : 'text-darkgreen'}`}>
+                      {pkg.package_name}
+                    </h4>
 
-                    <div className="bg-green-600 text-white rounded-lg py-2 px-3">
+                    <div className={`${isFeatured ? 'bg-gradient-to-r from-amber-500 to-orange-600' : 'bg-green-600'} text-white rounded-lg py-2 px-3`}>
                       <div className="text-xl font-bold">{pkg.price_per_tree} ر.س</div>
                       <div className="text-[10px] opacity-90">للشجرة الواحدة</div>
                     </div>
 
+                    {isFeatured && (
+                      <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-300 rounded-lg py-2 px-3 animate-bounce">
+                        <div className="flex items-center justify-center gap-2 text-amber-700">
+                          <Clock className="w-4 h-4" />
+                          <span className="font-bold text-sm">+6 أشهر إضافية مجاناً</span>
+                        </div>
+                      </div>
+                    )}
+
                     {pkg.motivational_text && (
-                      <div className="text-xs text-green-700 font-semibold bg-green-50 rounded-lg py-1.5 px-2">
+                      <div className={`text-xs font-semibold rounded-lg py-1.5 px-2 ${
+                        isFeatured
+                          ? 'text-amber-700 bg-amber-50 border border-amber-200'
+                          : 'text-green-700 bg-green-50'
+                      }`}>
                         {pkg.motivational_text}
                       </div>
                     )}
