@@ -74,7 +74,7 @@ export default function InvestmentAssetsView({ onClose }: InvestmentAssetsViewPr
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white pb-32 overflow-auto">
+    <div className="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white" style={{ paddingBottom: '200px', minHeight: '100%' }}>
       {onClose && (
         <div className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50">
           <div className="px-4 py-4 flex items-center justify-between">
