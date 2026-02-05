@@ -1,4 +1,4 @@
-import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Home, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X } from 'lucide-react';
+import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
@@ -1061,7 +1061,7 @@ function AppContent() {
               }
             }}
           >
-            <Home className="w-7 h-7 transition-transform duration-300 group-hover:scale-110" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37' }} />
+            <TreePine className="w-7 h-7 transition-transform duration-300 group-hover:scale-110" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37' }} />
             <span className="text-sm font-bold" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37' }}>
               {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
             </span>
@@ -1180,7 +1180,7 @@ function AppContent() {
                 border: appMode === 'agricultural' ? '3px solid rgba(58,161,126,0.5)' : '3px solid rgba(212,175,55,0.5)'
               }}
             >
-              <Home className="w-7 h-7 transition-all duration-300 group-active:scale-110" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37' }} />
+              <TreePine className="w-7 h-7 transition-all duration-300 group-active:scale-110" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37' }} />
             </div>
             <span className="text-[10px] font-black" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#b8942f' }}>
               {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}

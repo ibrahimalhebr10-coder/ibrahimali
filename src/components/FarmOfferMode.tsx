@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Sprout, CheckCircle, MapPin, Phone, Mail, FileText, Home, Plus, Trash2, MessageCircle } from 'lucide-react';
+import { X, Sprout, CheckCircle, MapPin, Phone, Mail, FileText, TreePine, Plus, Trash2, MessageCircle } from 'lucide-react';
 import { useOfferMode } from '../contexts/OfferModeContext';
 import { farmOfferService, type FarmOfferData, type FarmOffer, type TreeVariety } from '../services/farmOfferService';
 import { systemSettingsService } from '../services/systemSettingsService';
@@ -235,7 +235,7 @@ export default function FarmOfferMode() {
               onClick={handleExit}
               className="w-full bg-gradient-to-l from-green-600 to-green-700 text-white py-4 rounded-xl font-bold text-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
             >
-              <Home className="w-5 h-5" />
+              <TreePine className="w-5 h-5" />
               العودة للمنصة
             </button>
           </div>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { CheckCircle, XCircle, Loader, Home, Receipt } from 'lucide-react';
+import { CheckCircle, XCircle, Loader, TreePine, Receipt } from 'lucide-react';
 import { maintenancePaymentService } from '../services/maintenancePaymentService';
 
 interface MaintenancePaymentResultProps {
@@ -182,7 +182,7 @@ export default function MaintenancePaymentResult({ onReturnHome }: MaintenancePa
               onClick={onReturnHome}
               className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white py-4 rounded-xl hover:from-green-700 hover:to-emerald-700 transition-all font-bold text-lg shadow-lg hover:shadow-xl"
             >
-              <Home className="w-5 h-5" />
+              <TreePine className="w-5 h-5" />
               العودة إلى أشجاري
             </button>
 
