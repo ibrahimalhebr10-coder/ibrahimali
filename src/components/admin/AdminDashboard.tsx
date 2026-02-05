@@ -10,7 +10,8 @@ import {
   Menu,
   X,
   ClipboardList,
-  Wrench
+  Wrench,
+  DollarSign
 } from 'lucide-react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import DashboardOverview from './DashboardOverview';
@@ -21,12 +22,14 @@ import ContentManagement from './ContentManagement';
 import GeneralSettings from './GeneralSettings';
 import FarmOffersManager from './FarmOffersManager';
 import OperationsSection from './OperationsSection';
+import FinanceSection from './FinanceSection';
 
 type AdminSection =
   | 'overview'
   | 'farms'
   | 'farm-offers'
   | 'operations'
+  | 'finance'
   | 'packages'
   | 'marketing'
   | 'content'
@@ -42,6 +45,7 @@ const AdminDashboard: React.FC = () => {
     { id: 'farms' as AdminSection, label: 'المزارع', icon: Layers, color: 'green' },
     { id: 'farm-offers' as AdminSection, label: 'عروض المزارع', icon: ClipboardList, color: 'emerald' },
     { id: 'operations' as AdminSection, label: 'التشغيل', icon: Wrench, color: 'orange' },
+    { id: 'finance' as AdminSection, label: 'المالية', icon: DollarSign, color: 'teal' },
     { id: 'packages' as AdminSection, label: 'الباقات', icon: Package, color: 'purple' },
     { id: 'marketing' as AdminSection, label: 'التسويق', icon: Megaphone, color: 'pink' },
     { id: 'content' as AdminSection, label: 'المحتوى', icon: MessageSquare, color: 'indigo' },
@@ -71,6 +75,8 @@ const AdminDashboard: React.FC = () => {
         return <FarmOffersManager />;
       case 'operations':
         return <OperationsSection />;
+      case 'finance':
+        return <FinanceSection />;
       case 'packages':
         return <PackagesManagement />;
       case 'marketing':
@@ -93,6 +99,7 @@ const AdminDashboard: React.FC = () => {
       pink: 'text-pink-600',
       indigo: 'text-indigo-600',
       emerald: 'text-emerald-600',
+      teal: 'text-teal-600',
       gray: 'text-gray-600',
     };
     return colors[color as keyof typeof colors] || colors.blue;
