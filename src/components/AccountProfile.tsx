@@ -1,9 +1,10 @@
-import { X, User, LogOut, Sparkles, Sprout, TrendingUp } from 'lucide-react';
+import { X, User, LogOut, Sparkles, Sprout, TrendingUp, Shield, UserX } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import IdentityManager from './IdentityManager';
 import MyContracts from './MyContracts';
 import { type IdentityType, identityService } from '../services/identityService';
+import { deviceRecognitionService } from '../services/deviceRecognitionService';
 
 interface AccountProfileProps {
   isOpen: boolean;
@@ -18,8 +19,9 @@ interface AccountProfileProps {
 type AppMode = 'agricultural' | 'investment';
 
 export default function AccountProfile({ isOpen, currentContext, onClose, onOpenAuth, onOpenReservations, onStartInvestment, onOpenGreenTrees }: AccountProfileProps) {
-  const { user, signOut } = useAuth();
+  const { user, signOut, isTrustedDevice } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [primaryIdentity, setPrimaryIdentity] = useState<IdentityType | null>(null);
   const [isLoadingIdentity, setIsLoadingIdentity] = useState(true);
 
@@ -49,9 +51,20 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
 
   if (!isOpen) return null;
 
-  const handleSignOut = async () => {
-    await signOut();
+  const handleSignOut = async (fullLogout: boolean = false) => {
+    await signOut(fullLogout);
+    setShowLogoutModal(false);
+    setShowProfileMenu(false);
     onClose();
+  };
+
+  const handleLogoutClick = () => {
+    if (isTrustedDevice) {
+      setShowLogoutModal(true);
+      setShowProfileMenu(false);
+    } else {
+      handleSignOut(false);
+    }
   };
 
   const isFarmer = appMode === 'agricultural';
@@ -197,7 +210,7 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
               <p className="text-xs text-gray-500 text-right">{user.email}</p>
             </div>
             <button
-              onClick={handleSignOut}
+              onClick={handleLogoutClick}
               className="w-full p-3 flex items-center gap-2 hover:bg-red-50 rounded-xl transition-colors text-red-600"
             >
               <LogOut className="w-4 h-4" />
@@ -293,6 +306,73 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
           </div>
         </div>
       </div>
+
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowLogoutModal(false)} />
+
+          <div className="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl relative z-10 transform scale-100 animate-in">
+            <div className="text-center mb-6">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center shadow-lg">
+                <Shield className="w-10 h-10 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">تسجيل الخروج</h3>
+              <p className="text-sm text-gray-600">اختر طريقة الخروج المناسبة لك</p>
+            </div>
+
+            <div className="space-y-3 mb-6">
+              <button
+                onClick={() => handleSignOut(false)}
+                className="w-full p-5 rounded-2xl border-2 border-gray-200 hover:border-green-500 transition-all group text-right"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-green-100 flex items-center justify-center flex-shrink-0 group-hover:bg-green-500 transition-colors">
+                    <LogOut className="w-6 h-6 text-green-600 group-hover:text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 mb-1">خروج عادي</h4>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      ابقى مسجلاً على هذا الجهاز وعد بدون إعادة الدخول
+                    </p>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => handleSignOut(true)}
+                className="w-full p-5 rounded-2xl border-2 border-gray-200 hover:border-red-500 transition-all group text-right"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center flex-shrink-0 group-hover:bg-red-500 transition-colors">
+                    <UserX className="w-6 h-6 text-red-600 group-hover:text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h4 className="font-bold text-gray-900 mb-1">خروج كامل</h4>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      احذف بياناتي من هذا الجهاز وسأحتاج لإعادة الدخول
+                    </p>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <button
+              onClick={() => setShowLogoutModal(false)}
+              className="w-full py-3 rounded-xl border-2 border-gray-200 hover:bg-gray-50 transition-colors font-bold text-gray-700"
+            >
+              إلغاء
+            </button>
+
+            {deviceRecognitionService.isTrustedDevice() && (
+              <div className="mt-4 p-3 bg-blue-50 rounded-xl border border-blue-200">
+                <p className="text-xs text-blue-800 text-center">
+                  هذا الجهاز محفوظ كجهاز موثوق
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }

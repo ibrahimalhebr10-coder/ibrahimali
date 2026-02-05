@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Smartphone, Lock, X, AlertCircle, CheckCircle } from 'lucide-react';
+import { Smartphone, Lock, X, AlertCircle, CheckCircle, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface AuthFormProps {
@@ -13,6 +13,7 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
   const [mode, setMode] = useState<'signin' | 'signup'>('signup');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -71,7 +72,7 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
 
     try {
       if (mode === 'signup') {
-        const { error: signUpError } = await signUp(email, password);
+        const { error: signUpError } = await signUp(email, password, rememberMe);
 
         if (signUpError) {
           if (signUpError.message.includes('already registered')) {
@@ -86,7 +87,7 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
         setSuccess('تم إنشاء الحساب بنجاح! جاري تسجيل الدخول...');
 
         setTimeout(async () => {
-          const { error: signInError } = await signIn(email, password);
+          const { error: signInError } = await signIn(email, password, rememberMe);
 
           if (signInError) {
             setError('تم إنشاء الحساب لكن فشل تسجيل الدخول التلقائي. جرب تسجيل الدخول يدوياً.');
@@ -100,7 +101,7 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
         }, 1000);
 
       } else {
-        const { error: signInError } = await signIn(email, password);
+        const { error: signInError } = await signIn(email, password, rememberMe);
 
         if (signInError) {
           if (signInError.message.includes('Invalid login credentials')) {
@@ -219,6 +220,30 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
               <p className="text-xs text-gray-500 mt-2">
                 {mode === 'signup' && '6 أحرف أو أرقام على الأقل'}
               </p>
+            </div>
+
+            {/* خيار تذكرني على هذا الجهاز */}
+            <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-200">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  disabled={loading}
+                  className="mt-1 w-5 h-5 text-darkgreen focus:ring-2 focus:ring-darkgreen rounded border-gray-300 cursor-pointer disabled:cursor-not-allowed"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Shield className="w-5 h-5 text-blue-600" />
+                    <span className="font-bold text-sm text-darkgreen">
+                      تذكرني على هذا الجهاز
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-600 leading-relaxed">
+                    ابقى مسجلاً دخول بشكل دائم على جوالك الشخصي بدون الحاجة لإعادة الدخول في كل مرة
+                  </p>
+                </div>
+              </label>
             </div>
 
             {/* رسائل الطمأنة */}

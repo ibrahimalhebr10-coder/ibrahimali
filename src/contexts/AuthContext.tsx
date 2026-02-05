@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { supabase } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import { identityService, type IdentityType } from '../services/identityService';
+import { deviceRecognitionService } from '../services/deviceRecognitionService';
 
 interface AuthContextType {
   user: User | null;
@@ -11,9 +12,10 @@ interface AuthContextType {
   identityLoading: boolean;
   secondaryIdentity: IdentityType | null;
   secondaryIdentityEnabled: boolean;
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
-  signOut: () => Promise<void>;
+  isTrustedDevice: boolean;
+  signUp: (email: string, password: string, rememberMe?: boolean) => Promise<{ error: Error | null }>;
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<{ error: Error | null }>;
+  signOut: (fullLogout?: boolean) => Promise<void>;
   updateIdentity: (newIdentity: IdentityType) => Promise<boolean>;
   enableSecondaryIdentity: (secondaryIdentity: IdentityType) => Promise<boolean>;
   switchToSecondaryIdentity: () => Promise<boolean>;
@@ -30,6 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [identityLoading, setIdentityLoading] = useState(false);
   const [secondaryIdentity, setSecondaryIdentity] = useState<IdentityType | null>(null);
   const [secondaryIdentityEnabled, setSecondaryIdentityEnabled] = useState(false);
+  const [isTrustedDevice, setIsTrustedDevice] = useState(false);
 
   useEffect(() => {
     async function loadIdentity(userId: string) {
@@ -62,12 +65,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
 
+    setIsTrustedDevice(deviceRecognitionService.isTrustedDevice());
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
 
       if (session?.user) {
         loadIdentity(session.user.id);
+
+        if (!deviceRecognitionService.getDeviceFingerprint()) {
+          const fingerprint = deviceRecognitionService.generateFingerprint();
+          deviceRecognitionService.saveDeviceFingerprint(fingerprint);
+        }
       } else {
         const savedMode = localStorage.getItem('appMode');
         const fallbackIdentity: IdentityType =
@@ -97,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string, rememberMe: boolean = true) => {
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -108,13 +118,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error };
       }
 
+      if (rememberMe) {
+        deviceRecognitionService.setRememberMe(true);
+        deviceRecognitionService.markAsTrustedDevice();
+        setIsTrustedDevice(true);
+
+        const fingerprint = deviceRecognitionService.generateFingerprint();
+        deviceRecognitionService.saveDeviceFingerprint(fingerprint);
+      }
+
       return { error: null };
     } catch (error) {
       return { error: error as Error };
     }
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, rememberMe: boolean = true) => {
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -125,14 +144,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error };
       }
 
+      if (rememberMe) {
+        deviceRecognitionService.setRememberMe(true);
+        deviceRecognitionService.markAsTrustedDevice();
+        setIsTrustedDevice(true);
+
+        const fingerprint = deviceRecognitionService.generateFingerprint();
+        deviceRecognitionService.saveDeviceFingerprint(fingerprint);
+      }
+
       return { error: null };
     } catch (error) {
       return { error: error as Error };
     }
   };
 
-  const signOut = async () => {
+  const signOut = async (fullLogout: boolean = false) => {
     await supabase.auth.signOut();
+
+    if (fullLogout) {
+      deviceRecognitionService.clearDeviceData();
+      setIsTrustedDevice(false);
+    }
   };
 
   const updateIdentity = async (newIdentity: IdentityType): Promise<boolean> => {
@@ -205,6 +238,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         identityLoading,
         secondaryIdentity,
         secondaryIdentityEnabled,
+        isTrustedDevice,
         signUp,
         signIn,
         signOut,
