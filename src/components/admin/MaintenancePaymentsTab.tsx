@@ -7,15 +7,18 @@ import {
   TrendingUp,
   TreeDeciduous,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  AlertCircle
 } from 'lucide-react';
 import { operationsService } from '../../services/operationsService';
 
 interface FarmWithPaths {
   farm_id: string;
   farm_name: string;
+  total_trees: number;
   agricultural_trees: number;
   investment_trees: number;
+  unreserved_trees: number;
   has_agricultural: boolean;
   has_investment: boolean;
 }
@@ -213,6 +216,45 @@ export default function MaintenancePaymentsTab() {
 
       {selectedFarmId && selectedFarm && (
         <div className="space-y-6">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-2xl p-6">
+            <h4 className="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5" />
+              حالة الأشجار في المزرعة المختارة
+            </h4>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="bg-white rounded-xl p-4 border-2 border-gray-300">
+                <p className="text-xs text-gray-600 mb-2">إجمالي الأشجار</p>
+                <p className="text-2xl font-black text-gray-900">{selectedFarm.total_trees}</p>
+                <p className="text-xs text-gray-500 mt-1">في المزرعة (للعلم)</p>
+              </div>
+
+              <div className="bg-green-100 rounded-xl p-4 border-2 border-green-400">
+                <p className="text-xs text-green-700 mb-2 font-semibold">أشجار خضراء محجوزة</p>
+                <p className="text-2xl font-black text-green-800">{selectedFarm.agricultural_trees}</p>
+                <p className="text-xs text-green-600 mt-1">تدخل في الحسابات ✓</p>
+              </div>
+
+              <div className="bg-yellow-100 rounded-xl p-4 border-2 border-yellow-400">
+                <p className="text-xs text-yellow-700 mb-2 font-semibold">أشجار ذهبية محجوزة</p>
+                <p className="text-2xl font-black text-yellow-800">{selectedFarm.investment_trees}</p>
+                <p className="text-xs text-yellow-600 mt-1">تدخل في الحسابات ✓</p>
+              </div>
+
+              <div className="bg-gray-100 rounded-xl p-4 border-2 border-gray-400">
+                <p className="text-xs text-gray-700 mb-2 font-semibold">أشجار غير محجوزة</p>
+                <p className="text-2xl font-black text-gray-600">{selectedFarm.unreserved_trees}</p>
+                <p className="text-xs text-red-600 mt-1 font-bold">خارج نطاق الرسوم ✗</p>
+              </div>
+            </div>
+
+            <div className="mt-4 bg-white rounded-lg p-3 border-l-4 border-blue-500">
+              <p className="text-xs text-gray-700">
+                <span className="font-bold text-blue-700">تنبيه:</span> نسب السداد والمتبقي تُحسب فقط على الأشجار المحجوزة في المسار المختار.
+                الأشجار غير المحجوزة ({selectedFarm.unreserved_trees}) لا تدخل في أي مؤشر مالي.
+              </p>
+            </div>
+          </div>
+
           <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200 p-6">
             <h4 className="text-lg font-bold text-gray-900 mb-4">2. اختر المسار</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -314,6 +356,22 @@ export default function MaintenancePaymentsTab() {
 
           {selectedPath && (
             <div className="bg-white rounded-2xl shadow-lg border-2 border-gray-200 p-6 space-y-6">
+              <div className={`rounded-xl p-4 border-l-4 mb-4 ${
+                selectedPath === 'agricultural'
+                  ? 'bg-green-50 border-green-500'
+                  : 'bg-yellow-50 border-yellow-500'
+              }`}>
+                <p className="text-sm font-semibold mb-2" style={{ color: selectedPath === 'agricultural' ? '#166534' : '#854d0e' }}>
+                  📊 جميع الحسابات أدناه تعتمد على:
+                </p>
+                <p className="text-xs text-gray-700">
+                  ✓ عدد الأشجار المحجوزة فقط في مسار "{selectedPath === 'agricultural' ? 'الأشجار الخضراء' : 'الأشجار الذهبية'}" = {selectedPath === 'agricultural' ? selectedFarm.agricultural_trees : selectedFarm.investment_trees} شجرة
+                </p>
+                <p className="text-xs text-gray-700 mt-1">
+                  ✗ الأشجار غير المحجوزة ({selectedFarm.unreserved_trees}) لا تدخل في أي نسبة سداد أو مؤشر مالي
+                </p>
+              </div>
+
               <div className="flex items-center justify-between">
                 <h4 className="text-xl font-bold text-gray-900">
                   3. التفاصيل المالية - {selectedPath === 'agricultural' ? 'الأشجار الخضراء' : 'الأشجار الذهبية'}
