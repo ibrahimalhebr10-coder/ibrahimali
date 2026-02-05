@@ -486,41 +486,13 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
     );
   }
 
-  const isAgricultural = identity === 'agricultural';
-
-  if (!isAgricultural || (isDemoMode && demoType === 'gold')) {
-    return <InvestmentAssetsView onShowAuth={onShowAuth} />;
-  }
-
   return (
     <div
-      className={`min-h-screen py-8 px-4 pb-32 ${
-        isAgricultural
-          ? 'bg-gradient-to-br from-green-50 via-white to-emerald-50'
-          : 'bg-gradient-to-br from-amber-50 via-white to-blue-50'
-      }`}
+      className="min-h-screen py-8 px-4 pb-32 bg-gradient-to-br from-green-50 via-white to-emerald-50"
       dir="rtl"
     >
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center gap-4 mb-4">
-            <div
-              className={`w-20 h-20 rounded-3xl flex items-center justify-center shadow-lg ${
-                isAgricultural
-                  ? 'bg-gradient-to-br from-green-600 to-emerald-600'
-                  : 'bg-gradient-to-br from-amber-600 to-yellow-600'
-              }`}
-            >
-              <Sprout className="w-10 h-10 text-white" />
-            </div>
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">
-            {isAgricultural ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
-          </h1>
-          <p className="text-xl text-gray-600">تابع صيانة أشجارك وتحديثات المزرعة</p>
-        </div>
-
-        {generalStatus && isAgricultural && (
+        {generalStatus && (
           <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-3xl shadow-lg p-8 mb-8 border-2 border-green-200">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Heart className="w-8 h-8 text-green-600" />
