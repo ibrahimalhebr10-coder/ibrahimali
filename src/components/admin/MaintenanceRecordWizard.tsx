@@ -36,15 +36,17 @@ interface Props {
   farms: Farm[];
   onSubmit: (data: MaintenanceRecordData) => Promise<void>;
   onCancel: () => void;
+  defaultPathType?: 'agricultural' | 'investment';
+  hidePathTypeSelector?: boolean;
 }
 
-export default function MaintenanceRecordWizard({ farms, onSubmit, onCancel }: Props) {
+export default function MaintenanceRecordWizard({ farms, onSubmit, onCancel, defaultPathType, hidePathTypeSelector }: Props) {
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState<MaintenanceRecordData>({
     farm_id: '',
-    path_type: '' as any,
+    path_type: defaultPathType || ('' as any),
     maintenance_type: 'periodic',
     maintenance_date: new Date().toISOString().split('T')[0],
     status: 'published',
@@ -130,7 +132,8 @@ export default function MaintenanceRecordWizard({ farms, onSubmit, onCancel }: P
 
   const canProceed = () => {
     if (currentStep === 1) {
-      return formData.farm_id && formData.path_type && formData.maintenance_type && formData.maintenance_date;
+      const hasPathType = hidePathTypeSelector ? !!defaultPathType : !!formData.path_type;
+      return formData.farm_id && hasPathType && formData.maintenance_type && formData.maintenance_date;
     }
     return true;
   };
@@ -213,47 +216,49 @@ export default function MaintenanceRecordWizard({ farms, onSubmit, onCancel }: P
                 </select>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-gray-900 mb-3">المسار *</label>
-                <div className="grid grid-cols-2 gap-4">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, path_type: 'agricultural' })}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      formData.path_type === 'agricultural'
-                        ? 'border-green-600 bg-green-50 shadow-md scale-105'
-                        : 'border-gray-200 hover:border-gray-300 bg-white'
-                    }`}
-                  >
-                    <p className={`font-semibold ${
-                      formData.path_type === 'agricultural'
-                        ? 'text-green-600'
-                        : 'text-gray-700'
-                    }`}>
-                      أشجاري الخضراء
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">المسار الزراعي</p>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, path_type: 'investment' })}
-                    className={`p-4 rounded-xl border-2 transition-all ${
-                      formData.path_type === 'investment'
-                        ? 'border-amber-600 bg-amber-50 shadow-md scale-105'
-                        : 'border-gray-200 hover:border-gray-300 bg-white'
-                    }`}
-                  >
-                    <p className={`font-semibold ${
-                      formData.path_type === 'investment'
-                        ? 'text-amber-600'
-                        : 'text-gray-700'
-                    }`}>
-                      أشجاري الذهبية
-                    </p>
-                    <p className="text-xs text-gray-500 mt-1">المسار الاستثماري</p>
-                  </button>
+              {!hidePathTypeSelector && (
+                <div>
+                  <label className="block text-sm font-semibold text-gray-900 mb-3">المسار *</label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, path_type: 'agricultural' })}
+                      className={`p-4 rounded-xl border-2 transition-all ${
+                        formData.path_type === 'agricultural'
+                          ? 'border-green-600 bg-green-50 shadow-md scale-105'
+                          : 'border-gray-200 hover:border-gray-300 bg-white'
+                      }`}
+                    >
+                      <p className={`font-semibold ${
+                        formData.path_type === 'agricultural'
+                          ? 'text-green-600'
+                          : 'text-gray-700'
+                      }`}>
+                        أشجاري الخضراء
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">المسار الزراعي</p>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, path_type: 'investment' })}
+                      className={`p-4 rounded-xl border-2 transition-all ${
+                        formData.path_type === 'investment'
+                          ? 'border-amber-600 bg-amber-50 shadow-md scale-105'
+                          : 'border-gray-200 hover:border-gray-300 bg-white'
+                      }`}
+                    >
+                      <p className={`font-semibold ${
+                        formData.path_type === 'investment'
+                          ? 'text-amber-600'
+                          : 'text-gray-700'
+                      }`}>
+                        أشجاري الذهبية
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">المسار الاستثماري</p>
+                    </button>
+                  </div>
                 </div>
-              </div>
+              )}
 
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-3">نوع الصيانة *</label>

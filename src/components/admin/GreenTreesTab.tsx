@@ -85,7 +85,10 @@ export default function GreenTreesTab() {
 
   const handleCreateRecord = async (data: any) => {
     try {
-      await operationsService.createFullMaintenanceRecord(data);
+      await operationsService.createFullMaintenanceRecord({
+        ...data,
+        path_type: 'agricultural'
+      });
       alert('تم إنشاء سجل الصيانة بنجاح مع جميع التفاصيل');
       setShowAddForm(false);
       loadData();
@@ -359,6 +362,8 @@ export default function GreenTreesTab() {
           farms={farms}
           onSubmit={handleCreateRecord}
           onCancel={() => setShowAddForm(false)}
+          defaultPathType="agricultural"
+          hidePathTypeSelector={true}
         />
       )}
 
