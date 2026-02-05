@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Save, AlertCircle, CheckCircle } from 'lucide-react';
+import { Package, Save, AlertCircle, CheckCircle, DollarSign, Calendar, Clock, Gift, Sparkles } from 'lucide-react';
 import {
   influencerMarketingService,
   FeaturedPackageSettings
@@ -10,8 +10,12 @@ export default function FeaturedPackageManager() {
     color: '#d4af37',
     borderStyle: 'solid',
     congratulationText: 'مبرووووك! 🎉',
-    benefitDescription: 'الشحن مجاني على هذه الباقة',
-    benefitType: 'free_shipping'
+    name: 'الباقة الذهبية',
+    price: 150,
+    contractDuration: 10,
+    bonusDuration: 6,
+    description: 'باقة خاصة لعملاء شركاء المسيرة مع مميزات إضافية',
+    highlightText: '+6 أشهر إضافية مجاناً'
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -68,8 +72,8 @@ export default function FeaturedPackageManager() {
               <Package className="w-5 h-5 text-amber-600" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-800">إعدادات الباقة المميزة</h3>
-              <p className="text-sm text-slate-600">تخصيص شكل ومحتوى الباقة المميزة التي تظهر عند إدخال كود المؤثر</p>
+              <h3 className="text-lg font-bold text-slate-800">إدارة الباقة المميزة</h3>
+              <p className="text-sm text-slate-600">الباقة التي تظهر في صفحة المزرعة عند إدخال كود شريك المسيرة</p>
             </div>
           </div>
         </div>
@@ -98,108 +102,187 @@ export default function FeaturedPackageManager() {
             <div className="flex items-start gap-3">
               <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-blue-800">
-                <p className="font-semibold mb-2">القواعد الحاكمة:</p>
+                <p className="font-semibold mb-2">ملاحظة مهمة:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>الباقة المميزة عنصر تسويقي مؤقت (Temporary Overlay)</li>
-                  <li>ليست باقة دائمة ولا تُخزن مع الباقات</li>
-                  <li>تظهر فقط عند إدخال كود المؤثر في صفحة المزرعة</li>
-                  <li>تختفي تلقائياً عند: إعادة تحميل، رجوع، تغيير مزرعة، مسح الحقل</li>
+                  <li>هذه الباقة تظهر فقط عند إدخال كود شريك المسيرة</li>
+                  <li>تختفي عند إعادة تحميل الصفحة (F5)</li>
+                  <li>عنصر تسويقي مؤقت لتحفيز الحجز</li>
                 </ul>
               </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                لون الباقة
-              </label>
-              <div className="flex gap-3">
-                <input
-                  type="color"
-                  value={settings.color}
-                  onChange={(e) => setSettings({ ...settings, color: e.target.value })}
-                  className="w-16 h-10 rounded-lg border border-slate-300 cursor-pointer"
-                />
+          <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-6 border border-slate-200">
+            <h4 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <Package className="w-5 h-5 text-amber-600" />
+              بيانات الباقة الأساسية
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  اسم الباقة
+                </label>
                 <input
                   type="text"
-                  value={settings.color}
-                  onChange={(e) => setSettings({ ...settings, color: e.target.value })}
-                  className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                  placeholder="#d4af37"
+                  value={settings.name}
+                  onChange={(e) => setSettings({ ...settings, name: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white text-slate-800 font-medium"
+                  placeholder="الباقة الذهبية"
                 />
+                <p className="text-xs text-slate-500 mt-1">الاسم الذي يظهر على البطاقة</p>
               </div>
-              <p className="text-xs text-slate-500 mt-1">لون الإطار والعناصر المميزة</p>
-            </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                نمط الإطار
-              </label>
-              <select
-                value={settings.borderStyle}
-                onChange={(e) => setSettings({ ...settings, borderStyle: e.target.value as any })}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              >
-                <option value="solid">خط متصل (Solid)</option>
-                <option value="dashed">خط متقطع (Dashed)</option>
-                <option value="double">خط مزدوج (Double)</option>
-                <option value="gradient">تدرج لوني (Gradient)</option>
-              </select>
-              <p className="text-xs text-slate-500 mt-1">شكل إطار الباقة المميزة</p>
-            </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  السعر (ر.س / شجرة)
+                </label>
+                <input
+                  type="number"
+                  value={settings.price}
+                  onChange={(e) => setSettings({ ...settings, price: parseFloat(e.target.value) || 0 })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white text-slate-800 font-medium"
+                  placeholder="150"
+                  min="0"
+                  step="0.01"
+                />
+                <p className="text-xs text-slate-500 mt-1">سعر الشجرة الواحدة بالريال السعودي</p>
+              </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                نص التهنئة
-              </label>
-              <input
-                type="text"
-                value={settings.congratulationText}
-                onChange={(e) => setSettings({ ...settings, congratulationText: e.target.value })}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-                placeholder="مبرووووك! 🎉"
-              />
-              <p className="text-xs text-slate-500 mt-1">النص الذي يظهر أعلى الباقة</p>
-            </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  مدة العقد (سنوات)
+                </label>
+                <input
+                  type="number"
+                  value={settings.contractDuration}
+                  onChange={(e) => setSettings({ ...settings, contractDuration: parseInt(e.target.value) || 0 })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white text-slate-800 font-medium"
+                  placeholder="10"
+                  min="1"
+                />
+                <p className="text-xs text-slate-500 mt-1">عدد سنوات العقد</p>
+              </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                نوع المزية
-              </label>
-              <select
-                value={settings.benefitType}
-                onChange={(e) => setSettings({ ...settings, benefitType: e.target.value as any })}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-              >
-                <option value="free_shipping">شحن مجاني</option>
-                <option value="discount">خصم خاص</option>
-                <option value="bonus_trees">أشجار إضافية</option>
-                <option value="priority_support">دعم مميز</option>
-                <option value="custom">مزية مخصصة</option>
-              </select>
-              <p className="text-xs text-slate-500 mt-1">نوع الفائدة للمستخدم</p>
-            </div>
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                  <Clock className="w-4 h-4" />
+                  المدة المجانية (أشهر)
+                </label>
+                <input
+                  type="number"
+                  value={settings.bonusDuration}
+                  onChange={(e) => setSettings({ ...settings, bonusDuration: parseInt(e.target.value) || 0 })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white text-slate-800 font-medium"
+                  placeholder="6"
+                  min="0"
+                />
+                <p className="text-xs text-slate-500 mt-1">عدد الأشهر المجانية الإضافية</p>
+              </div>
 
-            <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-slate-700 mb-2">
-                وصف المزية
-              </label>
-              <textarea
-                value={settings.benefitDescription}
-                onChange={(e) => setSettings({ ...settings, benefitDescription: e.target.value })}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
-                rows={3}
-                placeholder="الشحن مجاني على هذه الباقة"
-              />
-              <p className="text-xs text-slate-500 mt-1">وصف تفصيلي للمزية</p>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  وصف الباقة
+                </label>
+                <textarea
+                  value={settings.description}
+                  onChange={(e) => setSettings({ ...settings, description: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none bg-white text-slate-800"
+                  rows={3}
+                  placeholder="باقة خاصة لعملاء شركاء المسيرة مع مميزات إضافية"
+                />
+                <p className="text-xs text-slate-500 mt-1">وصف تفصيلي للباقة</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2">
+                  <Gift className="w-4 h-4" />
+                  النص البارز
+                </label>
+                <input
+                  type="text"
+                  value={settings.highlightText}
+                  onChange={(e) => setSettings({ ...settings, highlightText: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white text-slate-800 font-medium"
+                  placeholder="+6 أشهر إضافية مجاناً"
+                />
+                <p className="text-xs text-slate-500 mt-1">النص الذي يظهر على شارة المزايا</p>
+              </div>
             </div>
           </div>
 
-          <div className="bg-slate-50 rounded-xl p-6 border border-slate-200">
-            <h4 className="text-sm font-semibold text-slate-700 mb-4">معاينة الباقة المميزة</h4>
+          <div className="bg-gradient-to-r from-slate-50 to-slate-100 rounded-xl p-6 border border-slate-200">
+            <h4 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-amber-600" />
+              تخصيص المظهر
+            </h4>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  لون الباقة
+                </label>
+                <div className="flex gap-3">
+                  <input
+                    type="color"
+                    value={settings.color}
+                    onChange={(e) => setSettings({ ...settings, color: e.target.value })}
+                    className="w-16 h-11 rounded-lg border border-slate-300 cursor-pointer"
+                  />
+                  <input
+                    type="text"
+                    value={settings.color}
+                    onChange={(e) => setSettings({ ...settings, color: e.target.value })}
+                    className="flex-1 px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white text-slate-800 font-medium"
+                    placeholder="#d4af37"
+                  />
+                </div>
+                <p className="text-xs text-slate-500 mt-1">لون الإطار والعناصر المميزة</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  نمط الإطار
+                </label>
+                <select
+                  value={settings.borderStyle}
+                  onChange={(e) => setSettings({ ...settings, borderStyle: e.target.value as any })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white text-slate-800 font-medium"
+                >
+                  <option value="solid">خط متصل (Solid)</option>
+                  <option value="dashed">خط متقطع (Dashed)</option>
+                  <option value="double">خط مزدوج (Double)</option>
+                  <option value="gradient">تدرج لوني (Gradient)</option>
+                </select>
+                <p className="text-xs text-slate-500 mt-1">شكل إطار الباقة المميزة</p>
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  نص التهنئة
+                </label>
+                <input
+                  type="text"
+                  value={settings.congratulationText}
+                  onChange={(e) => setSettings({ ...settings, congratulationText: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent bg-white text-slate-800 font-medium"
+                  placeholder="مبرووووك! 🎉"
+                />
+                <p className="text-xs text-slate-500 mt-1">النص الذي يظهر في رسالة التهنئة</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border-2 border-amber-200">
+            <h4 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <Package className="w-5 h-5 text-amber-600" />
+              معاينة الباقة المميزة
+            </h4>
+
             <div
-              className="relative bg-white rounded-2xl p-6 shadow-lg overflow-hidden"
+              className="relative bg-white rounded-2xl p-6 shadow-xl overflow-hidden"
               style={{
                 borderWidth: settings.borderStyle === 'double' ? '4px' : '3px',
                 borderStyle: settings.borderStyle === 'gradient' ? 'solid' : settings.borderStyle,
@@ -210,27 +293,46 @@ export default function FeaturedPackageManager() {
               }}
             >
               <div
-                className="absolute top-0 left-0 right-0 text-center py-2 text-sm font-bold text-white"
+                className="absolute -top-3 right-1/2 transform translate-x-1/2 text-white text-sm font-bold px-5 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg animate-pulse"
                 style={{ backgroundColor: settings.color }}
               >
-                {settings.congratulationText}
+                <Gift className="w-4 h-4" />
+                <span>الباقة المميزة</span>
               </div>
 
-              <div className="mt-8 space-y-3">
+              <div className="mt-4 space-y-4">
                 <div className="text-center">
-                  <p className="text-lg font-bold text-slate-800">الباقة المميزة</p>
-                  <p className="text-sm text-slate-600 mt-2">{settings.benefitDescription}</p>
+                  <h3 className="text-xl font-bold text-slate-800">{settings.name}</h3>
+                  <p className="text-sm text-slate-600 mt-2">{settings.description}</p>
                 </div>
 
-                <div className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-50 rounded-lg">
-                  <Package className="w-4 h-4" style={{ color: settings.color }} />
-                  <span className="text-sm font-medium text-slate-700">
-                    {settings.benefitType === 'free_shipping' && 'شحن مجاني'}
-                    {settings.benefitType === 'discount' && 'خصم خاص'}
-                    {settings.benefitType === 'bonus_trees' && 'أشجار إضافية'}
-                    {settings.benefitType === 'priority_support' && 'دعم مميز'}
-                    {settings.benefitType === 'custom' && 'مزية مخصصة'}
+                <div className="bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl py-3 px-4 text-center">
+                  <div className="text-2xl font-bold">{settings.price} ر.س</div>
+                  <div className="text-xs opacity-90">للشجرة الواحدة</div>
+                </div>
+
+                <div
+                  className="rounded-xl py-3 px-4 flex items-center justify-center gap-2 border-2 animate-bounce"
+                  style={{
+                    backgroundColor: `${settings.color}15`,
+                    borderColor: settings.color
+                  }}
+                >
+                  <Clock className="w-5 h-5" style={{ color: settings.color }} />
+                  <span className="font-bold text-sm" style={{ color: settings.color }}>
+                    {settings.highlightText}
                   </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-center">
+                  <div className="bg-slate-50 rounded-lg py-2 px-3">
+                    <div className="text-xs text-slate-600">مدة العقد</div>
+                    <div className="text-lg font-bold text-slate-800">{settings.contractDuration} سنوات</div>
+                  </div>
+                  <div className="bg-slate-50 rounded-lg py-2 px-3">
+                    <div className="text-xs text-slate-600">مجاناً</div>
+                    <div className="text-lg font-bold text-slate-800">{settings.bonusDuration} أشهر</div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -240,7 +342,7 @@ export default function FeaturedPackageManager() {
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-white rounded-xl hover:from-amber-600 hover:to-amber-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl font-semibold"
             >
               {saving ? (
                 <>

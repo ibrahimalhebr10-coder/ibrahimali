@@ -618,11 +618,11 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
                         <div className="text-[10px] opacity-90">للشجرة الواحدة</div>
                       </div>
 
-                      {isFeatured && (
+                      {isFeatured && featuredPackageSettings && (
                         <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-300 rounded-lg py-2 px-3 animate-bounce">
                           <div className="flex items-center justify-center gap-2 text-amber-700">
                             <Clock className="w-4 h-4" />
-                            <span className="font-bold text-sm">+6 أشهر إضافية مجاناً</span>
+                            <span className="font-bold text-sm">{featuredPackageSettings.highlightText}</span>
                           </div>
                         </div>
                       )}

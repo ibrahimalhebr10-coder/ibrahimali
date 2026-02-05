@@ -35,8 +35,12 @@ export interface FeaturedPackageSettings {
   color: string;
   borderStyle: 'solid' | 'dashed' | 'double' | 'gradient';
   congratulationText: string;
-  benefitDescription: string;
-  benefitType: 'free_shipping' | 'discount' | 'bonus_trees' | 'priority_support' | 'custom';
+  name: string;
+  price: number;
+  contractDuration: number;
+  bonusDuration: number;
+  description: string;
+  highlightText: string;
 }
 
 export interface CreateInfluencerPartnerData {
@@ -269,7 +273,17 @@ export const influencerMarketingService = {
   async getFeaturedPackageSettings(): Promise<FeaturedPackageSettings | null> {
     const { data, error } = await supabase
       .from('influencer_settings')
-      .select('featured_package_color, featured_package_border_style, featured_package_congratulation_text, featured_package_benefit_description, featured_package_benefit_type')
+      .select(`
+        featured_package_color,
+        featured_package_border_style,
+        featured_package_congratulation_text,
+        featured_package_name,
+        featured_package_price,
+        featured_package_contract_duration,
+        featured_package_bonus_duration,
+        featured_package_description,
+        featured_package_highlight_text
+      `)
       .limit(1)
       .single();
 
@@ -281,11 +295,15 @@ export const influencerMarketingService = {
     }
 
     return {
-      color: data.featured_package_color,
-      borderStyle: data.featured_package_border_style,
-      congratulationText: data.featured_package_congratulation_text,
-      benefitDescription: data.featured_package_benefit_description,
-      benefitType: data.featured_package_benefit_type
+      color: data.featured_package_color || '#d4af37',
+      borderStyle: data.featured_package_border_style || 'solid',
+      congratulationText: data.featured_package_congratulation_text || 'مبرووووك! 🎉',
+      name: data.featured_package_name || 'الباقة الذهبية',
+      price: data.featured_package_price || 150,
+      contractDuration: data.featured_package_contract_duration || 10,
+      bonusDuration: data.featured_package_bonus_duration || 6,
+      description: data.featured_package_description || 'باقة خاصة لعملاء شركاء المسيرة مع مميزات إضافية',
+      highlightText: data.featured_package_highlight_text || '+6 أشهر إضافية مجاناً'
     };
   },
 
@@ -295,8 +313,12 @@ export const influencerMarketingService = {
     if (settings.color !== undefined) updateData.featured_package_color = settings.color;
     if (settings.borderStyle !== undefined) updateData.featured_package_border_style = settings.borderStyle;
     if (settings.congratulationText !== undefined) updateData.featured_package_congratulation_text = settings.congratulationText;
-    if (settings.benefitDescription !== undefined) updateData.featured_package_benefit_description = settings.benefitDescription;
-    if (settings.benefitType !== undefined) updateData.featured_package_benefit_type = settings.benefitType;
+    if (settings.name !== undefined) updateData.featured_package_name = settings.name;
+    if (settings.price !== undefined) updateData.featured_package_price = settings.price;
+    if (settings.contractDuration !== undefined) updateData.featured_package_contract_duration = settings.contractDuration;
+    if (settings.bonusDuration !== undefined) updateData.featured_package_bonus_duration = settings.bonusDuration;
+    if (settings.description !== undefined) updateData.featured_package_description = settings.description;
+    if (settings.highlightText !== undefined) updateData.featured_package_highlight_text = settings.highlightText;
 
     const { data: currentSettings } = await supabase
       .from('influencer_settings')
