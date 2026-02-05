@@ -269,6 +269,9 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       console.log('🌾 [AGRICULTURAL] User ID:', user.id);
       console.log('🌾 [AGRICULTURAL] Trees:', treeCount, 'Price:', totalPrice);
       console.log('🌾 [AGRICULTURAL] Path Type: agricultural (أشجاري الخضراء)');
+      if (influencerCode) {
+        console.log('🎁 [AGRICULTURAL] Influencer Code:', influencerCode);
+      }
 
       const { data: reservation, error: reservationError } = await supabase
         .from('reservations')
@@ -284,7 +287,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           total_price: totalPrice,
           path_type: 'agricultural',
           status: 'pending',
-          payment_method: method
+          payment_method: method,
+          influencer_code: influencerCode || null
         } as any)
         .select()
         .single() as any;
@@ -309,6 +313,28 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         console.error('❌ [AGRICULTURAL] خطأ في تحديث الحالة:', statusError);
       } else {
         console.log('✅ [AGRICULTURAL] تم تأكيد الحجز بنجاح!');
+
+        if (influencerCode) {
+          console.log('🎁 [AGRICULTURAL] تحديث إحصائيات المؤثر...');
+          try {
+            const { data: influencerResult, error: influencerError } = await supabase
+              .rpc('update_influencer_stats_after_payment', {
+                p_influencer_code: influencerCode,
+                p_trees_count: treeCount,
+                p_reservation_id: reservation.id
+              });
+
+            if (influencerError) {
+              console.error('❌ [AGRICULTURAL] خطأ في تحديث إحصائيات المؤثر:', influencerError);
+            } else if (influencerResult?.success) {
+              console.log('✅ [AGRICULTURAL] تم تحديث إحصائيات المؤثر:', influencerResult);
+            } else {
+              console.warn('⚠️ [AGRICULTURAL] فشل تحديث إحصائيات المؤثر:', influencerResult?.message);
+            }
+          } catch (error) {
+            console.error('❌ [AGRICULTURAL] خطأ غير متوقع في تحديث المؤثر:', error);
+          }
+        }
       }
 
       setReservationData({
