@@ -35,7 +35,7 @@ export const platformWalletService = {
       .from('platform_wallet_transfers')
       .select(`
         *,
-        farms:farm_id(name, name_ar)
+        farms:farm_id(name_ar)
       `)
       .order('transferred_at', { ascending: false });
 

@@ -168,7 +168,7 @@ export default function PlatformWallet() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
-                      {transfer.farms?.name_ar || transfer.farms?.name || 'غير محدد'}
+                      {transfer.farms?.name_ar || 'غير محدد'}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
