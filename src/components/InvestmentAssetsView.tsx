@@ -1,5 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Sprout, ArrowRight, Sparkles, X } from 'lucide-react';
+import {
+  TrendingUp,
+  Sprout,
+  ArrowRight,
+  Sparkles,
+  X,
+  Scissors,
+  Droplets,
+  Sun,
+  CheckCircle2,
+  Clock,
+  Recycle,
+  Factory,
+  TreePine,
+  Wallet
+} from 'lucide-react';
 import { getDemoGoldenTreesData } from '../services/demoDataService';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -94,117 +109,225 @@ export default function InvestmentAssetsView({ onClose }: InvestmentAssetsViewPr
       )}
 
       {assets.length > 0 && (
-        <div className="max-w-7xl mx-auto px-4 py-16 space-y-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-amber-200 mb-4">أصولك الاستثمارية</h2>
-            <p className="text-xl text-slate-400">أشجارك الذهبية النشطة</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {assets.map((asset) => (
-              <div
-                key={asset.id}
-                className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20"
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-amber-200">{asset.tree_type}</h3>
-                  <div className="px-3 py-1 bg-green-500/20 border border-green-500/40 rounded-full">
-                    <span className="text-sm font-bold text-green-400">نشط</span>
-                  </div>
-                </div>
-
-                <div className="space-y-3 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">المزرعة</span>
-                    <span className="text-white font-medium">{asset.farm_name}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">عدد الأشجار</span>
-                    <span className="text-amber-200 font-bold">{asset.trees_count}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">المدة</span>
-                    <span className="text-white font-medium">{asset.contract_duration} سنوات</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">الاستثمار</span>
-                    <span className="text-amber-300 font-bold">{asset.total_price.toLocaleString()} ر.س</span>
-                  </div>
-                  <div className="flex justify-between text-xs pt-2 border-t border-slate-700">
-                    <span className="text-slate-500">تاريخ البداية</span>
-                    <span className="text-slate-400">{new Date(asset.contract_start_date).toLocaleDateString('ar-SA')}</span>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-16">
-            <div className="text-center mb-8">
-              <h3 className="text-3xl font-bold text-amber-200 mb-2">سجلات الصيانة</h3>
-              <p className="text-slate-400">الصيانة والرسوم المستحقة لأشجارك الذهبية</p>
+        <div className="max-w-7xl mx-auto px-4 py-16 space-y-16">
+          {/* 1️⃣ رحلة الشجرة - العنوان التمهيدي */}
+          <div className="text-center space-y-4">
+            <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-400/30 rounded-full">
+              <Sparkles className="w-6 h-6 text-amber-400" />
+              <h2 className="text-2xl font-bold text-amber-200">رحلة أشجارك في هذه الدورة</h2>
             </div>
+            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+              نعرض لك ما تم على أشجارك قبل أي التزام مالي
+            </p>
+          </div>
 
-            {maintenanceRecords.length === 0 ? (
-              <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-12 text-center border border-slate-700">
-                <div className="w-24 h-24 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Sprout className="w-12 h-12 text-slate-400" />
-                </div>
-                <h3 className="text-2xl font-bold text-slate-200 mb-3">لا توجد تحديثات حالياً</h3>
-                <p className="text-slate-400 text-lg">
-                  سيتم عرض تحديثات الصيانة والعناية بأشجارك هنا
-                </p>
+          {/* 2️⃣ Timeline الصيانة */}
+          {maintenanceRecords.length > 0 && (
+            <div className="space-y-8">
+              <div className="text-center">
+                <h3 className="text-3xl font-bold text-amber-200 mb-2">مراحل العناية بأشجارك</h3>
+                <p className="text-slate-400">كل ما تم من صيانة ورعاية</p>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {maintenanceRecords.map((record) => (
-                  <div
-                    key={record.maintenance_id}
-                    className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-6 border border-amber-500/20"
-                  >
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <h4 className="text-lg font-bold text-amber-200 mb-1">{record.farm_name}</h4>
-                        <p className="text-sm text-slate-400 mb-2">{clientMaintenanceService.getMaintenanceTypeLabel(record.maintenance_type)}</p>
-                        <p className="text-2xl font-black text-amber-400">{(record.client_due_amount || 0).toLocaleString()} ر.س</p>
-                        <p className="text-xs text-slate-500 mt-1">
-                          {record.client_tree_count} {record.client_tree_count === 1 ? 'شجرة' : record.client_tree_count === 2 ? 'شجرتان' : 'أشجار'}
-                          {record.cost_per_tree && ` × ${record.cost_per_tree.toLocaleString()} ر.س`}
-                        </p>
-                      </div>
-                      <div
-                        className={`px-3 py-1 rounded-full ${
-                          record.payment_status === 'paid'
-                            ? 'bg-green-500/20 border border-green-500/40'
-                            : 'bg-amber-500/20 border border-amber-500/40'
-                        }`}
-                      >
-                        <span className={`text-sm font-bold ${
-                          record.payment_status === 'paid' ? 'text-green-400' : 'text-amber-300'
-                        }`}>
-                          {record.payment_status === 'paid' ? 'مسدد' : 'معلق'}
-                        </span>
+
+              <div className="space-y-6">
+                {maintenanceRecords.map((record, index) => (
+                  <div key={record.maintenance_id} className="relative">
+                    <div className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-8 border border-amber-500/20">
+                      <div className="flex items-start gap-6">
+                        {/* أيقونة المرحلة */}
+                        <div className="flex-shrink-0">
+                          <div className="w-16 h-16 bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border-2 border-amber-400/40 rounded-2xl flex items-center justify-center">
+                            {record.maintenance_type === 'periodic' ? (
+                              <Scissors className="w-8 h-8 text-amber-400" />
+                            ) : record.maintenance_type === 'seasonal' ? (
+                              <Droplets className="w-8 h-8 text-amber-400" />
+                            ) : (
+                              <Sun className="w-8 h-8 text-amber-400" />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* تفاصيل المرحلة */}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-3">
+                            <h4 className="text-2xl font-bold text-amber-200">
+                              {clientMaintenanceService.getMaintenanceTypeLabel(record.maintenance_type)}
+                            </h4>
+                            <div className={`px-3 py-1 rounded-full ${
+                              record.payment_status === 'paid'
+                                ? 'bg-green-500/20 border border-green-500/40'
+                                : 'bg-slate-700/50 border border-slate-600'
+                            }`}>
+                              {record.payment_status === 'paid' ? (
+                                <div className="flex items-center gap-2">
+                                  <CheckCircle2 className="w-4 h-4 text-green-400" />
+                                  <span className="text-sm font-bold text-green-400">مكتملة</span>
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <Clock className="w-4 h-4 text-slate-400" />
+                                  <span className="text-sm font-bold text-slate-400">قيد التنفيذ</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="space-y-2 mb-4">
+                            <p className="text-slate-300">
+                              <span className="text-slate-500">المزرعة:</span> {record.farm_name}
+                            </p>
+                            <p className="text-slate-300">
+                              <span className="text-slate-500">التاريخ:</span> {new Date(record.maintenance_date).toLocaleDateString('ar-SA')}
+                            </p>
+                            {record.visible_media_count > 0 && (
+                              <p className="text-amber-400">
+                                <span className="text-slate-500">التوثيق:</span> {record.visible_media_count} {record.visible_media_count === 1 ? 'صورة' : record.visible_media_count === 2 ? 'صورتان' : 'صور'}
+                              </p>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="text-sm text-slate-400 mb-4">
-                      تاريخ الصيانة: {new Date(record.maintenance_date).toLocaleDateString('ar-SA')}
-                    </div>
-
-                    {record.payment_status === 'pending' && record.client_due_amount && (
-                      <button
-                        onClick={() => alert('سيتم توجيهك إلى صفحة السداد')}
-                        className="w-full py-3 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 rounded-xl font-bold text-black transition-all flex items-center justify-center gap-2"
-                      >
-                        <span>سداد الآن</span>
-                        <ArrowRight className="w-5 h-5" />
-                      </button>
+                    {/* خط الوصل بين المراحل */}
+                    {index < maintenanceRecords.length - 1 && (
+                      <div className="absolute right-[7.5rem] top-full w-0.5 h-6 bg-gradient-to-b from-amber-400/40 to-transparent" style={{ transform: 'translateX(50%)' }}></div>
                     )}
                   </div>
                 ))}
               </div>
-            )}
+            </div>
+          )}
+
+          {/* 3️⃣ القيمة المضافة - المخلفات */}
+          <div className="bg-gradient-to-br from-green-900/20 to-emerald-900/20 backdrop-blur-sm rounded-3xl p-8 border border-green-500/30">
+            <div className="flex items-start gap-6">
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-2 border-green-400/40 rounded-2xl flex items-center justify-center">
+                  <Recycle className="w-8 h-8 text-green-400" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-green-200 mb-3">استثمار المخلفات</h3>
+                <p className="text-slate-300 text-lg leading-relaxed">
+                  مخلفات التقليم والعناية بأشجارك دخلت ضمن دورة قيمة مستدامة ولم تُهدر، مما يعزز من العائد البيئي والاقتصادي لاستثمارك.
+                </p>
+              </div>
+            </div>
           </div>
+
+          {/* 4️⃣ قسم المصنع */}
+          <div className="bg-gradient-to-br from-blue-900/20 to-indigo-900/20 backdrop-blur-sm rounded-3xl p-8 border border-blue-500/30">
+            <div className="flex items-start gap-6">
+              <div className="flex-shrink-0">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border-2 border-blue-400/40 rounded-2xl flex items-center justify-center">
+                  <Factory className="w-8 h-8 text-blue-400" />
+                </div>
+              </div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold text-blue-200 mb-2">حالة المعالجة</h3>
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/10 border border-blue-400/30 rounded-full mb-3">
+                  <Clock className="w-5 h-5 text-blue-400 animate-pulse" />
+                  <span className="text-blue-300 font-semibold">قيد المعالجة</span>
+                </div>
+                <p className="text-slate-300 text-lg leading-relaxed">
+                  المحصول في مرحلة التحويل إلى قيمة فعلية في المصنع. سيتم تحديث البيانات عند اكتمال المعالجة.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 5️⃣ ملخص الملكية */}
+          <div className="bg-gradient-to-br from-slate-800/80 to-slate-900/80 backdrop-blur-sm rounded-3xl p-8 border border-amber-500/30">
+            <div className="text-center space-y-6">
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-500/10 border border-amber-400/30 rounded-full">
+                <TreePine className="w-6 h-6 text-amber-400" />
+                <h3 className="text-2xl font-bold text-amber-200">ملكيتك في هذا المسار</h3>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+                {assets.map((asset) => (
+                  <div
+                    key={asset.id}
+                    className="bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-2xl p-6 border border-amber-400/20"
+                  >
+                    <div className="space-y-3">
+                      <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center mx-auto">
+                        <Sparkles className="w-6 h-6 text-amber-400" />
+                      </div>
+                      <h4 className="text-lg font-bold text-amber-200 text-center">{asset.tree_type}</h4>
+                      <div className="text-center">
+                        <p className="text-4xl font-black text-amber-300 mb-1">{asset.trees_count}</p>
+                        <p className="text-sm text-slate-400">شجرة</p>
+                      </div>
+                      <div className="pt-3 border-t border-slate-700">
+                        <p className="text-xs text-slate-500 text-center">{asset.farm_name}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* 6️⃣ الرسوم والسداد - المرحلة الأخيرة */}
+          {maintenanceRecords.some(r => r.payment_status === 'pending' && r.client_due_amount) && (
+            <div className="bg-gradient-to-br from-amber-900/20 to-yellow-900/20 backdrop-blur-sm rounded-3xl p-8 border border-amber-500/40">
+              <div className="text-center space-y-6">
+                <div className="inline-flex items-center gap-3 px-6 py-3 bg-amber-500/10 border border-amber-400/30 rounded-full">
+                  <Wallet className="w-6 h-6 text-amber-400" />
+                  <h3 className="text-2xl font-bold text-amber-200">رسوم الصيانة المستحقة</h3>
+                </div>
+
+                <div className="max-w-2xl mx-auto space-y-6">
+                  {maintenanceRecords
+                    .filter(r => r.payment_status === 'pending' && r.client_due_amount)
+                    .map((record) => (
+                      <div
+                        key={record.maintenance_id}
+                        className="bg-gradient-to-br from-slate-800/50 to-slate-900/50 backdrop-blur-sm rounded-2xl p-6 border border-amber-400/30"
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="text-right">
+                            <p className="text-slate-400 text-sm mb-1">{record.farm_name}</p>
+                            <p className="text-3xl font-black text-amber-300">{(record.client_due_amount || 0).toLocaleString()} ر.س</p>
+                            <p className="text-xs text-slate-500 mt-1">
+                              {record.client_tree_count} {record.client_tree_count === 1 ? 'شجرة' : record.client_tree_count === 2 ? 'شجرتان' : 'أشجار'}
+                              {record.cost_per_tree && ` × ${record.cost_per_tree.toLocaleString()} ر.س`}
+                            </p>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => alert('سيتم توجيهك إلى صفحة السداد')}
+                          className="w-full py-4 bg-gradient-to-r from-amber-500 to-yellow-600 hover:from-amber-600 hover:to-yellow-700 rounded-xl font-bold text-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20"
+                        >
+                          <span className="text-lg">سداد الرسوم</span>
+                          <ArrowRight className="w-6 h-6" />
+                        </button>
+
+                        <p className="text-center text-slate-400 text-sm mt-4 leading-relaxed">
+                          الرسوم موزعة حسب عدد أشجارك فقط وتشمل صيانة هذه الدورة
+                        </p>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* رسالة إذا لم توجد صيانة */}
+          {maintenanceRecords.length === 0 && (
+            <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-12 text-center border border-slate-700">
+              <div className="w-24 h-24 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Sprout className="w-12 h-12 text-slate-400" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-200 mb-3">لا توجد تحديثات حالياً</h3>
+              <p className="text-slate-400 text-lg">
+                سيتم عرض تحديثات الصيانة والعناية بأشجارك هنا
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
