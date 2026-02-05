@@ -53,10 +53,10 @@ export const customerManagementService = {
     return data as Customer[];
   },
 
-  async getCustomerProfile(userId: string) {
+  async getCustomerProfile(identifier: string) {
     const { data, error } = await supabase
       .rpc('get_customer_profile', {
-        p_user_id: userId
+        p_identifier: identifier
       });
 
     if (error) throw error;
@@ -248,5 +248,13 @@ export const customerManagementService = {
 
     if (error) throw error;
     return group;
+  },
+
+  async findDuplicateCustomers() {
+    const { data, error } = await supabase
+      .rpc('find_duplicate_customers');
+
+    if (error) throw error;
+    return data;
   }
 };

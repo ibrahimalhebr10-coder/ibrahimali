@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Users, Filter, Plus, Search } from 'lucide-react';
+import { Users, Filter, Plus, Search, AlertTriangle } from 'lucide-react';
 import { customerManagementService, Customer } from '../../services/customerManagementService';
 
 interface CustomersListProps {
   onCustomerSelect: (userId: string) => void;
   onViewGroups: () => void;
+  onViewDuplicates: () => void;
 }
 
-export default function CustomersList({ onCustomerSelect, onViewGroups }: CustomersListProps) {
+export default function CustomersList({ onCustomerSelect, onViewGroups, onViewDuplicates }: CustomersListProps) {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -110,13 +111,22 @@ export default function CustomersList({ onCustomerSelect, onViewGroups }: Custom
           <h2 className="text-2xl font-bold text-gray-900">قائمة العملاء</h2>
           <p className="text-sm text-gray-600 mt-1">إجمالي العملاء: {customers.length}</p>
         </div>
-        <button
-          onClick={onViewGroups}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-        >
-          <Users className="w-4 h-4" />
-          المجموعات
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onViewDuplicates}
+            className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+          >
+            <AlertTriangle className="w-4 h-4" />
+            العملاء المكررين
+          </button>
+          <button
+            onClick={onViewGroups}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Users className="w-4 h-4" />
+            المجموعات
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
