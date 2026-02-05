@@ -55,6 +55,14 @@ export default function MyTrees({ onClose, onNavigateToPayment, onShowAuth }: My
     ? treesSummary?.greenTreesCount || 0
     : treesSummary?.goldenTreesCount || 0;
 
+  if (activePath === 'golden') {
+    return (
+      <div className="fixed inset-0 z-50">
+        <InvestmentAssetsView onClose={onClose} />
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-white overflow-hidden flex flex-col">
       <div
@@ -74,13 +82,9 @@ export default function MyTrees({ onClose, onNavigateToPayment, onShowAuth }: My
 
           <div className="flex flex-col items-center gap-1">
             <div className="flex items-center gap-2">
-              {activePath === 'green' ? (
-                <Leaf className="w-6 h-6" style={{ color: currentColor }} />
-              ) : (
-                <Sparkles className="w-6 h-6" style={{ color: currentColor }} />
-              )}
+              <Leaf className="w-6 h-6" style={{ color: currentColor }} />
               <h1 className="text-2xl font-bold" style={{ color: currentColor }}>
-                {activePath === 'green' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
+                أشجاري الخضراء
               </h1>
             </div>
             {!isDemoMode && treesSummary && (
@@ -106,16 +110,10 @@ export default function MyTrees({ onClose, onNavigateToPayment, onShowAuth }: My
             </div>
           </div>
         ) : (
-          <>
-            {activePath === 'green' ? (
-              <MyGreenTrees
-                onNavigateToPayment={onNavigateToPayment}
-                onShowAuth={onShowAuth}
-              />
-            ) : (
-              <InvestmentAssetsView />
-            )}
-          </>
+          <MyGreenTrees
+            onNavigateToPayment={onNavigateToPayment}
+            onShowAuth={onShowAuth}
+          />
         )}
       </div>
     </div>

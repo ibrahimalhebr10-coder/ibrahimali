@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Shield, Sprout, ArrowRight, Lock, Package, Sparkles } from 'lucide-react';
+import { TrendingUp, Shield, Sprout, ArrowRight, Lock, Package, Sparkles, X } from 'lucide-react';
 import { getDemoGoldenTreesData } from '../services/demoDataService';
 import { useDemoMode } from '../contexts/DemoModeContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,14 +13,15 @@ import { clientMaintenanceService, type ClientMaintenanceRecord } from '../servi
 
 interface InvestmentAssetsViewProps {
   onShowAuth?: (mode: 'login' | 'register') => void;
+  onClose?: () => void;
 }
 
-export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsViewProps) {
+export default function InvestmentAssetsView({ onShowAuth, onClose }: InvestmentAssetsViewProps) {
   const { isDemoMode } = useDemoMode();
   const { user } = useAuth();
   const [showDemoActionModal, setShowDemoActionModal] = useState(false);
   const [mode, setMode] = useState<GoldenTreesMode>('demo');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [assets, setAssets] = useState<any[]>([]);
   const [maintenanceRecords, setMaintenanceRecords] = useState<ClientMaintenanceRecord[]>([]);
   const data = getDemoGoldenTreesData();
@@ -30,14 +31,12 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
   }, [user]);
 
   const loadGoldenTreesData = async () => {
-    setLoading(true);
     try {
       const userId = user?.id;
 
       if (!userId) {
         console.log('[InvestmentAssetsView] No user ID, using demo mode');
         setMode('demo');
-        setLoading(false);
         return;
       }
 
@@ -61,8 +60,6 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
       }
     } catch (error) {
       console.error('[InvestmentAssetsView] Error loading golden trees data:', error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -73,7 +70,25 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white pb-32">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white pb-32 overflow-auto">
+      {onClose && (
+        <div className="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50">
+          <div className="px-4 py-4 flex items-center justify-between">
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-slate-800 rounded-full transition-colors"
+            >
+              <X className="w-6 h-6 text-slate-400" />
+            </button>
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-amber-400" />
+              <h1 className="text-xl font-bold text-amber-200">أشجاري الذهبية</h1>
+            </div>
+            <div className="w-10"></div>
+          </div>
+        </div>
+      )}
+
       {showDemoActionModal && (
         <DemoActionModal
           onClose={() => setShowDemoActionModal(false)}
