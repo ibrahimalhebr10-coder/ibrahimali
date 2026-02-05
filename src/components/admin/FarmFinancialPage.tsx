@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Plus, TrendingUp, TrendingDown, Wallet, Calendar, Lock } from 'lucide-react';
+import { ArrowLeft, Plus, TrendingUp, TrendingDown, Wallet, Calendar, Lock, Archive, Trash2, AlertTriangle } from 'lucide-react';
 import { farmFinancialService, FarmFinancialTransaction, FarmBalance } from '../../services/farmFinancialService';
 import { platformWalletService } from '../../services/platformWalletService';
 
@@ -17,7 +17,11 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
+  const [showArchiveModal, setShowArchiveModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isFinanciallyClosed, setIsFinanciallyClosed] = useState(false);
+  const [archiveLoading, setArchiveLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -107,6 +111,76 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
     }
   };
 
+  const handleArchive = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const archiveName = formData.get('archiveName') as string;
+    const clearCurrent = formData.get('clearCurrent') === 'true';
+    const notes = formData.get('notes') as string;
+
+    try {
+      setArchiveLoading(true);
+      const result = await farmFinancialService.archiveFarmFinances(farmId, archiveName, clearCurrent, notes);
+
+      if (result.success) {
+        alert(
+          `✓ تم الأرشفة بنجاح!\n\n` +
+          `اسم الأرشيف: ${result.archive_name}\n` +
+          `الدخل المؤرشف: ${result.total_income?.toLocaleString()} ر.س\n` +
+          `المصروفات المؤرشفة: ${result.total_expenses?.toLocaleString()} ر.س\n` +
+          `الرصيد النهائي: ${result.final_balance?.toLocaleString()} ر.س\n` +
+          `العمليات المؤرشفة: ${result.transactions_archived}\n` +
+          `التحويلات المؤرشفة: ${result.transfers_archived}\n\n` +
+          (clearCurrent ? '✓ تم تصفير البيانات الحالية' : 'البيانات الحالية محفوظة')
+        );
+        setShowArchiveModal(false);
+        loadData();
+      } else {
+        alert('❌ ' + (result.error || 'حدث خطأ أثناء الأرشفة'));
+      }
+    } catch (error) {
+      console.error('Error archiving:', error);
+      alert('❌ حدث خطأ أثناء الأرشفة. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setArchiveLoading(false);
+    }
+  };
+
+  const handleDelete = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const confirmationCode = formData.get('confirmationCode') as string;
+    const adminReason = formData.get('adminReason') as string;
+
+    if (!adminReason || adminReason.length < 10) {
+      alert('يرجى إدخال سبب الحذف (10 أحرف على الأقل)');
+      return;
+    }
+
+    try {
+      setDeleteLoading(true);
+      const result = await farmFinancialService.deleteFarmFinancesPermanently(farmId, confirmationCode, adminReason);
+
+      if (result.success) {
+        alert(
+          `✓ تم الحذف النهائي بنجاح!\n\n` +
+          `العمليات المحذوفة: ${result.transactions_deleted}\n` +
+          `التحويلات المحذوفة: ${result.transfers_deleted}\n\n` +
+          `تم تسجيل العملية في سجل التدقيق`
+        );
+        setShowDeleteModal(false);
+        loadData();
+      } else {
+        alert('❌ ' + (result.error || 'حدث خطأ أثناء الحذف'));
+      }
+    } catch (error) {
+      console.error('Error deleting:', error);
+      alert('❌ حدث خطأ أثناء الحذف. يرجى المحاولة مرة أخرى.');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -148,6 +222,20 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
               دفع فائض مالي
             </button>
           )}
+          <button
+            onClick={() => setShowArchiveModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
+          >
+            <Archive className="w-4 h-4" />
+            أرشفة
+          </button>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            <Trash2 className="w-4 h-4" />
+            حذف نهائي
+          </button>
         </div>
       </div>
 
@@ -416,6 +504,137 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
                 <button
                   type="button"
                   onClick={() => setShowTransferModal(false)}
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  إلغاء
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Archive Modal */}
+      {showArchiveModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+              <Archive className="w-6 h-6 text-yellow-600" />
+              <h3 className="text-xl font-bold text-gray-900">أرشفة البيانات المالية</h3>
+            </div>
+            <form onSubmit={handleArchive} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">اسم الأرشيف</label>
+                <input
+                  type="text"
+                  name="archiveName"
+                  required
+                  placeholder="مثال: الربع الأول 2024"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">ملاحظات</label>
+                <textarea
+                  name="notes"
+                  rows={3}
+                  placeholder="أي ملاحظات إضافية..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                />
+              </div>
+              <div className="bg-gray-50 rounded-lg p-4">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="clearCurrent"
+                    value="true"
+                    className="mt-1"
+                  />
+                  <div className="text-sm">
+                    <div className="font-medium text-gray-900">تصفير البيانات بعد الأرشفة</div>
+                    <div className="text-gray-600 mt-1">سيتم حفظ نسخة في الأرشيف ثم حذف البيانات الحالية للبدء من جديد</div>
+                  </div>
+                </label>
+              </div>
+              <div className="bg-blue-50 rounded-lg p-4 text-sm text-blue-800 space-y-1">
+                <div className="font-semibold">ما الذي سيتم أرشفته؟</div>
+                <div>• جميع العمليات المالية</div>
+                <div>• جميع التحويلات للمحفظة</div>
+                <div>• الأرصدة والملخصات</div>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <button
+                  type="submit"
+                  disabled={archiveLoading}
+                  className="flex-1 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors disabled:opacity-50"
+                >
+                  {archiveLoading ? 'جاري الأرشفة...' : 'أرشفة الآن'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowArchiveModal(false)}
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
+                >
+                  إلغاء
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="px-6 py-4 border-b border-red-200 bg-red-50 flex items-center gap-3">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
+              <h3 className="text-xl font-bold text-red-900">حذف نهائي - تحذير</h3>
+            </div>
+            <form onSubmit={handleDelete} className="p-6 space-y-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 space-y-2">
+                <div className="font-bold text-red-900">تحذير شديد الأهمية:</div>
+                <div className="text-sm text-red-800 space-y-1">
+                  <div>• الحذف نهائي ولا يمكن التراجع عنه</div>
+                  <div>• سيتم حذف جميع البيانات المالية</div>
+                  <div>• سيتم تسجيل هذه العملية في سجل التدقيق</div>
+                  <div>• يجب إدخال كود التأكيد الصحيح</div>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">سبب الحذف (إلزامي)</label>
+                <textarea
+                  name="adminReason"
+                  required
+                  rows={3}
+                  placeholder="يرجى توضيح السبب بالتفصيل (10 أحرف على الأقل)..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">كود التأكيد</label>
+                <input
+                  type="text"
+                  name="confirmationCode"
+                  required
+                  placeholder={`${farmId.substring(0, 8)}DELETE`}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent font-mono"
+                />
+                <div className="text-xs text-gray-600 mt-1">
+                  اكتب: <span className="font-mono font-bold">{farmId.substring(0, 8)}DELETE</span>
+                </div>
+              </div>
+              <div className="flex gap-2 pt-4">
+                <button
+                  type="submit"
+                  disabled={deleteLoading}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {deleteLoading ? 'جاري الحذف...' : 'حذف نهائي'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(false)}
                   className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors"
                 >
                   إلغاء

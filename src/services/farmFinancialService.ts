@@ -85,5 +85,59 @@ export const farmFinancialService = {
 
     if (error) throw error;
     return data;
+  },
+
+  async archiveFarmFinances(
+    farmId: string,
+    archiveName: string,
+    clearCurrent: boolean = false,
+    notes?: string
+  ) {
+    const { data, error } = await supabase
+      .rpc('archive_farm_finances', {
+        p_farm_id: farmId,
+        p_archive_name: archiveName,
+        p_clear_current: clearCurrent,
+        p_notes: notes || null
+      });
+
+    if (error) throw error;
+    return data;
+  },
+
+  async deleteFarmFinancesPermanently(
+    farmId: string,
+    confirmationCode: string,
+    adminReason: string
+  ) {
+    const { data, error } = await supabase
+      .rpc('delete_farm_finances_permanently', {
+        p_farm_id: farmId,
+        p_confirmation_code: confirmationCode,
+        p_admin_reason: adminReason
+      });
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getFarmArchives(farmId: string) {
+    const { data, error } = await supabase
+      .rpc('get_farm_archives', {
+        p_farm_id: farmId
+      });
+
+    if (error) throw error;
+    return data;
+  },
+
+  async getArchiveDetails(archiveId: string) {
+    const { data, error } = await supabase
+      .rpc('get_archive_details', {
+        p_archive_id: archiveId
+      });
+
+    if (error) throw error;
+    return data;
   }
 };
