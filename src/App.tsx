@@ -465,22 +465,35 @@ function AppContent() {
   };
 
   const handleMyFarmClick = () => {
-    console.log(`🏠 [Footer Button] Clicked "أشجاري"`);
+    console.log('');
+    console.log('🏠'.repeat(50));
+    console.log('🏠 [FOOTER BUTTON] زر "أشجاري" تم الضغط عليه!');
+    console.log('🏠'.repeat(50));
+    console.log('👤 User:', user?.id || '❌ NO USER');
+    console.log('🔐 Identity:', identity);
+    console.log('🎭 Is Demo Mode?', isDemoMode);
+    console.log('');
 
     if (!user) {
-      console.log(`⚠️ [Footer Button] No user - entering demo mode`);
+      console.log(`⚠️ [Footer Button] NO USER - Entering demo mode`);
       const demoType = identity === 'agricultural' ? 'green' : 'golden';
+      console.log('🎨 Demo Type:', demoType);
       enterDemoMode(demoType);
       setShowMyTrees(true);
+      console.log('✅ [Footer Button] Demo mode activated and MyTrees opened');
+      console.log('🏠'.repeat(50));
+      console.log('');
       return;
     }
 
     if (isDemoMode) {
-      console.log(`🔄 [Footer Button] Exiting demo mode`);
+      console.log(`🔄 [Footer Button] Was in Demo Mode - Exiting now`);
       exitDemoMode();
     }
 
-    console.log(`✅ [Footer Button] Opening My Trees`);
+    console.log(`✅ [Footer Button] Opening My Trees for user ${user.id} with identity ${identity}`);
+    console.log('🏠'.repeat(50));
+    console.log('');
     setShowMyTrees(true);
   };
 

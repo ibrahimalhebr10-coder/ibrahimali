@@ -36,32 +36,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     async function loadIdentity(userId: string) {
+      console.log('');
+      console.log('🔐'.repeat(40));
+      console.log('🔐 [AuthContext] Loading identity for user:', userId);
+      console.log('🔐'.repeat(40));
+
       setIdentityLoading(true);
       try {
         const userIdentity = await identityService.getUserIdentity(userId);
+        console.log('📊 [AuthContext] getUserIdentity result:', userIdentity);
+
         if (userIdentity) {
+          console.log('✅ [AuthContext] Identity found in database:');
+          console.log('   Primary:', userIdentity.primaryIdentity);
+          console.log('   Secondary:', userIdentity.secondaryIdentity);
+          console.log('   Secondary Enabled:', userIdentity.secondaryIdentityEnabled);
+
           setIdentity(userIdentity.primaryIdentity);
           setSecondaryIdentity(userIdentity.secondaryIdentity);
           setSecondaryIdentityEnabled(userIdentity.secondaryIdentityEnabled);
         } else {
+          console.log('⚠️ [AuthContext] No identity in database - using fallback');
           const savedMode = localStorage.getItem('appMode');
+          console.log('📦 [AuthContext] localStorage appMode:', savedMode);
+
           const fallbackIdentity: IdentityType =
             (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
+
+          console.log('🔄 [AuthContext] Using fallback identity:', fallbackIdentity);
+
           setIdentity(fallbackIdentity);
           setSecondaryIdentity(null);
           setSecondaryIdentityEnabled(false);
           await identityService.setPrimaryIdentity(userId, fallbackIdentity);
         }
       } catch (error) {
-        console.error('Error loading identity:', error);
+        console.error('❌ [AuthContext] Error loading identity:', error);
         const savedMode = localStorage.getItem('appMode');
         const fallbackIdentity: IdentityType =
           (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
+
+        console.log('🔄 [AuthContext] Using emergency fallback:', fallbackIdentity);
+
         setIdentity(fallbackIdentity);
         setSecondaryIdentity(null);
         setSecondaryIdentityEnabled(false);
       } finally {
         setIdentityLoading(false);
+        console.log('🔐'.repeat(40));
+        console.log('');
       }
     }
 

@@ -71,23 +71,42 @@ export const investmentCyclesService = {
   },
 
   async getClientInvestmentCycles() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    console.log('');
+    console.log('='.repeat(80));
+    console.log('🚀 [InvestmentCycles Service] START getClientInvestmentCycles()');
+    console.log('='.repeat(80));
 
+    const { data: { user } } = await supabase.auth.getUser();
+    console.log('👤 [InvestmentCycles] Current user:', user?.id || 'NO USER');
+
+    if (!user) {
+      console.error('❌ [InvestmentCycles] No user authenticated!');
+      throw new Error('Not authenticated');
+    }
+
+    console.log('📊 [InvestmentCycles] Step 1: Fetching user reservations...');
     const { data: userReservations, error: reservationsError } = await supabase
       .from('reservations')
-      .select('farm_id, total_trees')
+      .select('farm_id, total_trees, status')
       .eq('user_id', user.id)
       .in('status', ['active', 'confirmed', 'paid'])
       .eq('path_type', 'investment');
 
     if (reservationsError) {
-      console.error('[InvestmentCycles] Error loading user reservations:', reservationsError);
+      console.error('❌ [InvestmentCycles] Error loading user reservations:', reservationsError);
       throw reservationsError;
     }
 
+    console.log('📦 [InvestmentCycles] User reservations found:', userReservations?.length || 0);
+    console.table(userReservations);
+
     if (!userReservations || userReservations.length === 0) {
-      console.log('[InvestmentCycles] No investment reservations found for user');
+      console.warn('⚠️ [InvestmentCycles] No investment reservations found for user!');
+      console.log('🔍 [InvestmentCycles] This means:');
+      console.log('   - User has NO investment path reservations');
+      console.log('   - Or all reservations are NOT in status: active/confirmed/paid');
+      console.log('   - Returning empty array');
+      console.log('='.repeat(80));
       return [];
     }
 
@@ -99,13 +118,16 @@ export const investmentCyclesService = {
     }, {} as Record<string, number>);
 
     const farmIds = Object.keys(farmTreesMap);
-    console.log('[InvestmentCycles] User farms with tree counts:', farmTreesMap);
+    console.log('🌳 [InvestmentCycles] Farm trees map:', farmTreesMap);
+    console.log('🆔 [InvestmentCycles] Farm IDs:', farmIds);
 
     if (farmIds.length === 0) {
-      console.log('[InvestmentCycles] No valid farm IDs found');
+      console.warn('⚠️ [InvestmentCycles] No valid farm IDs found!');
+      console.log('='.repeat(80));
       return [];
     }
 
+    console.log('📊 [InvestmentCycles] Step 2: Fetching investment cycles for these farms...');
     const { data, error } = await supabase
       .from('investment_cycles')
       .select(`
@@ -122,8 +144,21 @@ export const investmentCyclesService = {
       .order('cycle_date', { ascending: false });
 
     if (error) {
-      console.error('[InvestmentCycles] Error loading client cycles:', error);
+      console.error('❌ [InvestmentCycles] Error loading client cycles:', error);
       throw error;
+    }
+
+    console.log('📦 [InvestmentCycles] Investment cycles found:', data?.length || 0);
+    console.table(data);
+
+    if (!data || data.length === 0) {
+      console.warn('⚠️ [InvestmentCycles] No published cycles found for user farms!');
+      console.log('🔍 [InvestmentCycles] This means:');
+      console.log('   - User has farms but NO cycles in those farms');
+      console.log('   - Or cycles are NOT published');
+      console.log('   - Or visible_to_client is false');
+      console.log('='.repeat(80));
+      return [];
     }
 
     const cyclesWithTreeCount = (data || []).map(cycle => ({
@@ -131,7 +166,18 @@ export const investmentCyclesService = {
       user_tree_count: farmTreesMap[cycle.farm_id] || 0
     }));
 
-    console.log('[InvestmentCycles] Loaded cycles for client:', cyclesWithTreeCount.length);
+    console.log('✅ [InvestmentCycles] SUCCESS! Final cycles with tree count:');
+    console.table(cyclesWithTreeCount.map(c => ({
+      cycle_id: c.id,
+      farm_name: c.farms?.name_ar,
+      user_trees: c.user_tree_count,
+      total_amount: c.total_amount,
+      cost_per_tree: c.cost_per_tree,
+      cycle_date: c.cycle_date
+    })));
+    console.log('='.repeat(80));
+    console.log('');
+
     return cyclesWithTreeCount;
   },
 

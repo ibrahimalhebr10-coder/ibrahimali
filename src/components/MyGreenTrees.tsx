@@ -38,6 +38,20 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
     ? 'from-amber-50 via-white to-yellow-50'
     : 'from-green-50 via-white to-emerald-50';
 
+  console.log('');
+  console.log('🌳'.repeat(40));
+  console.log('🎨 [MyGreenTrees] COMPONENT RENDER');
+  console.log('🌳'.repeat(40));
+  console.log('👤 User ID:', user?.id || '❌ NO USER');
+  console.log('🔐 Identity:', identity);
+  console.log('💎 Is Investment Path?', isInvestment ? '✅ YES' : '❌ NO (Agricultural)');
+  console.log('🎭 Is Demo Mode?', isDemoMode ? '✅ YES' : '❌ NO');
+  console.log('📊 Investment Cycles Count:', investmentCycles.length);
+  console.log('📋 Agricultural Records Count:', records.length);
+  console.log('⏳ Loading?', loading);
+  console.log('🌳'.repeat(40));
+  console.log('');
+
   const farmGroups = isInvestment
     ? investmentCycles.reduce((acc: any, cycle: any) => {
         const farmId = cycle.farm_id;
@@ -109,9 +123,16 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
 
   const loadMaintenanceRecords = async () => {
     try {
+      console.log('');
+      console.log('📥'.repeat(40));
+      console.log('📥 [MyGreenTrees] START loadMaintenanceRecords()');
+      console.log('📥'.repeat(40));
+
       setLoading(true);
 
       if (isDemoMode) {
+        console.log('🎭 [MyGreenTrees] In DEMO MODE - loading demo data');
+        console.log('🎨 Demo Type:', demoType);
         const demoData = demoType === 'green'
           ? getDemoGreenTreesData()
           : getDemoGoldenTreesData();
@@ -140,41 +161,87 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
           demoRecords = sortMaintenanceRecordsByPriority(demoRecords);
         }
 
+        console.log('✅ [MyGreenTrees] Demo data loaded:', demoRecords.length, 'records');
         setRecords(demoRecords);
         setLoading(false);
+        console.log('📥'.repeat(40));
+        console.log('');
         return;
       }
 
       if (!user) {
-        console.log('[MyGreenTrees] No user found, skipping maintenance records load');
+        console.log('❌ [MyGreenTrees] NO USER - Cannot load data');
         setRecords([]);
         setLoading(false);
+        console.log('📥'.repeat(40));
+        console.log('');
         return;
       }
 
-      console.log(`[MyGreenTrees] Loading maintenance records for user ${user.id} (identity: ${identity})`);
+      console.log('👤 [MyGreenTrees] User found:', user.id);
+      console.log('🔐 [MyGreenTrees] Current identity:', identity);
 
       if (identity === 'investment') {
-        console.log('[MyGreenTrees] Fetching investment cycles...');
+        console.log('💎 [MyGreenTrees] INVESTMENT PATH - Loading investment cycles...');
+        console.log('⏳ [MyGreenTrees] Calling investmentCyclesService.getClientInvestmentCycles()...');
         const cycles = await investmentCyclesService.getClientInvestmentCycles();
-        console.log(`[MyGreenTrees] ✅ Loaded ${cycles.length} investment cycles:`, cycles);
+        console.log('');
+        console.log('✅✅✅ [MyGreenTrees] Investment cycles loaded! ✅✅✅');
+        console.log('📊 Total cycles:', cycles.length);
+        if (cycles.length > 0) {
+          console.log('📋 Cycles details:');
+          console.table(cycles.map(c => ({
+            farm_name: c.farms?.name_ar,
+            user_trees: c.user_tree_count,
+            cycle_date: c.cycle_date,
+            total_amount: c.total_amount
+          })));
+        } else {
+          console.warn('⚠️ [MyGreenTrees] NO CYCLES RETURNED!');
+          console.log('🔍 Possible reasons:');
+          console.log('   1. User has NO investment reservations');
+          console.log('   2. User farms have NO published cycles');
+          console.log('   3. Cycles visible_to_client = false');
+        }
+        console.log('');
         setInvestmentCycles(cycles);
         setRecords([]);
       } else {
+        console.log('🌱 [MyGreenTrees] AGRICULTURAL PATH - Loading maintenance records...');
+        console.log('⏳ [MyGreenTrees] Calling clientMaintenanceService.getClientMaintenanceRecords("agricultural")...');
         const data = await clientMaintenanceService.getClientMaintenanceRecords('agricultural');
-        console.log(`[MyGreenTrees] Loaded ${data.length} records for user ${user.id}`);
+        console.log('');
+        console.log('✅ [MyGreenTrees] Agricultural records loaded!');
+        console.log('📊 Total records:', data.length);
 
         if (data.length === 0) {
-          console.warn(`[MyGreenTrees] No maintenance records found for user ${user.id}`);
+          console.warn('⚠️ [MyGreenTrees] NO AGRICULTURAL RECORDS found!');
+          console.log('🔍 This means user has NO agricultural reservations or maintenance');
+        } else {
+          console.table(data.slice(0, 5).map(r => ({
+            farm: r.farm_name,
+            type: r.maintenance_type,
+            date: r.maintenance_date,
+            payment: r.payment_status
+          })));
         }
+        console.log('');
 
         setRecords(sortMaintenanceRecordsByPriority(data));
         setInvestmentCycles([]);
       }
     } catch (error) {
-      console.error('Error loading maintenance records:', error);
+      console.error('');
+      console.error('❌'.repeat(40));
+      console.error('❌ [MyGreenTrees] ERROR loading maintenance records!');
+      console.error('❌'.repeat(40));
+      console.error('Error details:', error);
+      console.error('');
       alert('خطأ في تحميل بيانات الصيانة');
     } finally {
+      console.log('🏁 [MyGreenTrees] Loading complete!');
+      console.log('📥'.repeat(40));
+      console.log('');
       setLoading(false);
     }
   };
