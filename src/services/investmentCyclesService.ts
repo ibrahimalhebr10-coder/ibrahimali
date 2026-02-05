@@ -70,6 +70,54 @@ export const investmentCyclesService = {
     return data;
   },
 
+  async getClientInvestmentCycles() {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+
+    const { data: userFarms, error: farmsError } = await supabase
+      .from('reservations')
+      .select('farm_id')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .eq('path_type', 'investment');
+
+    if (farmsError) {
+      console.error('[InvestmentCycles] Error loading user farms:', farmsError);
+      throw farmsError;
+    }
+
+    const farmIds = userFarms?.map(r => r.farm_id) || [];
+
+    if (farmIds.length === 0) {
+      console.log('[InvestmentCycles] No farms found for user');
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from('investment_cycles')
+      .select(`
+        *,
+        farms(
+          id,
+          name_ar,
+          total_trees,
+          reserved_investment_trees
+        )
+      `)
+      .eq('status', 'published')
+      .eq('visible_to_client', true)
+      .in('farm_id', farmIds)
+      .order('cycle_date', { ascending: false });
+
+    if (error) {
+      console.error('[InvestmentCycles] Error loading client cycles:', error);
+      throw error;
+    }
+
+    console.log('[InvestmentCycles] Loaded cycles for client:', data?.length || 0);
+    return data || [];
+  },
+
   async createCycle(cycle: Omit<InvestmentCycle, 'id' | 'cost_per_tree' | 'created_at' | 'updated_at'>) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('Not authenticated');

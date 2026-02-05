@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Sprout, Calendar, DollarSign, Image as ImageIcon, Video, CheckCircle, AlertCircle, Eye, X, Play, Heart } from 'lucide-react';
+import { Sprout, Calendar, DollarSign, Image as ImageIcon, Video, CheckCircle, AlertCircle, Eye, X, Play, Heart, TrendingUp } from 'lucide-react';
 import { clientMaintenanceService, ClientMaintenanceRecord, MaintenanceDetails } from '../services/clientMaintenanceService';
+import { investmentCyclesService, InvestmentCycle } from '../services/investmentCyclesService';
 import { useAuth } from '../contexts/AuthContext';
 import { useDemoMode } from '../contexts/DemoModeContext';
 import { getDemoGreenTreesData, getDemoGoldenTreesData, sortMaintenanceRecordsByPriority, getMaintenanceTypeLabel } from '../services/demoDataService';
@@ -16,8 +17,10 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
   const { identity, user } = useAuth();
   const { isDemoMode, demoType } = useDemoMode();
   const [records, setRecords] = useState<ClientMaintenanceRecord[]>([]);
+  const [investmentCycles, setInvestmentCycles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRecord, setSelectedRecord] = useState<string | null>(null);
+  const [selectedCycle, setSelectedCycle] = useState<any | null>(null);
   const [maintenanceDetails, setMaintenanceDetails] = useState<MaintenanceDetails | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(false);
   const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
@@ -84,19 +87,21 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
 
       console.log(`[MyGreenTrees] Loading maintenance records for user ${user.id} (identity: ${identity})`);
 
-      const pathType = identity === 'agricultural' ? 'agricultural' : 'investment';
-      const data = await clientMaintenanceService.getClientMaintenanceRecords(pathType);
-
-      console.log(`[MyGreenTrees] Loaded ${data.length} records for user ${user.id}`);
-
-      if (data.length === 0) {
-        console.warn(`[MyGreenTrees] No maintenance records found for user ${user.id}`);
-      }
-
-      if (identity === 'agricultural') {
-        setRecords(sortMaintenanceRecordsByPriority(data));
+      if (identity === 'investment') {
+        const cycles = await investmentCyclesService.getClientInvestmentCycles();
+        console.log(`[MyGreenTrees] Loaded ${cycles.length} investment cycles for user ${user.id}`);
+        setInvestmentCycles(cycles);
+        setRecords([]);
       } else {
-        setRecords(data);
+        const data = await clientMaintenanceService.getClientMaintenanceRecords('agricultural');
+        console.log(`[MyGreenTrees] Loaded ${data.length} records for user ${user.id}`);
+
+        if (data.length === 0) {
+          console.warn(`[MyGreenTrees] No maintenance records found for user ${user.id}`);
+        }
+
+        setRecords(sortMaintenanceRecordsByPriority(data));
+        setInvestmentCycles([]);
       }
     } catch (error) {
       console.error('Error loading maintenance records:', error);
@@ -496,6 +501,147 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
     );
   }
 
+  if (selectedCycle) {
+    return (
+      <div
+        key={`cycle-details-${selectedCycle.id}`}
+        className="bg-gradient-to-br from-amber-50 via-white to-yellow-50 py-8 px-4"
+        dir="rtl"
+        style={{ paddingBottom: '200px', minHeight: '100%' }}
+      >
+        <div className="max-w-4xl mx-auto">
+          <button
+            onClick={() => setSelectedCycle(null)}
+            className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"
+          >
+            <X className="w-5 h-5" />
+            العودة للقائمة
+          </button>
+
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
+            <div className="bg-gradient-to-r from-amber-600 to-yellow-600 p-8 text-white">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm">
+                  <Sprout className="w-8 h-8" />
+                </div>
+                <div className="flex-1">
+                  <h1 className="text-3xl font-bold mb-1">تفاصيل الدورة الاستثمارية</h1>
+                  <p className="text-amber-100">
+                    {selectedCycle.farms?.name_ar}
+                  </p>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="flex items-center gap-2 text-amber-100">
+                  <Calendar className="w-4 h-4" />
+                  <span>{selectedCycle.cycle_date}</span>
+                </div>
+                <div className="flex items-center gap-2 text-amber-100">
+                  <Sprout className="w-4 h-4" />
+                  <span>{selectedCycle.farms?.reserved_investment_trees || 0} شجرة</span>
+                </div>
+                <div className="flex items-center gap-2 text-amber-100">
+                  <TrendingUp className="w-4 h-4" />
+                  <span>دورة استثمارية</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-8 space-y-8">
+              <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-6 border-2 border-amber-100">
+                <h3 className="text-xl font-bold text-gray-900 mb-3 flex items-center gap-2">
+                  <Sprout className="w-6 h-6 text-amber-600" />
+                  أنواع الدورة
+                </h3>
+                <div className="flex flex-wrap gap-3">
+                  {selectedCycle.cycle_types?.map((type: string) => (
+                    <div key={type} className="bg-white rounded-lg px-4 py-3 border border-amber-200">
+                      <div className="font-semibold text-gray-900">
+                        {type === 'maintenance' && '🌳 صيانة وعناية بالأشجار'}
+                        {type === 'waste' && '♻️ استثمار المخلفات الزراعية'}
+                        {type === 'factory' && '🏭 معالجة في المصنع (تمر/زيت)'}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <h3 className="text-xl font-bold text-gray-900 mb-3">الوصف والتفاصيل</h3>
+                <p className="text-gray-700 leading-relaxed text-lg">{selectedCycle.description}</p>
+              </div>
+
+              {selectedCycle.images && selectedCycle.images.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <ImageIcon className="w-6 h-6 text-amber-600" />
+                    صور التوثيق ({selectedCycle.images.length})
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {selectedCycle.images.map((url: string, index: number) => (
+                      <div
+                        key={index}
+                        className="bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
+                      >
+                        <div className="aspect-video bg-gray-200 flex items-center justify-center relative group">
+                          <img
+                            src={url}
+                            alt={`صورة ${index + 1}`}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedCycle.videos && selectedCycle.videos.length > 0 && (
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <Video className="w-6 h-6 text-amber-600" />
+                    فيديوهات التوثيق ({selectedCycle.videos.length})
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {selectedCycle.videos.map((url: string, index: number) => (
+                      <div
+                        key={index}
+                        className="bg-gray-50 rounded-xl overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
+                      >
+                        <div className="aspect-video bg-gray-900 relative">
+                          <video
+                            src={url}
+                            controls
+                            className="w-full h-full"
+                            preload="metadata"
+                          >
+                            المتصفح لا يدعم تشغيل الفيديو
+                          </video>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(!selectedCycle.images || selectedCycle.images.length === 0) &&
+               (!selectedCycle.videos || selectedCycle.videos.length === 0) && (
+                <div className="text-center py-12">
+                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <AlertCircle className="w-10 h-10 text-gray-400" />
+                  </div>
+                  <p className="text-gray-600 text-lg">لا يوجد توثيق مرئي لهذه الدورة</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const isInvestment = identity === 'investment';
   const headerColor = isInvestment
     ? 'from-amber-600 to-yellow-600'
@@ -558,7 +704,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
           </div>
         )}
 
-        {records.length === 0 ? (
+        {(isInvestment ? investmentCycles.length === 0 : records.length === 0) ? (
           <div className="bg-white rounded-3xl shadow-xl p-12 text-center">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <Sprout className="w-12 h-12 text-gray-400" />
@@ -582,13 +728,74 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
               </h2>
               <p className="text-gray-600 text-sm mr-13">
                 {isInvestment
-                  ? `عدد الدورات: ${records.length}`
+                  ? `عدد الدورات: ${investmentCycles.length}`
                   : `عدد أعمال الصيانة: ${records.length}`
                 }
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {records.map((record) => (
+            {isInvestment ? investmentCycles.map((cycle) => (
+              <div
+                key={cycle.id}
+                className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
+              >
+                <div className={`bg-gradient-to-r ${headerColor} p-6 text-white`}>
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-xl font-bold mb-2">{cycle.farms?.name_ar}</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {cycle.cycle_types?.map((type: string) => (
+                          <span key={type} className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur">
+                            {type === 'maintenance' && 'صيانة أشجار'}
+                            {type === 'waste' && 'استثمار مخلفات'}
+                            {type === 'factory' && 'معالجة مصنع'}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm text-amber-100">أشجارك</div>
+                      <div className="text-3xl font-bold">{cycle.farms?.reserved_investment_trees || 0}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-amber-100">
+                    <Calendar className="w-4 h-4" />
+                    <span className="text-sm">{cycle.cycle_date}</span>
+                  </div>
+                </div>
+
+                <div className="p-6 space-y-4">
+                  <div className="text-gray-700 leading-relaxed">
+                    {cycle.description}
+                  </div>
+
+                  {(cycle.images?.length > 0 || cycle.videos?.length > 0) && (
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      {cycle.images?.length > 0 && (
+                        <div className="flex items-center gap-1">
+                          <ImageIcon className="w-4 h-4 text-amber-500" />
+                          <span>{cycle.images.length} صور</span>
+                        </div>
+                      )}
+                      {cycle.videos?.length > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Video className="w-4 h-4 text-amber-500" />
+                          <span>{cycle.videos.length} فيديو</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => setSelectedCycle(cycle)}
+                    className={`w-full flex items-center justify-center gap-2 bg-gradient-to-r ${headerColor} text-white py-3 rounded-xl hover:opacity-90 transition-all font-semibold`}
+                  >
+                    <Eye className="w-5 h-5" />
+                    عرض التفاصيل والتوثيق
+                  </button>
+                </div>
+              </div>
+            )) : records.map((record) => (
               <div
                 key={record.maintenance_id}
                 className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow"
