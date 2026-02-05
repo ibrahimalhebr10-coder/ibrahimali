@@ -91,7 +91,7 @@ export async function getGoldenTreeAssets(userId?: string): Promise<GoldenTreeAs
         total_trees,
         contract_start_date,
         duration_years,
-        total_amount,
+        total_price,
         farm_name
       `)
       .eq('user_id', userId)
@@ -113,7 +113,7 @@ export async function getGoldenTreeAssets(userId?: string): Promise<GoldenTreeAs
       trees_count: r.total_trees || 0,
       contract_start_date: r.contract_start_date || '',
       contract_duration: r.duration_years || 0,
-      total_price: r.total_amount || 0
+      total_price: r.total_price || 0
     }));
   } catch (error) {
     console.error('Error fetching golden tree assets:', error);
