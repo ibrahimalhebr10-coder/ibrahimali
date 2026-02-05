@@ -75,6 +75,13 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
         return;
       }
 
+      if (!user) {
+        console.log('No user found, skipping maintenance records load');
+        setRecords([]);
+        setLoading(false);
+        return;
+      }
+
       const pathType = identity === 'agricultural' ? 'agricultural' : 'investment';
       const data = await clientMaintenanceService.getClientMaintenanceRecords(pathType);
 
@@ -138,6 +145,11 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
         }
         setLoadingDetails(false);
         loadingRef.current = false;
+        return;
+      }
+
+      if (!user) {
+        console.log('No user found, cannot load maintenance details');
         return;
       }
 

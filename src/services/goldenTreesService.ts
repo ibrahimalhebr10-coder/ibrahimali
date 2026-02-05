@@ -9,11 +9,9 @@ export interface GoldenTreesContext {
   message?: string;
 }
 
-export async function determineGoldenTreesMode(): Promise<GoldenTreesContext> {
+export async function determineGoldenTreesMode(userId?: string): Promise<GoldenTreesContext> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
+    if (!userId) {
       return {
         mode: 'demo',
         hasAuth: false,
@@ -25,9 +23,9 @@ export async function determineGoldenTreesMode(): Promise<GoldenTreesContext> {
     const { count, error } = await supabase
       .from('reservations')
       .select('id', { count: 'exact', head: true })
-      .eq('investor_id', user.id)
+      .eq('user_id', userId)
       .eq('path_type', 'investment')
-      .eq('status', 'confirmed');
+      .in('status', ['confirmed', 'completed']);
 
     if (error) throw error;
 
@@ -78,38 +76,37 @@ export interface GoldenTreeMaintenance {
   maintenance_type: string;
 }
 
-export async function getGoldenTreeAssets(): Promise<GoldenTreeAsset[]> {
+export async function getGoldenTreeAssets(userId?: string): Promise<GoldenTreeAsset[]> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
+    if (!userId) return [];
 
     const { data, error } = await supabase
       .from('reservations')
       .select(`
         id,
         farm_id,
-        tree_type,
-        trees_count,
+        tree_types,
+        total_trees,
         contract_start_date,
-        contract_duration,
-        total_price,
-        farms!inner(name_ar)
+        duration_years,
+        total_amount,
+        farm_name
       `)
-      .eq('investor_id', user.id)
+      .eq('user_id', userId)
       .eq('path_type', 'investment')
-      .eq('status', 'confirmed')
+      .in('status', ['confirmed', 'completed'])
       .order('contract_start_date', { ascending: false });
 
     if (error) throw error;
 
     return (data || []).map(r => ({
       id: r.id,
-      farm_name: (r.farms as any)?.name_ar || 'مزرعة',
-      tree_type: r.tree_type || 'غير محدد',
-      trees_count: r.trees_count || 0,
+      farm_name: r.farm_name || 'مزرعة',
+      tree_type: r.tree_types || 'غير محدد',
+      trees_count: r.total_trees || 0,
       contract_start_date: r.contract_start_date || '',
-      contract_duration: r.contract_duration || 0,
-      total_price: r.total_price || 0
+      contract_duration: r.duration_years || 0,
+      total_price: r.total_amount || 0
     }));
   } catch (error) {
     console.error('Error fetching golden tree assets:', error);
@@ -117,10 +114,9 @@ export async function getGoldenTreeAssets(): Promise<GoldenTreeAsset[]> {
   }
 }
 
-export async function getGoldenTreeMaintenanceFees(): Promise<GoldenTreeMaintenance[]> {
+export async function getGoldenTreeMaintenanceFees(userId?: string): Promise<GoldenTreeMaintenance[]> {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return [];
+    if (!userId) return [];
 
     const { data, error } = await supabase
       .from('maintenance_payments')
@@ -135,7 +131,7 @@ export async function getGoldenTreeMaintenanceFees(): Promise<GoldenTreeMaintena
           path_type
         )
       `)
-      .eq('investor_id', user.id)
+      .eq('user_id', userId)
       .eq('maintenance_fees.path_type', 'investment')
       .order('due_date', { ascending: true });
 

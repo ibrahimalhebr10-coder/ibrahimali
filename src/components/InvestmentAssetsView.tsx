@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { TrendingUp, Shield, Sprout, ArrowRight, Lock, Package, Sparkles } from 'lucide-react';
 import { getDemoGoldenTreesData } from '../services/demoDataService';
 import { useDemoMode } from '../contexts/DemoModeContext';
+import { useAuth } from '../contexts/AuthContext';
 import DemoActionModal from './DemoActionModal';
 import {
   determineGoldenTreesMode,
@@ -11,11 +12,12 @@ import {
 } from '../services/goldenTreesService';
 
 interface InvestmentAssetsViewProps {
-  onShowAuth?: () => void;
+  onShowAuth?: (mode: 'login' | 'register') => void;
 }
 
 export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsViewProps) {
   const { isDemoMode } = useDemoMode();
+  const { user } = useAuth();
   const [showDemoActionModal, setShowDemoActionModal] = useState(false);
   const [mode, setMode] = useState<GoldenTreesMode>('demo');
   const [loading, setLoading] = useState(true);
@@ -25,18 +27,19 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
 
   useEffect(() => {
     loadGoldenTreesData();
-  }, []);
+  }, [user]);
 
   const loadGoldenTreesData = async () => {
     setLoading(true);
     try {
-      const context = await determineGoldenTreesMode();
+      const userId = user?.id;
+      const context = await determineGoldenTreesMode(userId);
       setMode(context.mode);
 
-      if (context.mode === 'active') {
+      if (context.mode === 'active' && userId) {
         const [assetsData, feesData] = await Promise.all([
-          getGoldenTreeAssets(),
-          getGoldenTreeMaintenanceFees()
+          getGoldenTreeAssets(userId),
+          getGoldenTreeMaintenanceFees(userId)
         ]);
         setAssets(assetsData);
         setFees(feesData);
