@@ -19,6 +19,7 @@ export interface CreateReservationData {
   bonusYears?: number;
   treeDetails?: any[];
   isDemo?: boolean;
+  pathType?: 'agricultural' | 'investment';
 }
 
 export interface Reservation {
@@ -35,6 +36,7 @@ export interface Reservation {
   bonusYears?: number;
   treeDetails?: any[];
   isDemo?: boolean;
+  pathType?: 'agricultural' | 'investment';
   createdAt: string;
   updatedAt: string;
 }
@@ -74,6 +76,7 @@ class ReservationService {
           tree_details: data.treeDetails || [],
           tree_types: treeTypes,
           is_demo: data.isDemo || false,
+          path_type: data.pathType || 'agricultural',
           status: 'pending'
         })
         .select()
@@ -268,6 +271,7 @@ class ReservationService {
           duration_years: pendingData.durationYears || 1,
           bonus_years: pendingData.bonusYears || 0,
           tree_details: pendingData.treeDetails || [],
+          path_type: pendingData.pathType || 'agricultural',
           status: 'pending'
         })
         .select()
@@ -320,6 +324,7 @@ class ReservationService {
       bonusYears: data.bonus_years,
       treeDetails: data.tree_details || [],
       isDemo: data.is_demo || false,
+      pathType: data.path_type || 'agricultural',
       createdAt: data.created_at,
       updatedAt: data.updated_at
     };

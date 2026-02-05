@@ -90,6 +90,10 @@ const MyContracts: React.FC = () => {
 
         const farmData = farmMap.get(farmId)!;
         farmData.contracts_count++;
+
+        const pathType = reservation.path_type || 'agricultural';
+        console.log(`📋 [MyContracts] Reservation ${reservation.id}: path_type = "${pathType}" → ${pathType === 'investment' ? 'أشجاري الذهبية 🌟' : 'أشجاري الخضراء 🌿'}`);
+
         farmData.contracts.push({
           id: reservation.id,
           farm_id: farmId,
@@ -102,7 +106,7 @@ const MyContracts: React.FC = () => {
           bonus_years: reservation.bonus_years,
           status: reservation.status,
           created_at: reservation.created_at,
-          path_type: reservation.path_type || 'agricultural'
+          path_type: pathType
         });
       });
 
@@ -235,6 +239,8 @@ const MyContracts: React.FC = () => {
               const ContractIcon = badge.icon;
               const treeTypesList = parseTreeTypes(contract.tree_types);
               const isAgriculturalContract = contract.path_type === 'agricultural';
+
+              console.log(`🎨 [MyContracts] Rendering contract ${contract.id}: path_type="${contract.path_type}" → badge="${badge.label}"`);
 
               return (
                 <div

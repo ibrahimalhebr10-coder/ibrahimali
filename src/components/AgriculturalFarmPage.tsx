@@ -244,6 +244,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       console.log('🌾 [AGRICULTURAL] بدء إنشاء الحجز...');
       console.log('🌾 [AGRICULTURAL] User ID:', user.id);
       console.log('🌾 [AGRICULTURAL] Trees:', treeCount, 'Price:', totalPrice);
+      console.log('🌾 [AGRICULTURAL] Path Type: agricultural (أشجاري الخضراء)');
 
       const { data: reservation, error: reservationError } = await supabase
         .from('reservations')
@@ -257,6 +258,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           bonus_years: selectedPackage?.bonus_years || selectedContract.bonus_years,
           total_trees: treeCount,
           total_price: totalPrice,
+          path_type: 'agricultural',
           status: 'pending',
           payment_method: method
         } as any)
@@ -271,6 +273,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       }
 
       console.log('✅ [AGRICULTURAL] تم إنشاء الحجز! ID:', reservation.id);
+      console.log('✅ [AGRICULTURAL] Path Type المُحفوظ:', reservation.path_type);
       console.log('🔄 [AGRICULTURAL] تحديث الحالة إلى confirmed...');
 
       const { error: statusError } = await supabase

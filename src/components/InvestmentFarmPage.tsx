@@ -279,6 +279,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       console.log('💰 [INVESTMENT] بدء إنشاء الحجز...');
       console.log('💰 [INVESTMENT] User ID:', user.id);
       console.log('💰 [INVESTMENT] Trees:', treeCount, 'Price:', totalPrice);
+      console.log('💰 [INVESTMENT] Path Type: investment (أشجاري الذهبية)');
 
       const { data: reservation, error: reservationError } = await supabase
         .from('reservations')
@@ -292,6 +293,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           bonus_years: selectedPackage?.bonus_free_years || selectedContract.bonus_years,
           total_trees: treeCount,
           total_price: totalPrice,
+          path_type: 'investment',
           status: 'pending',
           payment_method: method
         } as any)
@@ -306,6 +308,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       }
 
       console.log('✅ [INVESTMENT] تم إنشاء الحجز! ID:', reservation.id);
+      console.log('✅ [INVESTMENT] Path Type المُحفوظ:', reservation.path_type);
       console.log('🔄 [INVESTMENT] تحديث الحالة إلى confirmed...');
 
       const { error: statusError } = await supabase
