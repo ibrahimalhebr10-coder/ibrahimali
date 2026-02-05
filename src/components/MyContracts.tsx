@@ -45,7 +45,11 @@ interface FarmWithContracts {
   contracts: Contract[];
 }
 
-const MyContracts: React.FC = () => {
+interface MyContractsProps {
+  filterByPathType?: 'agricultural' | 'investment' | null;
+}
+
+const MyContracts: React.FC<MyContractsProps> = ({ filterByPathType = null }) => {
   const { user, identity } = useAuth();
   const [farmsWithContracts, setFarmsWithContracts] = useState<FarmWithContracts[]>([]);
   const [expandedFarms, setExpandedFarms] = useState<Set<string>>(new Set());
@@ -56,7 +60,7 @@ const MyContracts: React.FC = () => {
     if (user) {
       loadMyContracts();
     }
-  }, [user]);
+  }, [user, filterByPathType]);
 
   const loadMyContracts = async () => {
     if (!user) return;
@@ -64,14 +68,24 @@ const MyContracts: React.FC = () => {
     try {
       setLoading(true);
 
-      const { data: reservations, error } = await supabase
+      console.log(`🔍 [MyContracts] Loading contracts with filter: ${filterByPathType || 'all'}`);
+
+      let query = supabase
         .from('reservations')
         .select('*')
         .eq('user_id', user.id)
-        .in('status', ['confirmed', 'completed'])
-        .order('created_at', { ascending: false });
+        .in('status', ['confirmed', 'completed']);
+
+      if (filterByPathType) {
+        query = query.eq('path_type', filterByPathType);
+        console.log(`🎯 [MyContracts] Applying filter: path_type = ${filterByPathType}`);
+      }
+
+      const { data: reservations, error } = await query.order('created_at', { ascending: false });
 
       if (error) throw error;
+
+      console.log(`✅ [MyContracts] Found ${reservations?.length || 0} contracts`);
 
       const farmMap = new Map<string, FarmWithContracts>();
 
@@ -209,14 +223,50 @@ const MyContracts: React.FC = () => {
     );
   }
 
+  const getFilterTitle = () => {
+    if (filterByPathType === 'investment') {
+      return {
+        title: 'عقود أشجاري الذهبية',
+        icon: TrendingUp,
+        gradient: 'from-amber-500 to-yellow-600',
+        color: 'text-amber-600'
+      };
+    }
+    if (filterByPathType === 'agricultural') {
+      return {
+        title: 'عقود أشجاري الخضراء',
+        icon: Sparkles,
+        gradient: 'from-green-500 to-emerald-600',
+        color: 'text-green-600'
+      };
+    }
+    return null;
+  };
+
+  const filterConfig = getFilterTitle();
+
   if (totalContracts === 0) {
     return (
       <div className="space-y-4">
+        {filterConfig && (
+          <div className={`bg-gradient-to-br ${filterConfig.gradient} rounded-2xl p-4 shadow-xl`}>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <filterConfig.icon className="w-6 h-6 text-white" strokeWidth={2.5} />
+              </div>
+              <h2 className="text-xl font-black text-white">{filterConfig.title}</h2>
+            </div>
+          </div>
+        )}
         <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-8 border-2 border-gray-200 text-center shadow-lg">
           <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-xl">
             <Scroll className="w-12 h-12 text-gray-400" />
           </div>
-          <h3 className="text-2xl font-bold text-gray-800 mb-2">لا توجد عقود بعد</h3>
+          <h3 className="text-2xl font-bold text-gray-800 mb-2">
+            {filterByPathType === 'investment' && 'لا توجد عقود استثمارية بعد'}
+            {filterByPathType === 'agricultural' && 'لا توجد عقود زراعية بعد'}
+            {!filterByPathType && 'لا توجد عقود بعد'}
+          </h3>
           <p className="text-sm text-gray-600 mb-4">ابدأ رحلتك بحجز أشجارك الأولى</p>
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border-2 border-gray-300">
             <Shield className="w-4 h-4 text-gray-500" />
@@ -229,6 +279,21 @@ const MyContracts: React.FC = () => {
 
   return (
     <div className="space-y-4">
+      {filterConfig && (
+        <div className={`bg-gradient-to-br ${filterConfig.gradient} rounded-2xl p-4 shadow-xl`}>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <filterConfig.icon className="w-6 h-6 text-white" strokeWidth={2.5} />
+              </div>
+              <div>
+                <h2 className="text-xl font-black text-white">{filterConfig.title}</h2>
+                <p className="text-sm text-white/80 font-semibold">{totalContracts} عقد</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="space-y-4">
         {farmsWithContracts.map((farm) => (
           <div key={farm.farm_id} className="space-y-4">

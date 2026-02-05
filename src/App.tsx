@@ -65,6 +65,7 @@ function AppContent() {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [selectedInvestmentFarm, setSelectedInvestmentFarm] = useState<FarmProject | null>(null);
   const [selectedFarmMode, setSelectedFarmMode] = useState<AppMode | null>(null);
+  const [accountContractFilter, setAccountContractFilter] = useState<'agricultural' | 'investment' | null>(null);
 
   const handleAppModeChange = async (mode: AppMode) => {
     await updateIdentity(mode);
@@ -441,9 +442,13 @@ function AppContent() {
   };
 
   const handleMyAccountClick = () => {
+    console.log(`👤 [Header] My Account clicked`);
     if (user) {
+      console.log(`✅ [Header] Opening Account Profile without filter (show all contracts)`);
+      setAccountContractFilter(null);
       setShowAccountProfile(true);
     } else {
+      console.log(`⚠️ [Header] No user - showing quick access`);
       setShowQuickAccountAccess(true);
     }
   };
@@ -460,7 +465,14 @@ function AppContent() {
   };
 
   const handleMyFarmClick = () => {
+    const filterType = identity === 'agricultural' ? 'agricultural' : 'investment';
+    const filterLabel = identity === 'agricultural' ? 'أشجاري الخضراء 🌿' : 'أشجاري الذهبية 🌟';
+
+    console.log(`🏠 [Footer Button] Clicked "${filterLabel}"`);
+    console.log(`🎯 [Footer Button] Setting filter: ${filterType}`);
+
     if (!user) {
+      console.log(`⚠️ [Footer Button] No user - entering demo mode`);
       const demoType = identity === 'agricultural' ? 'green' : 'golden';
       enterDemoMode(demoType);
       setShowMyGreenTrees(true);
@@ -468,10 +480,13 @@ function AppContent() {
     }
 
     if (isDemoMode) {
+      console.log(`🔄 [Footer Button] Exiting demo mode`);
       exitDemoMode();
     }
 
-    setShowMyGreenTrees(true);
+    console.log(`✅ [Footer Button] Opening Account Profile with filter: ${filterType}`);
+    setAccountContractFilter(filterType);
+    setShowAccountProfile(true);
   };
 
   const handleOfferFarmClick = () => {
@@ -1238,7 +1253,11 @@ function AppContent() {
       <AccountProfile
         isOpen={showAccountProfile}
         currentContext={identity}
-        onClose={() => setShowAccountProfile(false)}
+        contractFilter={accountContractFilter}
+        onClose={() => {
+          setShowAccountProfile(false);
+          setAccountContractFilter(null);
+        }}
         onOpenAuth={() => alert('قريباً: تسجيل الدخول')}
         onOpenReservations={() => {
           setShowAccountProfile(false);

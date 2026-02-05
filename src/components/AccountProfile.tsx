@@ -14,11 +14,12 @@ interface AccountProfileProps {
   onOpenReservations: () => void;
   onStartInvestment?: () => void;
   onOpenGreenTrees?: () => void;
+  contractFilter?: 'agricultural' | 'investment' | null;
 }
 
 type AppMode = 'agricultural' | 'investment';
 
-export default function AccountProfile({ isOpen, currentContext, onClose, onOpenAuth, onOpenReservations, onStartInvestment, onOpenGreenTrees }: AccountProfileProps) {
+export default function AccountProfile({ isOpen, currentContext, onClose, onOpenAuth, onOpenReservations, onStartInvestment, onOpenGreenTrees, contractFilter = null }: AccountProfileProps) {
   const { user, signOut, isTrustedDevice } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -266,7 +267,7 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
                   </div>
                 </div>
 
-                <MyContracts />
+                <MyContracts filterByPathType={contractFilter} />
 
                 {onOpenGreenTrees && (
                   <button
