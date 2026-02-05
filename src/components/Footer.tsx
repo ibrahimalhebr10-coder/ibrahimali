@@ -1,4 +1,4 @@
-import { Sprout, Plus, Home } from 'lucide-react';
+import { Sprout, Plus, TreePine } from 'lucide-react';
 import { type IdentityType } from '../services/identityService';
 
 interface FooterProps {
@@ -31,7 +31,7 @@ export default function Footer({ identity, onMyFarmClick, onOfferFarmClick }: Fo
             className="w-full py-4 rounded-2xl font-bold text-white text-lg shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
             style={{ background: gradient }}
           >
-            <Home className="w-6 h-6" />
+            <TreePine className="w-6 h-6" />
             <span>أشجاري</span>
           </button>
 
