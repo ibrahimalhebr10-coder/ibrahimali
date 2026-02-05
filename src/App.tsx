@@ -11,6 +11,7 @@ import MyReservations from './components/MyReservations';
 import MyGreenTrees from './components/MyGreenTrees';
 import MaintenancePaymentPage from './components/MaintenancePaymentPage';
 import MaintenancePaymentResult from './components/MaintenancePaymentResult';
+import QuickAccountAccess from './components/QuickAccountAccess';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
@@ -56,7 +57,9 @@ function AppContent() {
   const [selectedMaintenanceId, setSelectedMaintenanceId] = useState<string | null>(null);
   const [showPaymentResult, setShowPaymentResult] = useState(false);
   const [showStandaloneRegistration, setShowStandaloneRegistration] = useState(false);
+  const [standaloneRegistrationMode, setStandaloneRegistrationMode] = useState<'register' | 'login'>('register');
   const [showWelcomeToAccount, setShowWelcomeToAccount] = useState(false);
+  const [showQuickAccountAccess, setShowQuickAccountAccess] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
@@ -441,8 +444,19 @@ function AppContent() {
     if (user) {
       setShowAccountProfile(true);
     } else {
-      setShowWelcomeToAccount(true);
+      setShowQuickAccountAccess(true);
     }
+  };
+
+  const handleQuickAccessExistingUser = () => {
+    setShowQuickAccountAccess(false);
+    setStandaloneRegistrationMode('login');
+    setShowStandaloneRegistration(true);
+  };
+
+  const handleQuickAccessNewUser = () => {
+    setShowQuickAccountAccess(false);
+    setShowWelcomeToAccount(true);
   };
 
   const handleMyFarmClick = () => {
@@ -1195,6 +1209,14 @@ function AppContent() {
 
       <IdentitySwitcher />
 
+      {showQuickAccountAccess && (
+        <QuickAccountAccess
+          onExistingUser={handleQuickAccessExistingUser}
+          onNewUser={handleQuickAccessNewUser}
+          onClose={() => setShowQuickAccountAccess(false)}
+        />
+      )}
+
       {showWelcomeToAccount && (
         <WelcomeToAccountScreen
           onStartNow={handleWelcomeStartNow}
@@ -1205,7 +1227,11 @@ function AppContent() {
       {showStandaloneRegistration && (
         <StandaloneAccountRegistration
           onSuccess={handleRegistrationSuccess}
-          onBack={() => setShowStandaloneRegistration(false)}
+          onBack={() => {
+            setShowStandaloneRegistration(false);
+            setStandaloneRegistrationMode('register');
+          }}
+          initialMode={standaloneRegistrationMode}
         />
       )}
 

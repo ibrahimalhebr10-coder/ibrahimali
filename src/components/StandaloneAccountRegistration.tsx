@@ -6,10 +6,11 @@ import { useAuth } from '../contexts/AuthContext';
 interface StandaloneAccountRegistrationProps {
   onSuccess: () => void;
   onBack: () => void;
+  initialMode?: 'register' | 'login';
 }
 
-export default function StandaloneAccountRegistration({ onSuccess, onBack }: StandaloneAccountRegistrationProps) {
-  const [mode, setMode] = useState<'register' | 'login'>('register');
+export default function StandaloneAccountRegistration({ onSuccess, onBack, initialMode = 'register' }: StandaloneAccountRegistrationProps) {
+  const [mode, setMode] = useState<'register' | 'login'>(initialMode);
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
