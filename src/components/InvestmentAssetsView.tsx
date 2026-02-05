@@ -335,13 +335,23 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
             ))}
           </div>
 
-          {maintenanceRecords.length > 0 && (
-            <div className="mt-16">
-              <div className="text-center mb-8">
-                <h3 className="text-3xl font-bold text-amber-200 mb-2">سجلات الصيانة</h3>
-                <p className="text-slate-400">الصيانة والرسوم المستحقة لأشجارك الذهبية</p>
-              </div>
+          <div className="mt-16">
+            <div className="text-center mb-8">
+              <h3 className="text-3xl font-bold text-amber-200 mb-2">سجلات الصيانة</h3>
+              <p className="text-slate-400">الصيانة والرسوم المستحقة لأشجارك الذهبية</p>
+            </div>
 
+            {maintenanceRecords.length === 0 ? (
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-3xl p-12 text-center border border-slate-700">
+                <div className="w-24 h-24 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Sprout className="w-12 h-12 text-slate-400" />
+                </div>
+                <h3 className="text-2xl font-bold text-slate-200 mb-3">لا توجد تحديثات حالياً</h3>
+                <p className="text-slate-400 text-lg">
+                  سيتم عرض تحديثات الصيانة والعناية بأشجارك هنا
+                </p>
+              </div>
+            ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {maintenanceRecords.map((record) => (
                   <div
@@ -389,8 +399,8 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
                   </div>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
     </div>
