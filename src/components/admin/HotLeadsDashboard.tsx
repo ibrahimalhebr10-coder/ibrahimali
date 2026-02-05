@@ -20,10 +20,12 @@ export default function HotLeadsDashboard() {
 
   const loadHotLeads = async () => {
     try {
+      console.log('🔥 [Hot Leads] Loading hot leads...');
       const leads = await leadScoringService.getHotLeads(100);
+      console.log('🔥 [Hot Leads] Found', leads.length, 'hot leads:', leads);
       setHotLeads(leads);
     } catch (error) {
-      console.error('Error loading hot leads:', error);
+      console.error('❌ [Hot Leads] Error loading hot leads:', error);
     } finally {
       setLoading(false);
     }
