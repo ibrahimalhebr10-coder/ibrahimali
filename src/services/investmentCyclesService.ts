@@ -92,12 +92,19 @@ export const investmentCyclesService = {
     }
 
     const farmTreesMap = userReservations.reduce((acc, r) => {
-      acc[r.farm_id] = (acc[r.farm_id] || 0) + (r.total_trees || 0);
+      if (r.farm_id && r.farm_id !== 'undefined' && r.farm_id !== 'null') {
+        acc[r.farm_id] = (acc[r.farm_id] || 0) + (r.total_trees || 0);
+      }
       return acc;
     }, {} as Record<string, number>);
 
     const farmIds = Object.keys(farmTreesMap);
     console.log('[InvestmentCycles] User farms with tree counts:', farmTreesMap);
+
+    if (farmIds.length === 0) {
+      console.log('[InvestmentCycles] No valid farm IDs found');
+      return [];
+    }
 
     const { data, error } = await supabase
       .from('investment_cycles')

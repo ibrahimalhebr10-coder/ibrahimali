@@ -67,7 +67,11 @@ export default function InvestmentAssetsView({ onClose }: InvestmentAssetsViewPr
         const assetsData = await getGoldenTreeAssets(userId);
         const maintenanceData = await clientMaintenanceService.getClientMaintenanceRecords('investment');
 
-        const farmIds = [...new Set(assetsData.map((a: any) => a.farm_id))];
+        const farmIds = [...new Set(
+          assetsData
+            .map((a: any) => a.farm_id)
+            .filter((id: any) => id && id !== 'undefined' && id !== 'null')
+        )];
         let cyclesData: any[] = [];
 
         if (farmIds.length > 0) {
