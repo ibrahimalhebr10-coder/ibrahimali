@@ -248,13 +248,14 @@ export default function InfluencerPartnersManager() {
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الحجوزات</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الأشجار</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">المكافآت</th>
+                <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">التقدم</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الإجراءات</th>
               </tr>
             </thead>
             <tbody>
               {partners.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-500">
+                  <td colSpan={8} className="text-center py-12 text-slate-500">
                     لا يوجد مؤثرين حالياً. اضغط "إضافة مؤثر" للبدء
                   </td>
                 </tr>
@@ -280,6 +281,28 @@ export default function InfluencerPartnersManager() {
                     <td className="py-3 px-4 text-slate-600">{partner.total_trees_booked}</td>
                     <td className="py-3 px-4">
                       <span className="font-semibold text-amber-600">{partner.total_rewards_earned}</span>
+                    </td>
+                    <td className="py-3 px-4">
+                      {(() => {
+                        const treesInBatch = partner.total_trees_booked % 20;
+                        const treesUntilNext = 20 - treesInBatch;
+                        const progressPercentage = (treesInBatch / 20) * 100;
+
+                        return (
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 text-xs text-slate-600">
+                              <span className="font-medium">{treesInBatch}/20</span>
+                              <span className="text-slate-400">({treesUntilNext} متبقية)</span>
+                            </div>
+                            <div className="w-24 bg-slate-100 rounded-full h-2 overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-amber-400 to-amber-600 transition-all duration-300"
+                                style={{ width: `${progressPercentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
