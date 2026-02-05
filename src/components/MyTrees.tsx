@@ -34,6 +34,11 @@ export default function MyTrees({ onClose, onNavigateToPayment, onShowAuth }: My
       return;
     }
 
+    if (identity === 'investment') {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const summary = await userTreesService.getUserTreesSummary(user.id);
