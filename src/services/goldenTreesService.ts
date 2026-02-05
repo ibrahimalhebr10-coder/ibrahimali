@@ -20,16 +20,22 @@ export async function determineGoldenTreesMode(userId?: string): Promise<GoldenT
       };
     }
 
+    console.log(`[SECURITY] Checking golden trees mode for user ${userId}`);
+
     const { count, error } = await supabase
       .from('reservations')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', userId)
       .eq('path_type', 'investment')
-      .in('status', ['confirmed', 'completed']);
+      .in('status', ['confirmed', 'active']);
 
-    if (error) throw error;
+    if (error) {
+      console.error('[SECURITY] Error checking assets:', error);
+      throw error;
+    }
 
     const hasAssets = (count || 0) > 0;
+    console.log(`[SECURITY] User ${userId} has ${count} investment assets`);
 
     if (!hasAssets) {
       return {
@@ -67,18 +73,14 @@ export interface GoldenTreeAsset {
   total_price: number;
 }
 
-export interface GoldenTreeMaintenance {
-  id: string;
-  fee_title: string;
-  amount_due: number;
-  due_date: string;
-  payment_status: 'pending' | 'paid' | 'overdue';
-  maintenance_type: string;
-}
-
 export async function getGoldenTreeAssets(userId?: string): Promise<GoldenTreeAsset[]> {
   try {
-    if (!userId) return [];
+    if (!userId) {
+      console.warn('[SECURITY] Attempted to fetch golden tree assets without user ID');
+      return [];
+    }
+
+    console.log(`[SECURITY] Fetching golden tree assets for user ${userId}`);
 
     const { data, error } = await supabase
       .from('reservations')
@@ -94,10 +96,15 @@ export async function getGoldenTreeAssets(userId?: string): Promise<GoldenTreeAs
       `)
       .eq('user_id', userId)
       .eq('path_type', 'investment')
-      .in('status', ['confirmed', 'completed'])
+      .in('status', ['confirmed', 'active'])
       .order('contract_start_date', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('[SECURITY] Error fetching assets:', error);
+      throw error;
+    }
+
+    console.log(`[SECURITY] Found ${data?.length || 0} assets for user ${userId}`);
 
     return (data || []).map(r => ({
       id: r.id,
@@ -110,43 +117,6 @@ export async function getGoldenTreeAssets(userId?: string): Promise<GoldenTreeAs
     }));
   } catch (error) {
     console.error('Error fetching golden tree assets:', error);
-    return [];
-  }
-}
-
-export async function getGoldenTreeMaintenanceFees(userId?: string): Promise<GoldenTreeMaintenance[]> {
-  try {
-    if (!userId) return [];
-
-    const { data, error } = await supabase
-      .from('maintenance_payments')
-      .select(`
-        id,
-        amount_due,
-        due_date,
-        payment_status,
-        maintenance_fees!inner(
-          fee_title,
-          maintenance_type,
-          path_type
-        )
-      `)
-      .eq('user_id', userId)
-      .eq('maintenance_fees.path_type', 'investment')
-      .order('due_date', { ascending: true });
-
-    if (error) throw error;
-
-    return (data || []).map(p => ({
-      id: p.id,
-      fee_title: (p.maintenance_fees as any)?.fee_title || 'رسم صيانة',
-      amount_due: p.amount_due || 0,
-      due_date: p.due_date || '',
-      payment_status: p.payment_status as any || 'pending',
-      maintenance_type: (p.maintenance_fees as any)?.maintenance_type || 'periodic'
-    }));
-  } catch (error) {
-    console.error('Error fetching maintenance fees:', error);
     return [];
   }
 }

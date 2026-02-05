@@ -66,11 +66,15 @@ export const clientMaintenanceService = {
 
     const { data, error } = await supabase
       .rpc('get_client_maintenance_records', {
-        client_user_id: user.id,
         filter_path_type: pathType
       });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Error fetching maintenance records:', error);
+      throw error;
+    }
+
+    console.log(`[SECURITY] Fetched ${data?.length || 0} maintenance records for user ${user.id} (path: ${pathType})`);
     return data || [];
   },
 
@@ -106,12 +110,19 @@ export const clientMaintenanceService = {
 
     const reservationResult = await supabase
       .from('reservations')
-      .select('total_trees')
+      .select('total_trees, path_type')
       .eq('farm_id', recordResult.data.farm_id)
       .eq('user_id', user.id)
       .in('status', ['confirmed', 'active']);
 
     const clientTreeCount = reservationResult.data?.reduce((sum, res) => sum + (res.total_trees || 0), 0) || 0;
+
+    if (clientTreeCount === 0) {
+      console.error(`[SECURITY] User ${user.id} attempted to access maintenance ${maintenanceId} without owning trees`);
+      throw new Error('لا يمكنك عرض تفاصيل صيانة لا تخصك');
+    }
+
+    console.log(`[SECURITY] User ${user.id} viewing maintenance ${maintenanceId} (owns ${clientTreeCount} trees)`);
     const fee = recordResult.data.maintenance_fees?.[0];
     const costPerTree = fee?.cost_per_tree || null;
     const clientDueAmount = fee && costPerTree ? costPerTree * clientTreeCount : null;

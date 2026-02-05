@@ -33,19 +33,34 @@ export default function InvestmentAssetsView({ onShowAuth }: InvestmentAssetsVie
     setLoading(true);
     try {
       const userId = user?.id;
+
+      if (!userId) {
+        console.log('[InvestmentAssetsView] No user ID, using demo mode');
+        setMode('demo');
+        setLoading(false);
+        return;
+      }
+
+      console.log(`[InvestmentAssetsView] Loading data for user ${userId}`);
+
       const context = await determineGoldenTreesMode(userId);
       setMode(context.mode);
 
       if (context.mode === 'active' && userId) {
+        console.log(`[InvestmentAssetsView] User ${userId} has active assets, loading details`);
+
         const [assetsData, maintenanceData] = await Promise.all([
           getGoldenTreeAssets(userId),
           clientMaintenanceService.getClientMaintenanceRecords('investment')
         ]);
+
+        console.log(`[InvestmentAssetsView] Loaded ${assetsData.length} assets and ${maintenanceData.length} maintenance records for user ${userId}`);
+
         setAssets(assetsData);
         setMaintenanceRecords(maintenanceData);
       }
     } catch (error) {
-      console.error('Error loading golden trees data:', error);
+      console.error('[InvestmentAssetsView] Error loading golden trees data:', error);
     } finally {
       setLoading(false);
     }

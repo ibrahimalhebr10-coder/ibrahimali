@@ -76,14 +76,22 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
       }
 
       if (!user) {
-        console.log('No user found, skipping maintenance records load');
+        console.log('[MyGreenTrees] No user found, skipping maintenance records load');
         setRecords([]);
         setLoading(false);
         return;
       }
 
+      console.log(`[MyGreenTrees] Loading maintenance records for user ${user.id} (identity: ${identity})`);
+
       const pathType = identity === 'agricultural' ? 'agricultural' : 'investment';
       const data = await clientMaintenanceService.getClientMaintenanceRecords(pathType);
+
+      console.log(`[MyGreenTrees] Loaded ${data.length} records for user ${user.id}`);
+
+      if (data.length === 0) {
+        console.warn(`[MyGreenTrees] No maintenance records found for user ${user.id}`);
+      }
 
       if (identity === 'agricultural') {
         setRecords(sortMaintenanceRecordsByPriority(data));
