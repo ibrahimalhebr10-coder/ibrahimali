@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Megaphone, TrendingUp, Users, Target } from 'lucide-react';
+import { Megaphone, TrendingUp, Users, Target, Package } from 'lucide-react';
 import InfluencerPartnersManager from './InfluencerPartnersManager';
+import FeaturedPackageManager from './FeaturedPackageManager';
 
 const MarketingManagement = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'influencers'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'influencers' | 'featured'>('overview');
 
   return (
     <div className="space-y-6">
@@ -41,6 +42,19 @@ const MarketingManagement = () => {
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600" />
           )}
         </button>
+        <button
+          onClick={() => setActiveTab('featured')}
+          className={`px-6 py-3 font-medium transition-colors relative ${
+            activeTab === 'featured'
+              ? 'text-amber-600'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          الباقة المميزة
+          {activeTab === 'featured' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600" />
+          )}
+        </button>
       </div>
 
       {activeTab === 'overview' && (
@@ -58,6 +72,21 @@ const MarketingManagement = () => {
               </h3>
               <p className="text-sm text-gray-600">
                 إدارة المؤثرين ونظام المكافآت التراكمية
+              </p>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('featured')}
+              className="bg-white rounded-xl shadow-sm border border-amber-200 p-6 hover:shadow-md transition-all text-right group"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-lg flex items-center justify-center mb-4">
+                <Package className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors">
+                الباقة المميزة
+              </h3>
+              <p className="text-sm text-gray-600">
+                تخصيص الباقة المؤقتة التي تظهر عند إدخال كود المؤثر
               </p>
             </button>
 
@@ -99,6 +128,8 @@ const MarketingManagement = () => {
       )}
 
       {activeTab === 'influencers' && <InfluencerPartnersManager />}
+
+      {activeTab === 'featured' && <FeaturedPackageManager />}
     </div>
   );
 };

@@ -10,10 +10,8 @@ import {
   Save,
   X,
   CheckCircle,
-  AlertCircle,
-  Package
+  AlertCircle
 } from 'lucide-react';
-import FeaturedPackageManager from './FeaturedPackageManager';
 import {
   influencerMarketingService,
   InfluencerPartner,
@@ -27,7 +25,6 @@ export default function InfluencerPartnersManager() {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [showFeaturedPackage, setShowFeaturedPackage] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -204,13 +201,6 @@ export default function InfluencerPartnersManager() {
             >
               <Settings className="w-4 h-4" />
               الإعدادات
-            </button>
-            <button
-              onClick={() => setShowFeaturedPackage(true)}
-              className="px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors flex items-center gap-2"
-            >
-              <Package className="w-4 h-4" />
-              الباقة المميزة
             </button>
             <button
               onClick={() => setShowAddForm(true)}
@@ -553,29 +543,6 @@ export default function InfluencerPartnersManager() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {showFeaturedPackage && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between z-10">
-              <div className="flex items-center gap-3">
-                <Package className="w-6 h-6 text-amber-600" />
-                <h3 className="text-xl font-bold text-slate-800">إدارة الباقة المميزة</h3>
-              </div>
-              <button
-                onClick={() => setShowFeaturedPackage(false)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors"
-              >
-                <X className="w-5 h-5 text-slate-600" />
-              </button>
-            </div>
-
-            <div className="p-6">
-              <FeaturedPackageManager />
-            </div>
           </div>
         </div>
       )}
