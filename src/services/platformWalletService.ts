@@ -38,12 +38,12 @@ export const platformWalletService = {
     return data;
   },
 
-  async transferToWallet(farmId: string, amount: number, pathType: 'agricultural' | 'investment' = 'investment') {
+  async transferToWallet(farmId: string, amount: number, pathType?: 'agricultural' | 'investment') {
     const { data, error } = await supabase
       .rpc('transfer_to_platform_wallet', {
         p_farm_id: farmId,
         p_amount: amount,
-        p_path_type: pathType
+        p_path_type: pathType || null
       });
 
     if (error) throw error;

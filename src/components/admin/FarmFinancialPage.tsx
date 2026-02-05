@@ -67,13 +67,13 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
     const formData = new FormData(e.currentTarget);
     const amount = parseFloat(formData.get('amount') as string);
 
-    if (!pathBalance || amount > pathBalance.current_balance) {
+    if (!totalBalance || amount > totalBalance.current_balance) {
       alert('المبلغ أكبر من الرصيد المتاح');
       return;
     }
 
     try {
-      const result = await platformWalletService.transferToWallet(farmId, amount, activeTab);
+      const result = await platformWalletService.transferToWallet(farmId, amount);
 
       if (result.success) {
         alert('تم التحويل بنجاح!');
@@ -120,7 +120,7 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
             <Plus className="w-4 h-4" />
             إضافة عملية
           </button>
-          {pathBalance && pathBalance.current_balance > 0 && (
+          {totalBalance && totalBalance.current_balance > 0 && (
             <button
               onClick={() => setShowTransferModal(true)}
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -325,25 +325,26 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">دفع فائض مالي إلى محفظة المنصة</h3>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 text-sm text-blue-800">
-              <div className="font-medium mb-1">📋 ملاحظة مهمة:</div>
-              <div>سيتم الدفع من المسار النشط حالياً: <span className="font-bold">
-                {activeTab === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
-              </span></div>
-            </div>
-
-            <div className={`border rounded-lg p-4 mb-4 ${
-              activeTab === 'agricultural'
-                ? 'bg-green-50 border-green-200'
-                : 'bg-amber-50 border-amber-200'
-            }`}>
-              <div className={`text-sm ${
-                activeTab === 'agricultural' ? 'text-green-800' : 'text-amber-800'
-              }`}>
-                <div className="font-medium mb-1">
-                  الرصيد المتاح للدفع:
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-lg p-4 mb-4">
+              <div className="text-sm text-gray-700 mb-3">
+                الرصيد الكلي للمزرعة من جميع المسارات:
+              </div>
+              <div className="text-3xl font-bold text-blue-600">
+                {totalBalance?.current_balance.toLocaleString() || 0} ر.س
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-3 pt-3 border-t border-blue-200">
+                <div className="text-xs">
+                  <div className="text-gray-500 mb-1">أشجاري الخضراء</div>
+                  <div className={`font-bold ${pathBalance && activeTab === 'agricultural' ? (pathBalance.current_balance >= 0 ? 'text-green-600' : 'text-red-600') : 'text-gray-400'}`}>
+                    {activeTab === 'agricultural' ? `${pathBalance?.current_balance.toLocaleString() || 0} ر.س` : '---'}
+                  </div>
                 </div>
-                <div className="text-2xl font-bold">{pathBalance?.current_balance.toLocaleString() || 0} ر.س</div>
+                <div className="text-xs">
+                  <div className="text-gray-500 mb-1">أشجاري الذهبية</div>
+                  <div className={`font-bold ${pathBalance && activeTab === 'investment' ? (pathBalance.current_balance >= 0 ? 'text-amber-600' : 'text-red-600') : 'text-gray-400'}`}>
+                    {activeTab === 'investment' ? `${pathBalance?.current_balance.toLocaleString() || 0} ر.س` : '---'}
+                  </div>
+                </div>
               </div>
             </div>
             <form onSubmit={handleTransfer} className="space-y-4">
@@ -357,7 +358,7 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
                   required
                   min="0.01"
                   step="0.01"
-                  max={pathBalance?.current_balance}
+                  max={totalBalance?.current_balance}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
