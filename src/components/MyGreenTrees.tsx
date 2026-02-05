@@ -265,8 +265,9 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
       return (
         <div
           key="loading-details"
-          className={`min-h-screen bg-gradient-to-br ${bgColor} py-8 px-4 pb-32`}
+          className={`min-h-screen bg-gradient-to-br ${bgColor} py-8 px-4 pb-48 overflow-y-auto`}
           dir="rtl"
+          style={{ paddingBottom: '200px' }}
         >
           <div className="max-w-4xl mx-auto">
             <button
@@ -307,8 +308,9 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
     return (
       <div
         key={`details-${selectedRecord}-${maintenanceDetails.id}`}
-        className={`min-h-screen bg-gradient-to-br ${bgColor} py-8 px-4 pb-32`}
+        className={`min-h-screen bg-gradient-to-br ${bgColor} py-8 px-4 pb-48 overflow-y-auto`}
         dir="rtl"
+        style={{ paddingBottom: '200px' }}
       >
         <div className="max-w-4xl mx-auto">
           <button
@@ -504,8 +506,9 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
 
   return (
     <div
-      className={`min-h-screen py-8 px-4 pb-32 bg-gradient-to-br ${bgColor}`}
+      className={`min-h-screen py-8 px-4 pb-48 bg-gradient-to-br ${bgColor} overflow-y-auto`}
       dir="rtl"
+      style={{ paddingBottom: '200px' }}
     >
       <div className="max-w-6xl mx-auto">
         <div className={`bg-gradient-to-r ${headerColor} rounded-3xl shadow-2xl p-8 mb-8 text-white`}>
