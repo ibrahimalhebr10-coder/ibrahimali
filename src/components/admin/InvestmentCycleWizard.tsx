@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Upload, CheckCircle, AlertCircle, TrendingUp, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
 import { investmentCyclesService, InvestmentCycle, InvestmentCycleReadiness } from '../../services/investmentCyclesService';
-import { farmService } from '../../services/farmService';
+import { operationsService } from '../../services/operationsService';
 
 interface InvestmentCycleWizardProps {
   cycleId?: string;
@@ -44,7 +44,7 @@ export default function InvestmentCycleWizard({ cycleId, onClose, onSuccess }: I
 
   const loadFarms = async () => {
     try {
-      const data = await farmService.getAllFarms();
+      const data = await operationsService.getFarms();
       setFarms(data || []);
     } catch (error) {
       console.error('Error loading farms:', error);
@@ -194,8 +194,9 @@ export default function InvestmentCycleWizard({ cycleId, onClose, onSuccess }: I
   };
 
   const selectedFarm = farms.find(f => f.id === formData.farm_id);
-  const costPerTree = selectedFarm && selectedFarm.total_trees > 0
-    ? (formData.total_amount / selectedFarm.total_trees).toFixed(2)
+  const reservedInvestmentTrees = selectedFarm?.reserved_investment_trees || 0;
+  const costPerTree = selectedFarm && reservedInvestmentTrees > 0
+    ? (formData.total_amount / reservedInvestmentTrees).toFixed(2)
     : '0.00';
 
   return (
@@ -259,7 +260,7 @@ export default function InvestmentCycleWizard({ cycleId, onClose, onSuccess }: I
               <option value="">اختر المزرعة</option>
               {farms.map(farm => (
                 <option key={farm.id} value={farm.id}>
-                  {farm.name_ar} ({farm.total_trees} شجرة)
+                  {farm.name_ar} ({farm.reserved_investment_trees || 0} محجوزة من {farm.total_trees} شجرة)
                 </option>
               ))}
             </select>
@@ -328,12 +329,34 @@ export default function InvestmentCycleWizard({ cycleId, onClose, onSuccess }: I
               required
             />
             {selectedFarm && (
-              <div className="mt-2 p-3 bg-amber-50 rounded-lg flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-amber-600" />
-                <span className="text-sm text-amber-900">
-                  <strong>تكلفة الشجرة:</strong> {costPerTree} ريال
-                  (المبلغ ÷ {selectedFarm.total_trees} شجرة)
-                </span>
+              <div className="mt-2 space-y-2">
+                {reservedInvestmentTrees > 0 ? (
+                  <div className="p-3 bg-amber-50 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <TrendingUp className="w-5 h-5 text-amber-600" />
+                      <span className="text-sm font-bold text-amber-900">حساب التكلفة للأشجار المحجوزة</span>
+                    </div>
+                    <div className="text-sm text-amber-900 space-y-1">
+                      <p><strong>تكلفة الشجرة:</strong> {costPerTree} ريال</p>
+                      <p className="text-xs text-amber-700">
+                        (المبلغ {formData.total_amount} ÷ {reservedInvestmentTrees} شجرة محجوزة في أشجاري الذهبية)
+                      </p>
+                      <p className="text-xs text-gray-600 mt-2">
+                        إجمالي أشجار المزرعة: {selectedFarm.total_trees?.toLocaleString() || 0}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-5 h-5 text-red-600" />
+                      <span className="text-sm font-bold text-red-900">تحذير: لا توجد أشجار محجوزة</span>
+                    </div>
+                    <p className="text-xs text-red-700 mt-2">
+                      لا يوجد حجوزات في مسار أشجاري الذهبية لهذه المزرعة. لن يتم احتساب رسوم على المستثمرين.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>
