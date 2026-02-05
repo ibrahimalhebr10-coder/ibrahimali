@@ -35,6 +35,7 @@ interface Contract {
   bonus_years: number | null;
   status: string;
   created_at: string;
+  path_type: 'agricultural' | 'investment';
 }
 
 interface FarmWithContracts {
@@ -100,7 +101,8 @@ const MyContracts: React.FC = () => {
           duration_years: reservation.duration_years,
           bonus_years: reservation.bonus_years,
           status: reservation.status,
-          created_at: reservation.created_at
+          created_at: reservation.created_at,
+          path_type: reservation.path_type || 'agricultural'
         });
       });
 
@@ -133,14 +135,19 @@ const MyContracts: React.FC = () => {
     return TreePine;
   };
 
-  const getContractTypeBadge = (contractName: string | null) => {
-    if (!contractName) {
-      return { label: 'عقد زراعي', color: 'from-green-500 to-emerald-600' };
+  const getContractTypeBadge = (pathType: 'agricultural' | 'investment') => {
+    if (pathType === 'investment') {
+      return {
+        label: 'عقد أشجاري الذهبية',
+        color: 'from-amber-500 to-yellow-600',
+        icon: TrendingUp
+      };
     }
-    if (contractName.toLowerCase().includes('investment') || contractName.toLowerCase().includes('استثماري')) {
-      return { label: 'عقد استثماري', color: 'from-amber-500 to-yellow-600' };
-    }
-    return { label: 'عقد زراعي', color: 'from-green-500 to-emerald-600' };
+    return {
+      label: 'عقد أشجاري الخضراء',
+      color: 'from-green-500 to-emerald-600',
+      icon: Sparkles
+    };
   };
 
   const getStatusBadge = (status: string) => {
@@ -222,11 +229,12 @@ const MyContracts: React.FC = () => {
         {farmsWithContracts.map((farm) => (
           <div key={farm.farm_id} className="space-y-4">
             {farm.contracts.map((contract) => {
-              const badge = getContractTypeBadge(contract.contract_name);
+              const badge = getContractTypeBadge(contract.path_type);
               const statusBadge = getStatusBadge(contract.status);
               const StatusIcon = statusBadge.icon;
+              const ContractIcon = badge.icon;
               const treeTypesList = parseTreeTypes(contract.tree_types);
-              const isAgriculturalContract = badge.label === 'عقد زراعي';
+              const isAgriculturalContract = contract.path_type === 'agricultural';
 
               return (
                 <div
@@ -257,7 +265,7 @@ const MyContracts: React.FC = () => {
                             <div
                               className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${badge.color} flex items-center justify-center shadow-xl`}
                             >
-                              <Scroll className="w-8 h-8 text-white" strokeWidth={2.5} />
+                              <ContractIcon className="w-8 h-8 text-white" strokeWidth={2.5} />
                             </div>
                             <div>
                               <h2 className="text-2xl font-black mb-1" style={{ color: isAgriculturalContract ? '#059669' : '#d97706' }}>
