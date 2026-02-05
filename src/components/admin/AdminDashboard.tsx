@@ -12,7 +12,8 @@ import {
   ClipboardList,
   Wrench,
   DollarSign,
-  Users
+  Users,
+  Flame
 } from 'lucide-react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import DashboardOverview from './DashboardOverview';
@@ -25,11 +26,13 @@ import FarmOffersManager from './FarmOffersManager';
 import OperationsSection from './OperationsSection';
 import FinanceSection from './FinanceSection';
 import CustomersSection from './CustomersSection';
+import HotLeadsDashboard from './HotLeadsDashboard';
 
 type AdminSection =
   | 'overview'
   | 'farms'
   | 'farm-offers'
+  | 'hot-leads'
   | 'customers'
   | 'operations'
   | 'finance'
@@ -45,6 +48,7 @@ const AdminDashboard: React.FC = () => {
 
   const menuItems = [
     { id: 'overview' as AdminSection, label: 'الرئيسية', icon: LayoutDashboard, color: 'blue' },
+    { id: 'hot-leads' as AdminSection, label: 'العملاء الساخنون', icon: Flame, color: 'red' },
     { id: 'farms' as AdminSection, label: 'المزارع', icon: Layers, color: 'green' },
     { id: 'farm-offers' as AdminSection, label: 'عروض المزارع', icon: ClipboardList, color: 'emerald' },
     { id: 'customers' as AdminSection, label: 'العملاء', icon: Users, color: 'cyan' },
@@ -73,6 +77,8 @@ const AdminDashboard: React.FC = () => {
     switch (activeSection) {
       case 'overview':
         return <DashboardOverview />;
+      case 'hot-leads':
+        return <HotLeadsDashboard />;
       case 'farms':
         return <FarmCardsManagement />;
       case 'farm-offers':
@@ -99,6 +105,7 @@ const AdminDashboard: React.FC = () => {
   const getColorClasses = (color: string) => {
     const colors = {
       blue: 'text-blue-600',
+      red: 'text-red-600',
       green: 'text-green-600',
       cyan: 'text-cyan-600',
       purple: 'text-purple-600',

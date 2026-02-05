@@ -29,9 +29,11 @@ import { OfferModeProvider, useOfferMode } from './contexts/OfferModeContext';
 import { useDemoMode } from './contexts/DemoModeContext';
 import DemoWelcomeScreen from './components/DemoWelcomeScreen';
 import { initializeSupabase } from './lib/supabase';
+import { useLeadTracking } from './hooks/useLeadTracking';
 
 function AppContent() {
   const { user, identity, updateIdentity } = useAuth();
+  useLeadTracking();
   const { admin } = useAdminAuth();
   const { isOfferMode, enterOfferMode } = useOfferMode();
   const { isDemoMode, demoType, enterDemoMode, exitDemoMode, showDemoWelcome, setShowDemoWelcome } = useDemoMode();

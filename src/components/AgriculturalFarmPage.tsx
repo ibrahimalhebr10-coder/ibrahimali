@@ -9,6 +9,7 @@ import PaymentMethodSelector from './PaymentMethodSelector';
 import PrePaymentRegistration from './PrePaymentRegistration';
 import PaymentSuccessScreen from './PaymentSuccessScreen';
 import PackageDetailsModal from './PackageDetailsModal';
+import { usePageTracking } from '../hooks/useLeadTracking';
 
 interface AgriculturalFarmPageProps {
   farm: FarmProject;
@@ -18,6 +19,11 @@ interface AgriculturalFarmPageProps {
 
 export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: AgriculturalFarmPageProps) {
   const { user } = useAuth();
+  const leadService = usePageTracking('مزرعة زراعية');
+
+  useEffect(() => {
+    leadService.trackFarmView(farm.id, farm.name);
+  }, [farm.id, farm.name]);
   const [packages, setPackages] = useState<AgriculturalPackage[]>([]);
   const [selectedPackage, setSelectedPackage] = useState<AgriculturalPackage | null>(null);
   const [selectedContract, setSelectedContract] = useState<FarmContract | null>(null);
