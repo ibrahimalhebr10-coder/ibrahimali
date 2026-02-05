@@ -8,7 +8,7 @@ import AccountProfile from './components/AccountProfile';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
 import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
 import MyReservations from './components/MyReservations';
-import MyGreenTrees from './components/MyGreenTrees';
+import MyTrees from './components/MyTrees';
 import MaintenancePaymentPage from './components/MaintenancePaymentPage';
 import MaintenancePaymentResult from './components/MaintenancePaymentResult';
 import QuickAccountAccess from './components/QuickAccountAccess';
@@ -52,7 +52,7 @@ function AppContent() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
-  const [showMyGreenTrees, setShowMyGreenTrees] = useState(false);
+  const [showMyTrees, setShowMyTrees] = useState(false);
   const [showMaintenancePayment, setShowMaintenancePayment] = useState(false);
   const [selectedMaintenanceId, setSelectedMaintenanceId] = useState<string | null>(null);
   const [showPaymentResult, setShowPaymentResult] = useState(false);
@@ -465,17 +465,13 @@ function AppContent() {
   };
 
   const handleMyFarmClick = () => {
-    const filterType = identity === 'agricultural' ? 'agricultural' : 'investment';
-    const filterLabel = identity === 'agricultural' ? 'أشجاري الخضراء 🌿' : 'أشجاري الذهبية 🌟';
-
-    console.log(`🏠 [Footer Button] Clicked "${filterLabel}"`);
-    console.log(`🎯 [Footer Button] Setting filter: ${filterType}`);
+    console.log(`🏠 [Footer Button] Clicked "أشجاري"`);
 
     if (!user) {
       console.log(`⚠️ [Footer Button] No user - entering demo mode`);
       const demoType = identity === 'agricultural' ? 'green' : 'golden';
       enterDemoMode(demoType);
-      setShowMyGreenTrees(true);
+      setShowMyTrees(true);
       return;
     }
 
@@ -484,9 +480,8 @@ function AppContent() {
       exitDemoMode();
     }
 
-    console.log(`✅ [Footer Button] Opening Account Profile with filter: ${filterType}`);
-    setAccountContractFilter(filterType);
-    setShowAccountProfile(true);
+    console.log(`✅ [Footer Button] Opening My Trees`);
+    setShowMyTrees(true);
   };
 
   const handleOfferFarmClick = () => {
@@ -1269,7 +1264,7 @@ function AppContent() {
         }}
         onOpenGreenTrees={() => {
           setShowAccountProfile(false);
-          setShowMyGreenTrees(true);
+          setShowMyTrees(true);
         }}
       />
 
@@ -1318,36 +1313,29 @@ function AppContent() {
         onClose={() => setShowMyReservations(false)}
       />
 
-      {showMyGreenTrees && (
-        <div className="fixed inset-0 z-50 bg-white overflow-auto">
-          <button
-            onClick={() => {
-              setShowMyGreenTrees(false);
-              if (isDemoMode) {
-                exitDemoMode();
-              }
-            }}
-            className="fixed top-4 left-4 z-50 w-12 h-12 bg-white rounded-full shadow-xl flex items-center justify-center hover:bg-gray-50 transition-colors"
-          >
-            <X className="w-6 h-6 text-gray-700" />
-          </button>
-          <MyGreenTrees
-            onNavigateToPayment={(maintenanceId) => {
-              setSelectedMaintenanceId(maintenanceId);
-              setShowMyGreenTrees(false);
-              setShowMaintenancePayment(true);
-            }}
-            onShowAuth={(mode) => {
-              setShowMyGreenTrees(false);
+      {showMyTrees && (
+        <MyTrees
+          onClose={() => {
+            setShowMyTrees(false);
+            if (isDemoMode) {
               exitDemoMode();
-              if (mode === 'login') {
-                setShowAccountProfile(true);
-              } else {
-                setShowStandaloneRegistration(true);
-              }
-            }}
-          />
-        </div>
+            }
+          }}
+          onNavigateToPayment={(maintenanceId) => {
+            setSelectedMaintenanceId(maintenanceId);
+            setShowMyTrees(false);
+            setShowMaintenancePayment(true);
+          }}
+          onShowAuth={(mode) => {
+            setShowMyTrees(false);
+            exitDemoMode();
+            if (mode === 'login') {
+              setShowAccountProfile(true);
+            } else {
+              setShowStandaloneRegistration(true);
+            }
+          }}
+        />
       )}
 
       {showDemoWelcome && (
@@ -1365,7 +1353,7 @@ function AppContent() {
             onClose={() => {
               setShowMaintenancePayment(false);
               setSelectedMaintenanceId(null);
-              setShowMyGreenTrees(true);
+              setShowMyTrees(true);
             }}
             onSuccess={() => {
               setShowMaintenancePayment(false);
@@ -1381,7 +1369,7 @@ function AppContent() {
           <MaintenancePaymentResult
             onReturnHome={() => {
               setShowPaymentResult(false);
-              setShowMyGreenTrees(true);
+              setShowMyTrees(true);
               window.history.replaceState({}, '', window.location.pathname);
             }}
           />

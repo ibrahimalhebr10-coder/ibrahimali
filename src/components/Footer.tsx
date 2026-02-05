@@ -14,7 +14,6 @@ export default function Footer({ identity, onMyFarmClick, onOfferFarmClick }: Fo
   const gradient = isAgricultural
     ? 'linear-gradient(135deg, #3aa17e 0%, #2f8266 100%)'
     : 'linear-gradient(135deg, #d4af37 0%, #b8942f 100%)';
-  const buttonLabel = isAgricultural ? 'أشجاري الخضراء' : 'أشجاري الذهبية';
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-30 pb-safe">
@@ -26,14 +25,14 @@ export default function Footer({ identity, onMyFarmClick, onOfferFarmClick }: Fo
         }}
       >
         <div className="max-w-md mx-auto px-4 py-3 space-y-2">
-          {/* زر مزرعتي - الأصلي */}
+          {/* زر أشجاري - ديناميكي */}
           <button
             onClick={onMyFarmClick}
             className="w-full py-4 rounded-2xl font-bold text-white text-lg shadow-lg hover:shadow-xl transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3"
             style={{ background: gradient }}
           >
             <Home className="w-6 h-6" />
-            <span>{buttonLabel}</span>
+            <span>أشجاري</span>
           </button>
 
           {/* زر اعرض مزرعتك */}
