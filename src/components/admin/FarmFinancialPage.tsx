@@ -11,7 +11,8 @@ interface FarmFinancialPageProps {
 
 export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFinancialPageProps) {
   const [activeTab, setActiveTab] = useState<'agricultural' | 'investment'>('agricultural');
-  const [balance, setBalance] = useState<FarmBalance | null>(null);
+  const [totalBalance, setTotalBalance] = useState<FarmBalance | null>(null);
+  const [pathBalance, setPathBalance] = useState<FarmBalance | null>(null);
   const [transactions, setTransactions] = useState<FarmFinancialTransaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -24,11 +25,13 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
   const loadData = async () => {
     try {
       setLoading(true);
-      const [balanceData, transactionsData] = await Promise.all([
+      const [totalBalanceData, pathBalanceData, transactionsData] = await Promise.all([
+        farmFinancialService.getFarmBalance(farmId),
         farmFinancialService.getFarmBalance(farmId, activeTab),
         farmFinancialService.getFarmTransactions(farmId, activeTab)
       ]);
-      setBalance(balanceData);
+      setTotalBalance(totalBalanceData);
+      setPathBalance(pathBalanceData);
       setTransactions(transactionsData);
     } catch (error) {
       console.error('Error loading financial data:', error);
@@ -64,13 +67,13 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
     const formData = new FormData(e.currentTarget);
     const amount = parseFloat(formData.get('amount') as string);
 
-    if (!balance || amount > balance.current_balance) {
+    if (!pathBalance || amount > pathBalance.current_balance) {
       alert('المبلغ أكبر من الرصيد المتاح');
       return;
     }
 
     try {
-      const result = await platformWalletService.transferToWallet(farmId, amount);
+      const result = await platformWalletService.transferToWallet(farmId, amount, activeTab);
 
       if (result.success) {
         alert('تم التحويل بنجاح!');
@@ -127,8 +130,9 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
         </div>
       </div>
 
-      {/* Summary Card */}
+      {/* Summary Card - إجمالي كل المسارات */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="text-xs text-gray-500 mb-3 text-center">الملخص الكلي لجميع المسارات</div>
         <div className="grid grid-cols-3 gap-6">
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 text-green-600 mb-2">
@@ -136,7 +140,7 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
               <span className="text-sm font-medium">إجمالي الإيرادات</span>
             </div>
             <div className="text-2xl font-bold text-gray-900">
-              {balance?.total_income.toLocaleString() || 0} ر.س
+              {totalBalance?.total_income.toLocaleString() || 0} ر.س
             </div>
           </div>
           <div className="text-center">
@@ -145,16 +149,16 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
               <span className="text-sm font-medium">إجمالي المصروفات</span>
             </div>
             <div className="text-2xl font-bold text-gray-900">
-              {balance?.total_expenses.toLocaleString() || 0} ر.س
+              {totalBalance?.total_expenses.toLocaleString() || 0} ر.س
             </div>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 text-blue-600 mb-2">
               <Wallet className="w-5 h-5" />
-              <span className="text-sm font-medium">الرصيد الحالي</span>
+              <span className="text-sm font-medium">الرصيد الكلي</span>
             </div>
             <div className="text-2xl font-bold text-gray-900">
-              {balance?.current_balance.toLocaleString() || 0} ر.س
+              {totalBalance?.current_balance.toLocaleString() || 0} ر.س
             </div>
           </div>
         </div>
@@ -318,10 +322,18 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">دفع فائض مالي إلى محفظة المنصة</h3>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-              <div className="text-sm text-blue-800">
-                <div className="font-medium mb-1">الرصيد المتاح:</div>
-                <div className="text-2xl font-bold">{balance?.current_balance.toLocaleString() || 0} ر.س</div>
+            <div className={`border rounded-lg p-4 mb-4 ${
+              activeTab === 'agricultural'
+                ? 'bg-green-50 border-green-200'
+                : 'bg-amber-50 border-amber-200'
+            }`}>
+              <div className={`text-sm ${
+                activeTab === 'agricultural' ? 'text-green-800' : 'text-amber-800'
+              }`}>
+                <div className="font-medium mb-1">
+                  الرصيد المتاح - {activeTab === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}:
+                </div>
+                <div className="text-2xl font-bold">{pathBalance?.current_balance.toLocaleString() || 0} ر.س</div>
               </div>
             </div>
             <form onSubmit={handleTransfer} className="space-y-4">
@@ -335,7 +347,7 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
                   required
                   min="0.01"
                   step="0.01"
-                  max={balance?.current_balance}
+                  max={pathBalance?.current_balance}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>

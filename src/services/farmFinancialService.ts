@@ -65,28 +65,25 @@ export const farmFinancialService = {
     return data as FarmFinancialTransaction;
   },
 
-  async updateTransaction(id: string, updates: {
-    amount?: number;
-    description?: string;
-    transaction_date?: string;
-  }) {
+  async createReversalTransaction(originalTransactionId: string, reason: string) {
     const { data, error } = await supabase
-      .from('farm_financial_transactions')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single();
+      .rpc('create_reversal_transaction', {
+        p_original_transaction_id: originalTransactionId,
+        p_reason: reason
+      });
 
     if (error) throw error;
-    return data as FarmFinancialTransaction;
+    return data;
   },
 
-  async deleteTransaction(id: string) {
-    const { error } = await supabase
-      .from('farm_financial_transactions')
-      .delete()
-      .eq('id', id);
+  async getAuditLog(limit: number = 50, offset: number = 0) {
+    const { data, error } = await supabase
+      .rpc('get_financial_audit_log', {
+        p_limit: limit,
+        p_offset: offset
+      });
 
     if (error) throw error;
+    return data;
   }
 };
