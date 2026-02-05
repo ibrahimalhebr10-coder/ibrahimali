@@ -297,13 +297,27 @@ export const operationsService = {
   },
 
   async getFarms() {
-    const { data, error } = await supabase
+    const { data: farmsData, error } = await supabase
       .from('farms')
       .select('id, name_ar, name_en, total_trees')
       .order('name_ar');
 
     if (error) throw error;
-    return data || [];
+
+    const farms = await Promise.all(
+      (farmsData || []).map(async (farm) => {
+        const agricultureTreesCount = await this.getReservedTreesCount(farm.id, 'agricultural');
+        const investmentTreesCount = await this.getReservedTreesCount(farm.id, 'investment');
+
+        return {
+          ...farm,
+          reserved_agricultural_trees: agricultureTreesCount,
+          reserved_investment_trees: investmentTreesCount
+        };
+      })
+    );
+
+    return farms;
   },
 
   async getReservedTreesCount(farmId: string, pathType: 'agricultural' | 'investment'): Promise<number> {

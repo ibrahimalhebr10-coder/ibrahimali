@@ -5,6 +5,8 @@ interface Farm {
   id: string;
   name_ar: string;
   total_trees: number;
+  reserved_agricultural_trees?: number;
+  reserved_investment_trees?: number;
 }
 
 interface MaintenanceStageInput {
@@ -62,8 +64,21 @@ export default function MaintenanceRecordWizard({ farms, onSubmit, onCancel, def
   });
 
   const selectedFarm = farms.find(f => f.id === formData.farm_id);
-  const costPerTree = formData.total_amount && selectedFarm
-    ? (parseFloat(formData.total_amount) / selectedFarm.total_trees).toFixed(2)
+
+  const getReservedTreesCount = () => {
+    if (!selectedFarm) return 0;
+    if (formData.path_type === 'agricultural') {
+      return selectedFarm.reserved_agricultural_trees || 0;
+    }
+    if (formData.path_type === 'investment') {
+      return selectedFarm.reserved_investment_trees || 0;
+    }
+    return 0;
+  };
+
+  const reservedTreesCount = getReservedTreesCount();
+  const costPerTree = formData.total_amount && reservedTreesCount > 0
+    ? (parseFloat(formData.total_amount) / reservedTreesCount).toFixed(2)
     : '0.00';
 
   const handleAddStage = () => {
@@ -530,7 +545,10 @@ export default function MaintenanceRecordWizard({ farms, onSubmit, onCancel, def
                     </div>
                     <div>
                       <h5 className="font-bold text-gray-900 text-lg">{selectedFarm.name_ar}</h5>
-                      <p className="text-green-700">إجمالي الأشجار: {selectedFarm.total_trees} شجرة</p>
+                      <p className="text-green-700">
+                        الأشجار المحجوزة في {formData.path_type === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}: {reservedTreesCount.toLocaleString()} شجرة
+                      </p>
+                      <p className="text-gray-500 text-sm mt-1">إجمالي الأشجار بالمزرعة: {selectedFarm.total_trees.toLocaleString()} شجرة</p>
                     </div>
                   </div>
                 </div>
@@ -553,17 +571,35 @@ export default function MaintenanceRecordWizard({ farms, onSubmit, onCancel, def
                 </div>
 
                 {formData.total_amount && parseFloat(formData.total_amount) > 0 && selectedFarm && (
-                  <div className="bg-white border-2 border-green-300 rounded-xl p-6">
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600 mb-2">إجمالي الرسوم</p>
-                        <p className="text-3xl font-bold text-green-600">{formData.total_amount} ر.س</p>
+                  <div>
+                    {reservedTreesCount > 0 ? (
+                      <div className="bg-white border-2 border-green-300 rounded-xl p-6">
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="text-center">
+                            <p className="text-sm text-gray-600 mb-2">إجمالي الرسوم</p>
+                            <p className="text-3xl font-bold text-green-600">{formData.total_amount} ر.س</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-sm text-gray-600 mb-2">عدد الأشجار المحجوزة</p>
+                            <p className="text-3xl font-bold text-amber-600">{reservedTreesCount}</p>
+                          </div>
+                          <div className="text-center">
+                            <p className="text-sm text-gray-600 mb-2">تكلفة الشجرة الواحدة</p>
+                            <p className="text-3xl font-bold text-blue-600">{costPerTree} ر.س</p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <p className="text-sm text-gray-600 mb-2">تكلفة الشجرة الواحدة</p>
-                        <p className="text-3xl font-bold text-blue-600">{costPerTree} ر.س</p>
+                    ) : (
+                      <div className="bg-red-50 border-2 border-red-300 rounded-xl p-6">
+                        <div className="text-center">
+                          <p className="text-red-700 font-bold mb-2">تحذير: لا توجد أشجار محجوزة</p>
+                          <p className="text-sm text-red-600">
+                            لا يوجد حجوزات في مسار {formData.path_type === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'} لهذه المزرعة.
+                            لن يتم احتساب رسوم على العملاء.
+                          </p>
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
 
