@@ -42,9 +42,14 @@ export default function MaintenancePaymentResult({ onReturnHome }: MaintenancePa
         }
 
         if (status === 'success' && transactionId) {
+          const paymentRecord = await maintenancePaymentService.getPaymentById(paymentId);
+
           const result = await maintenancePaymentService.completePayment(
             paymentId,
-            transactionId
+            transactionId,
+            paymentRecord.amount_due,
+            'electronic_payment',
+            { status: 'success', transaction_id: transactionId }
           );
 
           setSuccess(true);
