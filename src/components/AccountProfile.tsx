@@ -3,8 +3,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import IdentityManager from './IdentityManager';
 import MyContracts from './MyContracts';
+import InfluencerDashboard from './InfluencerDashboard';
 import { type IdentityType, identityService } from '../services/identityService';
 import { deviceRecognitionService } from '../services/deviceRecognitionService';
+import { influencerMarketingService } from '../services/influencerMarketingService';
 
 interface AccountProfileProps {
   isOpen: boolean;
@@ -25,6 +27,7 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [primaryIdentity, setPrimaryIdentity] = useState<IdentityType | null>(null);
   const [isLoadingIdentity, setIsLoadingIdentity] = useState(true);
+  const [isInfluencer, setIsInfluencer] = useState(false);
 
   useEffect(() => {
     const loadPrimaryIdentity = async () => {
@@ -34,12 +37,18 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
       }
 
       setIsLoadingIdentity(true);
-      const identity = await identityService.getUserIdentity(user.id);
+      const [identity, isInfluencerUser] = await Promise.all([
+        identityService.getUserIdentity(user.id),
+        influencerMarketingService.checkIfUserIsInfluencer()
+      ]);
+
       if (identity) {
         setPrimaryIdentity(identity.primaryIdentity);
       } else {
         setPrimaryIdentity('agricultural');
       }
+
+      setIsInfluencer(isInfluencerUser);
       setIsLoadingIdentity(false);
     };
 
@@ -268,6 +277,12 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
                 </div>
 
                 <MyContracts filterByPathType={contractFilter} />
+
+                {isInfluencer && (
+                  <div className="mb-6">
+                    <InfluencerDashboard />
+                  </div>
+                )}
 
                 {onOpenGreenTrees && (
                   <button

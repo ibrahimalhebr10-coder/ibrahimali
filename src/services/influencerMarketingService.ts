@@ -41,6 +41,28 @@ export interface UpdateInfluencerPartnerData {
   notes?: string;
 }
 
+export interface InfluencerStats {
+  total_bookings: number;
+  total_trees_booked: number;
+  total_rewards_earned: number;
+  trees_in_current_batch: number;
+  trees_until_next_reward: number;
+  progress_percentage: number;
+}
+
+export interface InfluencerActivityLog {
+  id: string;
+  created_at: string;
+  activity_date: string;
+  farm_name: string;
+  farm_location: string | null;
+  trees_referred: number;
+  trees_earned: number;
+  trees_in_current_batch: number;
+  trees_until_next_reward: number;
+  notes: string | null;
+}
+
 export const influencerMarketingService = {
   async getAllPartners(): Promise<InfluencerPartner[]> {
     const { data, error } = await supabase
@@ -179,5 +201,56 @@ export const influencerMarketingService = {
 
     if (error) throw error;
     return data || [];
+  },
+
+  async getMyInfluencerStats(): Promise<InfluencerStats | null> {
+    const { data, error } = await supabase
+      .from('influencer_rewards_details')
+      .select('total_bookings, total_trees_booked, total_rewards_earned, trees_in_current_batch, trees_until_next_reward, progress_percentage')
+      .eq('is_active', true)
+      .limit(1)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null;
+      }
+      throw error;
+    }
+
+    return data;
+  },
+
+  async getMyActivityLog(): Promise<InfluencerActivityLog[]> {
+    const { data, error } = await supabase
+      .from('influencer_activity_log')
+      .select('id, created_at, activity_date, farm_name, farm_location, trees_referred, trees_earned, trees_in_current_batch, trees_until_next_reward, notes')
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  async checkIfUserIsInfluencer(): Promise<boolean> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return false;
+
+    const { data, error } = await supabase
+      .from('influencer_partners')
+      .select('id')
+      .eq('user_id', user.id)
+      .eq('is_active', true)
+      .limit(1)
+      .single();
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return false;
+      }
+      throw error;
+    }
+
+    return !!data;
   }
 };
