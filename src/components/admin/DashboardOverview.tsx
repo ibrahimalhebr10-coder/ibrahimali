@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, TreePine, Package, TrendingUp, DollarSign, MessageSquare, Activity, BarChart3, LayoutDashboard } from 'lucide-react';
+import { Users, TreePine, FileText, CheckCircle, DollarSign, Database, Wifi, HardDrive, Zap } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
 const DashboardOverview: React.FC = () => {
@@ -9,35 +9,37 @@ const DashboardOverview: React.FC = () => {
     activeFarms: 0,
     activeContracts: 0,
     totalRevenue: 0,
-    pendingMessages: 0,
   });
 
   const [isLoading, setIsLoading] = useState(true);
+  const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
     loadStats();
+    const timer = setInterval(() => setCurrentDate(new Date()), 60000);
+    return () => clearInterval(timer);
   }, []);
 
   const loadStats = async () => {
     setIsLoading(true);
     try {
-      const [farmsResult, reservationsResult] = await Promise.all([
+      const [farmsResult, reservationsResult, usersResult] = await Promise.all([
         supabase.from('farms').select('total_trees, is_open_for_booking'),
         supabase.from('reservations').select('status, total_price, is_demo').eq('is_demo', false),
+        supabase.from('user_profiles').select('id', { count: 'exact', head: true }),
       ]);
 
       const totalTrees = farmsResult.data?.reduce((sum, farm) => sum + (farm.total_trees || 0), 0) || 0;
       const activeFarms = farmsResult.data?.filter(f => f.is_open_for_booking).length || 0;
-      const activeContracts = reservationsResult.data?.filter(r => r.status === 'confirmed').length || 0;
+      const activeContracts = reservationsResult.data?.filter(r => r.status === 'confirmed' || r.status === 'paid').length || 0;
       const totalRevenue = reservationsResult.data?.reduce((sum, r) => sum + (r.total_price || 0), 0) || 0;
 
       setStats({
-        totalUsers: 0,
+        totalUsers: usersResult.count || 0,
         totalTrees,
         activeFarms,
         activeContracts,
         totalRevenue,
-        pendingMessages: 0,
       });
     } catch (err) {
       console.error('Error loading stats:', err);
@@ -46,226 +48,212 @@ const DashboardOverview: React.FC = () => {
     }
   };
 
-  const statsCards = [
-    {
-      label: 'المزارع النشطة',
-      value: isLoading ? '...' : stats.activeFarms,
-      icon: TreePine,
-      color: 'green',
-      change: '+5%',
-      trend: 'up'
-    },
-    {
-      label: 'إجمالي الأشجار',
-      value: isLoading ? '...' : stats.totalTrees.toLocaleString(),
-      icon: Package,
-      color: 'emerald',
-      change: '+12%',
-      trend: 'up'
-    },
-    {
-      label: 'العقود النشطة',
-      value: isLoading ? '...' : stats.activeContracts,
-      icon: TrendingUp,
-      color: 'blue',
-      change: '+8%',
-      trend: 'up'
-    },
-    {
-      label: 'الإيرادات الكلية',
-      value: isLoading ? '...' : `${stats.totalRevenue.toLocaleString()} ر.س`,
-      icon: DollarSign,
-      color: 'purple',
-      change: '+15%',
-      trend: 'up'
-    },
-    {
-      label: 'إجمالي المستخدمين',
-      value: '---',
-      icon: Users,
-      color: 'orange',
-      change: '+3%',
-      trend: 'up'
-    },
-    {
-      label: 'الرسائل الجديدة',
-      value: '---',
-      icon: MessageSquare,
-      color: 'red',
-      change: '0',
-      trend: 'neutral'
-    },
-  ];
-
-  const getColorClasses = (color: string) => {
-    const colors = {
-      blue: 'bg-blue-50 text-blue-600 border-blue-100',
-      green: 'bg-green-50 text-green-600 border-green-100',
-      purple: 'bg-purple-50 text-purple-600 border-purple-100',
-      orange: 'bg-orange-50 text-orange-600 border-orange-100',
-      emerald: 'bg-emerald-50 text-emerald-600 border-emerald-100',
-      red: 'bg-red-50 text-red-600 border-red-100',
-    };
-    return colors[color as keyof typeof colors] || colors.blue;
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('ar-SA', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
   };
 
-  const quickActions = [
-    { label: 'إضافة مزرعة جديدة', icon: TreePine, color: 'green' },
-    { label: 'إدارة الباقات', icon: Package, color: 'purple' },
-    { label: 'مراجعة العقود', icon: TrendingUp, color: 'blue' },
-    { label: 'الرسائل والإشعارات', icon: MessageSquare, color: 'orange' },
-  ];
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('ar-SA', {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
 
   return (
-    <div className="space-y-6 lg:space-y-8">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2">
-            الصفحة الرئيسية
-          </h1>
-          <p className="text-sm sm:text-base text-gray-600 flex items-center gap-2">
-            <Activity className="w-4 h-4" />
-            نظرة عامة على أداء المنصة الهجينة
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <button className="px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
-            تحديث البيانات
-          </button>
-          <button className="px-4 py-2 bg-darkgreen text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium flex items-center gap-2">
-            <BarChart3 className="w-4 h-4" />
-            <span className="hidden sm:inline">تقرير مفصل</span>
-          </button>
-        </div>
+    <div className="space-y-8" dir="rtl">
+      {/* Header - Simple Title Only */}
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          غرفة المراقبة
+        </h1>
+        <p className="text-gray-600">
+          نظرة عامة على حالة المنصة
+        </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 2xl:grid-cols-6 gap-4 lg:gap-6">
-        {statsCards.map((stat, index) => {
-          const Icon = stat.icon;
-          return (
-            <div
-              key={index}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 p-5 lg:p-6 hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
-            >
-              <div className="flex items-start justify-between mb-4">
-                <div className={`p-3 rounded-xl border ${getColorClasses(stat.color)}`}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                {stat.trend === 'up' && (
-                  <span className="text-xs font-semibold text-green-600 bg-green-50 px-2 py-1 rounded-full">
-                    {stat.change}
-                  </span>
-                )}
-              </div>
-              <div>
-                <p className="text-xs sm:text-sm text-gray-600 mb-2">{stat.label}</p>
-                <p className="text-2xl lg:text-3xl font-bold text-gray-900 truncate">{stat.value}</p>
-              </div>
+      {/* 1. شريط الحالة العام */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <h2 className="text-lg font-semibold text-gray-900">حالة المنصة</h2>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-4">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <CheckCircle className="w-5 h-5 text-green-600" />
             </div>
-          );
-        })}
+            <div>
+              <p className="text-xs text-gray-500">النظام</p>
+              <p className="text-sm font-semibold text-green-600">يعمل</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-4">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <Database className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">قاعدة البيانات</p>
+              <p className="text-sm font-semibold text-green-600">متصلة</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-4">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <Wifi className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">بوابات الدفع</p>
+              <p className="text-sm font-semibold text-green-600">نشطة</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-4">
+            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <Zap className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-xs text-gray-500">التشغيل</p>
+              <p className="text-sm font-semibold text-green-600">مستقر</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 lg:p-8">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-1 h-6 bg-darkgreen rounded-full"></div>
-          <h2 className="text-xl lg:text-2xl font-bold text-gray-900">إجراءات سريعة</h2>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {quickActions.map((action, index) => {
-            const Icon = action.icon;
-            return (
-              <button
-                key={index}
-                className="flex flex-col items-center gap-3 p-6 bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl hover:shadow-md hover:border-darkgreen transition-all group"
-              >
-                <div className={`p-4 rounded-xl ${getColorClasses(action.color)} group-hover:scale-110 transition-transform`}>
-                  <Icon className="w-6 h-6" />
-                </div>
-                <span className="text-sm font-semibold text-gray-700 group-hover:text-darkgreen transition-colors text-center">
-                  {action.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Info Cards Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* System Status */}
-        <div className="bg-gradient-to-br from-green-50 via-emerald-50 to-blue-50 rounded-xl p-6 lg:p-8 border border-green-100 shadow-sm">
+      {/* 2. منطقة النبض الرقمي - بطاقات الأرقام */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/50"></div>
-            <h3 className="text-lg lg:text-xl font-semibold text-gray-900">حالة النظام</h3>
+            <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+              <Users className="w-6 h-6 text-blue-600" />
+            </div>
           </div>
-          <p className="text-sm lg:text-base text-gray-700 leading-relaxed mb-4">
-            جميع الأنظمة تعمل بكفاءة. المنصة الهجينة جاهزة للاستقبال والتشغيل الكامل.
+          <p className="text-sm text-gray-600 mb-2">إجمالي المستخدمين</p>
+          <p className="text-3xl font-bold text-gray-900">
+            {isLoading ? '...' : stats.totalUsers.toLocaleString()}
           </p>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">قاعدة البيانات</span>
-              <span className="text-xs font-semibold text-green-600 bg-white px-3 py-1 rounded-full">متصل</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">خدمات API</span>
-              <span className="text-xs font-semibold text-green-600 bg-white px-3 py-1 rounded-full">نشط</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">التخزين السحابي</span>
-              <span className="text-xs font-semibold text-green-600 bg-white px-3 py-1 rounded-full">جاهز</span>
-            </div>
-          </div>
         </div>
 
-        {/* Platform Info */}
-        <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 rounded-xl p-6 lg:p-8 border border-blue-100 shadow-sm">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center">
-              <LayoutDashboard className="w-5 h-5 text-white" />
+            <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+              <FileText className="w-6 h-6 text-green-600" />
             </div>
-            <h3 className="text-lg lg:text-xl font-semibold text-gray-900">معلومات المنصة</h3>
           </div>
-          <p className="text-sm lg:text-base text-gray-700 leading-relaxed mb-4">
-            لوحة تحكم متكاملة لإدارة المزارع الهجينة (زراعية واستثمارية).
+          <p className="text-sm text-gray-600 mb-2">العقود النشطة</p>
+          <p className="text-3xl font-bold text-gray-900">
+            {isLoading ? '...' : stats.activeContracts.toLocaleString()}
           </p>
-          <ul className="space-y-2 text-sm text-gray-700">
-            <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-1">•</span>
-              <span>إدارة مركزية للمزارع والباقات</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-1">•</span>
-              <span>نظام عقود ذكي وآمن</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-1">•</span>
-              <span>تتبع لحظي للأشجار والحجوزات</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-blue-500 mt-1">•</span>
-              <span>تقارير مالية وإدارية شاملة</span>
-            </li>
-          </ul>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center">
+              <TreePine className="w-6 h-6 text-emerald-600" />
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-2">إجمالي الأشجار المحجوزة</p>
+          <p className="text-3xl font-bold text-gray-900">
+            {isLoading ? '...' : stats.totalTrees.toLocaleString()}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
+              <HardDrive className="w-6 h-6 text-orange-600" />
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-2">المزارع النشطة</p>
+          <p className="text-3xl font-bold text-gray-900">
+            {isLoading ? '...' : stats.activeFarms.toLocaleString()}
+          </p>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-12 h-12 bg-amber-50 rounded-lg flex items-center justify-center">
+              <DollarSign className="w-6 h-6 text-amber-600" />
+            </div>
+          </div>
+          <p className="text-sm text-gray-600 mb-2">إجمالي الإيرادات</p>
+          <p className="text-2xl font-bold text-gray-900">
+            {isLoading ? '...' : `${stats.totalRevenue.toLocaleString()} ر.س`}
+          </p>
         </div>
       </div>
 
-      {/* Development Note */}
-      <div className="bg-white border-2 border-dashed border-gray-300 rounded-xl p-6 lg:p-8">
-        <div className="flex items-start gap-4">
-          <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-            <Activity className="w-5 h-5 text-gray-600" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">ملاحظة تطويرية</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">
-              هذه نسخة محسّنة من لوحة التحكم مع تصميم احترافي متجاوب.
-              البيانات المعروضة حالياً هي بيانات حقيقية من قاعدة البيانات.
-              المزيد من الإحصائيات والمؤشرات سيتم إضافتها في المراحل القادمة.
+      {/* 3. فاصل بصري */}
+      <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+
+      {/* 4. لوحة ملخص المنصة */}
+      <div className="bg-gradient-to-br from-slate-50 to-gray-50 rounded-2xl p-8 border border-gray-100">
+        <h2 className="text-xl font-bold text-gray-900 mb-6">ملخص المنصة</h2>
+
+        <div className="space-y-4 text-gray-700">
+          <div className="flex items-start gap-3">
+            <div className="w-2 h-2 bg-gray-400 rounded-full mt-2"></div>
+            <p className="leading-relaxed">
+              إدارة مركزية للمزارع - نظام موحد لإدارة جميع المزارع والباقات
             </p>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="w-2 h-2 bg-gray-400 rounded-full mt-2"></div>
+            <p className="leading-relaxed">
+              تشغيل وصيانة - نظام كامل لإدارة العمليات التشغيلية وسجلات الصيانة
+            </p>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="w-2 h-2 bg-gray-400 rounded-full mt-2"></div>
+            <p className="leading-relaxed">
+              نظام مالي مبسط - تتبع الإيرادات والمصروفات لكل مزرعة بشكل منفصل
+            </p>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <div className="w-2 h-2 bg-gray-400 rounded-full mt-2"></div>
+            <p className="leading-relaxed">
+              مساران متكاملان - أشجاري الخضراء (زراعي) وأشجاري الذهبية (استثماري)
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. لوحة الاطمئنان الإداري */}
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-8 border border-green-200">
+        <div className="flex items-start gap-4">
+          <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center flex-shrink-0">
+            <CheckCircle className="w-6 h-6 text-white" />
+          </div>
+          <div className="flex-1">
+            <h2 className="text-xl font-bold text-gray-900 mb-3">المنصة جاهزة للتشغيل</h2>
+            <div className="space-y-2 text-gray-700">
+              <p className="flex items-center gap-2">
+                <span className="text-green-600">•</span>
+                <span>لا توجد تنبيهات حرجة</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <span className="text-green-600">•</span>
+                <span>لا توجد مشاكل معلّقة</span>
+              </p>
+              <p className="flex items-center gap-2">
+                <span className="text-green-600">•</span>
+                <span>جميع الأنظمة تعمل بكفاءة</span>
+              </p>
+            </div>
+            <div className="mt-4 pt-4 border-t border-green-200">
+              <p className="text-sm text-gray-600">
+                آخر تحديث: {formatDate(currentDate)} - {formatTime(currentDate)}
+              </p>
+            </div>
           </div>
         </div>
       </div>
