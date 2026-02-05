@@ -120,13 +120,15 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
             <Plus className="w-4 h-4" />
             إضافة عملية
           </button>
-          <button
-            onClick={() => setShowTransferModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            <Wallet className="w-4 h-4" />
-            دفع فائض مالي
-          </button>
+          {pathBalance && pathBalance.current_balance > 0 && (
+            <button
+              onClick={() => setShowTransferModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <Wallet className="w-4 h-4" />
+              دفع فائض مالي
+            </button>
+          )}
         </div>
       </div>
 
@@ -322,6 +324,14 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl max-w-md w-full p-6">
             <h3 className="text-xl font-bold text-gray-900 mb-4">دفع فائض مالي إلى محفظة المنصة</h3>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 text-sm text-blue-800">
+              <div className="font-medium mb-1">📋 ملاحظة مهمة:</div>
+              <div>سيتم الدفع من المسار النشط حالياً: <span className="font-bold">
+                {activeTab === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
+              </span></div>
+            </div>
+
             <div className={`border rounded-lg p-4 mb-4 ${
               activeTab === 'agricultural'
                 ? 'bg-green-50 border-green-200'
@@ -331,7 +341,7 @@ export default function FarmFinancialPage({ farmId, farmName, onBack }: FarmFina
                 activeTab === 'agricultural' ? 'text-green-800' : 'text-amber-800'
               }`}>
                 <div className="font-medium mb-1">
-                  الرصيد المتاح - {activeTab === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}:
+                  الرصيد المتاح للدفع:
                 </div>
                 <div className="text-2xl font-bold">{pathBalance?.current_balance.toLocaleString() || 0} ر.س</div>
               </div>
