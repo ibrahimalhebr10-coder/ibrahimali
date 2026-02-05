@@ -57,7 +57,7 @@ export default function MyTrees({ onClose, onNavigateToPayment, onShowAuth }: My
 
   if (activePath === 'golden') {
     return (
-      <div className="fixed inset-0 z-50">
+      <div className="fixed inset-0 z-50 overflow-auto bg-slate-900">
         <InvestmentAssetsView onClose={onClose} />
       </div>
     );
