@@ -41,6 +41,10 @@ export interface FeaturedPackageSettings {
   bonusDuration: number;
   description: string;
   highlightText: string;
+  successTitle: string;
+  successSubtitle: string;
+  successDescription: string;
+  successBenefits: string[];
 }
 
 export interface CreateInfluencerPartnerData {
@@ -312,27 +316,58 @@ export const influencerMarketingService = {
   },
 
   async getFeaturedPackageSettings(): Promise<FeaturedPackageSettings | null> {
-    const { data, error } = await supabase
-      .from('influencer_settings')
-      .select(`
-        featured_package_color,
-        featured_package_border_style,
-        featured_package_congratulation_text,
-        featured_package_name,
-        featured_package_price,
-        featured_package_contract_duration,
-        featured_package_bonus_duration,
-        featured_package_description,
-        featured_package_highlight_text
-      `)
-      .limit(1)
-      .single();
+    const [influencerSettingsResult, systemSettingsResult] = await Promise.all([
+      supabase
+        .from('influencer_settings')
+        .select(`
+          featured_package_color,
+          featured_package_border_style,
+          featured_package_congratulation_text,
+          featured_package_name,
+          featured_package_price,
+          featured_package_contract_duration,
+          featured_package_bonus_duration,
+          featured_package_description,
+          featured_package_highlight_text
+        `)
+        .limit(1)
+        .single(),
+      supabase
+        .from('system_settings')
+        .select('key, value')
+        .in('key', [
+          'influencer_success_title',
+          'influencer_success_subtitle',
+          'influencer_success_description',
+          'influencer_success_benefits'
+        ])
+    ]);
 
-    if (error) {
-      if (error.code === 'PGRST116') {
+    if (influencerSettingsResult.error) {
+      if (influencerSettingsResult.error.code === 'PGRST116') {
         return null;
       }
-      throw error;
+      throw influencerSettingsResult.error;
+    }
+
+    const data = influencerSettingsResult.data;
+    const systemSettings = systemSettingsResult.data || [];
+
+    const getSystemSetting = (key: string, defaultValue: string): string => {
+      const setting = systemSettings.find(s => s.key === key);
+      return setting ? setting.value : defaultValue;
+    };
+
+    const benefitsValue = getSystemSetting(
+      'influencer_success_benefits',
+      '["6 أشهر إضافية على مدة العقد", "نفس السعر بدون زيادة", "أولوية في الخدمات"]'
+    );
+
+    let benefitsArray: string[];
+    try {
+      benefitsArray = JSON.parse(benefitsValue);
+    } catch {
+      benefitsArray = ['6 أشهر إضافية على مدة العقد', 'نفس السعر بدون زيادة', 'أولوية في الخدمات'];
     }
 
     return {
@@ -344,7 +379,11 @@ export const influencerMarketingService = {
       contractDuration: data.featured_package_contract_duration || 10,
       bonusDuration: data.featured_package_bonus_duration || 6,
       description: data.featured_package_description || 'باقة خاصة لعملاء شركاء المسيرة مع مميزات إضافية',
-      highlightText: data.featured_package_highlight_text || '+6 أشهر إضافية مجاناً'
+      highlightText: data.featured_package_highlight_text || '+6 أشهر إضافية مجاناً',
+      successTitle: getSystemSetting('influencer_success_title', 'مبروووك! 🎉'),
+      successSubtitle: getSystemSetting('influencer_success_subtitle', 'تم فتح باقة مميزة خصيصاً لك!'),
+      successDescription: getSystemSetting('influencer_success_description', 'احصل على 6 أشهر إضافية مجاناً'),
+      successBenefits: benefitsArray
     };
   },
 
@@ -372,6 +411,45 @@ export const influencerMarketingService = {
         .from('influencer_settings')
         .update(updateData)
         .eq('id', currentSettings.id);
+
+      if (error) throw error;
+    }
+
+    const systemSettingsUpdates: Array<{ key: string; value: string }> = [];
+
+    if (settings.successTitle !== undefined) {
+      systemSettingsUpdates.push({
+        key: 'influencer_success_title',
+        value: settings.successTitle
+      });
+    }
+
+    if (settings.successSubtitle !== undefined) {
+      systemSettingsUpdates.push({
+        key: 'influencer_success_subtitle',
+        value: settings.successSubtitle
+      });
+    }
+
+    if (settings.successDescription !== undefined) {
+      systemSettingsUpdates.push({
+        key: 'influencer_success_description',
+        value: settings.successDescription
+      });
+    }
+
+    if (settings.successBenefits !== undefined) {
+      systemSettingsUpdates.push({
+        key: 'influencer_success_benefits',
+        value: JSON.stringify(settings.successBenefits)
+      });
+    }
+
+    for (const update of systemSettingsUpdates) {
+      const { error } = await supabase
+        .from('system_settings')
+        .update({ value: update.value })
+        .eq('key', update.key);
 
       if (error) throw error;
     }

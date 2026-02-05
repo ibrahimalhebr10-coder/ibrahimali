@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Save, AlertCircle, CheckCircle, DollarSign, Calendar, Clock, Gift, Sparkles } from 'lucide-react';
+import { Package, Save, AlertCircle, CheckCircle, DollarSign, Calendar, Clock, Gift, Sparkles, MessageSquare, Plus, X } from 'lucide-react';
 import {
   influencerMarketingService,
   FeaturedPackageSettings
@@ -15,7 +15,11 @@ export default function FeaturedPackageManager() {
     contractDuration: 10,
     bonusDuration: 6,
     description: 'باقة خاصة لعملاء شركاء المسيرة مع مميزات إضافية',
-    highlightText: '+6 أشهر إضافية مجاناً'
+    highlightText: '+6 أشهر إضافية مجاناً',
+    successTitle: 'مبروووك! 🎉',
+    successSubtitle: 'تم فتح باقة مميزة خصيصاً لك!',
+    successDescription: 'احصل على 6 أشهر إضافية مجاناً',
+    successBenefits: ['6 أشهر إضافية على مدة العقد', 'نفس السعر بدون زيادة', 'أولوية في الخدمات']
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -53,6 +57,29 @@ export default function FeaturedPackageManager() {
     } finally {
       setSaving(false);
     }
+  };
+
+  const addBenefit = () => {
+    setSettings({
+      ...settings,
+      successBenefits: [...settings.successBenefits, 'ميزة جديدة']
+    });
+  };
+
+  const removeBenefit = (index: number) => {
+    setSettings({
+      ...settings,
+      successBenefits: settings.successBenefits.filter((_, i) => i !== index)
+    });
+  };
+
+  const updateBenefit = (index: number, value: string) => {
+    const newBenefits = [...settings.successBenefits];
+    newBenefits[index] = value;
+    setSettings({
+      ...settings,
+      successBenefits: newBenefits
+    });
   };
 
   if (loading) {
@@ -271,6 +298,109 @@ export default function FeaturedPackageManager() {
                   placeholder="مبرووووك! 🎉"
                 />
                 <p className="text-xs text-slate-500 mt-1">النص الذي يظهر في رسالة التهنئة</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+            <h4 className="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+              <MessageSquare className="w-5 h-5 text-blue-600" />
+              محتوى إشعار النجاح
+            </h4>
+
+            <div className="bg-white rounded-lg p-4 mb-4 border border-blue-100">
+              <div className="flex items-start gap-2 text-sm text-blue-800">
+                <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <p>
+                  هذا المحتوى يظهر في الإشعار المنبثق عند إدخال كود مؤثر صحيح.
+                  يجب أن يكون متطابقاً مع بيانات الباقة المميزة أعلاه.
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  عنوان الإشعار الرئيسي
+                </label>
+                <input
+                  type="text"
+                  value={settings.successTitle}
+                  onChange={(e) => setSettings({ ...settings, successTitle: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-800 font-medium"
+                  placeholder="مبروووك! 🎉"
+                />
+                <p className="text-xs text-slate-500 mt-1">العنوان الكبير الذي يظهر في أعلى الإشعار</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  العنوان الفرعي
+                </label>
+                <input
+                  type="text"
+                  value={settings.successSubtitle}
+                  onChange={(e) => setSettings({ ...settings, successSubtitle: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-800 font-medium"
+                  placeholder="تم فتح باقة مميزة خصيصاً لك!"
+                />
+                <p className="text-xs text-slate-500 mt-1">النص الذي يظهر أسفل العنوان الرئيسي</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-2">
+                  الوصف البارز
+                </label>
+                <input
+                  type="text"
+                  value={settings.successDescription}
+                  onChange={(e) => setSettings({ ...settings, successDescription: e.target.value })}
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-800 font-medium"
+                  placeholder="احصل على 6 أشهر إضافية مجاناً"
+                />
+                <p className="text-xs text-slate-500 mt-1">النص البارز الذي يصف الميزة الرئيسية</p>
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-semibold text-slate-700">
+                    قائمة المزايا
+                  </label>
+                  <button
+                    type="button"
+                    onClick={addBenefit}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm font-medium"
+                  >
+                    <Plus className="w-4 h-4" />
+                    إضافة ميزة
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  {settings.successBenefits.map((benefit, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={benefit}
+                          onChange={(e) => updateBenefit(index, e.target.value)}
+                          className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-800"
+                          placeholder="ميزة من مزايا الباقة"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeBenefit(index)}
+                        className="p-2.5 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
+                        title="حذف"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+
+                <p className="text-xs text-slate-500 mt-2">قائمة المزايا التي تظهر في الإشعار</p>
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Gift, Sparkles, CheckCircle, X, AlertCircle } from 'lucide-react';
-import { influencerMarketingService } from '../services/influencerMarketingService';
+import { influencerMarketingService, FeaturedPackageSettings } from '../services/influencerMarketingService';
 
 interface InfluencerCodeInputProps {
   onCodeEntered: (code: string) => void;
@@ -15,6 +15,22 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
   const [hasEnteredCode, setHasEnteredCode] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [notificationContent, setNotificationContent] = useState<FeaturedPackageSettings | null>(null);
+
+  useEffect(() => {
+    loadNotificationContent();
+  }, []);
+
+  const loadNotificationContent = async () => {
+    try {
+      const settings = await influencerMarketingService.getFeaturedPackageSettings();
+      if (settings) {
+        setNotificationContent(settings);
+      }
+    } catch (err) {
+      console.error('خطأ في تحميل محتوى الإشعار:', err);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -203,7 +219,7 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
                 </div>
 
                 <h2 className="text-3xl font-bold text-slate-800 mb-3 animate-bounce">
-                  مبروووك! 🎉
+                  {notificationContent?.successTitle || 'مبروووك! 🎉'}
                 </h2>
 
                 <div
@@ -214,10 +230,10 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
                 </div>
 
                 <p className="text-xl text-slate-700 mb-6 leading-relaxed">
-                  تم فتح باقة مميزة خصيصاً لك!
+                  {notificationContent?.successSubtitle || 'تم فتح باقة مميزة خصيصاً لك!'}
                   <br />
                   <span className="font-bold" style={{ color: featuredColor }}>
-                    احصل على 6 أشهر إضافية مجاناً
+                    {notificationContent?.successDescription || 'احصل على 6 أشهر إضافية مجاناً'}
                   </span>
                 </p>
 
@@ -229,18 +245,16 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
                   </div>
                   <h3 className="font-bold text-slate-800 mb-2">مزايا الباقة المميزة:</h3>
                   <ul className="text-right space-y-2 text-slate-600">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: featuredColor }} />
-                      <span>6 أشهر إضافية على مدة العقد</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: featuredColor }} />
-                      <span>نفس السعر بدون زيادة</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: featuredColor }} />
-                      <span>أولوية في الخدمات</span>
-                    </li>
+                    {(notificationContent?.successBenefits || [
+                      '6 أشهر إضافية على مدة العقد',
+                      'نفس السعر بدون زيادة',
+                      'أولوية في الخدمات'
+                    ]).map((benefit, index) => (
+                      <li key={index} className="flex items-center gap-2">
+                        <CheckCircle className="w-5 h-5 flex-shrink-0" style={{ color: featuredColor }} />
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
 
