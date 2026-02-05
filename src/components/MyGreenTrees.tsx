@@ -41,6 +41,12 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
   const farmGroups = isInvestment
     ? investmentCycles.reduce((acc: any, cycle: any) => {
         const farmId = cycle.farm_id;
+        console.log('[MyGreenTrees] Processing cycle:', {
+          cycleId: cycle.id,
+          farmId,
+          farmName: cycle.farms?.name_ar,
+          userTreeCount: cycle.user_tree_count
+        });
         if (!acc[farmId]) {
           acc[farmId] = {
             farm_id: farmId,
@@ -54,15 +60,39 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
       }, {})
     : {};
 
+  console.log('[MyGreenTrees] Farm groups computed:', {
+    isInvestment,
+    farmGroups,
+    farmGroupsKeys: Object.keys(farmGroups)
+  });
+
   const farms = Object.values(farmGroups);
   const selectedFarmData = selectedFarm ? farmGroups[selectedFarm] : null;
   const selectedFarmCycles = selectedFarmData?.cycles || [];
 
+  console.log('[MyGreenTrees] Render state:', {
+    isInvestment,
+    investmentCyclesLength: investmentCycles.length,
+    farmsLength: farms.length,
+    selectedFarm,
+    selectedFarmData,
+    selectedFarmCyclesLength: selectedFarmCycles.length
+  });
+
   useEffect(() => {
-    if (farms.length > 0 && !selectedFarm) {
-      setSelectedFarm((farms[0] as any).farm_id);
+    console.log('[MyGreenTrees] Investment cycles or farms changed:', {
+      cyclesLength: investmentCycles.length,
+      cycles: investmentCycles,
+      farmsLength: farms.length,
+      farms: farms,
+      selectedFarm
+    });
+    if (investmentCycles.length > 0 && farms.length > 0 && !selectedFarm) {
+      const firstFarmId = (farms[0] as any).farm_id;
+      console.log('[MyGreenTrees] Auto-selecting first farm:', firstFarmId);
+      setSelectedFarm(firstFarmId);
     }
-  }, [farms.length, selectedFarm]);
+  }, [investmentCycles.length, farms.length, selectedFarm]);
 
   useEffect(() => {
     loadMaintenanceRecords();
@@ -125,8 +155,9 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
       console.log(`[MyGreenTrees] Loading maintenance records for user ${user.id} (identity: ${identity})`);
 
       if (identity === 'investment') {
+        console.log('[MyGreenTrees] Fetching investment cycles...');
         const cycles = await investmentCyclesService.getClientInvestmentCycles();
-        console.log(`[MyGreenTrees] Loaded ${cycles.length} investment cycles for user ${user.id}`);
+        console.log(`[MyGreenTrees] ✅ Loaded ${cycles.length} investment cycles:`, cycles);
         setInvestmentCycles(cycles);
         setRecords([]);
       } else {

@@ -24,6 +24,14 @@ export default function MyTrees({ onClose, onNavigateToPayment, onShowAuth }: My
     ? (demoType === 'green' ? 'green' : 'golden')
     : (identity === 'agricultural' ? 'green' : 'golden');
 
+  console.log('[MyTrees] Component mounted/updated:', {
+    user: user?.id,
+    identity,
+    isDemoMode,
+    demoType,
+    activePath
+  });
+
   useEffect(() => {
     loadTreesSummary();
   }, [user]);
