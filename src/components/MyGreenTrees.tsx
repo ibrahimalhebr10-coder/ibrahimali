@@ -29,6 +29,7 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
 
   const loadingRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const [selectedFarm, setSelectedFarm] = useState<string | null>(null);
 
   useEffect(() => {
     loadMaintenanceRecords();
@@ -667,9 +668,12 @@ export default function MyGreenTrees({ onNavigateToPayment, onShowAuth }: MyGree
     : {};
 
   const farms = Object.values(farmGroups);
-  const [selectedFarm, setSelectedFarm] = useState<string | null>(
-    farms.length > 0 ? (farms[0] as any).farm_id : null
-  );
+
+  useEffect(() => {
+    if (farms.length > 0 && !selectedFarm) {
+      setSelectedFarm((farms[0] as any).farm_id);
+    }
+  }, [farms.length, selectedFarm]);
 
   const selectedFarmData = selectedFarm ? farmGroups[selectedFarm] : null;
   const selectedFarmCycles = selectedFarmData?.cycles || [];
