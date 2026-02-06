@@ -588,7 +588,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       )}
 
       {/* Purchase Summary - Fixed Bottom - Compact Design */}
-      {treeCount > 0 && selectedContract && !showReviewScreen && (() => {
+      {treeCount > 0 && selectedContract && !showBookingFlow && (() => {
         console.log('📊 عرض الشريط السفلي - العقد المختار:', {
           name: selectedContract.contract_name,
           duration: selectedContract.duration_years,
