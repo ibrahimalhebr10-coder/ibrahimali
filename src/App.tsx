@@ -572,7 +572,11 @@ function AppContent() {
 
   const handleRegistrationSuccess = () => {
     setShowStandaloneRegistration(false);
-    // لا نفتح أي صفحة - نترك المستخدم على الواجهة الرئيسية
+    // بعد نجاح تسجيل الدخول، نعيد فتح QuickAccountAccess لفحص نوع الحساب
+    console.log('✅ [Registration Success] Re-opening QuickAccountAccess to check account type');
+    setTimeout(() => {
+      setShowQuickAccountAccess(true);
+    }, 300);
   };
 
   if (isOfferMode) {
