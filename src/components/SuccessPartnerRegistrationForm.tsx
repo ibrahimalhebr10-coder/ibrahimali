@@ -83,6 +83,8 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
 
       if (result.success) {
         setSuccess(true);
+        localStorage.setItem('successPartnerJustRegistered', 'true');
+        console.log('🌿 [Registration] Success Partner registered - setting localStorage flag');
         setTimeout(() => {
           onSuccess();
         }, 2500);

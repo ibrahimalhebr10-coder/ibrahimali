@@ -8,6 +8,7 @@ import SuccessPartnerOnboarding from './components/SuccessPartnerOnboarding';
 import SuccessPartnerRegistrationForm from './components/SuccessPartnerRegistrationForm';
 import SuccessPartnerWelcome from './components/SuccessPartnerWelcome';
 import HowItWorksPartner from './components/HowItWorksPartner';
+import SuccessPartnerWelcomeBanner from './components/SuccessPartnerWelcomeBanner';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
@@ -61,6 +62,7 @@ function AppContent() {
   const [showSuccessPartnerRegistration, setShowSuccessPartnerRegistration] = useState(false);
   const [showSuccessPartnerWelcome, setShowSuccessPartnerWelcome] = useState(false);
   const [showHowItWorksPartner, setShowHowItWorksPartner] = useState(false);
+  const [showSuccessPartnerWelcomeBanner, setShowSuccessPartnerWelcomeBanner] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
@@ -213,6 +215,19 @@ function AppContent() {
       }
     };
   }, []);
+
+  useEffect(() => {
+    if (user && !showAccountProfile) {
+      const justRegistered = localStorage.getItem('successPartnerJustRegistered');
+      if (justRegistered === 'true') {
+        console.log('🌿 [Banner] Success Partner just registered and logged in - showing welcome banner');
+        localStorage.removeItem('successPartnerJustRegistered');
+        setTimeout(() => {
+          setShowSuccessPartnerWelcomeBanner(true);
+        }, 500);
+      }
+    }
+  }, [user, showAccountProfile]);
 
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
@@ -1280,6 +1295,11 @@ function AppContent() {
       <HowItWorksPartner
         isOpen={showHowItWorksPartner}
         onClose={() => setShowHowItWorksPartner(false)}
+      />
+
+      <SuccessPartnerWelcomeBanner
+        isOpen={showSuccessPartnerWelcomeBanner}
+        onClose={() => setShowSuccessPartnerWelcomeBanner(false)}
       />
 
       <IdentitySwitcher />
