@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Megaphone, TrendingUp, Users, Target, Package, Settings } from 'lucide-react';
+import { Megaphone, TrendingUp, Users, Target, Package, Settings, MessageSquare } from 'lucide-react';
 import InfluencerPartnersManager from './InfluencerPartnersManager';
 import FeaturedPackageManager from './FeaturedPackageManager';
 import InfluencerSettingsManager from './InfluencerSettingsManager';
+import PartnerShareMessageManager from './PartnerShareMessageManager';
 
 const MarketingManagement = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'influencers' | 'featured' | 'settings'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'influencers' | 'featured' | 'settings' | 'share-message'>('overview');
 
   return (
     <div className="space-y-6">
@@ -69,6 +70,19 @@ const MarketingManagement = () => {
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600" />
           )}
         </button>
+        <button
+          onClick={() => setActiveTab('share-message')}
+          className={`px-6 py-3 font-medium transition-colors relative ${
+            activeTab === 'share-message'
+              ? 'text-amber-600'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          رسالة المشاركة
+          {activeTab === 'share-message' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600" />
+          )}
+        </button>
       </div>
 
       {activeTab === 'overview' && (
@@ -119,6 +133,21 @@ const MarketingManagement = () => {
               </p>
             </button>
 
+            <button
+              onClick={() => setActiveTab('share-message')}
+              className="bg-white rounded-xl shadow-sm border border-amber-200 p-6 hover:shadow-md transition-all text-right group"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center mb-4">
+                <MessageSquare className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-amber-600 transition-colors">
+                رسالة المشاركة
+              </h3>
+              <p className="text-sm text-gray-600">
+                تخصيص رسالة المشاركة والرابط للشركاء
+              </p>
+            </button>
+
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 opacity-50">
               <div className="w-12 h-12 bg-pink-50 rounded-lg flex items-center justify-center mb-4">
                 <Megaphone className="w-6 h-6 text-pink-600" />
@@ -161,6 +190,8 @@ const MarketingManagement = () => {
       {activeTab === 'featured' && <FeaturedPackageManager />}
 
       {activeTab === 'settings' && <InfluencerSettingsManager />}
+
+      {activeTab === 'share-message' && <PartnerShareMessageManager />}
     </div>
   );
 };

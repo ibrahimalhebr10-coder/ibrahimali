@@ -6,6 +6,7 @@ import {
   InfluencerStats,
   InfluencerActivityLog
 } from '../services/influencerMarketingService';
+import { partnerShareMessageService } from '../services/partnerShareMessageService';
 
 export default function InfluencerDashboard() {
   const [stats, setStats] = useState<InfluencerStats | null>(null);
@@ -64,28 +65,23 @@ export default function InfluencerDashboard() {
   const handleShareByName = async () => {
     if (!stats) return;
 
-    const partnerName = stats.name || '';
-    const textToShare = `🌿 *استثمر في المستقبل الأخضر!* 🌿
-
-مرحباً، أنا ${stats.display_name || partnerName}
-شريك نجاح معتمد في منصة *حصص زراعية* 🌱
-
-💡 *لماذا تستثمر معنا؟*
-✓ مزارع حقيقية بعوائد مضمونة
-✓ استثمار آمن ومربح
-✓ شفافية كاملة ومتابعة مستمرة
-✓ عوائد سنوية من محاصيل حقيقية
-
-🎁 *مكافأة خاصة عند الحجز!*
-اكتب اسمي عند التسجيل: *${partnerName}*
-
-🌐 ابدأ رحلتك الاستثمارية الآن:
-https://ashjari.com
-
-انضم لآلاف المستثمرين الذين حققوا أحلامهم 🚀`;
-
-
     try {
+      const templateData = await partnerShareMessageService.getTemplate();
+
+      if (!templateData.enabled) {
+        alert('نظام المشاركة غير مفعّل حالياً');
+        return;
+      }
+
+      const partnerName = stats.name || '';
+      const displayName = stats.display_name || partnerName;
+
+      const textToShare = partnerShareMessageService.renderTemplate(templateData.template, {
+        partner_name: partnerName,
+        display_name: displayName,
+        website_url: templateData.websiteUrl
+      });
+
       await navigator.clipboard.writeText(textToShare);
       setCopiedName(true);
       setTimeout(() => setCopiedName(false), 2000);
