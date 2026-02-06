@@ -66,6 +66,8 @@ export interface UpdateInfluencerPartnerData {
 }
 
 export interface InfluencerStats {
+  name: string;
+  display_name: string | null;
   total_bookings: number;
   total_trees_booked: number;
   total_rewards_earned: number;
@@ -272,7 +274,7 @@ export const influencerMarketingService = {
   async getMyInfluencerStats(): Promise<InfluencerStats | null> {
     const { data, error } = await supabase
       .from('influencer_rewards_details')
-      .select('total_bookings, total_trees_booked, total_rewards_earned, trees_in_current_batch, trees_until_next_reward, progress_percentage, trees_required_for_reward')
+      .select('referral_code, partner_name, total_bookings, total_trees_booked, total_rewards_earned, trees_in_current_batch, trees_until_next_reward, progress_percentage, trees_required_for_reward')
       .eq('is_active', true)
       .limit(1)
       .single();
@@ -284,7 +286,17 @@ export const influencerMarketingService = {
       throw error;
     }
 
-    return data;
+    return {
+      name: data.referral_code,
+      display_name: data.partner_name,
+      total_bookings: data.total_bookings,
+      total_trees_booked: data.total_trees_booked,
+      total_rewards_earned: data.total_rewards_earned,
+      trees_in_current_batch: data.trees_in_current_batch,
+      trees_until_next_reward: data.trees_until_next_reward,
+      progress_percentage: data.progress_percentage,
+      trees_required_for_reward: data.trees_required_for_reward
+    };
   },
 
   async getMyActivityLog(): Promise<InfluencerActivityLog[]> {
