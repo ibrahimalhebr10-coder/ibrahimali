@@ -1,8 +1,9 @@
 import { X, User, LogOut, Sparkles, Award, Shield, UserX } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import InfluencerDashboard from './InfluencerDashboard';
 import { deviceRecognitionService } from '../services/deviceRecognitionService';
+import { supabase } from '../lib/supabase';
 
 interface SuccessPartnerAccountProps {
   isOpen: boolean;
@@ -13,6 +14,47 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
   const { user, signOut, isTrustedDevice } = useAuth();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [isPartner, setIsPartner] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (isOpen && user) {
+      checkPartnerStatus();
+    } else if (isOpen && !user) {
+      setIsPartner(false);
+      setLoading(false);
+    }
+  }, [isOpen, user]);
+
+  const checkPartnerStatus = async () => {
+    if (!user) {
+      setIsPartner(false);
+      setLoading(false);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('influencer_partners')
+        .select('id, is_active, status')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking partner status:', error);
+      }
+
+      setIsPartner(!!data);
+    } catch (err) {
+      console.error('Error in checkPartnerStatus:', err);
+      setIsPartner(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -32,7 +74,28 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
     }
   };
 
-  if (!user) {
+  if (loading) {
+    return (
+      <>
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-md z-50"
+          onClick={onClose}
+        />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <Sparkles className="w-8 h-8 text-white" />
+              </div>
+              <p className="text-gray-600">جاري التحميل...</p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!user || !isPartner) {
     return (
       <>
         <div
@@ -57,7 +120,7 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">حساب شريك النجاح</h2>
               <p className="text-gray-600">
-                سجل الدخول لمتابعة مكافآتك وأثرك
+                {!user ? 'سجل الدخول لمتابعة مكافآتك وأثرك' : 'انضم كشريك نجاح واكسب المكافآت'}
               </p>
             </div>
 
