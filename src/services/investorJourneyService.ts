@@ -3,9 +3,7 @@ import { supabase } from '../lib/supabase';
 export type InvestorJourneyStatus =
   | 'no_reservation'
   | 'pending'
-  | 'waiting_for_payment'
-  | 'payment_submitted'
-  | 'paid'
+  | 'confirmed'
   | 'transferred_to_harvest'
   | 'cancelled';
 
@@ -101,34 +99,14 @@ class InvestorJourneyService {
           status: 'pending',
           reservation,
           latestReceipt,
-          canProceed: false,
-          nextAction: 'wait_approval',
-          message: 'تم حجز مزرعتك بنجاح - أشجارك محفوظة باسمك'
-        };
-
-      case 'waiting_for_payment':
-        return {
-          status: 'waiting_for_payment',
-          reservation,
-          latestReceipt,
           canProceed: true,
           nextAction: 'proceed_to_payment',
-          message: 'تم اعتماد حجزك! الآن يمكنك إتمام عملية السداد'
+          message: 'تم حجز أشجارك بنجاح! أكمل الدفع لتأكيد حجزك'
         };
 
-      case 'payment_submitted':
+      case 'confirmed':
         return {
-          status: 'payment_submitted',
-          reservation,
-          latestReceipt,
-          canProceed: false,
-          nextAction: 'wait_receipt_review',
-          message: 'تم رفع إيصال السداد وهو قيد المراجعة'
-        };
-
-      case 'paid':
-        return {
-          status: 'paid',
+          status: 'confirmed',
           reservation,
           latestReceipt,
           canProceed: false,
@@ -221,12 +199,12 @@ class InvestorJourneyService {
   getStatusLabel(status: string): string {
     const labels: Record<string, string> = {
       no_reservation: 'لا يوجد حجز',
-      pending: 'قيد المراجعة',
-      waiting_for_payment: 'بانتظار السداد',
-      payment_submitted: 'تم رفع الإيصال',
-      paid: 'مدفوع',
+      pending: 'بانتظار الدفع',
+      confirmed: 'مؤكد ومدفوع',
       transferred_to_harvest: 'في مزرعتي',
-      cancelled: 'ملغي'
+      cancelled: 'ملغي',
+      temporary: 'مؤقت',
+      completed: 'مكتمل'
     };
     return labels[status] || status;
   }
@@ -235,9 +213,9 @@ class InvestorJourneyService {
     const colors: Record<string, { bg: string; text: string; border: string }> = {
       no_reservation: { bg: 'bg-gray-100', text: 'text-gray-800', border: 'border-gray-300' },
       pending: { bg: 'bg-amber-100', text: 'text-amber-800', border: 'border-amber-300' },
-      waiting_for_payment: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-300' },
-      payment_submitted: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-300' },
-      paid: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-300' },
+      confirmed: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-300' },
+      temporary: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-300' },
+      completed: { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-300' },
       transferred_to_harvest: { bg: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-emerald-300' },
       cancelled: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-300' }
     };
