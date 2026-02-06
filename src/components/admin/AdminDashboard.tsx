@@ -28,7 +28,7 @@ import OperationsSection from './OperationsSection';
 import FinanceSection from './FinanceSection';
 import CustomersSection from './CustomersSection';
 import HotLeadsDashboard from './HotLeadsDashboard';
-import AdvancedAssistantManager from './AdvancedAssistantManager';
+import SmartAssistantManager from './SmartAssistantManager';
 
 type AdminSection =
   | 'overview'
@@ -100,7 +100,7 @@ const AdminDashboard: React.FC = () => {
       case 'content':
         return <ContentManagement />;
       case 'assistant':
-        return <AdvancedAssistantManager />;
+        return <SmartAssistantManager />;
       case 'settings':
         return <GeneralSettings />;
       default:
