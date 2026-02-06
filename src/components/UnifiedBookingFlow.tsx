@@ -52,7 +52,7 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         path_type: props.pathType,
         status: 'pending',
         influencer_code: props.influencerCode || null,
-        tree_varieties: props.treeVarieties || []
+        tree_details: props.treeVarieties || []
       };
 
       const { data: reservation, error } = await supabase
