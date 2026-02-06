@@ -15,106 +15,42 @@ interface RequestBody {
   userContext?: Record<string, any>;
 }
 
-interface FAQ {
+interface SearchResult {
   id: string;
   question_ar: string;
   answer_ar: string;
-  question_variations: any;
-  intent_tags: string[];
-  usage_count: number;
-}
-
-interface SearchResult {
-  faq: FAQ;
   score: number;
-  matchType: 'exact' | 'variation' | 'keyword';
 }
 
 async function searchInKnowledgeBase(
   supabase: any,
   question: string
 ): Promise<SearchResult | null> {
-  const lowerQuestion = question.toLowerCase().trim();
+  try {
+    const { data, error } = await supabase.rpc('search_faqs', {
+      search_query: question
+    });
 
-  const { data: faqs, error } = await supabase
-    .from('assistant_faqs')
-    .select('*')
-    .eq('is_active', true)
-    .eq('is_approved', true);
+    if (error) {
+      console.error('Error searching FAQs:', error);
+      return null;
+    }
 
-  if (error || !faqs || faqs.length === 0) {
-    console.log('No FAQs found or error:', error);
+    if (!data || data.length === 0) {
+      return null;
+    }
+
+    const bestMatch = data[0];
+    return {
+      id: bestMatch.id,
+      question_ar: bestMatch.question_ar,
+      answer_ar: bestMatch.answer_ar,
+      score: bestMatch.score || 0
+    };
+  } catch (error) {
+    console.error('Search error:', error);
     return null;
   }
-
-  let bestMatch: SearchResult | null = null;
-  let highestScore = 0;
-
-  for (const faq of faqs) {
-    let score = 0;
-    let matchType: 'exact' | 'variation' | 'keyword' = 'keyword';
-
-    const mainQuestion = faq.question_ar?.toLowerCase() || '';
-
-    if (mainQuestion === lowerQuestion) {
-      score = 100;
-      matchType = 'exact';
-    } else if (mainQuestion.includes(lowerQuestion) || lowerQuestion.includes(mainQuestion)) {
-      score = 90;
-      matchType = 'exact';
-    }
-
-    if (score === 0 && faq.question_variations) {
-      const variations = Array.isArray(faq.question_variations)
-        ? faq.question_variations
-        : [];
-
-      for (const variation of variations) {
-        const varLower = (typeof variation === 'string' ? variation : '').toLowerCase();
-        if (varLower === lowerQuestion) {
-          score = 95;
-          matchType = 'variation';
-          break;
-        } else if (varLower.includes(lowerQuestion) || lowerQuestion.includes(varLower)) {
-          score = Math.max(score, 85);
-          matchType = 'variation';
-        }
-      }
-    }
-
-    if (score === 0) {
-      const questionWords = lowerQuestion.split(/\s+/).filter(w => w.length > 2);
-      const faqWords = mainQuestion.split(/\s+/).filter(w => w.length > 2);
-
-      const matchingWords = questionWords.filter(word =>
-        faqWords.some(faqWord => faqWord.includes(word) || word.includes(faqWord))
-      );
-
-      if (matchingWords.length > 0) {
-        score = (matchingWords.length / questionWords.length) * 70;
-        matchType = 'keyword';
-      }
-    }
-
-    if (faq.intent_tags && Array.isArray(faq.intent_tags)) {
-      for (const tag of faq.intent_tags) {
-        if (lowerQuestion.includes(tag.toLowerCase())) {
-          score += 10;
-        }
-      }
-    }
-
-    if (score > highestScore && score >= 50) {
-      highestScore = score;
-      bestMatch = {
-        faq,
-        score,
-        matchType
-      };
-    }
-  }
-
-  return bestMatch;
 }
 
 async function saveUnansweredQuestion(
@@ -191,18 +127,7 @@ async function saveConversationMessage(
       .eq('id', sessionId);
 
     if (matchedFaqId) {
-      const { data } = await supabase
-        .from('assistant_faqs')
-        .select('usage_count')
-        .eq('id', matchedFaqId)
-        .maybeSingle();
-
-      if (data) {
-        await supabase
-          .from('assistant_faqs')
-          .update({ usage_count: (data.usage_count || 0) + 1 })
-          .eq('id', matchedFaqId);
-      }
+      await supabase.rpc('mark_faq_as_used', { faq_id: matchedFaqId });
     }
   } catch (error) {
     console.error('Error saving conversation:', error);
@@ -260,9 +185,9 @@ Deno.serve(async (req: Request) => {
     let confidenceScore: number;
     let category = 'general';
 
-    if (searchResult && searchResult.score >= 70) {
-      answer = searchResult.faq.answer_ar;
-      matchedFaqId = searchResult.faq.id;
+    if (searchResult && searchResult.score >= 50) {
+      answer = searchResult.answer_ar;
+      matchedFaqId = searchResult.id;
       confidenceScore = searchResult.score / 100;
       category = 'knowledge_base';
     } else {
