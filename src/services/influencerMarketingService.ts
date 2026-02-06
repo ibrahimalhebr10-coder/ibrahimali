@@ -422,7 +422,7 @@ export const influencerMarketingService = {
           featured_package_highlight_text
         `)
         .limit(1)
-        .single(),
+        .maybeSingle(),
       supabase
         .from('system_settings')
         .select('key, value')
@@ -442,6 +442,11 @@ export const influencerMarketingService = {
     }
 
     const data = influencerSettingsResult.data;
+
+    if (!data) {
+      return null;
+    }
+
     const systemSettings = systemSettingsResult.data || [];
 
     const getSystemSetting = (key: string, defaultValue: string): string => {
