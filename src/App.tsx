@@ -4,6 +4,7 @@ import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
 import SmartAssistant from './components/SmartAssistant';
 import SuccessPartnerIntro from './components/SuccessPartnerIntro';
+import SuccessPartnerOnboarding from './components/SuccessPartnerOnboarding';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
@@ -53,6 +54,7 @@ function AppContent() {
   const [showHowToStart, setShowHowToStart] = useState(false);
   const [showAssistant, setShowAssistant] = useState(false);
   const [showSuccessPartnerIntro, setShowSuccessPartnerIntro] = useState(false);
+  const [showSuccessPartnerOnboarding, setShowSuccessPartnerOnboarding] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
@@ -1237,7 +1239,19 @@ function AppContent() {
       <SuccessPartnerIntro
         isOpen={showSuccessPartnerIntro}
         onClose={() => setShowSuccessPartnerIntro(false)}
-        onDiscover={() => alert('قريباً: المرحلة الثالثة')}
+        onDiscover={() => {
+          setShowSuccessPartnerIntro(false);
+          setShowSuccessPartnerOnboarding(true);
+        }}
+      />
+
+      <SuccessPartnerOnboarding
+        isOpen={showSuccessPartnerOnboarding}
+        onClose={() => setShowSuccessPartnerOnboarding(false)}
+        onComplete={() => {
+          setShowSuccessPartnerOnboarding(false);
+          alert('قريباً: نموذج التسجيل كشريك نجاح - المرحلة الرابعة');
+        }}
       />
 
       <IdentitySwitcher />
