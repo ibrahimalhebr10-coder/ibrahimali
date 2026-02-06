@@ -11,6 +11,8 @@ import HowItWorksPartner from './components/HowItWorksPartner';
 import SuccessPartnerWelcomeBanner from './components/SuccessPartnerWelcomeBanner';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
+import SuccessPartnerAccount from './components/SuccessPartnerAccount';
+import AccountTypeSelector from './components/AccountTypeSelector';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
 import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
 import MyReservations from './components/MyReservations';
@@ -83,6 +85,8 @@ function AppContent() {
   const [accountContractFilter, setAccountContractFilter] = useState<'agricultural' | 'investment' | null>(null);
   const [showAccountIndicator, setShowAccountIndicator] = useState(false);
   const [accountIndicatorType, setAccountIndicatorType] = useState<'regular' | 'partner'>('regular');
+  const [showSuccessPartnerAccount, setShowSuccessPartnerAccount] = useState(false);
+  const [showAccountTypeSelector, setShowAccountTypeSelector] = useState(false);
 
   const handleAppModeChange = async (mode: AppMode) => {
     await updateIdentity(mode);
@@ -523,7 +527,7 @@ function AppContent() {
     setShowAccountIndicator(true);
   };
 
-  const handleMyFarmClick = () => {
+  const handleMyFarmClick = async () => {
     console.log('');
     console.log('🏠'.repeat(50));
     console.log('🏠 [FOOTER BUTTON] زر "أشجاري" تم الضغط عليه!');
@@ -550,10 +554,19 @@ function AppContent() {
       exitDemoMode();
     }
 
-    console.log(`✅ [Footer Button] Opening My Trees for user ${user.id} with identity ${identity}`);
+    const { influencerMarketingService } = await import('./services/influencerMarketingService');
+    const isInfluencer = await influencerMarketingService.checkIfUserIsInfluencer();
+
+    if (isInfluencer) {
+      console.log('⭐ [Footer Button] User is a Success Partner');
+      setShowSuccessPartnerAccount(true);
+    } else {
+      console.log(`✅ [Footer Button] Opening My Trees for user ${user.id} with identity ${identity}`);
+      setShowMyTrees(true);
+    }
+
     console.log('🏠'.repeat(50));
     console.log('');
-    setShowMyTrees(true);
   };
 
   const handleOfferFarmClick = () => {
@@ -1363,6 +1376,25 @@ function AppContent() {
           initialMode={standaloneRegistrationMode}
         />
       )}
+
+      <SuccessPartnerAccount
+        isOpen={showSuccessPartnerAccount}
+        onClose={() => setShowSuccessPartnerAccount(false)}
+      />
+
+      <AccountTypeSelector
+        isOpen={showAccountTypeSelector}
+        identity={identity}
+        onClose={() => setShowAccountTypeSelector(false)}
+        onSelectCustomerAccount={() => {
+          setShowAccountTypeSelector(false);
+          setShowMyTrees(true);
+        }}
+        onSelectPartnerAccount={() => {
+          setShowAccountTypeSelector(false);
+          setShowSuccessPartnerAccount(true);
+        }}
+      />
 
       <AccountProfile
         isOpen={showAccountProfile}
