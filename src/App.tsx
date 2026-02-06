@@ -30,6 +30,7 @@ import AdminLogin from './components/admin/AdminLogin';
 import FarmOfferMode from './components/FarmOfferMode';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { farmLoadingService, type LoadingProgress } from './services/farmLoadingService';
+import { diagnostics } from './utils/diagnostics';
 import { getUnreadCount } from './services/messagesService';
 import { useAuth } from './contexts/AuthContext';
 import { useAdminAuth } from './contexts/AdminAuthContext';
@@ -113,10 +114,31 @@ function AppContent() {
     let refreshInterval: NodeJS.Timeout;
 
     async function loadFarmsWithProgressiveLoading() {
+      console.log('');
+      console.log('🚀'.repeat(50));
       console.log('[App] 🚀 Starting Progressive Farm Loading System');
+      console.log('🚀'.repeat(50));
+      console.log('');
+
+      // Run diagnostics BEFORE starting
+      const initialDiagnostics = await diagnostics.generateReport({
+        loading: true,
+        categoriesCount: 0,
+        farmsCount: 0,
+        currentCategory: 'all',
+        currentFarmsCount: 0,
+      });
+
+      console.log('');
+      console.log('📋 INITIAL DIAGNOSTICS (Before Loading):');
+      diagnostics.printReport(initialDiagnostics);
+      diagnostics.saveReport(initialDiagnostics);
+
       setLoading(true);
 
       try {
+        console.log('[App] 📡 Calling farmLoadingService.loadWithCache...');
+
         const result = await farmLoadingService.loadWithCache((progress) => {
           if (mounted) {
             setLoadingProgress(progress);
@@ -124,7 +146,21 @@ function AppContent() {
           }
         });
 
-        if (!mounted) return;
+        if (!mounted) {
+          console.log('[App] ⚠️ Component unmounted, aborting');
+          return;
+        }
+
+        console.log('');
+        console.log('📦'.repeat(50));
+        console.log('[App] 📦 loadWithCache RETURNED:');
+        console.log('Categories:', result.categories.length);
+        console.log('Categories data:', result.categories);
+        console.log('Farms object keys:', Object.keys(result.farms));
+        console.log('Farms per category:', Object.entries(result.farms).map(([cat, farms]) => `${cat}: ${farms.length}`));
+        console.log('From cache:', result.fromCache);
+        console.log('📦'.repeat(50));
+        console.log('');
 
         setFromCache(result.fromCache);
         setCategories(result.categories);
@@ -132,16 +168,56 @@ function AppContent() {
         setActiveCategory('all');
 
         const totalFarms = Object.values(result.farms).flat().length;
-        console.log(`[App] ✅ Loaded ${totalFarms} farms ${result.fromCache ? '(from cache)' : '(fresh)'}`);
+        console.log(`[App] ✅ State updated - ${totalFarms} farms ${result.fromCache ? '(from cache)' : '(fresh)'}`);
         console.log(`[App] 📦 Categories: ${result.categories.length}, Farms by category:`,
           Object.entries(result.farms).map(([cat, farms]) => `${cat}: ${farms.length}`).join(', '));
 
+        // Run diagnostics AFTER loading
+        setTimeout(async () => {
+          const finalDiagnostics = await diagnostics.generateReport({
+            loading: false,
+            categoriesCount: result.categories.length,
+            farmsCount: totalFarms,
+            currentCategory: 'all',
+            currentFarmsCount: totalFarms,
+          });
+
+          console.log('');
+          console.log('📋 FINAL DIAGNOSTICS (After Loading):');
+          diagnostics.printReport(finalDiagnostics);
+          diagnostics.saveReport(finalDiagnostics);
+        }, 1000);
+
       } catch (error) {
-        console.error('[App] ❌ Error loading farms:', error);
+        console.log('');
+        console.log('❌'.repeat(50));
+        console.error('[App] ❌❌❌ CRITICAL ERROR loading farms:');
+        console.error('Error type:', error?.constructor?.name);
+        console.error('Error message:', error instanceof Error ? error.message : String(error));
+        console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+        console.error('Full error object:', error);
+        console.log('❌'.repeat(50));
+        console.log('');
+
         if (mounted) {
           setCategories([]);
           setFarmProjects({});
         }
+
+        // Run error diagnostics
+        const errorDiagnostics = await diagnostics.generateReport({
+          loading: false,
+          categoriesCount: 0,
+          farmsCount: 0,
+          currentCategory: 'all',
+          currentFarmsCount: 0,
+        });
+
+        console.log('');
+        console.log('📋 ERROR DIAGNOSTICS:');
+        diagnostics.printReport(errorDiagnostics);
+        diagnostics.saveReport(errorDiagnostics);
+
       } finally {
         if (mounted) {
           setLoading(false);
@@ -409,13 +485,20 @@ function AppContent() {
     ? Object.values(farmProjects).flat()
     : farmProjects[activeCategory] || [];
 
-  console.log(`[App] 📍 Current View State:`, {
+  console.log('');
+  console.log('📍'.repeat(50));
+  console.log(`[App] 📍 Current View State (CRITICAL FOR DISPLAY):`, {
     activeCategory,
     totalCategories: categories.length,
     farmsInCategory: currentFarms.length,
     allProjectKeys: Object.keys(farmProjects),
-    loading
+    farmProjectsObject: farmProjects,
+    loading,
+    'Will Display?': !loading && currentFarms.length > 0 ? '✅ YES' : '❌ NO',
+    'Why Not?': loading ? '⏳ Still loading' : currentFarms.length === 0 ? '❌ currentFarms is EMPTY' : ''
   });
+  console.log('📍'.repeat(50));
+  console.log('');
 
   const activeIconName = activeCategory === 'all' ? 'all' : categories.find(cat => cat.slug === activeCategory)?.icon || 'leaf';
   const activeColors = getColorForIcon(activeIconName, appMode);
