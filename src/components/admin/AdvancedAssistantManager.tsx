@@ -1878,143 +1878,137 @@ function SuggestionsTab({
 }
 
 function AnalyticsTab() {
-  const [metrics, setMetrics] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadMetrics();
-  }, []);
-
-  const loadMetrics = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('intelligence_metrics')
-        .select('*')
-        .order('metric_date', { ascending: false })
-        .limit(7);
-
-      if (error) throw error;
-      setMetrics(data || []);
-    } catch (error) {
-      console.error('Error loading metrics:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const calculateImprovement = (current: number, previous: number) => {
-    if (previous === 0) return 0;
-    return ((current - previous) / previous * 100).toFixed(1);
-  };
-
-  const todayMetrics = metrics[0] || {
-    total_conversations: 0,
-    satisfaction_rate: 0,
-    avg_confidence_score: 0,
-    answered_successfully: 0,
-    unanswered_questions: 0,
-    avg_response_time_ms: 0,
-    helpfulness_rate: 0
-  };
-
-  const yesterdayMetrics = metrics[1] || todayMetrics;
-
-  const conversationsChange = calculateImprovement(
-    todayMetrics.total_conversations,
-    yesterdayMetrics.total_conversations
-  );
-
-  const satisfactionChange = calculateImprovement(
-    todayMetrics.satisfaction_rate,
-    yesterdayMetrics.satisfaction_rate
-  );
-
-  const confidenceChange = calculateImprovement(
-    todayMetrics.avg_confidence_score,
-    yesterdayMetrics.avg_confidence_score
-  );
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold text-gray-900">الإحصائيات والتحليلات</h2>
-        <button
-          onClick={loadMetrics}
-          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm transition-colors"
-        >
-          تحديث
-        </button>
+        <span className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
+          معطل مؤقتاً
+        </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <MessageCircle className="w-8 h-8 text-blue-600" />
-            <div>
-              <p className="text-sm text-blue-600 font-medium">المحادثات اليوم</p>
-              <p className="text-2xl font-bold text-blue-900">{todayMetrics.total_conversations}</p>
-            </div>
+      <div className="bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 border-2 border-orange-200 rounded-2xl p-8">
+        <div className="text-center max-w-2xl mx-auto">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-6">
+            <BarChart3 className="w-8 h-8 text-orange-600" />
           </div>
-          <p className={`text-xs ${Number(conversationsChange) >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-            {Number(conversationsChange) >= 0 ? '+' : ''}{conversationsChange}% عن الأمس
-          </p>
-        </div>
 
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <TrendingUp className="w-8 h-8 text-green-600" />
-            <div>
-              <p className="text-sm text-green-600 font-medium">معدل الرضا</p>
-              <p className="text-2xl font-bold text-green-900">{(todayMetrics.satisfaction_rate * 100).toFixed(0)}%</p>
-            </div>
-          </div>
-          <p className={`text-xs ${Number(satisfactionChange) >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-            {Number(satisfactionChange) >= 0 ? '+' : ''}{satisfactionChange}% عن الأمس
-          </p>
-        </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">
+            🔒 قسم الإحصائيات معطل مؤقتاً
+          </h3>
 
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6">
-          <div className="flex items-center gap-3 mb-2">
-            <Brain className="w-8 h-8 text-purple-600" />
-            <div>
-              <p className="text-sm text-purple-600 font-medium">دقة الإجابات</p>
-              <p className="text-2xl font-bold text-purple-900">{(todayMetrics.avg_confidence_score * 100).toFixed(0)}%</p>
+          <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+            تم اتخاذ قرار إداري بتعطيل عرض الإحصائيات مؤقتاً حتى توفر بيانات حقيقية وموثوقة
+          </p>
+
+          <div className="bg-white rounded-xl border border-orange-200 p-6 mb-6">
+            <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-orange-600" />
+              أسباب التعطيل المؤقت:
+            </h4>
+            <div className="space-y-3 text-right">
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
+                <div>
+                  <p className="font-medium text-gray-900">أرقام وهمية</p>
+                  <p className="text-sm text-gray-600">البيانات الحالية ليست من مصادر حقيقية</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                <div>
+                  <p className="font-medium text-gray-900">قيم غير صحيحة (NaN)</p>
+                  <p className="text-sm text-gray-600">ظهور أخطاء في الحسابات والقيم المعروضة</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 bg-amber-500 rounded-full mt-2"></div>
+                <div>
+                  <p className="font-medium text-gray-900">انطباع كاذب</p>
+                  <p className="text-sm text-gray-600">عرض بيانات غير دقيقة يعطي صورة مضللة عن الأداء الفعلي</p>
+                </div>
+              </div>
             </div>
           </div>
-          <p className={`text-xs ${Number(confidenceChange) >= 0 ? 'text-purple-700' : 'text-red-700'}`}>
-            {Number(confidenceChange) >= 0 ? '+' : ''}{confidenceChange}% عن الأمس
-          </p>
+
+          <div className="bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-xl p-6">
+            <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <CheckCircle className="w-5 h-5 text-emerald-600" />
+              شروط إعادة التفعيل:
+            </h4>
+            <div className="space-y-2 text-right">
+              <div className="flex items-center gap-3">
+                <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <p className="text-sm text-gray-700">وجود محادثات حقيقية مع المستخدمين</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <p className="text-sm text-gray-700">جمع بيانات موثوقة من الاستخدام الفعلي</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <p className="text-sm text-gray-700">التأكد من صحة جميع القيم والحسابات</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                <p className="text-sm text-gray-700">اعتماد البيانات من قبل الإدارة</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-900 font-medium">
+              💡 نصيحة: يمكنك متابعة الأسئلة غير المجابة لتحسين المساعد الذكي،
+              والإحصائيات ستُعاد تلقائياً عند توفر بيانات حقيقية
+            </p>
+          </div>
         </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h3 className="font-bold text-gray-900 mb-4">الأداء التفصيلي</h3>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between py-2 border-b border-gray-100">
-            <span className="text-sm text-gray-600">إجابات ناجحة</span>
-            <span className="font-bold text-gray-900">{todayMetrics.answered_successfully}</span>
+        <h4 className="font-bold text-gray-900 mb-4">معايير القبول (Acceptance Rules)</h4>
+        <p className="text-gray-600 mb-4">
+          أي عنصر إحصائي يجب أن يحقق المعايير التالية قبل العرض:
+        </p>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div className="bg-gray-50 rounded-lg p-4 text-center">
+            <div className="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-2">
+              <Check className="w-5 h-5 text-emerald-600" />
+            </div>
+            <p className="text-sm font-medium text-gray-900">حفظ</p>
+            <p className="text-xs text-gray-600 mt-1">البيانات محفوظة بشكل صحيح</p>
           </div>
-          <div className="flex items-center justify-between py-2 border-b border-gray-100">
-            <span className="text-sm text-gray-600">أسئلة غير مجابة</span>
-            <span className="font-bold text-red-600">{todayMetrics.unanswered_questions}</span>
+
+          <div className="bg-gray-50 rounded-lg p-4 text-center">
+            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+              <Check className="w-5 h-5 text-blue-600" />
+            </div>
+            <p className="text-sm font-medium text-gray-900">بقاء</p>
+            <p className="text-xs text-gray-600 mt-1">تبقى بعد التحديث</p>
           </div>
-          <div className="flex items-center justify-between py-2 border-b border-gray-100">
-            <span className="text-sm text-gray-600">متوسط وقت الاستجابة</span>
-            <span className="font-bold text-gray-900">{todayMetrics.avg_response_time_ms}ms</span>
+
+          <div className="bg-gray-50 rounded-lg p-4 text-center">
+            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-2">
+              <Check className="w-5 h-5 text-purple-600" />
+            </div>
+            <p className="text-sm font-medium text-gray-900">تعديل</p>
+            <p className="text-xs text-gray-600 mt-1">قابلة للتعديل</p>
           </div>
-          <div className="flex items-center justify-between py-2">
-            <span className="text-sm text-gray-600">معدل الفائدة</span>
-            <span className="font-bold text-green-600">{(todayMetrics.helpfulness_rate * 100).toFixed(0)}%</span>
+
+          <div className="bg-gray-50 rounded-lg p-4 text-center">
+            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-2">
+              <Check className="w-5 h-5 text-red-600" />
+            </div>
+            <p className="text-sm font-medium text-gray-900">حذف</p>
+            <p className="text-xs text-gray-600 mt-1">قابلة للحذف</p>
           </div>
+        </div>
+        <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-900 font-medium text-center">
+            ⚠️ أي عنصر لا يحقق هذه المعايير يُرفض مباشرة
+          </p>
         </div>
       </div>
     </div>
