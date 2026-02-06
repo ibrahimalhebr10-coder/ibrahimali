@@ -1,4 +1,4 @@
-import { User, Calculator, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X } from 'lucide-react';
+import { User, Handshake, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
@@ -569,17 +569,17 @@ function AppContent() {
                   <div className="flex gap-1.5 lg:gap-3 justify-between lg:max-w-5xl lg:mx-auto">
                     {[
                       {
-                        icon: Calculator,
-                        label: 'حاسبة مزرعتك',
-                        onClick: () => alert('قريباً: حاسبة المزرعة'),
+                        icon: Handshake,
+                        label: 'شريك النجاح',
+                        onClick: () => alert('قريباً: شريك النجاح'),
                         delay: '0ms',
-                        gradient: 'linear-gradient(135deg, rgba(6, 182, 212, 0.12) 0%, rgba(8, 145, 178, 0.15) 50%, rgba(6, 182, 212, 0.12) 100%)',
-                        hoverGradient: 'linear-gradient(135deg, rgba(34, 211, 238, 0.18) 0%, rgba(6, 182, 212, 0.22) 50%, rgba(34, 211, 238, 0.18) 100%)',
-                        iconColor: '#0891b2',
-                        textColor: '#0e7490',
-                        border: 'rgba(6, 182, 212, 0.25)',
-                        shadow: 'rgba(6, 182, 212, 0.15)',
-                        glow: 'rgba(6, 182, 212, 0.08)'
+                        gradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.15) 50%, rgba(16, 185, 129, 0.12) 100%)',
+                        hoverGradient: 'linear-gradient(135deg, rgba(52, 211, 153, 0.18) 0%, rgba(16, 185, 129, 0.22) 50%, rgba(52, 211, 153, 0.18) 100%)',
+                        iconColor: '#059669',
+                        textColor: '#047857',
+                        border: 'rgba(16, 185, 129, 0.25)',
+                        shadow: 'rgba(16, 185, 129, 0.15)',
+                        glow: 'rgba(16, 185, 129, 0.08)'
                       },
                       {
                         icon: Video,
