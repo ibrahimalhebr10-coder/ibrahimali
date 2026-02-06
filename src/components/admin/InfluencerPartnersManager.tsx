@@ -54,6 +54,18 @@ export default function InfluencerPartnersManager() {
 
   useEffect(() => {
     loadData();
+
+    // Listen for admin identity changes to refresh data
+    const handleIdentityChange = () => {
+      console.log('🔄 [InfluencerPartnersManager] Identity changed, reloading data...');
+      loadData();
+    };
+
+    window.addEventListener('admin-identity-changed', handleIdentityChange);
+
+    return () => {
+      window.removeEventListener('admin-identity-changed', handleIdentityChange);
+    };
   }, []);
 
   const loadData = async () => {

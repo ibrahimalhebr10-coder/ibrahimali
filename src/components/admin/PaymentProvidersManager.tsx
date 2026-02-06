@@ -29,6 +29,18 @@ const PaymentProvidersManager: React.FC = () => {
 
   useEffect(() => {
     loadProviders();
+
+    // Listen for admin identity changes to refresh data
+    const handleIdentityChange = () => {
+      console.log('🔄 [PaymentProvidersManager] Identity changed, reloading data...');
+      loadProviders();
+    };
+
+    window.addEventListener('admin-identity-changed', handleIdentityChange);
+
+    return () => {
+      window.removeEventListener('admin-identity-changed', handleIdentityChange);
+    };
   }, []);
 
   const loadProviders = async () => {

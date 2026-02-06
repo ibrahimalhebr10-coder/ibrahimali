@@ -43,6 +43,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setIdentityLoading(true);
       try {
+        // Check if user is an admin
+        const { data: adminData } = await supabase
+          .from('admins')
+          .select('id, role')
+          .eq('user_id', userId)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if (adminData) {
+          console.log('👤 [AuthContext] User is Admin - using localStorage mode only');
+          const savedMode = localStorage.getItem('appMode');
+          const fallbackIdentity: IdentityType =
+            (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
+
+          console.log('🔄 [AuthContext] Admin mode:', fallbackIdentity);
+          setIdentity(fallbackIdentity);
+          setSecondaryIdentity(null);
+          setSecondaryIdentityEnabled(false);
+          setIdentityLoading(false);
+          console.log('🔐'.repeat(40));
+          console.log('');
+          return;
+        }
+
         const userIdentity = await identityService.getUserIdentity(userId);
         console.log('📊 [AuthContext] getUserIdentity result:', userIdentity);
 
@@ -193,6 +217,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateIdentity = async (newIdentity: IdentityType): Promise<boolean> => {
     if (user) {
+      // Check if user is admin
+      const { data: adminData } = await supabase
+        .from('admins')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('is_active', true)
+        .maybeSingle();
+
+      if (adminData) {
+        // Admin - only update localStorage and state
+        console.log('👤 [AuthContext] Admin identity switch to:', newIdentity);
+        setIdentity(newIdentity);
+        localStorage.setItem('appMode', newIdentity);
+
+        // Trigger a state change to force re-render
+        window.dispatchEvent(new CustomEvent('admin-identity-changed', { detail: { identity: newIdentity } }));
+        return true;
+      }
+
+      // Regular user - update database
       const success = await identityService.setPrimaryIdentity(user.id, newIdentity);
       if (success) {
         setIdentity(newIdentity);

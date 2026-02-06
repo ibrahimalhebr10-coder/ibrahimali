@@ -22,6 +22,14 @@ export default function PendingPartnersRequests() {
   useEffect(() => {
     loadPendingPartners();
 
+    // Listen for admin identity changes to refresh data
+    const handleIdentityChange = () => {
+      console.log('🔄 [PendingPartnersRequests] Identity changed, reloading data...');
+      loadPendingPartners();
+    };
+
+    window.addEventListener('admin-identity-changed', handleIdentityChange);
+
     const channel = supabase
       .channel('pending-partners-changes')
       .on(
@@ -65,6 +73,7 @@ export default function PendingPartnersRequests() {
       .subscribe();
 
     return () => {
+      window.removeEventListener('admin-identity-changed', handleIdentityChange);
       supabase.removeChannel(channel);
     };
   }, []);
