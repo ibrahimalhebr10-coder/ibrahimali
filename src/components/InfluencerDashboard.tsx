@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Award, TrendingUp, Calendar, MapPin, Sparkles, Share2, Link as LinkIcon, Copy, CheckCircle2 } from 'lucide-react';
+import { Award, TrendingUp, Calendar, MapPin, Sparkles, Share2, Link as LinkIcon, Copy, CheckCircle2, Bell, Users, Gift, Target, MessageCircle, Phone } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import {
   influencerMarketingService,
@@ -14,10 +14,33 @@ export default function InfluencerDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [copiedName, setCopiedName] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [showAchievements, setShowAchievements] = useState(false);
 
   useEffect(() => {
     loadData();
+    checkNotificationPermission();
   }, []);
+
+  const checkNotificationPermission = () => {
+    if ('Notification' in window) {
+      setNotificationsEnabled(Notification.permission === 'granted');
+    }
+  };
+
+  const requestNotificationPermission = async () => {
+    if ('Notification' in window) {
+      const permission = await Notification.requestPermission();
+      setNotificationsEnabled(permission === 'granted');
+      if (permission === 'granted') {
+        new Notification('🎉 تم تفعيل الإشعارات!', {
+          body: 'سنرسل لك إشعاراً فورياً عند كسب مكافآت جديدة',
+          icon: '/logo.png'
+        });
+      }
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -90,6 +113,90 @@ ${referralLink}
     } catch (err) {
       console.error('Error sharing:', err);
     }
+  };
+
+  const handleCopyCode = async () => {
+    if (!stats?.name) return;
+
+    try {
+      await navigator.clipboard.writeText(stats.name);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch (err) {
+      console.error('Error copying code:', err);
+    }
+  };
+
+  const handleShareWhatsApp = () => {
+    if (!stats) return;
+
+    const partnerName = stats.name || '';
+    const referralLink = `${window.location.origin}?ref=${encodeURIComponent(partnerName)}`;
+    const message = `مرحباً! أنا ${stats.display_name || partnerName} - شريك نجاح في منصة حصص زراعية 🌿
+
+احجز عبر رابطي الخاص:
+${referralLink}
+
+استثمر في مزارع حقيقية واربح من منتجاتها! 🌱`;
+
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const getAchievements = () => {
+    if (!stats) return [];
+
+    const achievements = [];
+
+    if (stats.total_bookings >= 1) {
+      achievements.push({
+        icon: '🎯',
+        title: 'الخطوة الأولى',
+        description: 'أول حجز ناجح'
+      });
+    }
+
+    if (stats.total_bookings >= 5) {
+      achievements.push({
+        icon: '⭐',
+        title: 'صاعد بقوة',
+        description: '5 حجوزات ناجحة'
+      });
+    }
+
+    if (stats.total_bookings >= 10) {
+      achievements.push({
+        icon: '💎',
+        title: 'شريك محترف',
+        description: '10 حجوزات ناجحة'
+      });
+    }
+
+    if (stats.total_rewards_earned >= 1) {
+      achievements.push({
+        icon: '🏆',
+        title: 'المكافأة الأولى',
+        description: 'حصلت على أول شجرة مكافأة'
+      });
+    }
+
+    if (stats.total_rewards_earned >= 5) {
+      achievements.push({
+        icon: '🌟',
+        title: 'جامع المكافآت',
+        description: '5 أشجار مكافأة'
+      });
+    }
+
+    if (stats.total_trees_booked >= 20) {
+      achievements.push({
+        icon: '🌳',
+        title: 'غارس الأشجار',
+        description: '20 شجرة محالة'
+      });
+    }
+
+    return achievements;
   };
 
   if (loading) {
@@ -181,6 +288,92 @@ ${referralLink}
         </div>
       </div>
 
+      {/* بطاقة الإشعارات والإنجازات */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* الإشعارات */}
+        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 border border-blue-200">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Bell className="w-6 h-6 text-blue-600" />
+              <div>
+                <h3 className="text-base font-bold text-blue-900">الإشعارات الفورية</h3>
+                <p className="text-xs text-blue-600">تنبيهات المكافآت</p>
+              </div>
+            </div>
+            {notificationsEnabled && (
+              <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+            )}
+          </div>
+
+          <button
+            onClick={requestNotificationPermission}
+            disabled={notificationsEnabled}
+            className={`w-full py-3 px-4 rounded-xl font-bold transition-all duration-300 ${
+              notificationsEnabled
+                ? 'bg-emerald-500 text-white cursor-default'
+                : 'bg-blue-600 text-white hover:bg-blue-700 active:scale-95'
+            }`}
+          >
+            {notificationsEnabled ? (
+              <span className="flex items-center justify-center gap-2">
+                <CheckCircle2 className="w-5 h-5" />
+                مفعلة
+              </span>
+            ) : (
+              'تفعيل الإشعارات'
+            )}
+          </button>
+
+          {notificationsEnabled && (
+            <p className="text-xs text-blue-700 text-center mt-3">
+              سنرسل لك تنبيهاً فورياً عند كل مكافأة جديدة
+            </p>
+          )}
+        </div>
+
+        {/* الإنجازات */}
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <Gift className="w-6 h-6 text-purple-600" />
+              <div>
+                <h3 className="text-base font-bold text-purple-900">الإنجازات</h3>
+                <p className="text-xs text-purple-600">{getAchievements().length} إنجاز</p>
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={() => setShowAchievements(!showAchievements)}
+            className="w-full py-3 px-4 rounded-xl font-bold bg-purple-600 text-white hover:bg-purple-700 transition-all duration-300 active:scale-95"
+          >
+            {showAchievements ? 'إخفاء الإنجازات' : 'عرض الإنجازات'}
+          </button>
+        </div>
+      </div>
+
+      {/* عرض الإنجازات */}
+      {showAchievements && getAchievements().length > 0 && (
+        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 border border-purple-200">
+          <h3 className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
+            <Award className="w-6 h-6" />
+            إنجازاتك
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            {getAchievements().map((achievement, index) => (
+              <div
+                key={index}
+                className="bg-white/80 rounded-xl p-4 text-center transform hover:scale-105 transition-all duration-300"
+              >
+                <div className="text-3xl mb-2">{achievement.icon}</div>
+                <h4 className="text-sm font-bold text-purple-900 mb-1">{achievement.title}</h4>
+                <p className="text-xs text-purple-600">{achievement.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* قسم المشاركة */}
       <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border border-emerald-200">
         <h3 className="text-lg font-bold text-emerald-900 mb-4 text-center">شارك كودك واكسب المزيد!</h3>
@@ -189,10 +382,21 @@ ${referralLink}
           <p className="text-sm text-emerald-800 font-semibold mb-2 text-center">كودك الخاص:</p>
           <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-emerald-50 border-2 border-emerald-300">
             <p className="text-xl font-black text-emerald-900">{stats?.name || ''}</p>
+            <button
+              onClick={handleCopyCode}
+              className="p-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all duration-300 active:scale-95"
+              title="نسخ الكود"
+            >
+              {copiedCode ? (
+                <CheckCircle2 className="w-5 h-5" />
+              ) : (
+                <Copy className="w-5 h-5" />
+              )}
+            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <button
             onClick={handleShareByName}
             className="py-4 px-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 active:scale-95"
@@ -236,11 +440,73 @@ ${referralLink}
               </>
             )}
           </button>
+
+          <button
+            onClick={handleShareWhatsApp}
+            className="py-4 px-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+              boxShadow: '0 4px 12px rgba(37, 211, 102, 0.3)',
+              border: '2px solid rgba(255, 255, 255, 0.3)'
+            }}
+          >
+            <MessageCircle className="w-5 h-5 text-white" />
+            <span className="text-white font-bold">واتساب</span>
+          </button>
         </div>
 
         <p className="text-xs text-center text-emerald-700 mt-4 leading-relaxed">
-          💡 <span className="font-bold">نصيحة:</span> استخدم "شارك باسمك" للمجموعات، و"شارك برابطك" لوسائل التواصل
+          💡 <span className="font-bold">نصيحة:</span> استخدم "شارك باسمك" للمجموعات، و"واتساب" للتواصل المباشر
         </p>
+      </div>
+
+      {/* إحصائيات متقدمة */}
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl p-6 border border-slate-200">
+        <div className="flex items-center gap-3 mb-6">
+          <Target className="w-6 h-6 text-slate-600" />
+          <h3 className="text-lg font-bold text-slate-800">إحصائيات متقدمة</h3>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="bg-white rounded-xl p-4 text-center">
+            <Users className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-slate-800">{stats.total_bookings}</p>
+            <p className="text-xs text-slate-600 mt-1">عملاء محالين</p>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 text-center">
+            <TrendingUp className="w-6 h-6 text-emerald-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-slate-800">{stats.total_trees_booked}</p>
+            <p className="text-xs text-slate-600 mt-1">أشجار محالة</p>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 text-center">
+            <Award className="w-6 h-6 text-amber-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-slate-800">{stats.total_rewards_earned}</p>
+            <p className="text-xs text-slate-600 mt-1">مكافآت مكتسبة</p>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 text-center">
+            <Gift className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+            <p className="text-2xl font-bold text-slate-800">
+              {stats.total_bookings > 0
+                ? Math.round((stats.total_trees_booked / stats.total_bookings) * 10) / 10
+                : 0}
+            </p>
+            <p className="text-xs text-slate-600 mt-1">متوسط الأشجار/عميل</p>
+          </div>
+        </div>
+
+        <div className="mt-4 bg-white rounded-xl p-4">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-slate-600">معدل التحويل:</span>
+            <span className="font-bold text-emerald-600">
+              {stats.total_bookings > 0
+                ? `${Math.round((stats.total_rewards_earned / stats.total_bookings) * 100)}%`
+                : '0%'}
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* سجل النشاط */}
