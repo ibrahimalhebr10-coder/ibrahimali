@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
 import SmartAssistant from './components/SmartAssistant';
+import SuccessPartnerIntro from './components/SuccessPartnerIntro';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
@@ -51,6 +52,7 @@ function AppContent() {
   const [showVideoIntro, setShowVideoIntro] = useState(false);
   const [showHowToStart, setShowHowToStart] = useState(false);
   const [showAssistant, setShowAssistant] = useState(false);
+  const [showSuccessPartnerIntro, setShowSuccessPartnerIntro] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
@@ -571,7 +573,7 @@ function AppContent() {
                       {
                         icon: Handshake,
                         label: 'شريك النجاح',
-                        onClick: () => alert('قريباً: شريك النجاح'),
+                        onClick: () => setShowSuccessPartnerIntro(true),
                         delay: '0ms',
                         gradient: 'linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(5, 150, 105, 0.15) 50%, rgba(16, 185, 129, 0.12) 100%)',
                         hoverGradient: 'linear-gradient(135deg, rgba(52, 211, 153, 0.18) 0%, rgba(16, 185, 129, 0.22) 50%, rgba(52, 211, 153, 0.18) 100%)',
@@ -1230,6 +1232,12 @@ function AppContent() {
       <SmartAssistant
         isOpen={showAssistant}
         onClose={() => setShowAssistant(false)}
+      />
+
+      <SuccessPartnerIntro
+        isOpen={showSuccessPartnerIntro}
+        onClose={() => setShowSuccessPartnerIntro(false)}
+        onDiscover={() => alert('قريباً: المرحلة الثالثة')}
       />
 
       <IdentitySwitcher />
