@@ -256,5 +256,27 @@ export const customerManagementService = {
 
     if (error) throw error;
     return data;
+  },
+
+  async deleteCustomersInBatch(userIds: string[], confirmationCode: string, adminReason: string) {
+    const results = [];
+    const errors = [];
+
+    for (const userId of userIds) {
+      try {
+        const result = await this.deleteCustomerAccount(userId, confirmationCode, adminReason);
+        results.push({ userId, success: true, result });
+      } catch (error) {
+        errors.push({ userId, error });
+      }
+    }
+
+    return {
+      success: errors.length === 0,
+      deleted: results.length,
+      failed: errors.length,
+      results,
+      errors
+    };
   }
 };

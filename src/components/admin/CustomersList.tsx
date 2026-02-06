@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Filter, Plus, Search, AlertTriangle } from 'lucide-react';
+import { Users, Filter, Plus, Search, AlertTriangle, Trash2, CheckSquare, Square } from 'lucide-react';
 import { customerManagementService, Customer } from '../../services/customerManagementService';
 
 interface CustomersListProps {
@@ -16,6 +16,11 @@ export default function CustomersList({ onCustomerSelect, onViewGroups, onViewDu
   const [searchQuery, setSearchQuery] = useState('');
   const [showCreateGroupModal, setShowCreateGroupModal] = useState(false);
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ type: 'single' | 'multiple', userId?: string }>({ type: 'multiple' });
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [deleteReason, setDeleteReason] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadCustomers();
@@ -87,6 +92,75 @@ export default function CustomersList({ onCustomerSelect, onViewGroups, onViewDu
     }
   };
 
+  const handleToggleCustomer = (userId: string) => {
+    setSelectedCustomers(prev =>
+      prev.includes(userId)
+        ? prev.filter(id => id !== userId)
+        : [...prev, userId]
+    );
+  };
+
+  const handleToggleAll = () => {
+    if (selectedCustomers.length === filteredCustomers.length) {
+      setSelectedCustomers([]);
+    } else {
+      setSelectedCustomers(filteredCustomers.map(c => c.user_id));
+    }
+  };
+
+  const handleDeleteSingle = (userId: string) => {
+    setDeleteTarget({ type: 'single', userId });
+    setShowDeleteModal(true);
+    setDeleteConfirmation('');
+    setDeleteReason('');
+  };
+
+  const handleDeleteMultiple = () => {
+    if (selectedCustomers.length === 0) {
+      alert('الرجاء اختيار عملاء للحذف');
+      return;
+    }
+    setDeleteTarget({ type: 'multiple' });
+    setShowDeleteModal(true);
+    setDeleteConfirmation('');
+    setDeleteReason('');
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteConfirmation !== 'DELETE') {
+      alert('الرجاء كتابة كلمة DELETE للتأكيد');
+      return;
+    }
+
+    if (!deleteReason.trim()) {
+      alert('الرجاء إدخال سبب الحذف');
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      if (deleteTarget.type === 'single' && deleteTarget.userId) {
+        await customerManagementService.deleteCustomerAccount(deleteTarget.userId, 'DELETE', deleteReason);
+        alert('تم حذف العميل بنجاح');
+      } else {
+        const result = await customerManagementService.deleteCustomersInBatch(
+          selectedCustomers,
+          'DELETE',
+          deleteReason
+        );
+        alert(`تم حذف ${result.deleted} عميل بنجاح${result.failed > 0 ? `\nفشل حذف ${result.failed} عميل` : ''}`);
+        setSelectedCustomers([]);
+      }
+      setShowDeleteModal(false);
+      loadCustomers();
+    } catch (error) {
+      console.error('Error deleting customer(s):', error);
+      alert('حدث خطأ أثناء الحذف');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'نشط': return 'bg-green-100 text-green-800';
@@ -109,9 +183,25 @@ export default function CustomersList({ onCustomerSelect, onViewGroups, onViewDu
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">قائمة العملاء</h2>
-          <p className="text-sm text-gray-600 mt-1">إجمالي العملاء: {customers.length}</p>
+          <p className="text-sm text-gray-600 mt-1">
+            إجمالي العملاء: {customers.length}
+            {selectedCustomers.length > 0 && (
+              <span className="mr-2 text-blue-600 font-semibold">
+                • تم اختيار {selectedCustomers.length} عميل
+              </span>
+            )}
+          </p>
         </div>
         <div className="flex gap-2">
+          {selectedCustomers.length > 0 && (
+            <button
+              onClick={handleDeleteMultiple}
+              className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              <Trash2 className="w-4 h-4" />
+              حذف المحدد ({selectedCustomers.length})
+            </button>
+          )}
           <button
             onClick={onViewDuplicates}
             className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors"
@@ -185,6 +275,19 @@ export default function CustomersList({ onCustomerSelect, onViewGroups, onViewDu
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
+                <th className="px-4 py-3 text-center">
+                  <button
+                    onClick={handleToggleAll}
+                    className="text-gray-500 hover:text-blue-600 transition-colors"
+                    title={selectedCustomers.length === filteredCustomers.length ? 'إلغاء تحديد الكل' : 'تحديد الكل'}
+                  >
+                    {selectedCustomers.length === filteredCustomers.length ? (
+                      <CheckSquare className="w-5 h-5" />
+                    ) : (
+                      <Square className="w-5 h-5" />
+                    )}
+                  </button>
+                </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الاسم</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الجوال / البريد</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">حالة الحساب</th>
@@ -192,38 +295,86 @@ export default function CustomersList({ onCustomerSelect, onViewGroups, onViewDu
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">أشجاري ذهبية</th>
                 <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">إجمالي الأشجار</th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">تاريخ التسجيل</th>
+                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">إجراءات</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredCustomers.map((customer) => (
                 <tr
                   key={customer.user_id}
-                  onClick={() => onCustomerSelect(customer.user_id)}
-                  className="hover:bg-gray-50 cursor-pointer transition-colors"
+                  className="hover:bg-gray-50 transition-colors"
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="px-4 py-4 text-center">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleCustomer(customer.user_id);
+                      }}
+                      className="text-gray-500 hover:text-blue-600 transition-colors"
+                    >
+                      {selectedCustomers.includes(customer.user_id) ? (
+                        <CheckSquare className="w-5 h-5 text-blue-600" />
+                      ) : (
+                        <Square className="w-5 h-5" />
+                      )}
+                    </button>
+                  </td>
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    onClick={() => onCustomerSelect(customer.user_id)}
+                  >
                     <div className="font-medium text-gray-900">{customer.full_name}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    onClick={() => onCustomerSelect(customer.user_id)}
+                  >
                     <div className="text-sm text-gray-900">{customer.phone || '-'}</div>
                     <div className="text-xs text-gray-500">{customer.email}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td
+                    className="px-6 py-4 whitespace-nowrap cursor-pointer"
+                    onClick={() => onCustomerSelect(customer.user_id)}
+                  >
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(customer.account_status)}`}>
                       {customer.account_status}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-center cursor-pointer"
+                    onClick={() => onCustomerSelect(customer.user_id)}
+                  >
                     <span className="font-semibold text-green-600">{customer.green_trees_count}</span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-center cursor-pointer"
+                    onClick={() => onCustomerSelect(customer.user_id)}
+                  >
                     <span className="font-semibold text-yellow-600">{customer.golden_trees_count}</span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-center cursor-pointer"
+                    onClick={() => onCustomerSelect(customer.user_id)}
+                  >
                     <span className="font-bold text-gray-900">{customer.total_trees_count}</span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td
+                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 cursor-pointer"
+                    onClick={() => onCustomerSelect(customer.user_id)}
+                  >
                     {new Date(customer.registered_at).toLocaleDateString('ar-SA')}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-center">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteSingle(customer.user_id);
+                      }}
+                      className="text-red-600 hover:text-red-800 transition-colors p-2"
+                      title="حذف العميل"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -284,6 +435,81 @@ export default function CustomersList({ onCustomerSelect, onViewGroups, onViewDu
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-3">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
+              <h3 className="text-xl font-bold text-gray-900">تأكيد الحذف</h3>
+            </div>
+            <div className="p-6 space-y-4">
+              <div className="bg-red-50 border-r-4 border-red-600 rounded-lg p-4">
+                <p className="text-sm text-red-800 font-medium">
+                  {deleteTarget.type === 'single'
+                    ? 'أنت على وشك حذف عميل واحد نهائياً'
+                    : `أنت على وشك حذف ${selectedCustomers.length} عميل نهائياً`
+                  }
+                </p>
+                <p className="text-xs text-red-700 mt-2">
+                  سيتم حذف جميع بيانات العميل بما في ذلك الحجوزات والعقود والمدفوعات
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  سبب الحذف <span className="text-red-600">*</span>
+                </label>
+                <textarea
+                  value={deleteReason}
+                  onChange={(e) => setDeleteReason(e.target.value)}
+                  rows={3}
+                  placeholder="يرجى توضيح سبب حذف هذا العميل..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  اكتب كلمة <span className="font-bold text-red-600">DELETE</span> للتأكيد
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmation}
+                  onChange={(e) => setDeleteConfirmation(e.target.value)}
+                  placeholder="DELETE"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent font-mono"
+                  required
+                />
+              </div>
+
+              <div className="flex gap-2 pt-4">
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  disabled={isDeleting || deleteConfirmation !== 'DELETE' || !deleteReason.trim()}
+                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isDeleting ? 'جاري الحذف...' : 'تأكيد الحذف'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setDeleteConfirmation('');
+                    setDeleteReason('');
+                  }}
+                  disabled={isDeleting}
+                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
+                >
+                  إلغاء
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
