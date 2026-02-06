@@ -46,8 +46,12 @@ interface Topic {
 
 interface FAQ {
   id: string;
+  topic_id: string | null;
+  domain_id: string | null;
   question_ar: string;
+  question_en: string;
   answer_ar: string;
+  answer_en: string;
   target_audience: string;
   is_active: boolean;
   is_approved: boolean;
@@ -977,55 +981,422 @@ function FAQsTab({
   onApprove: (id: string) => void;
   onRefresh: () => void;
 }) {
+  const [showModal, setShowModal] = useState(false);
+  const [editingFAQ, setEditingFAQ] = useState<FAQ | null>(null);
+  const [domains, setDomains] = useState<Domain[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [formData, setFormData] = useState({
+    topic_id: '',
+    domain_id: '',
+    question_ar: '',
+    question_en: '',
+    answer_ar: '',
+    answer_en: '',
+    target_audience: 'all',
+    is_active: true,
+    is_approved: false
+  });
+
+  useEffect(() => {
+    loadDomainsAndTopics();
+  }, []);
+
+  const loadDomainsAndTopics = async () => {
+    const { data: domainsData } = await supabase
+      .from('knowledge_domains')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order');
+
+    const { data: topicsData } = await supabase
+      .from('knowledge_topics')
+      .select('*')
+      .eq('is_active', true)
+      .order('title_ar');
+
+    if (domainsData) setDomains(domainsData);
+    if (topicsData) setTopics(topicsData);
+  };
+
+  const resetForm = () => {
+    setFormData({
+      topic_id: '',
+      domain_id: '',
+      question_ar: '',
+      question_en: '',
+      answer_ar: '',
+      answer_en: '',
+      target_audience: 'all',
+      is_active: true,
+      is_approved: false
+    });
+    setEditingFAQ(null);
+  };
+
+  const handleAdd = () => {
+    resetForm();
+    setShowModal(true);
+  };
+
+  const handleEdit = (faq: FAQ) => {
+    setEditingFAQ(faq);
+    setFormData({
+      topic_id: faq.topic_id || '',
+      domain_id: faq.domain_id || '',
+      question_ar: faq.question_ar,
+      question_en: faq.question_en,
+      answer_ar: faq.answer_ar,
+      answer_en: faq.answer_en,
+      target_audience: faq.target_audience,
+      is_active: faq.is_active,
+      is_approved: faq.is_approved
+    });
+    setShowModal(true);
+  };
+
+  const handleSave = async () => {
+    if (!formData.question_ar || !formData.answer_ar) {
+      alert('يرجى إدخال السؤال والجواب بالعربية');
+      return;
+    }
+
+    try {
+      const dataToSave = {
+        ...formData,
+        topic_id: formData.topic_id || null,
+        domain_id: formData.domain_id || null
+      };
+
+      if (editingFAQ) {
+        await supabase
+          .from('assistant_faqs')
+          .update(dataToSave)
+          .eq('id', editingFAQ.id);
+      } else {
+        await supabase
+          .from('assistant_faqs')
+          .insert([dataToSave]);
+      }
+      setShowModal(false);
+      resetForm();
+      onRefresh();
+    } catch (error) {
+      console.error('Error saving FAQ:', error);
+      alert('حدث خطأ أثناء الحفظ');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('هل أنت متأكد من حذف هذا السؤال؟')) {
+      return;
+    }
+    try {
+      await supabase.from('assistant_faqs').delete().eq('id', id);
+      onRefresh();
+    } catch (error) {
+      console.error('Error deleting FAQ:', error);
+      alert('حدث خطأ أثناء الحذف');
+    }
+  };
+
+  const toggleStatus = async (id: string, currentStatus: boolean) => {
+    await supabase
+      .from('assistant_faqs')
+      .update({ is_active: !currentStatus })
+      .eq('id', id);
+    onRefresh();
+  };
+
+  const getTopicName = (topicId: string | null) => {
+    if (!topicId) return 'غير محدد';
+    const topic = topics.find((t) => t.id === topicId);
+    return topic?.title_ar || 'غير محدد';
+  };
+
+  const getDomainName = (domainId: string | null) => {
+    if (!domainId) return 'غير محدد';
+    const domain = domains.find((d) => d.id === domainId);
+    return domain?.name_ar || 'غير محدد';
+  };
+
+  const filteredTopics = formData.domain_id
+    ? topics.filter((t) => t.domain_id === formData.domain_id)
+    : topics;
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900">الأسئلة الشائعة</h2>
-        <button className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors">
+        <button
+          onClick={handleAdd}
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors"
+        >
           <Plus className="w-4 h-4" />
           إضافة سؤال جديد
         </button>
       </div>
 
       <div className="grid gap-3">
-        {faqs.map((faq) => (
-          <div
-            key={faq.id}
-            className="bg-white border border-gray-200 rounded-lg p-4"
-          >
-            <div className="space-y-3">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h3 className="font-bold text-gray-900">{faq.question_ar}</h3>
-                  <p className="text-sm text-gray-600 mt-2">{faq.answer_ar}</p>
+        {faqs.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-xl">
+            <HelpCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+            <p className="text-gray-600">لا توجد أسئلة شائعة</p>
+          </div>
+        ) : (
+          faqs.map((faq) => (
+            <div
+              key={faq.id}
+              className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+            >
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      {faq.topic_id && (
+                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                          {getTopicName(faq.topic_id)}
+                        </span>
+                      )}
+                      {faq.domain_id && (
+                        <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-medium">
+                          {getDomainName(faq.domain_id)}
+                        </span>
+                      )}
+                      <span
+                        className={`px-2 py-1 rounded text-xs ${
+                          faq.is_approved
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-yellow-100 text-yellow-700'
+                        }`}
+                      >
+                        {faq.is_approved ? 'معتمد' : 'قيد المراجعة'}
+                      </span>
+                      <span
+                        className={`px-2 py-1 rounded text-xs ${
+                          faq.is_active
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {faq.is_active ? 'نشط' : 'غير نشط'}
+                      </span>
+                    </div>
+                    <h3 className="font-bold text-gray-900">{faq.question_ar}</h3>
+                    <p className="text-sm text-gray-600 mt-2">{faq.answer_ar}</p>
+                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                      <span>استخدم {faq.usage_count} مرة</span>
+                      <span>{faq.helpful_count} مفيد</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {!faq.is_approved && (
+                      <button
+                        onClick={() => onApprove(faq.id)}
+                        className="p-2 bg-green-500 hover:bg-green-600 text-white rounded-lg transition-colors"
+                        title="اعتماد"
+                      >
+                        <Check className="w-4 h-4" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => toggleStatus(faq.id, faq.is_active)}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                        faq.is_active
+                          ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {faq.is_active ? 'نشط' : 'غير نشط'}
+                    </button>
+                    <button
+                      onClick={() => handleEdit(faq)}
+                      className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    >
+                      <Edit2 className="w-4 h-4 text-gray-600" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(faq.id)}
+                      className="p-2 hover:bg-red-100 rounded-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4 text-red-600" />
+                    </button>
+                  </div>
                 </div>
-                {!faq.is_approved && (
-                  <button
-                    onClick={() => onApprove(faq.id)}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition-colors"
-                  >
-                    <Check className="w-4 h-4" />
-                    اعتماد
-                  </button>
-                )}
-              </div>
-              <div className="flex items-center gap-4 text-sm text-gray-500">
-                <span>استخدم {faq.usage_count} مرة</span>
-                <span>{faq.helpful_count} مفيد</span>
-                <span
-                  className={`px-2 py-1 rounded text-xs ${
-                    faq.is_approved
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-yellow-100 text-yellow-700'
-                  }`}
-                >
-                  {faq.is_approved ? 'معتمد' : 'قيد المراجعة'}
-                </span>
               </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900">
+                {editingFAQ ? 'تعديل السؤال الشائع' : 'إضافة سؤال شائع جديد'}
+              </h3>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    المجال المعرفي (اختياري)
+                  </label>
+                  <select
+                    value={formData.domain_id}
+                    onChange={(e) => {
+                      setFormData({ ...formData, domain_id: e.target.value, topic_id: '' });
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  >
+                    <option value="">اختر المجال المعرفي</option>
+                    {domains.map((domain) => (
+                      <option key={domain.id} value={domain.id}>
+                        {domain.icon} {domain.name_ar}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    الموضوع (اختياري)
+                  </label>
+                  <select
+                    value={formData.topic_id}
+                    onChange={(e) => setFormData({ ...formData, topic_id: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    disabled={!formData.domain_id}
+                  >
+                    <option value="">اختر الموضوع</option>
+                    {filteredTopics.map((topic) => (
+                      <option key={topic.id} value={topic.id}>
+                        {topic.title_ar}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  السؤال بالعربية
+                </label>
+                <input
+                  type="text"
+                  value={formData.question_ar}
+                  onChange={(e) => setFormData({ ...formData, question_ar: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="مثل: كيف أبدأ الاستثمار في المزارع؟"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Question in English
+                </label>
+                <input
+                  type="text"
+                  value={formData.question_en}
+                  onChange={(e) => setFormData({ ...formData, question_en: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="e.g: How do I start investing in farms?"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  الجواب بالعربية
+                </label>
+                <textarea
+                  value={formData.answer_ar}
+                  onChange={(e) => setFormData({ ...formData, answer_ar: e.target.value })}
+                  rows={4}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="الجواب التفصيلي للسؤال"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Answer in English
+                </label>
+                <textarea
+                  value={formData.answer_en}
+                  onChange={(e) => setFormData({ ...formData, answer_en: e.target.value })}
+                  rows={4}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Detailed answer to the question"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  الجمهور المستهدف
+                </label>
+                <select
+                  value={formData.target_audience}
+                  onChange={(e) => setFormData({ ...formData, target_audience: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                >
+                  <option value="all">الجميع</option>
+                  <option value="visitor">الزوار</option>
+                  <option value="investor">المستثمرون</option>
+                  <option value="partner">شركاء النجاح</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="faq_active"
+                    checked={formData.is_active}
+                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                    className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                  />
+                  <label htmlFor="faq_active" className="text-sm font-medium text-gray-700">
+                    نشط
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="faq_approved"
+                    checked={formData.is_approved}
+                    onChange={(e) => setFormData({ ...formData, is_approved: e.target.checked })}
+                    className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                  />
+                  <label htmlFor="faq_approved" className="text-sm font-medium text-gray-700">
+                    معتمد
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  resetForm();
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={handleSave}
+                className="flex items-center gap-2 px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors"
+              >
+                <Save className="w-4 h-4" />
+                حفظ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
