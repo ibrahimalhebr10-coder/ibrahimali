@@ -18,6 +18,7 @@ import MyTrees from './components/MyTrees';
 import MaintenancePaymentPage from './components/MaintenancePaymentPage';
 import MaintenancePaymentResult from './components/MaintenancePaymentResult';
 import QuickAccountAccess from './components/QuickAccountAccess';
+import AccountTypeIndicator from './components/AccountTypeIndicator';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
@@ -80,6 +81,8 @@ function AppContent() {
   const [selectedInvestmentFarm, setSelectedInvestmentFarm] = useState<FarmProject | null>(null);
   const [selectedFarmMode, setSelectedFarmMode] = useState<AppMode | null>(null);
   const [accountContractFilter, setAccountContractFilter] = useState<'agricultural' | 'investment' | null>(null);
+  const [showAccountIndicator, setShowAccountIndicator] = useState(false);
+  const [accountIndicatorType, setAccountIndicatorType] = useState<'regular' | 'partner'>('regular');
 
   const handleAppModeChange = async (mode: AppMode) => {
     await updateIdentity(mode);
@@ -493,15 +496,31 @@ function AppContent() {
     }
   };
 
-  const handleQuickAccessExistingUser = () => {
+  const handleQuickAccessLogin = () => {
     setShowQuickAccountAccess(false);
     setStandaloneRegistrationMode('login');
     setShowStandaloneRegistration(true);
   };
 
-  const handleQuickAccessNewUser = () => {
+  const handleQuickAccessRegister = () => {
     setShowQuickAccountAccess(false);
     setShowWelcomeToAccount(true);
+  };
+
+  const handleOpenRegularAccount = () => {
+    console.log('📱 [QuickAccess] Opening regular account');
+    setShowAccountProfile(true);
+    setAccountContractFilter(null);
+    setAccountIndicatorType('regular');
+    setShowAccountIndicator(true);
+  };
+
+  const handleOpenPartnerAccount = () => {
+    console.log('🌟 [QuickAccess] Opening partner account');
+    setShowAccountProfile(true);
+    setAccountContractFilter(null);
+    setAccountIndicatorType('partner');
+    setShowAccountIndicator(true);
   };
 
   const handleMyFarmClick = () => {
@@ -1319,8 +1338,10 @@ function AppContent() {
 
       {showQuickAccountAccess && (
         <QuickAccountAccess
-          onExistingUser={handleQuickAccessExistingUser}
-          onNewUser={handleQuickAccessNewUser}
+          onLogin={handleQuickAccessLogin}
+          onRegister={handleQuickAccessRegister}
+          onOpenRegularAccount={handleOpenRegularAccount}
+          onOpenPartnerAccount={handleOpenPartnerAccount}
           onClose={() => setShowQuickAccountAccess(false)}
         />
       )}
@@ -1366,6 +1387,12 @@ function AppContent() {
         }}
       />
 
+      {showAccountIndicator && (
+        <AccountTypeIndicator
+          accountType={accountIndicatorType}
+          onClose={() => setShowAccountIndicator(false)}
+        />
+      )}
 
       {selectedInvestmentFarm && (
         <>
