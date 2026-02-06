@@ -2,7 +2,6 @@ import { User, Handshake, Sprout, Wheat, Apple, Grape, Leaf, Video, HelpCircle, 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
-import SmartAssistant from './components/SmartAssistant';
 import AdvancedAIAssistant from './components/AdvancedAIAssistant';
 import SuccessPartnerIntro from './components/SuccessPartnerIntro';
 import SuccessPartnerOnboarding from './components/SuccessPartnerOnboarding';
@@ -59,7 +58,6 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
   const [showVideoIntro, setShowVideoIntro] = useState(false);
   const [showHowToStart, setShowHowToStart] = useState(false);
-  const [showAssistant, setShowAssistant] = useState(false);
   const [showSuccessPartnerIntro, setShowSuccessPartnerIntro] = useState(false);
   const [showSuccessPartnerOnboarding, setShowSuccessPartnerOnboarding] = useState(false);
   const [showSuccessPartnerRegistration, setShowSuccessPartnerRegistration] = useState(false);
@@ -1081,7 +1079,7 @@ function AppContent() {
           </>
         )}
 
-      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && (
+      {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && (
         <nav
           className="hidden lg:flex fixed left-0 right-0 z-50 backdrop-blur-2xl"
           style={{
@@ -1127,26 +1125,6 @@ function AppContent() {
               <Sprout className="w-6 h-6 text-white transition-transform duration-300 group-hover:scale-110" />
             </div>
             <span className="text-sm font-bold text-white relative">اعرض مزرعتك</span>
-          </button>
-
-          <button
-            onClick={() => setShowAssistant(true)}
-            className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 hover:scale-105 relative group"
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.08) 0%, rgba(58,161,126,0.12) 100%)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
-          >
-            <Sparkles className="w-6 h-6 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
-            <span className="text-sm font-bold text-darkgreen">المساعد</span>
-            <div className="absolute top-2 right-2 w-3 h-3 rounded-full animate-pulse" style={{
-              background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
-              boxShadow: '0 0 10px rgba(212,175,55,0.6)'
-            }}></div>
           </button>
 
           <button
@@ -1212,7 +1190,7 @@ function AppContent() {
       </nav>
       )}
 
-      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && (
+      {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && (
         <nav
           className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
         style={{
@@ -1258,30 +1236,6 @@ function AppContent() {
               </div>
             </div>
             <span className="text-[9px] font-bold" style={{ color: '#b8942f' }}>اعرض مزرعتك</span>
-          </button>
-
-          <button
-            onClick={() => setShowAssistant(true)}
-            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
-          >
-            <div
-              className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 relative group-active:scale-90 overflow-hidden"
-              style={{
-                background: 'linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,252,250,0.9) 100%)',
-                boxShadow: '0 4px 8px rgba(58,161,126,0.15), inset 0 2px 4px rgba(255,255,255,0.9)',
-                border: '2px solid rgba(58,161,126,0.3)'
-              }}
-            >
-              <Sparkles className="w-5 h-5 text-darkgreen transition-all duration-300 group-active:scale-110" />
-              <div
-                className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full animate-pulse"
-                style={{
-                  background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
-                  boxShadow: '0 0 8px rgba(212,175,55,0.6)'
-                }}
-              />
-            </div>
-            <span className="text-[9px] font-bold text-darkgreen/70">المساعد</span>
           </button>
 
           <button
@@ -1343,11 +1297,6 @@ function AppContent() {
         isOpen={showHowToStart}
         onClose={() => setShowHowToStart(false)}
         onStart={() => alert('قريباً')}
-      />
-
-      <SmartAssistant
-        isOpen={showAssistant}
-        onClose={() => setShowAssistant(false)}
       />
 
       <SuccessPartnerIntro
