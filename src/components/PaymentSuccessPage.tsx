@@ -36,17 +36,22 @@ export default function PaymentSuccessPage({ reservationId, onViewMyTrees, onGoH
         .select(`
           *,
           farms(name_ar),
-          tree_varieties(name_ar)
+          reservation_items(variety_name, type_name, quantity)
         `)
         .eq('id', reservationId)
         .single();
 
       if (error) throw error;
 
+      const firstItem = reservation.reservation_items?.[0];
+      const treeType = firstItem
+        ? `${firstItem.variety_name || firstItem.type_name}`
+        : 'شجرة';
+
       setDetails({
         farmName: reservation.farms?.name_ar || 'المزرعة',
         treeCount: reservation.tree_count || 0,
-        treeType: reservation.tree_varieties?.name_ar || 'شجرة',
+        treeType,
         totalPrice: reservation.total_price || 0,
         pathType: reservation.path_type || 'agricultural',
         contractStartDate: reservation.contract_start_date || new Date().toISOString(),
