@@ -137,7 +137,7 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
                   <span className="text-white font-bold">2</span>
                 </div>
                 <p className="text-sm text-gray-700 text-right flex-1">
-                  شارك اسمك أو رابطك الخاص
+                  شارك اسمك الخاص
                 </p>
               </div>
 

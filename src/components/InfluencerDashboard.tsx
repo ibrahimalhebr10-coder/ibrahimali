@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Award, TrendingUp, Calendar, MapPin, Sparkles, Share2, Link as LinkIcon, Copy, CheckCircle2, Bell, Users, Gift, Target, MessageCircle, Phone } from 'lucide-react';
+import { Award, TrendingUp, Calendar, MapPin, Sparkles, Copy, CheckCircle2, Bell, Users, Gift, Target } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import {
   influencerMarketingService,
@@ -13,7 +13,6 @@ export default function InfluencerDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiedName, setCopiedName] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [showAchievements, setShowAchievements] = useState(false);
@@ -82,28 +81,6 @@ export default function InfluencerDashboard() {
     }
   };
 
-  const handleShareByLink = async () => {
-    if (!stats) return;
-
-    const partnerName = stats.name || '';
-    const referralLink = `${window.location.origin}?ref=${encodeURIComponent(partnerName)}`;
-    const textToShare = `مرحباً! أنا ${stats.display_name || partnerName} - شريك نجاح في منصة حصص زراعية 🌿
-
-احجز عبر رابطي الخاص:
-${referralLink}
-
-استثمر في مزارع حقيقية واربح من منتجاتها! 🌱`;
-
-    try {
-      await navigator.clipboard.writeText(textToShare);
-      setCopiedLink(true);
-      setTimeout(() => setCopiedLink(false), 2000);
-    } catch (err) {
-      console.error('Error copying:', err);
-      alert('تم تحضير الرسالة! الرجاء النسخ يدوياً');
-    }
-  };
-
   const handleCopyCode = async () => {
     if (!stats?.name) return;
 
@@ -114,22 +91,6 @@ ${referralLink}
     } catch (err) {
       console.error('Error copying code:', err);
     }
-  };
-
-  const handleShareWhatsApp = () => {
-    if (!stats) return;
-
-    const partnerName = stats.name || '';
-    const referralLink = `${window.location.origin}?ref=${encodeURIComponent(partnerName)}`;
-    const message = `مرحباً! أنا ${stats.display_name || partnerName} - شريك نجاح في منصة حصص زراعية 🌿
-
-احجز عبر رابطي الخاص:
-${referralLink}
-
-استثمر في مزارع حقيقية واربح من منتجاتها! 🌱`;
-
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, '_blank');
   };
 
   const getAchievements = () => {
@@ -365,16 +326,16 @@ ${referralLink}
 
       {/* قسم المشاركة */}
       <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border border-emerald-200">
-        <h3 className="text-lg font-bold text-emerald-900 mb-4 text-center">شارك كودك واكسب المزيد!</h3>
+        <h3 className="text-lg font-bold text-emerald-900 mb-4 text-center">شارك اسمك واكسب المزيد!</h3>
 
         <div className="bg-white/80 rounded-xl p-4 mb-4">
-          <p className="text-sm text-emerald-800 font-semibold mb-2 text-center">كودك الخاص:</p>
+          <p className="text-sm text-emerald-800 font-semibold mb-2 text-center">اسمك الخاص:</p>
           <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-emerald-50 border-2 border-emerald-300">
             <p className="text-xl font-black text-emerald-900">{stats?.name || ''}</p>
             <button
               onClick={handleCopyCode}
               className="p-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all duration-300 active:scale-95"
-              title="نسخ الكود"
+              title="نسخ الاسم"
             >
               {copiedCode ? (
                 <CheckCircle2 className="w-5 h-5" />
@@ -385,73 +346,41 @@ ${referralLink}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          <button
-            onClick={handleShareByName}
-            className="py-4 px-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 active:scale-95"
-            style={{
-              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
-              border: '2px solid rgba(255, 255, 255, 0.3)'
-            }}
-          >
-            {copiedName ? (
-              <>
-                <CheckCircle2 className="w-5 h-5 text-white" />
-                <span className="text-white font-bold text-sm">تم النسخ!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="w-5 h-5 text-white" />
-                <span className="text-white font-bold text-sm">انسخ باسمك</span>
-              </>
-            )}
-          </button>
+        <button
+          onClick={handleShareByName}
+          className="w-full py-5 px-6 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 active:scale-95"
+          style={{
+            background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+            boxShadow: '0 6px 20px rgba(16, 185, 129, 0.4)',
+            border: '2px solid rgba(255, 255, 255, 0.3)'
+          }}
+        >
+          {copiedName ? (
+            <>
+              <CheckCircle2 className="w-6 h-6 text-white" />
+              <span className="text-white font-bold text-lg">تم النسخ!</span>
+            </>
+          ) : (
+            <>
+              <Copy className="w-6 h-6 text-white" />
+              <span className="text-white font-bold text-lg">انسخ رسالة المشاركة</span>
+            </>
+          )}
+        </button>
 
-          <button
-            onClick={handleShareByLink}
-            className="py-4 px-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 active:scale-95"
-            style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
-              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
-              border: '2px solid rgba(255, 255, 255, 0.3)'
-            }}
-          >
-            {copiedLink ? (
-              <>
-                <CheckCircle2 className="w-5 h-5 text-white" />
-                <span className="text-white font-bold text-sm">تم النسخ!</span>
-              </>
-            ) : (
-              <>
-                <LinkIcon className="w-5 h-5 text-white" />
-                <span className="text-white font-bold text-sm">انسخ رابطك</span>
-              </>
-            )}
-          </button>
-
-          <button
-            onClick={handleShareWhatsApp}
-            className="py-4 px-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 active:scale-95"
-            style={{
-              background: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
-              boxShadow: '0 4px 12px rgba(37, 211, 102, 0.3)',
-              border: '2px solid rgba(255, 255, 255, 0.3)'
-            }}
-          >
-            <MessageCircle className="w-5 h-5 text-white" />
-            <span className="text-white font-bold text-sm">شارك واتساب</span>
-          </button>
+        <div className="mt-4 bg-white/80 rounded-xl p-4">
+          <p className="text-xs text-emerald-800 text-center leading-relaxed">
+            💡 <span className="font-bold">نصيحة:</span> اضغط على الزر لنسخ رسالة جاهزة تحتوي على اسمك، ثم الصقها في واتساب أو أي مكان تريد المشاركة فيه
+          </p>
         </div>
 
-        <p className="text-xs text-center text-emerald-700 mt-4 leading-relaxed">
-          💡 <span className="font-bold">نصيحة:</span> اضغط على أي زر لنسخ الرسالة، ثم الصقها في أي مكان تريد المشاركة فيه
-        </p>
-
-        <div className="mt-4 bg-white/60 rounded-xl p-3 text-center">
-          <p className="text-xs text-emerald-800">
-            <span className="font-bold">الأزرار الثلاثة:</span> "باسمك" للمجموعات | "رابطك" للسوشيال ميديا | "واتساب" يفتح التطبيق مباشرة
-          </p>
+        <div className="mt-4 bg-gradient-to-r from-amber-50 to-emerald-50 rounded-xl p-4 border border-emerald-200">
+          <p className="text-sm text-emerald-900 text-center font-semibold mb-2">كيف يستخدم العميل اسمك؟</p>
+          <div className="bg-white/80 rounded-lg p-3 text-center">
+            <p className="text-xs text-emerald-800">
+              عند الحجز، يكتب العميل اسمك <span className="font-bold text-emerald-900">{stats?.name || ''}</span> في حقل "كود شريك النجاح"
+            </p>
+          </div>
         </div>
       </div>
 
