@@ -34,8 +34,12 @@ export default function QuickAccountAccess({
     try {
       setLoading(true);
 
-      console.log('🔍 [QuickAccountAccess] Checking account type...');
-      console.log('   User:', user?.id || 'NO USER');
+      console.log('');
+      console.log('🔍'.repeat(50));
+      console.log('🔍 [QuickAccountAccess] checkAccountType() called');
+      console.log('🔍 User:', user?.id || 'NO USER');
+      console.log('🔍'.repeat(50));
+      console.log('');
 
       // If user is not logged in, show login selector
       if (!user) {
@@ -78,11 +82,24 @@ export default function QuickAccountAccess({
           onClose();
         }, 100);
       } else if (type === 'partner') {
-        console.log('⭐ [QuickAccountAccess] Opening partner account...');
+        console.log('');
+        console.log('⭐'.repeat(50));
+        console.log('⭐ [QuickAccountAccess] TYPE IS PARTNER - Opening partner account...');
+        console.log('⭐ About to call onOpenPartnerAccount() in 100ms');
+        console.log('⭐'.repeat(50));
+        console.log('');
         // Has partner account only - open it directly
         setTimeout(() => {
+          console.log('');
+          console.log('🚀'.repeat(50));
+          console.log('🚀 [QuickAccountAccess] Calling onOpenPartnerAccount NOW');
           onOpenPartnerAccount();
+          console.log('✅ [QuickAccountAccess] onOpenPartnerAccount called successfully');
+          console.log('🔒 [QuickAccountAccess] Calling onClose to hide QuickAccountAccess');
           onClose();
+          console.log('✅ [QuickAccountAccess] onClose called');
+          console.log('🚀'.repeat(50));
+          console.log('');
         }, 100);
       } else if (type === 'both') {
         console.log('🔀 [QuickAccountAccess] Has both accounts - showing selector');

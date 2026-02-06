@@ -18,11 +18,23 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('');
+    console.log('🎭'.repeat(50));
+    console.log('🎭 [SuccessPartnerAccount] Component useEffect triggered');
+    console.log('🎭 isOpen:', isOpen);
+    console.log('🎭 user:', user?.id || 'NO USER');
+    console.log('🎭'.repeat(50));
+    console.log('');
+
     if (isOpen && user) {
+      console.log('✅ [SuccessPartnerAccount] isOpen=true AND user exists - calling checkPartnerStatus');
       checkPartnerStatus();
     } else if (isOpen && !user) {
+      console.log('⚠️ [SuccessPartnerAccount] isOpen=true BUT NO user');
       setIsPartner(false);
       setLoading(false);
+    } else {
+      console.log('❌ [SuccessPartnerAccount] isOpen=false - component will not render');
     }
   }, [isOpen, user]);
 
@@ -70,7 +82,20 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log('🚫 [SuccessPartnerAccount] isOpen is FALSE - returning null (component not visible)');
+    return null;
+  }
+
+  console.log('');
+  console.log('🟢'.repeat(50));
+  console.log('🟢 [SuccessPartnerAccount] Component IS RENDERING');
+  console.log('🟢 isOpen:', isOpen);
+  console.log('🟢 loading:', loading);
+  console.log('🟢 isPartner:', isPartner);
+  console.log('🟢 user:', user?.id || 'NO USER');
+  console.log('🟢'.repeat(50));
+  console.log('');
 
   const handleSignOut = async (fullLogout: boolean = false) => {
     await signOut(fullLogout);
