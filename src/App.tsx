@@ -490,14 +490,9 @@ function AppContent() {
 
   const handleMyAccountClick = () => {
     console.log(`👤 [Header] My Account clicked`);
-    if (user) {
-      console.log(`✅ [Header] Opening Account Profile without filter (show all contracts)`);
-      setAccountContractFilter(null);
-      setShowAccountProfile(true);
-    } else {
-      console.log(`⚠️ [Header] No user - showing quick access`);
-      setShowQuickAccountAccess(true);
-    }
+    // Always use QuickAccountAccess - it will check account type and route correctly
+    console.log(`🔄 [Header] Opening QuickAccountAccess to check account type`);
+    setShowQuickAccountAccess(true);
   };
 
   const handleQuickAccessLogin = () => {
