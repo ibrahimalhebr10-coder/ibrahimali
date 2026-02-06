@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض توضيحي: زر شريك النجاح</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #fafcfb 0%, #f5faf7 50%, #f8fcfa 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #047857;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .demo-section {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #10b981;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .action-button {
+            flex: 1;
+            height: 80px;
+            border-radius: 16px;
+            border: 2px solid;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+
+        .action-button:hover {
+            transform: scale(1.05);
+        }
+
+        .action-button:active {
+            transform: scale(0.95);
+        }
+
+        .btn-success-partner {
+            border-color: #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.15) 100%);
+        }
+
+        .btn-success-partner:hover {
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-video {
+            border-color: #ec4899;
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.1) 0%, rgba(219, 39, 119, 0.15) 100%);
+        }
+
+        .btn-how-to {
+            border-color: #f59e0b;
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.15) 100%);
+        }
+
+        .icon {
+            font-size: 32px;
+        }
+
+        .label {
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .btn-success-partner .label {
+            color: #047857;
+        }
+
+        .btn-video .label {
+            color: #be185d;
+        }
+
+        .btn-how-to .label {
+            color: #b45309;
+        }
+
+        .info-box {
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .info-box h3 {
+            color: #047857;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #065f46;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .modal-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #047857;
+            margin-bottom: 15px;
+        }
+
+        .modal-text {
+            font-size: 16px;
+            color: #6b7280;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .modal-button {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
+        }
+
+        .close-btn {
+            background: #e5e7eb;
+            color: #6b7280;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .status-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .checklist {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .check-icon {
+            color: #10b981;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 عرض توضيحي: نظام شريك النجاح</h1>
+            <p>هذا عرض توضيحي لكيفية عمل الميزة في التطبيق الفعلي</p>
+        </div>
+
+        <div class="demo-section">
+            <div class="section-title">الأزرار في أعلى الصفحة الرئيسية</div>
+            <p style="color: #6b7280; margin-bottom: 15px; font-size: 14px;">
+                هذه الأزرار موجودة في التطبيق مباشرة تحت الـ Header
+            </p>
+
+            <div class="buttons-container">
+                <button class="action-button btn-success-partner" onclick="showModal()">
+                    <div class="icon">✋</div>
+                    <div class="label">شريك النجاح</div>
+                </button>
+
+                <button class="action-button btn-video">
+                    <div class="icon">📹</div>
+                    <div class="label">فيديو تعريفي</div>
+                </button>
+
+                <button class="action-button btn-how-to">
+                    <div class="icon">❓</div>
+                    <div class="label">كيف تبدأ؟</div>
+                </button>
+            </div>
+
+            <div class="info-box">
+                <h3>👆 جرب الضغط على الزر الأخضر!</h3>
+                <p>عند الضغط على زر "شريك النجاح" في التطبيق الفعلي، ستبدأ رحلة التسجيل المكونة من 4 مراحل.</p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <div class="section-title">الحالة الفعلية للنظام</div>
+
+            <div class="checklist">
+                <div class="checklist-item">
+                    <span class="check-icon">✅</span>
+                    <span><strong>الكود:</strong> موجود ويعمل بالكامل</span>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="check-icon">✅</span>
+                    <span><strong>Components:</strong> جميع المكونات موجودة</span>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="check-icon">✅</span>
+                    <span><strong>قاعدة البيانات:</strong> Migration مُطبّق</span>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="check-icon">✅</span>
+                    <span><strong>البناء:</strong> نجح بدون أخطاء</span>
+                </div>
+
+                <div class="checklist-item">
+                    <span class="check-icon">✅</span>
+                    <span><strong>المراحل:</strong> 4 مراحل مكتملة</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px; padding: 15px; background: #fef3c7; border-radius: 12px; text-align: center;">
+                <p style="color: #92400e; font-weight: bold; margin-bottom: 10px;">
+                    📍 أين تجد الزر في التطبيق؟
+                </p>
+                <p style="color: #78350f; font-size: 14px;">
+                    الصفحة الرئيسية > أعلى الصفحة > تحت Header مباشرة
+                </p>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <div class="section-title">المراحل الأربعة</div>
+
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div class="status status-success">المرحلة 1: شاشة التعريف ✅</div>
+                <div class="status status-success">المرحلة 2: الجولة التعريفية (4 شاشات) ✅</div>
+                <div class="status status-success">المرحلة 3: نموذج التسجيل ✅</div>
+                <div class="status status-success">المرحلة 4: شاشة النجاح ✅</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-icon">🎉</div>
+            <div class="modal-title">مرحباً بك في برنامج شريك النجاح!</div>
+            <div class="modal-text">
+                هذا عرض توضيحي فقط. في التطبيق الفعلي، ستفتح هذه الشاشة:
+                <br><br>
+                <strong>شاشة التعريف</strong> → ثم <strong>4 شاشات توضيحية</strong> → ثم <strong>نموذج التسجيل</strong> → وأخيراً <strong>شاشة النجاح</strong>
+            </div>
+            <button class="modal-button" onclick="hideModal()">رائع! فهمت</button>
+            <button class="close-btn" onclick="hideModal()">إغلاق</button>
+        </div>
+    </div>
+
+    <script>
+        function showModal() {
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function hideModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideModal();
+            }
+        });
+    </script>
+</body>
+</html>
