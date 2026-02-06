@@ -8,7 +8,7 @@ export default function VideoIntroManager() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [showUploadForm, setShowUploadForm] = useState(false);
 
   const [formData, setFormData] = useState({
     title: 'تعرّف على جود',
@@ -24,6 +24,7 @@ export default function VideoIntroManager() {
       setLoading(true);
       const data = await videoIntroService.getActiveVideo();
       setVideo(data);
+      setShowUploadForm(!data);
       if (data) {
         setFormData({
           title: data.title,
@@ -79,7 +80,7 @@ export default function VideoIntroManager() {
       });
 
       setVideo(newVideo);
-      setPreviewUrl(URL.createObjectURL(file));
+      setShowUploadForm(false);
       setSuccess('تم رفع الفيديو بنجاح');
     } catch (err) {
       console.error('Error uploading video:', err);
@@ -124,7 +125,7 @@ export default function VideoIntroManager() {
 
       await videoIntroService.deleteVideo(video.id);
       setVideo(null);
-      setPreviewUrl(null);
+      setShowUploadForm(true);
       setSuccess('تم حذف الفيديو بنجاح');
     } catch (err) {
       console.error('Error deleting video:', err);
@@ -169,7 +170,7 @@ export default function VideoIntroManager() {
           </div>
         </div>
 
-        {video ? (
+        {video && !showUploadForm ? (
           <div className="space-y-6">
             <div className="relative bg-gray-900 rounded-lg overflow-hidden aspect-video">
               <video
@@ -216,11 +217,19 @@ export default function VideoIntroManager() {
                 </button>
 
                 <button
+                  onClick={() => setShowUploadForm(true)}
+                  className="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition-all flex items-center gap-2"
+                >
+                  <Upload className="w-5 h-5" />
+                  استبدال الفيديو
+                </button>
+
+                <button
                   onClick={handleDelete}
                   className="px-6 py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition-all flex items-center gap-2"
                 >
                   <Trash2 className="w-5 h-5" />
-                  حذف الفيديو
+                  حذف
                 </button>
               </div>
             </div>
@@ -290,6 +299,18 @@ export default function VideoIntroManager() {
                     placeholder="مثال: استثمار زراعي حقيقي في مزارع طبيعية"
                   />
                 </div>
+
+                {video && (
+                  <button
+                    onClick={() => {
+                      setShowUploadForm(false);
+                      setError(null);
+                    }}
+                    className="w-full px-6 py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-all"
+                  >
+                    إلغاء
+                  </button>
+                )}
               </div>
             )}
           </div>
