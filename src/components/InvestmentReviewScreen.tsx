@@ -3,12 +3,14 @@ import { ArrowLeft, MapPin, Calendar, DollarSign, Clock, Gift } from 'lucide-rea
 interface InvestmentReviewScreenProps {
   farmName: string;
   farmLocation?: string;
+  packageName?: string;
   contractName: string;
   durationYears: number;
   bonusYears: number;
   treeCount: number;
   totalPrice: number;
-  pricePerTree: number;
+  pricePerTree?: number;
+  treeVarieties?: any[];
   onConfirm: () => void;
   onBack: () => void;
   isLoading?: boolean;
@@ -17,16 +19,19 @@ interface InvestmentReviewScreenProps {
 export default function InvestmentReviewScreen({
   farmName,
   farmLocation,
+  packageName,
   contractName,
   durationYears,
   bonusYears,
   treeCount,
   totalPrice,
   pricePerTree,
+  treeVarieties,
   onConfirm,
   onBack,
   isLoading = false
 }: InvestmentReviewScreenProps) {
+  const calculatedPricePerTree = pricePerTree || (treeCount > 0 ? Math.round(totalPrice / treeCount) : 0);
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 z-50 overflow-y-auto">
       <div className="min-h-screen p-4 flex items-center justify-center">
@@ -77,7 +82,7 @@ export default function InvestmentReviewScreen({
                   <span className="text-sm font-semibold text-gray-600">عدد الأشجار</span>
                   <div className="text-right">
                     <p className="text-xl font-bold text-green-700">{treeCount} شجرة</p>
-                    <p className="text-xs text-gray-500">{pricePerTree.toLocaleString()} ر.س للشجرة</p>
+                    <p className="text-xs text-gray-500">{calculatedPricePerTree.toLocaleString()} ر.س للشجرة</p>
                   </div>
                 </div>
 

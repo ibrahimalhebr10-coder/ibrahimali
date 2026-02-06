@@ -4,9 +4,8 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import type { FarmProject, FarmContract } from '../services/farmService';
 import { investmentPackagesService, type InvestmentPackage } from '../services/investmentPackagesService';
-import InvestmentReviewScreen from './InvestmentReviewScreen';
 import InvestmentPackageDetailsModal from './InvestmentPackageDetailsModal';
-import PaymentPage from './PaymentPage';
+import UnifiedBookingFlow from './UnifiedBookingFlow';
 import { usePageTracking } from '../hooks/useLeadTracking';
 import InfluencerCodeInput from './InfluencerCodeInput';
 import FeaturedPackageOverlay from './FeaturedPackageOverlay';
@@ -64,12 +63,9 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showPackageDetailsModal, setShowPackageDetailsModal] = useState(false);
-  const [showReviewScreen, setShowReviewScreen] = useState(false);
-  const [showPaymentPage, setShowPaymentPage] = useState(false);
-  const [reservationId, setReservationId] = useState<string>('');
+  const [showBookingFlow, setShowBookingFlow] = useState(false);
   const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
   const [isLoadingContract, setIsLoadingContract] = useState(false);
-  const [isCreatingReservation, setIsCreatingReservation] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const packagesScrollRef = useRef<HTMLDivElement>(null);
   const [influencerCode, setInfluencerCode] = useState<string | null>(null);
@@ -298,71 +294,17 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       return;
     }
 
-    setShowReviewScreen(true);
+    setShowBookingFlow(true);
   };
 
-  const handleConfirmReview = async () => {
-    if (isCreatingReservation) {
-      console.log('⚠️ [INVESTMENT] جاري إنشاء الحجز بالفعل، تم تجاهل الضغطة');
-      return;
-    }
+  const handleBookingComplete = () => {
+    console.log('✅ [INVESTMENT] تم إتمام الحجز والدفع بنجاح!');
+    setShowBookingFlow(false);
+    handleGoToAccount();
+  };
 
-    if (!selectedContract || treeCount === 0) {
-      alert('يرجى اختيار باقة وعدد الأشجار');
-      return;
-    }
-
-    setIsCreatingReservation(true);
-
-    try {
-      const totalPrice = calculateTotal();
-
-      console.log('💰 [INVESTMENT] بدء إنشاء الحجز...');
-      console.log('💰 [INVESTMENT] User ID:', user?.id || 'غير مسجل');
-      console.log('💰 [INVESTMENT] Trees:', treeCount, 'Price:', totalPrice);
-      console.log('💰 [INVESTMENT] Path Type: investment (أشجاري الذهبية)');
-      if (influencerCode) {
-        console.log('🎁 [INVESTMENT] Influencer Code:', influencerCode);
-      }
-
-      const { data: reservation, error: reservationError } = await supabase
-        .from('reservations')
-        .insert({
-          user_id: user?.id || null,
-          farm_id: farm.id,
-          farm_name: farm.name,
-          contract_id: selectedContract.id,
-          contract_name: selectedPackage?.package_name || selectedContract.contract_name,
-          duration_years: selectedPackage?.base_duration_years || selectedContract.duration_years,
-          bonus_years: selectedPackage?.bonus_free_years || selectedContract.bonus_years,
-          total_trees: treeCount,
-          total_price: totalPrice,
-          path_type: 'investment',
-          status: 'pending',
-          influencer_code: influencerCode || null
-        } as any)
-        .select()
-        .single() as any;
-
-      if (reservationError) {
-        console.error('❌ [INVESTMENT] خطأ في إنشاء الحجز:', reservationError);
-        alert('حدث خطأ في إنشاء الحجز. يرجى المحاولة مرة أخرى');
-        setIsCreatingReservation(false);
-        return;
-      }
-
-      console.log('✅ [INVESTMENT] تم إنشاء الحجز! ID:', reservation.id);
-      console.log('✅ [INVESTMENT] Path Type المُحفوظ:', reservation.path_type);
-
-      setReservationId(reservation.id);
-      setShowReviewScreen(false);
-      setShowPaymentPage(true);
-      console.log('💳 [INVESTMENT] فتح صفحة الدفع');
-    } catch (error) {
-      console.error('Error creating reservation:', error);
-      alert('حدث خطأ غير متوقع');
-      setIsCreatingReservation(false);
-    }
+  const handleBookingBack = () => {
+    setShowBookingFlow(false);
   };
 
   const handleGoToAccount = () => {
@@ -374,7 +316,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
 
   return (
     <>
-    {!showReviewScreen && (
+    {!showBookingFlow && (
     <div className="fixed inset-0 bg-gradient-to-br from-amber-50/95 via-yellow-50/90 to-orange-50/95 z-50 overflow-y-auto">
       <div className={`min-h-screen ${treeCount > 0 ? 'pb-96' : 'pb-32'}`}>
         {/* Header with Back Button */}
@@ -851,40 +793,23 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
         </div>
       )}
 
-      {/* Investment Review Screen */}
-      {showReviewScreen && selectedContract && (
-        <InvestmentReviewScreen
+      {/* Unified Booking Flow - يشمل المراجعة + التسجيل + الدفع */}
+      {showBookingFlow && selectedContract && selectedPackage && (
+        <UnifiedBookingFlow
+          farmId={farm.id}
           farmName={farm.name}
-          farmLocation={farm.location}
-          contractName={selectedPackage?.package_name || selectedContract.contract_name}
-          durationYears={selectedContract.duration_years}
-          bonusYears={selectedContract.bonus_years}
+          pathType="investment"
+          packageName={selectedPackage.package_name}
           treeCount={treeCount}
+          contractId={selectedContract.id}
+          contractName={selectedPackage.package_name || selectedContract.contract_name}
+          durationYears={selectedPackage.base_duration_years || selectedContract.duration_years}
+          bonusYears={selectedPackage.bonus_free_years || selectedContract.bonus_years}
           totalPrice={calculateTotal()}
-          pricePerTree={selectedPackage?.price_per_tree || selectedContract.investor_price}
-          onConfirm={handleConfirmReview}
-          onBack={() => setShowReviewScreen(false)}
-          isLoading={isCreatingReservation}
+          influencerCode={influencerCode}
+          onBack={handleBookingBack}
+          onComplete={handleBookingComplete}
         />
-      )}
-
-      {/* Payment Page */}
-      {showPaymentPage && reservationId && (
-        <div className="fixed inset-0 z-[60]">
-          <PaymentPage
-            reservationId={reservationId}
-            amount={calculateTotal()}
-            onSuccess={() => {
-              console.log('✅ [INVESTMENT] تم الدفع بنجاح!');
-              setShowPaymentPage(false);
-              handleGoToAccount();
-            }}
-            onBack={() => {
-              setShowPaymentPage(false);
-              setShowReviewScreen(true);
-            }}
-          />
-        </div>
       )}
 
       {/* Package Details Modal */}
