@@ -108,6 +108,10 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   }, [selectedContract]);
 
   useEffect(() => {
+    console.log('📊 [State Change] showReviewScreen:', showReviewScreen, 'showPaymentFlow:', showPaymentFlow, 'reservationId:', reservationId);
+  }, [showReviewScreen, showPaymentFlow, reservationId]);
+
+  useEffect(() => {
     const slider = packagesScrollRef.current;
     if (!slider || packages.length <= 1) return;
 
@@ -350,9 +354,11 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       console.log('✅ [INVESTMENT] تم إنشاء الحجز! ID:', reservation.id);
       console.log('✅ [INVESTMENT] Path Type المُحفوظ:', reservation.path_type);
 
+      console.log('🔄 [INVESTMENT] تغيير الحالة: showReviewScreen -> false, showPaymentFlow -> true');
       setReservationId(reservation.id);
       setShowReviewScreen(false);
       setShowPaymentFlow(true);
+      console.log('✅ [INVESTMENT] تم تعيين الحالة بنجاح');
     } catch (error) {
       console.error('Error creating reservation:', error);
       alert('حدث خطأ غير متوقع');
@@ -369,6 +375,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
 
   return (
     <>
+    {!showReviewScreen && !showPaymentFlow && (
     <div className="fixed inset-0 bg-gradient-to-br from-amber-50/95 via-yellow-50/90 to-orange-50/95 z-50 overflow-y-auto">
       <div className={`min-h-screen ${treeCount > 0 ? 'pb-96' : 'pb-32'}`}>
         {/* Header with Back Button */}
@@ -758,6 +765,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           </div>
         )}
       </div>
+    )}
 
       {/* Video Modal */}
       {showVideoModal && farm.video && (

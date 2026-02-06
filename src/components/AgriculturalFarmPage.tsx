@@ -332,6 +332,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
   return (
     <>
+      {!showReviewScreen && !showPaymentFlow && (
+      <>
       {/* Header - Fixed to viewport */}
       <div className="fixed top-0 left-0 right-0 z-[60] bg-white/80 backdrop-blur-lg border-b border-green-200/50">
         <div className="flex items-center justify-between p-4">
@@ -647,6 +649,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
         </div>
       </div>
+      </>
+      )}
 
       {/* Purchase Summary - Fixed Bottom - Compact Design */}
       {treeCount > 0 && selectedContract && !showReviewScreen && !showPaymentFlow && (() => {
