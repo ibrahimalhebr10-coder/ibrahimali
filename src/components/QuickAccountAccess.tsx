@@ -34,43 +34,59 @@ export default function QuickAccountAccess({
     try {
       setLoading(true);
 
+      console.log('🔍 [QuickAccountAccess] Checking account type...');
+      console.log('   User:', user?.id || 'NO USER');
+
       // If user is not logged in, show login selector
       if (!user) {
+        console.log('❌ [QuickAccountAccess] No user - showing login selector');
         setAccountType('none');
         setLoading(false);
         return;
       }
 
+      console.log('✅ [QuickAccountAccess] User found - calling RPC...');
+
       // Check account types
       const { data, error } = await supabase.rpc('get_user_account_types');
 
       if (error) {
-        console.error('Error checking account types:', error);
+        console.error('❌ [QuickAccountAccess] RPC Error:', error);
         setAccountType('none');
         return;
       }
 
       const result = data as any;
       const type = result?.account_type || 'none';
+
+      console.log('📊 [QuickAccountAccess] RPC Result:');
+      console.log('   Account Type:', type);
+      console.log('   Has Reservations:', result?.has_reservations);
+      console.log('   Is Partner:', result?.is_partner);
+
       setAccountType(type);
 
       // Smart routing based on account type
       if (type === 'regular') {
+        console.log('🌳 [QuickAccountAccess] Opening regular account...');
         // Has regular account only - open it directly
         setTimeout(() => {
           onOpenRegularAccount();
           onClose();
         }, 100);
       } else if (type === 'partner') {
+        console.log('⭐ [QuickAccountAccess] Opening partner account...');
         // Has partner account only - open it directly
         setTimeout(() => {
           onOpenPartnerAccount();
           onClose();
         }, 100);
       } else if (type === 'both') {
+        console.log('🔀 [QuickAccountAccess] Has both accounts - showing selector');
         // Has both accounts - show selector
         // Keep selector visible
       } else {
+        console.log('❓ [QuickAccountAccess] No account found - showing login selector');
         // No account - show login selector
         // Keep login selector visible
       }

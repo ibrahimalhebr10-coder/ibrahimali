@@ -572,11 +572,12 @@ function AppContent() {
 
   const handleRegistrationSuccess = () => {
     setShowStandaloneRegistration(false);
-    // بعد نجاح تسجيل الدخول، نعيد فتح QuickAccountAccess لفحص نوع الحساب
-    console.log('✅ [Registration Success] Re-opening QuickAccountAccess to check account type');
+    // بعد نجاح تسجيل الدخول، ننتظر تحديث AuthContext ثم نفتح QuickAccountAccess
+    console.log('✅ [Registration Success] Waiting for AuthContext to update user state...');
     setTimeout(() => {
+      console.log('✅ [Registration Success] Re-opening QuickAccountAccess to check account type');
       setShowQuickAccountAccess(true);
-    }, 300);
+    }, 1500);
   };
 
   if (isOfferMode) {
