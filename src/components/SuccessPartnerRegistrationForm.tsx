@@ -224,14 +224,14 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
 
               <div className="space-y-3">
                 <h3 className="text-2xl font-black text-emerald-900">
-                  {isPending ? 'تم استلام طلبك!' : 'مرحباً بك في شركاء النجاح!'}
+                  {isPending ? 'شكراً لانضمامك!' : 'مرحباً بك في شركاء النجاح!'}
                 </h3>
                 <p className="text-lg text-emerald-800/80 leading-relaxed">
                   {isPending ? (
                     <>
-                      طلبك قيد المراجعة حالياً
+                      نشكرك على تسجيلك كشريك نجاح
                       <br />
-                      سنتواصل معك خلال 24 ساعة
+                      سيتم تفعيل اسمك للمشاركة خلال 24 ساعة
                     </>
                   ) : (
                     <>
@@ -247,8 +247,16 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
                 background: 'linear-gradient(135deg, rgba(236, 253, 245, 0.5) 0%, rgba(209, 250, 229, 0.4) 100%)',
                 border: '2px solid rgba(16, 185, 129, 0.2)'
               }}>
-                <p className="text-sm text-emerald-700">
-                  {isPending ? 'شكراً لصبرك، سيتم إشعارك فور الموافقة' : 'جاري تسجيل دخولك تلقائياً...'}
+                <p className="text-sm text-emerald-700 font-medium">
+                  {isPending ? (
+                    <>
+                      <span className="font-bold">📋 مدة التفعيل:</span> خلال 24 ساعة من الآن
+                      <br />
+                      <span className="text-emerald-600">سنتواصل معك فور الموافقة على طلبك</span>
+                    </>
+                  ) : (
+                    'جاري تسجيل دخولك تلقائياً...'
+                  )}
                 </p>
               </div>
             </div>
