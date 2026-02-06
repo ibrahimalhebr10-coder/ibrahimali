@@ -273,7 +273,12 @@ export const influencerMarketingService = {
 
   async getMyInfluencerStats(): Promise<InfluencerStats | null> {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return null;
+    if (!user) {
+      console.log('🔍 [getMyInfluencerStats] No user logged in');
+      return null;
+    }
+
+    console.log('🔍 [getMyInfluencerStats] Fetching stats for user:', user.id);
 
     const { data, error } = await supabase
       .from('influencer_rewards_details')
@@ -282,8 +287,17 @@ export const influencerMarketingService = {
       .eq('is_active', true)
       .maybeSingle();
 
-    if (error) throw error;
-    if (!data) return null;
+    if (error) {
+      console.error('❌ [getMyInfluencerStats] Error:', error);
+      throw error;
+    }
+
+    if (!data) {
+      console.log('⚠️ [getMyInfluencerStats] No data found for user:', user.id);
+      return null;
+    }
+
+    console.log('✅ [getMyInfluencerStats] Data found:', data);
 
     return {
       name: data.referral_code,
@@ -315,18 +329,40 @@ export const influencerMarketingService = {
 
   async checkIfUserIsInfluencer(): Promise<boolean> {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return false;
+    if (!user) {
+      console.log('🔍 [checkIfUserIsInfluencer] No user logged in');
+      return false;
+    }
+
+    console.log('🔍 [checkIfUserIsInfluencer] Checking for user:', user.id);
 
     const { data, error } = await supabase
       .from('influencer_partners')
-      .select('id')
+      .select('id, status, is_active, name')
       .eq('user_id', user.id)
-      .eq('is_active', true)
       .maybeSingle();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ [checkIfUserIsInfluencer] Error:', error);
+      throw error;
+    }
 
-    return !!data;
+    if (!data) {
+      console.log('⚠️ [checkIfUserIsInfluencer] No partner record found');
+      return false;
+    }
+
+    console.log('📊 [checkIfUserIsInfluencer] Partner record found:', {
+      id: data.id,
+      name: data.name,
+      status: data.status,
+      is_active: data.is_active
+    });
+
+    const isActive = data.status === 'active' && data.is_active === true;
+    console.log(isActive ? '✅ [checkIfUserIsInfluencer] User is active partner' : '⚠️ [checkIfUserIsInfluencer] Partner not active');
+
+    return isActive;
   },
 
   async getFeaturedPackageSettings(): Promise<FeaturedPackageSettings | null> {

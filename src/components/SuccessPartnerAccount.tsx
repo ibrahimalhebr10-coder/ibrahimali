@@ -28,6 +28,7 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
 
   const checkPartnerStatus = async () => {
     if (!user) {
+      console.log('🔍 [SuccessPartnerAccount] No user - setting isPartner to false');
       setIsPartner(false);
       setLoading(false);
       return;
@@ -35,21 +36,34 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
 
     try {
       setLoading(true);
+      console.log('🔍 [SuccessPartnerAccount] Checking partner status for user:', user.id);
+
       const { data, error } = await supabase
         .from('influencer_partners')
-        .select('id, is_active, status')
+        .select('id, is_active, status, name')
         .eq('user_id', user.id)
         .eq('status', 'active')
         .eq('is_active', true)
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
-        console.error('Error checking partner status:', error);
+        console.error('❌ [SuccessPartnerAccount] Error checking partner status:', error);
+      }
+
+      if (data) {
+        console.log('✅ [SuccessPartnerAccount] Active partner found:', {
+          id: data.id,
+          name: data.name,
+          status: data.status,
+          is_active: data.is_active
+        });
+      } else {
+        console.log('⚠️ [SuccessPartnerAccount] No active partner record found');
       }
 
       setIsPartner(!!data);
     } catch (err) {
-      console.error('Error in checkPartnerStatus:', err);
+      console.error('❌ [SuccessPartnerAccount] Error in checkPartnerStatus:', err);
       setIsPartner(false);
     } finally {
       setLoading(false);
