@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import AgriculturalReviewScreen from './AgriculturalReviewScreen';
 import InvestmentReviewScreen from './InvestmentReviewScreen';
+import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 
 interface UnifiedBookingFlowProps {
   farmId: string;
@@ -22,14 +24,12 @@ interface UnifiedBookingFlowProps {
 type FlowStep = 'review' | 'payment';
 
 export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
+  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<FlowStep>('review');
   const [reservationId, setReservationId] = useState<string>('');
 
   const handleReviewConfirm = async () => {
     try {
-      const { supabase } = await import('../lib/supabase');
-      const { user } = await import('../contexts/AuthContext').then(m => m.useAuth());
-
       const { data: reservation, error } = await supabase
         .from('reservations')
         .insert({
