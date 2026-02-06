@@ -105,24 +105,46 @@ export const influencerMarketingService = {
       .from('influencer_partners')
       .select('*')
       .eq('name', code.trim())
-      .single();
+      .maybeSingle();
 
     if (error) {
-      if (error.code === 'PGRST116') {
-        return {
-          isValid: false,
-          partner: null,
-          message: 'الكود غير مسجل في النظام'
-        };
-      }
-      throw error;
+      console.error('Error verifying influencer code:', error);
+      return {
+        isValid: false,
+        partner: null,
+        message: 'حدث خطأ أثناء التحقق من الكود'
+      };
     }
 
-    if (!data.is_active) {
+    if (!data) {
+      return {
+        isValid: false,
+        partner: null,
+        message: 'الكود غير مسجل في النظام'
+      };
+    }
+
+    if (data.status === 'pending') {
+      return {
+        isValid: false,
+        partner: null,
+        message: 'هذا الشريك قيد المراجعة. سيتم تفعيل الكود خلال 24 ساعة'
+      };
+    }
+
+    if (data.status === 'suspended' || data.status === 'rejected') {
       return {
         isValid: false,
         partner: null,
         message: 'هذا الكود غير نشط، يرجى التواصل مع الإدارة'
+      };
+    }
+
+    if (!data.is_active || data.status !== 'active') {
+      return {
+        isValid: false,
+        partner: null,
+        message: 'هذا الكود غير مفعّل حالياً، يرجى التواصل مع الإدارة'
       };
     }
 
