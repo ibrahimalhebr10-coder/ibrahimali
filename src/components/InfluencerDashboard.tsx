@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Award, TrendingUp, Calendar, MapPin, Sparkles } from 'lucide-react';
+import { Award, TrendingUp, Calendar, MapPin, Sparkles, Share2, Link as LinkIcon, Copy, CheckCircle2 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import {
   influencerMarketingService,
   InfluencerStats,
@@ -11,6 +12,8 @@ export default function InfluencerDashboard() {
   const [activityLog, setActivityLog] = useState<InfluencerActivityLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copiedName, setCopiedName] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -33,6 +36,59 @@ export default function InfluencerDashboard() {
       setError('فشل تحميل البيانات');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleShareByName = async () => {
+    if (!stats) return;
+
+    const partnerName = stats.name || '';
+    const textToShare = `مرحباً! أنا ${stats.display_name || partnerName} - شريك نجاح في منصة حصص زراعية 🌿
+
+عند حجزك، اكتب اسمي: ${partnerName}
+
+استثمر في مزارع حقيقية واربح من منتجاتها! 🌱`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          text: textToShare
+        });
+      } else {
+        await navigator.clipboard.writeText(textToShare);
+        setCopiedName(true);
+        setTimeout(() => setCopiedName(false), 2000);
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
+    }
+  };
+
+  const handleShareByLink = async () => {
+    if (!stats) return;
+
+    const partnerName = stats.name || '';
+    const referralLink = `${window.location.origin}?ref=${encodeURIComponent(partnerName)}`;
+    const textToShare = `مرحباً! أنا ${stats.display_name || partnerName} - شريك نجاح في منصة حصص زراعية 🌿
+
+احجز عبر رابطي الخاص:
+${referralLink}
+
+استثمر في مزارع حقيقية واربح من منتجاتها! 🌱`;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          text: textToShare,
+          url: referralLink
+        });
+      } else {
+        await navigator.clipboard.writeText(textToShare);
+        setCopiedLink(true);
+        setTimeout(() => setCopiedLink(false), 2000);
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
     }
   };
 
@@ -119,6 +175,68 @@ export default function InfluencerDashboard() {
             {stats.trees_until_next_reward} {stats.trees_until_next_reward === 1 ? 'شجرة' : 'أشجار'} متبقية
           </p>
         </div>
+      </div>
+
+      {/* قسم المشاركة */}
+      <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border border-emerald-200">
+        <h3 className="text-lg font-bold text-emerald-900 mb-4 text-center">شارك كودك واكسب المزيد!</h3>
+
+        <div className="bg-white/80 rounded-xl p-4 mb-4">
+          <p className="text-sm text-emerald-800 font-semibold mb-2 text-center">كودك الخاص:</p>
+          <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-emerald-50 border-2 border-emerald-300">
+            <p className="text-xl font-black text-emerald-900">{stats?.name || ''}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <button
+            onClick={handleShareByName}
+            className="py-4 px-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+              border: '2px solid rgba(255, 255, 255, 0.3)'
+            }}
+          >
+            {copiedName ? (
+              <>
+                <CheckCircle2 className="w-5 h-5 text-white" />
+                <span className="text-white font-bold">تم النسخ!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-5 h-5 text-white" />
+                <span className="text-white font-bold">شارك باسمك</span>
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={handleShareByLink}
+            className="py-4 px-4 rounded-xl flex items-center justify-center gap-3 transition-all duration-300 hover:scale-105 active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.3)',
+              border: '2px solid rgba(255, 255, 255, 0.3)'
+            }}
+          >
+            {copiedLink ? (
+              <>
+                <CheckCircle2 className="w-5 h-5 text-white" />
+                <span className="text-white font-bold">تم النسخ!</span>
+              </>
+            ) : (
+              <>
+                <LinkIcon className="w-5 h-5 text-white" />
+                <span className="text-white font-bold">شارك برابطك</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        <p className="text-xs text-center text-emerald-700 mt-4 leading-relaxed">
+          💡 <span className="font-bold">نصيحة:</span> استخدم "شارك باسمك" للمجموعات، و"شارك برابطك" لوسائل التواصل
+        </p>
       </div>
 
       {/* سجل النشاط */}

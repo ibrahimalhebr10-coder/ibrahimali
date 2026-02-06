@@ -90,6 +90,19 @@ function AppContent() {
     if (urlParams.has('payment_id')) {
       setShowPaymentResult(true);
     }
+
+    // Check for referral link parameter
+    const refCode = urlParams.get('ref');
+    if (refCode) {
+      console.log('🔗 [App] Referral link detected, partner code:', refCode);
+      sessionStorage.setItem('influencer_code', refCode);
+      sessionStorage.setItem('influencer_activated_at', new Date().toISOString());
+      console.log('✅ [App] Partner code saved to sessionStorage');
+
+      // Clean URL without reload
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
   }, []);
 
   useEffect(() => {
