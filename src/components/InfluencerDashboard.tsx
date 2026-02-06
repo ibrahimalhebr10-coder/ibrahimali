@@ -73,17 +73,12 @@ export default function InfluencerDashboard() {
 استثمر في مزارع حقيقية واربح من منتجاتها! 🌱`;
 
     try {
-      if (navigator.share) {
-        await navigator.share({
-          text: textToShare
-        });
-      } else {
-        await navigator.clipboard.writeText(textToShare);
-        setCopiedName(true);
-        setTimeout(() => setCopiedName(false), 2000);
-      }
+      await navigator.clipboard.writeText(textToShare);
+      setCopiedName(true);
+      setTimeout(() => setCopiedName(false), 2000);
     } catch (err) {
-      console.error('Error sharing:', err);
+      console.error('Error copying:', err);
+      alert('تم تحضير الرسالة! الرجاء النسخ يدوياً');
     }
   };
 
@@ -100,18 +95,12 @@ ${referralLink}
 استثمر في مزارع حقيقية واربح من منتجاتها! 🌱`;
 
     try {
-      if (navigator.share) {
-        await navigator.share({
-          text: textToShare,
-          url: referralLink
-        });
-      } else {
-        await navigator.clipboard.writeText(textToShare);
-        setCopiedLink(true);
-        setTimeout(() => setCopiedLink(false), 2000);
-      }
+      await navigator.clipboard.writeText(textToShare);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
     } catch (err) {
-      console.error('Error sharing:', err);
+      console.error('Error copying:', err);
+      alert('تم تحضير الرسالة! الرجاء النسخ يدوياً');
     }
   };
 
@@ -409,12 +398,12 @@ ${referralLink}
             {copiedName ? (
               <>
                 <CheckCircle2 className="w-5 h-5 text-white" />
-                <span className="text-white font-bold">تم النسخ!</span>
+                <span className="text-white font-bold text-sm">تم النسخ!</span>
               </>
             ) : (
               <>
-                <Share2 className="w-5 h-5 text-white" />
-                <span className="text-white font-bold">شارك باسمك</span>
+                <Copy className="w-5 h-5 text-white" />
+                <span className="text-white font-bold text-sm">انسخ باسمك</span>
               </>
             )}
           </button>
@@ -431,12 +420,12 @@ ${referralLink}
             {copiedLink ? (
               <>
                 <CheckCircle2 className="w-5 h-5 text-white" />
-                <span className="text-white font-bold">تم النسخ!</span>
+                <span className="text-white font-bold text-sm">تم النسخ!</span>
               </>
             ) : (
               <>
                 <LinkIcon className="w-5 h-5 text-white" />
-                <span className="text-white font-bold">شارك برابطك</span>
+                <span className="text-white font-bold text-sm">انسخ رابطك</span>
               </>
             )}
           </button>
@@ -451,13 +440,19 @@ ${referralLink}
             }}
           >
             <MessageCircle className="w-5 h-5 text-white" />
-            <span className="text-white font-bold">واتساب</span>
+            <span className="text-white font-bold text-sm">شارك واتساب</span>
           </button>
         </div>
 
         <p className="text-xs text-center text-emerald-700 mt-4 leading-relaxed">
-          💡 <span className="font-bold">نصيحة:</span> استخدم "شارك باسمك" للمجموعات، و"واتساب" للتواصل المباشر
+          💡 <span className="font-bold">نصيحة:</span> اضغط على أي زر لنسخ الرسالة، ثم الصقها في أي مكان تريد المشاركة فيه
         </p>
+
+        <div className="mt-4 bg-white/60 rounded-xl p-3 text-center">
+          <p className="text-xs text-emerald-800">
+            <span className="font-bold">الأزرار الثلاثة:</span> "باسمك" للمجموعات | "رابطك" للسوشيال ميديا | "واتساب" يفتح التطبيق مباشرة
+          </p>
+        </div>
       </div>
 
       {/* إحصائيات متقدمة */}
