@@ -13,7 +13,8 @@ import {
   Wrench,
   DollarSign,
   Users,
-  Flame
+  Flame,
+  Sparkles
 } from 'lucide-react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import DashboardOverview from './DashboardOverview';
@@ -27,6 +28,7 @@ import OperationsSection from './OperationsSection';
 import FinanceSection from './FinanceSection';
 import CustomersSection from './CustomersSection';
 import HotLeadsDashboard from './HotLeadsDashboard';
+import AdvancedAssistantManager from './AdvancedAssistantManager';
 
 type AdminSection =
   | 'overview'
@@ -39,6 +41,7 @@ type AdminSection =
   | 'packages'
   | 'marketing'
   | 'content'
+  | 'assistant'
   | 'settings';
 
 const AdminDashboard: React.FC = () => {
@@ -57,6 +60,7 @@ const AdminDashboard: React.FC = () => {
     { id: 'packages' as AdminSection, label: 'الباقات', icon: Package, color: 'purple' },
     { id: 'marketing' as AdminSection, label: 'التسويق', icon: Megaphone, color: 'pink' },
     { id: 'content' as AdminSection, label: 'المحتوى', icon: MessageSquare, color: 'indigo' },
+    { id: 'assistant' as AdminSection, label: 'المساعد الذكي', icon: Sparkles, color: 'emerald' },
     { id: 'settings' as AdminSection, label: 'الإعدادات', icon: Settings, color: 'gray' },
   ];
 
@@ -95,6 +99,8 @@ const AdminDashboard: React.FC = () => {
         return <MarketingManagement />;
       case 'content':
         return <ContentManagement />;
+      case 'assistant':
+        return <AdvancedAssistantManager />;
       case 'settings':
         return <GeneralSettings />;
       default:

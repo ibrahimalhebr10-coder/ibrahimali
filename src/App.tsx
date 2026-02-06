@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import VideoIntro from './components/VideoIntro';
 import HowToStart from './components/HowToStart';
 import SmartAssistant from './components/SmartAssistant';
+import AdvancedAIAssistant from './components/AdvancedAIAssistant';
 import SuccessPartnerIntro from './components/SuccessPartnerIntro';
 import SuccessPartnerOnboarding from './components/SuccessPartnerOnboarding';
 import SuccessPartnerRegistrationForm from './components/SuccessPartnerRegistrationForm';
@@ -1553,6 +1554,7 @@ function AppContent() {
         />
       )}
 
+      <AdvancedAIAssistant />
 
       </div>
     </ErrorBoundary>
