@@ -61,8 +61,9 @@ export default function QuickAccountAccess({
 
       console.log('📊 [QuickAccountAccess] RPC Result:');
       console.log('   Account Type:', type);
-      console.log('   Has Reservations:', result?.has_reservations);
-      console.log('   Is Partner:', result?.is_partner);
+      console.log('   Primary Identity:', result?.primary_identity);
+      console.log('   Has Regular:', result?.has_regular_account);
+      console.log('   Has Partner:', result?.has_partner_account);
 
       setAccountType(type);
 
