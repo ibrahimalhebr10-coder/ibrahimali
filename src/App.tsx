@@ -29,6 +29,7 @@ import AdminDashboard from './components/admin/AdminDashboard';
 import AdminLogin from './components/admin/AdminLogin';
 import FarmOfferMode from './components/FarmOfferMode';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
+import { farmLoadingService, type LoadingProgress } from './services/farmLoadingService';
 import { getUnreadCount } from './services/messagesService';
 import { useAuth } from './contexts/AuthContext';
 import { useAdminAuth } from './contexts/AdminAuthContext';
@@ -56,6 +57,8 @@ function AppContent() {
   const [categories, setCategories] = useState<FarmCategory[]>([]);
   const [farmProjects, setFarmProjects] = useState<Record<string, FarmProject[]>>({});
   const [loading, setLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState<LoadingProgress | null>(null);
+  const [fromCache, setFromCache] = useState(false);
   const [showVideoIntro, setShowVideoIntro] = useState(false);
   const [showHowToStart, setShowHowToStart] = useState(false);
   const [showAdvancedAssistant, setShowAdvancedAssistant] = useState(false);
@@ -106,90 +109,63 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
-    let retryCount = 0;
-    const MAX_RETRIES = 3;
+    let mounted = true;
     let refreshInterval: NodeJS.Timeout;
-    let isFirstLoad = true;
 
-    async function loadData(isRetry: boolean = false) {
-      const wasFirstLoad = isFirstLoad;
-
-      if (!isRetry && wasFirstLoad) {
-        setLoading(true);
-      }
+    async function loadFarmsWithProgressiveLoading() {
+      console.log('[App] 🚀 Starting Progressive Farm Loading System');
+      setLoading(true);
 
       try {
-        const [cats, allProjects] = await Promise.all([
-          farmService.getDisplayCategories(),
-          farmService.getAllDisplayProjects()
-        ]);
-
-        if (!cats || cats.length === 0) {
-          console.warn('[App] ⚠️ No categories found - retrying...');
-          if (retryCount < MAX_RETRIES) {
-            retryCount++;
-            const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000);
-            console.log(`[App] 🔄 Retry ${retryCount}/${MAX_RETRIES} in ${retryDelay}ms`);
-            setTimeout(() => loadData(true), retryDelay);
-            return;
+        const result = await farmLoadingService.loadWithCache((progress) => {
+          if (mounted) {
+            setLoadingProgress(progress);
+            console.log(`[App] 📊 Progress: ${progress.stage} - ${progress.loaded}/${progress.total} - ${progress.message}`);
           }
+        });
 
-          console.error('[App] ❌ Max retries reached - no categories available');
-          if (wasFirstLoad) {
-            setCategories([]);
-            setFarmProjects({});
-            setLoading(false);
-          } else {
-            console.warn('[App] Background refresh failed, keeping existing data');
-          }
-          return;
-        }
+        if (!mounted) return;
 
-        retryCount = 0;
-        console.log(`[App] ✅ Loaded ${cats.length} categories:`, cats.map(c => c.name).join(', '));
-        setCategories(cats);
+        setFromCache(result.fromCache);
+        setCategories(result.categories);
+        setFarmProjects(result.farms);
+        setActiveCategory('all');
 
-        const projectCount = Object.values(allProjects).flat().length;
-        console.log(`[App] ✅ Loaded ${projectCount} projects across ${Object.keys(allProjects).length} categories`);
-        console.log(`[App] 📊 Projects per category:`, Object.entries(allProjects).map(([cat, farms]) => `${cat}: ${farms.length}`).join(', '));
+        const totalFarms = Object.values(result.farms).flat().length;
+        console.log(`[App] ✅ Loaded ${totalFarms} farms ${result.fromCache ? '(from cache)' : '(fresh)'}`);
+        console.log(`[App] 📦 Categories: ${result.categories.length}, Farms by category:`,
+          Object.entries(result.farms).map(([cat, farms]) => `${cat}: ${farms.length}`).join(', '));
 
-        if (wasFirstLoad) {
-          setActiveCategory('all');
-          isFirstLoad = false;
-        }
-
-        setFarmProjects(allProjects);
       } catch (error) {
-        console.error('[App] Error loading farm data:', error);
-
-        if (retryCount < MAX_RETRIES) {
-          retryCount++;
-          const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000);
-          setTimeout(() => loadData(true), retryDelay);
-          return;
-        }
-
-        if (wasFirstLoad) {
-          console.error('[App] Max retries reached. Using empty data.');
+        console.error('[App] ❌ Error loading farms:', error);
+        if (mounted) {
           setCategories([]);
           setFarmProjects({});
-        } else {
-          console.warn('[App] Background refresh failed, keeping existing data');
         }
       } finally {
-        if (wasFirstLoad || !isRetry) {
+        if (mounted) {
           setLoading(false);
+          setLoadingProgress(null);
         }
       }
     }
 
-    loadData();
+    loadFarmsWithProgressiveLoading();
 
     refreshInterval = setInterval(() => {
-      loadData(false);
-    }, 120000);
+      console.log('[App] 🔄 Background refresh');
+      farmLoadingService.loadAllFarms().then(result => {
+        if (mounted) {
+          farmLoadingService.saveToCache(result.categories, result.farms);
+          console.log('[App] ✅ Cache updated in background');
+        }
+      }).catch(error => {
+        console.error('[App] ⚠️ Background refresh failed:', error);
+      });
+    }, 180000);
 
     return () => {
+      mounted = false;
       if (refreshInterval) {
         clearInterval(refreshInterval);
       }
@@ -904,18 +880,55 @@ function AppContent() {
                 <div className="max-w-7xl mx-auto">
                   <section className="px-3 lg:px-4 pb-4 lg:pb-6 pt-14 lg:pt-6">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-12 gap-3 animate-fadeIn">
+            <div className="flex flex-col items-center justify-center py-12 gap-4 animate-fadeIn">
               <div className="relative">
-                <div className="animate-spin rounded-full h-12 w-12 border-3 border-emerald-200"></div>
-                <div className="animate-spin rounded-full h-12 w-12 border-3 border-darkgreen border-t-transparent absolute inset-0"></div>
-                <Sprout className="w-6 h-6 text-darkgreen absolute inset-0 m-auto animate-pulse" />
+                <div className="animate-spin rounded-full h-14 w-14 border-4 border-emerald-200"></div>
+                <div className="animate-spin rounded-full h-14 w-14 border-4 border-darkgreen border-t-transparent absolute inset-0"></div>
+                <Sprout className="w-7 h-7 text-darkgreen absolute inset-0 m-auto animate-pulse" />
               </div>
-              <p className="text-sm text-darkgreen font-bold animate-pulse">جاري تحميل المزارع...</p>
-              <div className="flex gap-1.5">
-                <div className="w-1.5 h-1.5 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-1.5 h-1.5 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-1.5 h-1.5 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-              </div>
+
+              {fromCache ? (
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-darkgreen font-bold flex items-center gap-2 justify-center">
+                    <Sparkles className="w-4 h-4 animate-pulse" />
+                    تحميل فوري من الذاكرة
+                  </p>
+                  <p className="text-xs text-darkgreen/60">تحديث البيانات في الخلفية...</p>
+                </div>
+              ) : loadingProgress ? (
+                <div className="text-center space-y-3 w-full max-w-xs">
+                  <p className="text-sm text-darkgreen font-bold">{loadingProgress.message}</p>
+
+                  {loadingProgress.stage !== 'complete' && (
+                    <div className="w-full space-y-2">
+                      <div className="relative h-2 bg-emerald-100 rounded-full overflow-hidden">
+                        <div
+                          className="absolute top-0 left-0 h-full bg-gradient-to-r from-darkgreen to-emerald-400 rounded-full transition-all duration-500 ease-out"
+                          style={{
+                            width: `${(loadingProgress.loaded / loadingProgress.total) * 100}%`
+                          }}
+                        >
+                          <div className="absolute inset-0 bg-white/30 animate-pulse"></div>
+                        </div>
+                      </div>
+                      <p className="text-xs text-darkgreen/70 font-medium">
+                        {loadingProgress.loaded} من {loadingProgress.total}
+                        {loadingProgress.stage === 'instant' && ' • تحميل سريع'}
+                        {loadingProgress.stage === 'progressive' && ' • تحميل تدريجي'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center space-y-2">
+                  <p className="text-sm text-darkgreen font-bold animate-pulse">جاري التحميل...</p>
+                  <div className="flex gap-1.5 justify-center">
+                    <div className="w-1.5 h-1.5 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-1.5 h-1.5 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-1.5 h-1.5 bg-darkgreen rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
+                </div>
+              )}
             </div>
           ) : currentFarms.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 gap-3 animate-scaleIn">
