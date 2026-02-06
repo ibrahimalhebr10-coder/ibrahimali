@@ -137,13 +137,23 @@ export const videoIntroService = {
     }
   },
 
-  async uploadVideoFile(file: File): Promise<string | null> {
+  async uploadVideoFile(file: File, onProgress?: (progress: number) => void): Promise<string | null> {
     try {
+      console.log('🎬 [VideoIntro] Starting video upload...');
+      console.log('📊 File details:', {
+        name: file.name,
+        size: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+        type: file.type
+      });
+
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      if (onProgress) onProgress(10);
+
+      console.log('⬆️ [VideoIntro] Uploading to storage...');
+      const { error: uploadError, data } = await supabase.storage
         .from('intro-videos')
         .upload(filePath, file, {
           cacheControl: '3600',
@@ -151,17 +161,32 @@ export const videoIntroService = {
         });
 
       if (uploadError) {
-        console.error('Error uploading video file:', uploadError);
-        throw uploadError;
+        console.error('❌ [VideoIntro] Upload error:', uploadError);
+
+        if (uploadError.message.includes('row-level security')) {
+          throw new Error('ليس لديك صلاحية لرفع الفيديو. تأكد من تسجيل دخولك كمدير.');
+        } else if (uploadError.message.includes('size')) {
+          throw new Error('حجم الفيديو كبير جداً. الحد الأقصى 500 ميجابايت.');
+        } else if (uploadError.message.includes('timeout')) {
+          throw new Error('انتهت مهلة الرفع. تأكد من سرعة الإنترنت وحاول مرة أخرى.');
+        } else {
+          throw new Error(`فشل رفع الفيديو: ${uploadError.message}`);
+        }
       }
 
+      if (onProgress) onProgress(80);
+
+      console.log('✅ [VideoIntro] Upload successful, generating public URL...');
       const { data: { publicUrl } } = supabase.storage
         .from('intro-videos')
         .getPublicUrl(filePath);
 
+      if (onProgress) onProgress(100);
+
+      console.log('✅ [VideoIntro] Video uploaded successfully:', publicUrl);
       return publicUrl;
     } catch (error) {
-      console.error('Error in uploadVideoFile:', error);
+      console.error('❌ [VideoIntro] Error in uploadVideoFile:', error);
       throw error;
     }
   },
