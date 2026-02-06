@@ -25,19 +25,32 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
       setIsProcessing(true);
       setError(null);
 
+      console.log('💳 [PAYMENT] Step 1: Creating payment record...');
+      console.log('💳 [PAYMENT] Reservation ID:', reservationId);
+      console.log('💳 [PAYMENT] Amount:', amount);
+      console.log('💳 [PAYMENT] Method:', method);
+
       const payment = await paymentService.createPayment({
         reservationId,
         amount,
         paymentMethod: method
       });
 
+      console.log('✅ [PAYMENT] Payment created successfully:', payment.id);
+      console.log('💳 [PAYMENT] Step 2: Processing payment...');
+
       await paymentService.processPayment(payment.id, token, reference);
+
+      console.log('✅ [PAYMENT] Payment processed successfully');
+      console.log('💳 [PAYMENT] Step 3: Completing payment...');
+
       await paymentService.completePayment(payment.id);
 
+      console.log('🎉 [PAYMENT] Payment completed successfully!');
       onSuccess();
     } catch (err) {
       setError('حدث خطأ أثناء معالجة الدفع. يرجى المحاولة مرة أخرى.');
-      console.error('Payment error:', err);
+      console.error('❌ [PAYMENT] Payment error:', err);
     } finally {
       setIsProcessing(false);
     }

@@ -27,22 +27,39 @@ export interface CreatePaymentParams {
 
 export const paymentService = {
   async createPayment(params: CreatePaymentParams): Promise<Payment> {
+    console.log('🆕 [paymentService] createPayment called');
+    console.log('🆕 [paymentService] Params:', params);
+
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('User not authenticated');
+    if (!user) {
+      console.error('❌ [paymentService] User not authenticated');
+      throw new Error('User not authenticated');
+    }
+
+    console.log('👤 [paymentService] User ID:', user.id);
+
+    const paymentData = {
+      reservation_id: params.reservationId,
+      user_id: user.id,
+      amount: params.amount,
+      status: 'pending' as PaymentStatus,
+      payment_method: params.paymentMethod
+    };
+
+    console.log('📝 [paymentService] Inserting payment:', paymentData);
 
     const { data, error } = await supabase
       .from('payments')
-      .insert([{
-        reservation_id: params.reservationId,
-        user_id: user.id,
-        amount: params.amount,
-        status: 'pending' as PaymentStatus,
-        payment_method: params.paymentMethod
-      }])
+      .insert([paymentData])
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ [paymentService] createPayment error:', error);
+      throw error;
+    }
+
+    console.log('✅ [paymentService] createPayment success:', data);
     return data;
   },
 
@@ -51,6 +68,11 @@ export const paymentService = {
     paymentToken: string,
     gatewayReference: string
   ): Promise<Payment> {
+    console.log('🔄 [paymentService] processPayment called');
+    console.log('🔄 [paymentService] Payment ID:', paymentId);
+    console.log('🔄 [paymentService] Token:', paymentToken);
+    console.log('🔄 [paymentService] Reference:', gatewayReference);
+
     const { data, error } = await supabase
       .from('payments')
       .update({
@@ -62,7 +84,12 @@ export const paymentService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ [paymentService] processPayment error:', error);
+      throw error;
+    }
+
+    console.log('✅ [paymentService] processPayment success:', data);
     return data;
   },
 
@@ -70,6 +97,9 @@ export const paymentService = {
     paymentId: string,
     gatewayResponse?: any
   ): Promise<Payment> {
+    console.log('✨ [paymentService] completePayment called');
+    console.log('✨ [paymentService] Payment ID:', paymentId);
+
     const { data, error } = await supabase
       .from('payments')
       .update({
@@ -81,7 +111,12 @@ export const paymentService = {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ [paymentService] completePayment error:', error);
+      throw error;
+    }
+
+    console.log('🎉 [paymentService] completePayment success:', data);
     return data;
   },
 
