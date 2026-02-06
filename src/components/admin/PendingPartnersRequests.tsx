@@ -73,7 +73,7 @@ export default function PendingPartnersRequests() {
     try {
       setLoading(true);
 
-      const { data, error } = await supabase
+      const { data: partnersData, error } = await supabase
         .from('influencer_partners')
         .select('*')
         .eq('status', 'pending')
@@ -81,7 +81,26 @@ export default function PendingPartnersRequests() {
 
       if (error) throw error;
 
-      setPendingPartners(data || []);
+      if (!partnersData || partnersData.length === 0) {
+        setPendingPartners([]);
+        return;
+      }
+
+      const userIds = partnersData.map(p => p.user_id).filter(Boolean);
+
+      const { data: profilesData } = await supabase
+        .from('user_profiles')
+        .select('id, email')
+        .in('id', userIds);
+
+      const emailMap = new Map(profilesData?.map(p => [p.id, p.email]) || []);
+
+      const enrichedPartners = partnersData.map(partner => ({
+        ...partner,
+        email: emailMap.get(partner.user_id) || 'غير متوفر'
+      }));
+
+      setPendingPartners(enrichedPartners);
     } catch (error) {
       console.error('خطأ في تحميل الطلبات:', error);
     } finally {

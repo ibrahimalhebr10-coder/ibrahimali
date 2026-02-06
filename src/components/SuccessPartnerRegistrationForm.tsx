@@ -16,6 +16,7 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [isPending, setIsPending] = useState(false);
 
   if (!isOpen) return null;
 
@@ -139,8 +140,8 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
         } else if (existingPartner.status === 'pending') {
           setError('طلبك قيد المراجعة حالياً. سنتواصل معك قريباً.');
           return;
-        } else if (existingPartner.status === 'rejected') {
-          setError('نأسف، تم رفض طلبك السابق. يرجى التواصل مع الإدارة.');
+        } else if (existingPartner.status === 'suspended') {
+          setError('نأسف، تم إيقاف حسابك. يرجى التواصل مع الإدارة.');
           return;
         }
       }
@@ -157,28 +158,40 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
         return;
       }
 
-      const { error: insertError } = await supabase
+      const { data: insertedPartner, error: insertError } = await supabase
         .from('influencer_partners')
         .insert({
           user_id: userId,
           name: name.trim(),
           display_name: name.trim(),
-          phone: phone.trim(),
-          status: 'active',
-          is_active: true
-        });
+          phone: phone.trim()
+        })
+        .select('status')
+        .single();
 
       if (insertError) {
         throw insertError;
       }
 
-      setSuccess(true);
-      localStorage.setItem('successPartnerJustRegistered', 'true');
-      console.log('🌿 [Registration] Success Partner registered - setting localStorage flag');
+      const partnerStatus = insertedPartner?.status || 'pending';
 
-      setTimeout(() => {
-        onSuccess();
-      }, 2500);
+      if (partnerStatus === 'pending') {
+        setIsPending(true);
+      } else {
+        localStorage.setItem('successPartnerJustRegistered', 'true');
+        console.log('🌿 [Registration] Success Partner registered - setting localStorage flag');
+      }
+
+      setSuccess(true);
+
+      setTimeout(async () => {
+        if (partnerStatus === 'pending') {
+          await supabase.auth.signOut();
+          onClose();
+        } else {
+          onSuccess();
+        }
+      }, 3000);
 
     } catch (err: any) {
       console.error('Registration error:', err);
@@ -211,12 +224,22 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
 
               <div className="space-y-3">
                 <h3 className="text-2xl font-black text-emerald-900">
-                  مرحباً بك في شركاء النجاح!
+                  {isPending ? 'تم استلام طلبك!' : 'مرحباً بك في شركاء النجاح!'}
                 </h3>
                 <p className="text-lg text-emerald-800/80 leading-relaxed">
-                  تم تسجيل حسابك بنجاح
-                  <br />
-                  يمكنك الآن الدخول ومتابعة أثرك
+                  {isPending ? (
+                    <>
+                      طلبك قيد المراجعة حالياً
+                      <br />
+                      سنتواصل معك خلال 24 ساعة
+                    </>
+                  ) : (
+                    <>
+                      تم تسجيل حسابك بنجاح
+                      <br />
+                      يمكنك الآن الدخول ومتابعة أثرك
+                    </>
+                  )}
                 </p>
               </div>
 
@@ -225,7 +248,7 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
                 border: '2px solid rgba(16, 185, 129, 0.2)'
               }}>
                 <p className="text-sm text-emerald-700">
-                  جاري تسجيل دخولك تلقائياً...
+                  {isPending ? 'شكراً لصبرك، سيتم إشعارك فور الموافقة' : 'جاري تسجيل دخولك تلقائياً...'}
                 </p>
               </div>
             </div>
