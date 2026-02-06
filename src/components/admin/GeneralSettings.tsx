@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Settings, Palette, Key, Database } from 'lucide-react';
+import { Settings, Palette, Key, Database, CreditCard } from 'lucide-react';
+import PaymentProvidersManager from './PaymentProvidersManager';
 
-type SettingsTab = 'system' | 'branding' | 'api-keys' | 'database';
+type SettingsTab = 'system' | 'branding' | 'api-keys' | 'database' | 'payments';
 
 const GeneralSettings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('system');
 
   const tabs = [
     { id: 'system' as SettingsTab, label: 'إعدادات النظام', icon: Settings },
+    { id: 'payments' as SettingsTab, label: 'بوابات الدفع', icon: CreditCard },
     { id: 'branding' as SettingsTab, label: 'الهوية العامة', icon: Palette },
     { id: 'api-keys' as SettingsTab, label: 'مفاتيح التشغيل', icon: Key },
     { id: 'database' as SettingsTab, label: 'قاعدة البيانات', icon: Database },
@@ -45,30 +47,42 @@ const GeneralSettings: React.FC = () => {
       </div>
 
       {/* Content */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-        <div className="text-center max-w-md mx-auto py-8">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              {tabs.find(t => t.id === activeTab) && React.createElement(
-                tabs.find(t => t.id === activeTab)!.icon,
-                { className: 'w-10 h-10 text-gray-600' }
-              )}
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              {tabs.find(t => t.id === activeTab)?.label}
-            </h3>
-            <p className="text-gray-600 mb-6">
-              هذا التبويب جاهز للتطوير. سيتم إضافة المحتوى والوظائف في المراحل القادمة.
+      {activeTab === 'payments' ? (
+        <div>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">إدارة بوابات الدفع</h2>
+            <p className="text-gray-600">
+              قم بتكوين وإدارة بوابات الدفع المختلفة للمنصة
             </p>
-
-            {/* Warning for sensitive settings */}
-            <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 text-right">
-              <p className="text-sm font-medium text-red-900 mb-2">تنبيه أمني</p>
-              <p className="text-sm text-red-700">
-                الإعدادات الحساسة مثل مفاتيح API وإعدادات قاعدة البيانات ستتطلب صلاحيات خاصة
-              </p>
-            </div>
+          </div>
+          <PaymentProvidersManager />
         </div>
-      </div>
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+          <div className="text-center max-w-md mx-auto py-8">
+              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                {tabs.find(t => t.id === activeTab) && React.createElement(
+                  tabs.find(t => t.id === activeTab)!.icon,
+                  { className: 'w-10 h-10 text-gray-600' }
+                )}
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {tabs.find(t => t.id === activeTab)?.label}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                هذا التبويب جاهز للتطوير. سيتم إضافة المحتوى والوظائف في المراحل القادمة.
+              </p>
+
+              {/* Warning for sensitive settings */}
+              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 text-right">
+                <p className="text-sm font-medium text-red-900 mb-2">تنبيه أمني</p>
+                <p className="text-sm text-red-700">
+                  الإعدادات الحساسة مثل مفاتيح API وإعدادات قاعدة البيانات ستتطلب صلاحيات خاصة
+                </p>
+              </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
