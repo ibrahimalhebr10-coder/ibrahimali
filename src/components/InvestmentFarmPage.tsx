@@ -6,6 +6,7 @@ import type { FarmProject, FarmContract } from '../services/farmService';
 import { investmentPackagesService, type InvestmentPackage } from '../services/investmentPackagesService';
 import InvestmentReviewScreen from './InvestmentReviewScreen';
 import InvestmentPackageDetailsModal from './InvestmentPackageDetailsModal';
+import PaymentPage from './PaymentPage';
 import { usePageTracking } from '../hooks/useLeadTracking';
 import InfluencerCodeInput from './InfluencerCodeInput';
 import FeaturedPackageOverlay from './FeaturedPackageOverlay';
@@ -64,6 +65,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showPackageDetailsModal, setShowPackageDetailsModal] = useState(false);
   const [showReviewScreen, setShowReviewScreen] = useState(false);
+  const [showPaymentPage, setShowPaymentPage] = useState(false);
   const [reservationId, setReservationId] = useState<string>('');
   const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
   const [isLoadingContract, setIsLoadingContract] = useState(false);
@@ -352,8 +354,10 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       console.log('✅ [INVESTMENT] تم إنشاء الحجز! ID:', reservation.id);
       console.log('✅ [INVESTMENT] Path Type المُحفوظ:', reservation.path_type);
 
-      console.log('🔄 [INVESTMENT] التوجه إلى الحساب بعد إنشاء الحجز');
-      handleGoToAccount();
+      setReservationId(reservation.id);
+      setShowReviewScreen(false);
+      setShowPaymentPage(true);
+      console.log('💳 [INVESTMENT] فتح صفحة الدفع');
     } catch (error) {
       console.error('Error creating reservation:', error);
       alert('حدث خطأ غير متوقع');
@@ -862,6 +866,25 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           onBack={() => setShowReviewScreen(false)}
           isLoading={isCreatingReservation}
         />
+      )}
+
+      {/* Payment Page */}
+      {showPaymentPage && reservationId && (
+        <div className="fixed inset-0 z-[60]">
+          <PaymentPage
+            reservationId={reservationId}
+            amount={calculateTotal()}
+            onSuccess={() => {
+              console.log('✅ [INVESTMENT] تم الدفع بنجاح!');
+              setShowPaymentPage(false);
+              handleGoToAccount();
+            }}
+            onBack={() => {
+              setShowPaymentPage(false);
+              setShowReviewScreen(true);
+            }}
+          />
+        </div>
       )}
 
       {/* Package Details Modal */}

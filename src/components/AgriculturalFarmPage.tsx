@@ -6,6 +6,7 @@ import type { FarmProject, FarmContract } from '../services/farmService';
 import { agriculturalPackagesService, type AgriculturalPackage } from '../services/agriculturalPackagesService';
 import AgriculturalReviewScreen from './AgriculturalReviewScreen';
 import PackageDetailsModal from './PackageDetailsModal';
+import PaymentPage from './PaymentPage';
 import { usePageTracking } from '../hooks/useLeadTracking';
 import InfluencerCodeInput from './InfluencerCodeInput';
 import FeaturedPackageOverlay from './FeaturedPackageOverlay';
@@ -64,6 +65,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showPackageDetailsModal, setShowPackageDetailsModal] = useState(false);
   const [showReviewScreen, setShowReviewScreen] = useState(false);
+  const [showPaymentPage, setShowPaymentPage] = useState(false);
   const [reservationId, setReservationId] = useState<string>('');
   const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
   const [isLoadingContract, setIsLoadingContract] = useState(false);
@@ -322,8 +324,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
       setReservationId(reservation.id);
       setShowReviewScreen(false);
-      console.log('🔄 [AGRICULTURAL] التوجه إلى الحساب بعد إنشاء الحجز');
-      handleGoToAccount();
+      setShowPaymentPage(true);
+      console.log('💳 [AGRICULTURAL] فتح صفحة الدفع');
     } catch (error) {
       console.error('Error creating reservation:', error);
       alert('حدث خطأ غير متوقع');
@@ -828,6 +830,25 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           onBack={() => setShowReviewScreen(false)}
           isLoading={isCreatingReservation}
         />
+      )}
+
+      {/* Payment Page */}
+      {showPaymentPage && reservationId && (
+        <div className="fixed inset-0 z-[60]">
+          <PaymentPage
+            reservationId={reservationId}
+            amount={calculateTotal()}
+            onSuccess={() => {
+              console.log('✅ [AGRICULTURAL] تم الدفع بنجاح!');
+              setShowPaymentPage(false);
+              handleGoToAccount();
+            }}
+            onBack={() => {
+              setShowPaymentPage(false);
+              setShowReviewScreen(true);
+            }}
+          />
+        </div>
       )}
 
       {/* Package Details Modal */}
