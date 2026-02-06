@@ -284,14 +284,15 @@ export default function InfluencerPartnersManager() {
                     </td>
                     <td className="py-3 px-4">
                       {(() => {
-                        const treesInBatch = partner.total_trees_booked % 20;
-                        const treesUntilNext = 20 - treesInBatch;
-                        const progressPercentage = (treesInBatch / 20) * 100;
+                        const treesRequired = settings?.trees_required_for_reward || 20;
+                        const treesInBatch = partner.total_trees_booked % treesRequired;
+                        const treesUntilNext = treesRequired - treesInBatch;
+                        const progressPercentage = (treesInBatch / treesRequired) * 100;
 
                         return (
                           <div className="space-y-1">
                             <div className="flex items-center gap-2 text-xs text-slate-600">
-                              <span className="font-medium">{treesInBatch}/20</span>
+                              <span className="font-medium">{treesInBatch}/{treesRequired}</span>
                               <span className="text-slate-400">({treesUntilNext} متبقية)</span>
                             </div>
                             <div className="w-24 bg-slate-100 rounded-full h-2 overflow-hidden">
