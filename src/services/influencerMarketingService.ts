@@ -4,7 +4,10 @@ export interface InfluencerPartner {
   id: string;
   name: string;
   display_name: string | null;
+  phone: string | null;
+  user_id: string | null;
   is_active: boolean;
+  status: string | null;
   total_bookings: number;
   total_trees_booked: number;
   total_rewards_earned: number;
@@ -50,6 +53,7 @@ export interface FeaturedPackageSettings {
 export interface CreateInfluencerPartnerData {
   name: string;
   display_name?: string;
+  phone?: string;
   is_active?: boolean;
   notes?: string;
 }

@@ -10,7 +10,9 @@ import {
   Save,
   X,
   CheckCircle,
-  AlertCircle
+  AlertCircle,
+  LogIn,
+  Phone
 } from 'lucide-react';
 import {
   influencerMarketingService,
@@ -18,6 +20,7 @@ import {
   InfluencerSettings,
   CreateInfluencerPartnerData
 } from '../../services/influencerMarketingService';
+import { supabase } from '../../lib/supabase';
 
 export default function InfluencerPartnersManager() {
   const [partners, setPartners] = useState<InfluencerPartner[]>([]);
@@ -31,6 +34,7 @@ export default function InfluencerPartnersManager() {
   const [newPartner, setNewPartner] = useState<CreateInfluencerPartnerData>({
     name: '',
     display_name: '',
+    phone: '',
     is_active: true,
     notes: ''
   });
@@ -108,7 +112,7 @@ export default function InfluencerPartnersManager() {
 
       showMessage('success', 'تم إضافة المؤثر بنجاح');
       setShowAddForm(false);
-      setNewPartner({ name: '', display_name: '', is_active: true, notes: '' });
+      setNewPartner({ name: '', display_name: '', phone: '', is_active: true, notes: '' });
       loadData();
     } catch (error) {
       console.error('خطأ في إضافة المؤثر:', error);
@@ -137,6 +141,38 @@ export default function InfluencerPartnersManager() {
     } catch (error) {
       console.error('خطأ في حذف المؤثر:', error);
       showMessage('error', 'فشل في حذف المؤثر');
+    }
+  };
+
+  const handleImpersonatePartner = async (partnerId: string, partnerName: string) => {
+    if (!confirm(`هل تريد الدخول على حساب ${partnerName}؟`)) return;
+
+    try {
+      const { data, error } = await supabase.rpc('admin_get_partner_login_info', {
+        partner_id: partnerId
+      });
+
+      if (error) throw error;
+
+      if (!data.success) {
+        showMessage('error', data.message || 'فشل في الوصول للحساب');
+        return;
+      }
+
+      if (!data.user_id) {
+        showMessage('error', 'هذا الشريك لا يمتلك حساب مستخدم بعد');
+        return;
+      }
+
+      showMessage('success', `جارِ الدخول على حساب ${partnerName}...`);
+
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 1500);
+
+    } catch (error) {
+      console.error('خطأ في محاولة الدخول:', error);
+      showMessage('error', 'فشل في الدخول على الحساب');
     }
   };
 
@@ -244,6 +280,7 @@ export default function InfluencerPartnersManager() {
               <tr className="border-b border-slate-200">
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">اسم المؤثر</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">اسم العرض</th>
+                <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">رقم الجوال</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الحالة</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الحجوزات</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الأشجار</th>
@@ -255,7 +292,7 @@ export default function InfluencerPartnersManager() {
             <tbody>
               {partners.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-12 text-slate-500">
+                  <td colSpan={9} className="text-center py-12 text-slate-500">
                     لا يوجد مؤثرين حالياً. اضغط "إضافة مؤثر" للبدء
                   </td>
                 </tr>
@@ -267,6 +304,18 @@ export default function InfluencerPartnersManager() {
                     </td>
                     <td className="py-3 px-4 text-slate-600">
                       {partner.display_name || '-'}
+                    </td>
+                    <td className="py-3 px-4">
+                      {partner.phone ? (
+                        <div className="flex items-center gap-2">
+                          <Phone className="w-4 h-4 text-slate-400" />
+                          <a href={`tel:${partner.phone}`} className="text-emerald-600 hover:text-emerald-700 font-medium">
+                            {partner.phone}
+                          </a>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400">-</span>
+                      )}
                     </td>
                     <td className="py-3 px-4">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
@@ -307,6 +356,15 @@ export default function InfluencerPartnersManager() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
+                        {partner.user_id && (
+                          <button
+                            onClick={() => handleImpersonatePartner(partner.id, partner.display_name || partner.name)}
+                            className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                            title="دخول مباشر على الحساب"
+                          >
+                            <LogIn className="w-4 h-4" />
+                          </button>
+                        )}
                         <button
                           onClick={() => handleToggleStatus(partner.id, partner.is_active)}
                           className={`p-2 rounded-lg transition-colors ${
@@ -379,6 +437,21 @@ export default function InfluencerPartnersManager() {
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
                   placeholder="مثال: أحمد المزارع"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  رقم الجوال (اختياري)
+                </label>
+                <input
+                  type="tel"
+                  value={newPartner.phone}
+                  onChange={(e) => setNewPartner({ ...newPartner, phone: e.target.value })}
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="مثال: 05xxxxxxxx"
+                  dir="ltr"
+                />
+                <p className="text-xs text-slate-500 mt-1">رقم الجوال للتواصل مع الشريك</p>
               </div>
 
               <div>
