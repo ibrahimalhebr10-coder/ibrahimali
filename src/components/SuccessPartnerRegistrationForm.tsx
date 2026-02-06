@@ -105,7 +105,7 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm overflow-y-auto">
-      <div className="min-h-full flex items-center justify-center px-4 py-8">
+      <div className="min-h-full flex items-center justify-center px-4 py-12">
         {success ? (
           <div className="w-full max-w-md rounded-3xl p-8 animate-fadeIn" style={{
             background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(236, 253, 245, 0.95) 100%)',

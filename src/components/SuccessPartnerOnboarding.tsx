@@ -119,7 +119,7 @@ export default function SuccessPartnerOnboarding({ isOpen, onClose, onComplete }
           </div>
         </div>
 
-        <div className="h-full flex items-center justify-center px-4 pb-32 pt-8">
+        <div className="h-full flex items-center justify-center px-4 pb-24 lg:pb-32 pt-8">
           <div className="max-w-2xl w-full space-y-8 animate-fadeIn">
             <div className="flex justify-center mb-8">
               <div className="relative">

@@ -969,7 +969,7 @@ function AppContent() {
           </>
         )}
 
-      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && (
+      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && (
         <nav
           className="hidden lg:flex fixed left-0 right-0 z-50 backdrop-blur-2xl"
           style={{
@@ -1100,7 +1100,7 @@ function AppContent() {
       </nav>
       )}
 
-      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && (
+      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && (
         <nav
           className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
         style={{
