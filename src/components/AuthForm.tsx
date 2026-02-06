@@ -13,6 +13,7 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
   const [mode, setMode] = useState<'signin' | 'signup'>('signup');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +65,12 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
 
     if (password.length < 6) {
       setError('كلمة المرور يجب أن تكون 6 أحرف أو أرقام على الأقل');
+      setLoading(false);
+      return;
+    }
+
+    if (mode === 'signup' && password !== confirmPassword) {
+      setError('كلمة المرور غير متطابقة');
       setLoading(false);
       return;
     }
@@ -222,6 +229,29 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
               </p>
             </div>
 
+            {mode === 'signup' && (
+              <div>
+                <label className="block text-sm font-bold text-darkgreen mb-2">
+                  تأكيد كلمة المرور
+                </label>
+                <div className="relative">
+                  <Lock className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="••••••••"
+                    disabled={loading}
+                    className="w-full pr-12 pl-4 py-4 rounded-xl border-2 border-gray-200 focus:border-darkgreen focus:outline-none transition-colors text-left disabled:bg-gray-50"
+                    dir="ltr"
+                  />
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  أعد إدخال كلمة المرور للتأكيد
+                </p>
+              </div>
+            )}
+
             {/* خيار تذكرني على هذا الجهاز */}
             <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-200">
               <label className="flex items-start gap-3 cursor-pointer">
@@ -287,6 +317,7 @@ export default function AuthForm({ isOpen, onClose, onSuccess }: AuthFormProps) 
             <button
               onClick={() => {
                 setMode(mode === 'signup' ? 'signin' : 'signup');
+                setConfirmPassword('');
                 setError(null);
                 setSuccess(null);
               }}

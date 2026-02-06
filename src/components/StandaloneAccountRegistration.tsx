@@ -14,7 +14,8 @@ export default function StandaloneAccountRegistration({ onSuccess, onBack, initi
   const [formData, setFormData] = useState({
     fullName: '',
     phoneNumber: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,6 +40,10 @@ export default function StandaloneAccountRegistration({ onSuccess, onBack, initi
     }
     if (formData.password.length < 6) {
       setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      return false;
+    }
+    if (mode === 'register' && formData.password !== formData.confirmPassword) {
+      setError('كلمة المرور غير متطابقة');
       return false;
     }
     return true;
@@ -187,6 +192,22 @@ export default function StandaloneAccountRegistration({ onSuccess, onBack, initi
                 disabled={loading}
               />
             </div>
+
+            {mode === 'register' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  تأكيد كلمة المرور
+                </label>
+                <input
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="أعد إدخال كلمة المرور"
+                  disabled={loading}
+                />
+              </div>
+            )}
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
