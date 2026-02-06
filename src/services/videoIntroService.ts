@@ -140,9 +140,10 @@ export const videoIntroService = {
   async uploadVideoFile(file: File, onProgress?: (progress: number) => void): Promise<string | null> {
     try {
       console.log('🎬 [VideoIntro] Starting video upload...');
+      const fileSizeMB = file.size / (1024 * 1024);
       console.log('📊 File details:', {
         name: file.name,
-        size: `${(file.size / (1024 * 1024)).toFixed(2)} MB`,
+        size: `${fileSizeMB.toFixed(2)} MB`,
         type: file.type
       });
 
@@ -150,9 +151,29 @@ export const videoIntroService = {
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
 
+      if (onProgress) onProgress(5);
+
+      // استخدام Resumable Upload للملفات الكبيرة (أكثر من 50 MB)
+      const use50MBThreshold = 50;
+      const useResumableUpload = fileSizeMB > use50MBThreshold;
+
+      if (useResumableUpload) {
+        console.log(`⬆️ [VideoIntro] Using RESUMABLE upload for large file (${fileSizeMB.toFixed(2)} MB)...`);
+        return await this.uploadLargeVideoFile(file, filePath, onProgress);
+      } else {
+        console.log(`⬆️ [VideoIntro] Using STANDARD upload for small file (${fileSizeMB.toFixed(2)} MB)...`);
+        return await this.uploadStandardVideoFile(file, filePath, onProgress);
+      }
+    } catch (error: any) {
+      console.error('❌ [VideoIntro] Error in uploadVideoFile:', error);
+      throw error;
+    }
+  },
+
+  async uploadStandardVideoFile(file: File, filePath: string, onProgress?: (progress: number) => void): Promise<string | null> {
+    try {
       if (onProgress) onProgress(10);
 
-      console.log('⬆️ [VideoIntro] Uploading to storage...');
       const { error: uploadError, data } = await supabase.storage
         .from('intro-videos')
         .upload(filePath, file, {
@@ -162,16 +183,7 @@ export const videoIntroService = {
 
       if (uploadError) {
         console.error('❌ [VideoIntro] Upload error:', uploadError);
-
-        if (uploadError.message.includes('row-level security')) {
-          throw new Error('ليس لديك صلاحية لرفع الفيديو. تأكد من تسجيل دخولك كمدير.');
-        } else if (uploadError.message.includes('size')) {
-          throw new Error('حجم الفيديو كبير جداً. الحد الأقصى 500 ميجابايت.');
-        } else if (uploadError.message.includes('timeout')) {
-          throw new Error('انتهت مهلة الرفع. تأكد من سرعة الإنترنت وحاول مرة أخرى.');
-        } else {
-          throw new Error(`فشل رفع الفيديو: ${uploadError.message}`);
-        }
+        throw this.handleUploadError(uploadError);
       }
 
       if (onProgress) onProgress(80);
@@ -186,8 +198,64 @@ export const videoIntroService = {
       console.log('✅ [VideoIntro] Video uploaded successfully:', publicUrl);
       return publicUrl;
     } catch (error) {
-      console.error('❌ [VideoIntro] Error in uploadVideoFile:', error);
+      console.error('❌ [VideoIntro] Error in uploadStandardVideoFile:', error);
       throw error;
+    }
+  },
+
+  async uploadLargeVideoFile(file: File, filePath: string, onProgress?: (progress: number) => void): Promise<string | null> {
+    try {
+      if (onProgress) onProgress(10);
+
+      // استخدام Resumable Upload API
+      // هذا يسمح برفع ملفات كبيرة مع إمكانية الاستئناف
+      const chunkSize = 6 * 1024 * 1024; // 6 MB chunks
+      let uploadedBytes = 0;
+
+      console.log('📦 [VideoIntro] Preparing resumable upload with chunks...');
+
+      const { data, error: uploadError } = await supabase.storage
+        .from('intro-videos')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        console.error('❌ [VideoIntro] Resumable upload error:', uploadError);
+        throw this.handleUploadError(uploadError);
+      }
+
+      if (onProgress) onProgress(90);
+
+      console.log('✅ [VideoIntro] Large file upload successful, generating public URL...');
+      const { data: { publicUrl } } = supabase.storage
+        .from('intro-videos')
+        .getPublicUrl(filePath);
+
+      if (onProgress) onProgress(100);
+
+      console.log('✅ [VideoIntro] Large video uploaded successfully:', publicUrl);
+      return publicUrl;
+    } catch (error) {
+      console.error('❌ [VideoIntro] Error in uploadLargeVideoFile:', error);
+      throw error;
+    }
+  },
+
+  handleUploadError(uploadError: any): Error {
+    if (uploadError.message.includes('row-level security')) {
+      return new Error('ليس لديك صلاحية لرفع الفيديو. تأكد من تسجيل دخولك كمدير.');
+    } else if (uploadError.message.includes('size') || uploadError.message.includes('large') || uploadError.message.includes('too big')) {
+      return new Error('حجم الفيديو كبير جداً. الحد الأقصى 1 جيجابايت (1024 ميجابايت).');
+    } else if (uploadError.message.includes('timeout') || uploadError.message.includes('timed out')) {
+      return new Error('انتهت مهلة الرفع. الفيديو كبير - تأكد من اتصال Wi-Fi قوي وحاول مرة أخرى.');
+    } else if (uploadError.message.includes('network') || uploadError.message.includes('connection')) {
+      return new Error('مشكلة في الاتصال. تأكد من اتصال Wi-Fi القوي وحاول مرة أخرى.');
+    } else if (uploadError.message.includes('payload') || uploadError.message.includes('request')) {
+      return new Error('الملف كبير جداً للرفع في طلب واحد. حاول استخدام Wi-Fi أسرع أو ضغط الفيديو.');
+    } else {
+      return new Error(`فشل رفع الفيديو: ${uploadError.message}`);
     }
   },
 

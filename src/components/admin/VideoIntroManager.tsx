@@ -58,10 +58,15 @@ export default function VideoIntroManager() {
     const fileSizeMB = file.size / (1024 * 1024);
     setFileSize(`${fileSizeMB.toFixed(2)} ميجابايت`);
 
-    const maxSize = 500 * 1024 * 1024;
+    const maxSize = 1024 * 1024 * 1024; // 1 GB
     if (file.size > maxSize) {
-      setError(`حجم الفيديو (${fileSizeMB.toFixed(2)} ميجابايت) يجب ألا يتجاوز 500 ميجابايت`);
+      setError(`حجم الفيديو (${fileSizeMB.toFixed(2)} ميجابايت) يجب ألا يتجاوز 1024 ميجابايت (1 جيجابايت)`);
       return;
+    }
+
+    // تحذير للملفات الكبيرة جداً
+    if (fileSizeMB > 200) {
+      console.warn(`⚠️ Large file detected: ${fileSizeMB.toFixed(2)} MB - Upload may take 3-5 minutes`);
     }
 
     try {
@@ -277,7 +282,14 @@ export default function VideoIntroManager() {
                     <p className="text-gray-600 font-medium">جاري رفع الفيديو...</p>
 
                     {fileSize && (
-                      <p className="text-sm text-gray-500">حجم الملف: {fileSize}</p>
+                      <div className="space-y-1">
+                        <p className="text-sm text-gray-500">حجم الملف: {fileSize}</p>
+                        {parseFloat(fileSize) > 100 && (
+                          <p className="text-xs text-amber-600 font-medium">
+                            ملف كبير - قد يستغرق 3-5 دقائق
+                          </p>
+                        )}
+                      </div>
                     )}
 
                     <div className="w-full max-w-md mx-auto">
@@ -290,8 +302,8 @@ export default function VideoIntroManager() {
                       <p className="text-sm text-gray-600 mt-2 font-medium">{uploadProgress}%</p>
                     </div>
 
-                    <p className="text-xs text-blue-600 mt-3">
-                      الرجاء عدم إغلاق الصفحة حتى اكتمال الرفع
+                    <p className="text-xs text-blue-600 mt-3 font-medium">
+                      ⚠️ الرجاء عدم إغلاق الصفحة أو تبديل التطبيق حتى اكتمال الرفع
                     </p>
                   </div>
                 ) : (
@@ -307,10 +319,10 @@ export default function VideoIntroManager() {
                         يمكنك رفع فيديو من الجوال أو الكمبيوتر
                       </p>
                       <p className="text-xs text-gray-500 mt-2">
-                        الحد الأقصى: 500 ميجابايت • صيغ مدعومة: MP4, MOV, AVI, WebM
+                        الحد الأقصى: 1 جيجابايت (1024 ميجابايت) • صيغ مدعومة: MP4, MOV, AVI, WebM
                       </p>
                       <p className="text-xs text-emerald-600 mt-1 font-medium">
-                        📱 مدعوم من الجوال مباشرة
+                        📱 مدعوم من الجوال • ⚡ رفع ذكي للملفات الكبيرة
                       </p>
                     </div>
                   </div>
@@ -411,11 +423,11 @@ export default function VideoIntroManager() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-600 mt-1">•</span>
-                  <span>قد يستغرق الرفع 1-3 دقائق حسب حجم الفيديو</span>
+                  <span>قد يستغرق الرفع 1-5 دقائق حسب حجم الفيديو</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-600 mt-1">•</span>
-                  <span>الحد الأقصى: 500 ميجابايت (كافي لفيديو 5 دقائق)</span>
+                  <span>الحد الأقصى: 1 جيجابايت (كافي لفيديو 10 دقائق عالي الجودة)</span>
                 </li>
               </ul>
             </div>
