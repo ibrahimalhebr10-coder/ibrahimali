@@ -6,6 +6,7 @@ import SmartAssistant from './components/SmartAssistant';
 import SuccessPartnerIntro from './components/SuccessPartnerIntro';
 import SuccessPartnerOnboarding from './components/SuccessPartnerOnboarding';
 import SuccessPartnerRegistrationForm from './components/SuccessPartnerRegistrationForm';
+import SuccessPartnerWelcome from './components/SuccessPartnerWelcome';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
@@ -57,6 +58,7 @@ function AppContent() {
   const [showSuccessPartnerIntro, setShowSuccessPartnerIntro] = useState(false);
   const [showSuccessPartnerOnboarding, setShowSuccessPartnerOnboarding] = useState(false);
   const [showSuccessPartnerRegistration, setShowSuccessPartnerRegistration] = useState(false);
+  const [showSuccessPartnerWelcome, setShowSuccessPartnerWelcome] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
@@ -969,7 +971,7 @@ function AppContent() {
           </>
         )}
 
-      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && (
+      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && (
         <nav
           className="hidden lg:flex fixed left-0 right-0 z-50 backdrop-blur-2xl"
           style={{
@@ -1100,7 +1102,7 @@ function AppContent() {
       </nav>
       )}
 
-      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && (
+      {!selectedInvestmentFarm && !showAssistant && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && (
         <nav
           className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
         style={{
@@ -1261,6 +1263,15 @@ function AppContent() {
         onClose={() => setShowSuccessPartnerRegistration(false)}
         onSuccess={() => {
           setShowSuccessPartnerRegistration(false);
+          setShowSuccessPartnerWelcome(true);
+        }}
+      />
+
+      <SuccessPartnerWelcome
+        isOpen={showSuccessPartnerWelcome}
+        onExplore={() => {
+          setShowSuccessPartnerWelcome(false);
+          setShowVideoIntro(true);
         }}
       />
 
