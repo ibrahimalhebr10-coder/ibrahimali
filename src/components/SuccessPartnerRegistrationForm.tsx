@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, User, Phone, Send, Loader, CheckCircle2, AlertCircle } from 'lucide-react';
+import { X, User, Phone, Send, Loader, CheckCircle2, AlertCircle, Lock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface SuccessPartnerRegistrationFormProps {
@@ -11,6 +11,8 @@ interface SuccessPartnerRegistrationFormProps {
 export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSuccess }: SuccessPartnerRegistrationFormProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -64,42 +66,124 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
       return;
     }
 
+    if (!password.trim()) {
+      setError('يرجى إدخال كلمة المرور');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('كلمة المرور غير متطابقة');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      const { data, error: functionError } = await supabase.rpc(
-        'register_success_partner',
-        {
-          partner_name: name.trim(),
-          partner_phone: phone.trim()
+      const phoneEmail = `${phone.replace(/\s/g, '')}@temp.local`;
+
+      let userId: string | null = null;
+      let isExistingUser = false;
+
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email: phoneEmail,
+        password: password,
+        options: {
+          data: {
+            full_name: name.trim(),
+            phone: phone.trim()
+          }
         }
-      );
+      });
 
-      if (functionError) {
-        throw functionError;
-      }
+      if (signUpError) {
+        if (signUpError.message.includes('already registered')) {
+          isExistingUser = true;
 
-      const result = (data as any) || {};
+          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+            email: phoneEmail,
+            password: password
+          });
 
-      if (result.success) {
-        setSuccess(true);
-        localStorage.setItem('successPartnerJustRegistered', 'true');
-        console.log('🌿 [Registration] Success Partner registered - setting localStorage flag');
-        setTimeout(() => {
-          onSuccess();
-        }, 2500);
-      } else {
-        if (result.error === 'phone_exists') {
-          setError('رقم الجوال مسجل مسبقاً. يرجى استخدام رقم آخر أو التواصل معنا.');
-        } else if (result.error === 'name_exists') {
-          setError('هذا الاسم مسجل مسبقاً. يرجى استخدام اسم آخر.');
+          if (signInError) {
+            setError('كلمة المرور غير صحيحة. إذا نسيت كلمة المرور، يرجى التواصل مع الإدارة.');
+            return;
+          }
+
+          userId = signInData.user?.id || null;
         } else {
-          setError(result.message || 'حدث خطأ أثناء التسجيل');
+          throw signUpError;
+        }
+      } else {
+        userId = signUpData.user?.id || null;
+      }
+
+      if (!userId) {
+        throw new Error('فشل الحصول على معرف المستخدم');
+      }
+
+      const { data: existingPartner } = await supabase
+        .from('influencer_partners')
+        .select('id, status')
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (existingPartner) {
+        if (existingPartner.status === 'active') {
+          setError('أنت مسجل بالفعل كشريك نجاح!');
+          return;
+        } else if (existingPartner.status === 'pending') {
+          setError('طلبك قيد المراجعة حالياً. سنتواصل معك قريباً.');
+          return;
+        } else if (existingPartner.status === 'rejected') {
+          setError('نأسف، تم رفض طلبك السابق. يرجى التواصل مع الإدارة.');
+          return;
         }
       }
-    } catch (err) {
+
+      const { data: nameCheck } = await supabase
+        .from('influencer_partners')
+        .select('id')
+        .ilike('name', name.trim())
+        .maybeSingle();
+
+      if (nameCheck) {
+        setError('هذا الاسم مسجل مسبقاً. يرجى استخدام اسم آخر.');
+        await supabase.auth.signOut();
+        return;
+      }
+
+      const { error: insertError } = await supabase
+        .from('influencer_partners')
+        .insert({
+          user_id: userId,
+          name: name.trim(),
+          display_name: name.trim(),
+          phone: phone.trim(),
+          status: 'active',
+          is_active: true
+        });
+
+      if (insertError) {
+        throw insertError;
+      }
+
+      setSuccess(true);
+      localStorage.setItem('successPartnerJustRegistered', 'true');
+      console.log('🌿 [Registration] Success Partner registered - setting localStorage flag');
+
+      setTimeout(() => {
+        onSuccess();
+      }, 2500);
+
+    } catch (err: any) {
       console.error('Registration error:', err);
-      setError('حدث خطأ أثناء التسجيل. يرجى المحاولة لاحقاً.');
+      setError(err.message || 'حدث خطأ أثناء التسجيل. يرجى المحاولة لاحقاً.');
+      await supabase.auth.signOut();
     } finally {
       setIsSubmitting(false);
     }
@@ -127,12 +211,12 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
 
               <div className="space-y-3">
                 <h3 className="text-2xl font-black text-emerald-900">
-                  تم استلام طلبك بنجاح!
+                  مرحباً بك في شركاء النجاح!
                 </h3>
                 <p className="text-lg text-emerald-800/80 leading-relaxed">
-                  شكراً لانضمامك إلى شركاء النجاح
+                  تم تسجيل حسابك بنجاح
                   <br />
-                  سنتواصل معك قريباً عبر رقم الجوال
+                  يمكنك الآن الدخول ومتابعة أثرك
                 </p>
               </div>
 
@@ -141,7 +225,7 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
                 border: '2px solid rgba(16, 185, 129, 0.2)'
               }}>
                 <p className="text-sm text-emerald-700">
-                  ستتلقى رسالة تأكيد خلال 24-48 ساعة
+                  جاري تسجيل دخولك تلقائياً...
                 </p>
               </div>
             </div>
@@ -227,8 +311,64 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
                   />
                 </div>
                 <p className="text-xs text-emerald-600 text-right">
-                  للتواصل والتفعيل
+                  سيُستخدم لتسجيل الدخول
                 </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-emerald-900">
+                  كلمة المرور
+                  <span className="text-red-500 mr-1">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <Lock className="w-5 h-5 text-emerald-600" strokeWidth={2} />
+                  </div>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      setError('');
+                    }}
+                    placeholder="6 أحرف على الأقل"
+                    className="w-full pr-12 pl-4 py-4 rounded-2xl text-right text-emerald-900 font-semibold placeholder:text-emerald-400 placeholder:font-normal transition-all focus:scale-[1.02]"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(236, 253, 245, 0.5) 0%, rgba(209, 250, 229, 0.4) 100%)',
+                      border: '2px solid rgba(16, 185, 129, 0.3)',
+                      outline: 'none'
+                    }}
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-emerald-900">
+                  تأكيد كلمة المرور
+                  <span className="text-red-500 mr-1">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
+                    <Lock className="w-5 h-5 text-emerald-600" strokeWidth={2} />
+                  </div>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      setError('');
+                    }}
+                    placeholder="أعد إدخال كلمة المرور"
+                    className="w-full pr-12 pl-4 py-4 rounded-2xl text-right text-emerald-900 font-semibold placeholder:text-emerald-400 placeholder:font-normal transition-all focus:scale-[1.02]"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(236, 253, 245, 0.5) 0%, rgba(209, 250, 229, 0.4) 100%)',
+                      border: '2px solid rgba(16, 185, 129, 0.3)',
+                      outline: 'none'
+                    }}
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
 
               {error && (
@@ -260,12 +400,12 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
                   {isSubmitting ? (
                     <>
                       <Loader className="w-5 h-5 animate-spin" strokeWidth={2.5} />
-                      <span>جاري الإرسال...</span>
+                      <span>جاري التسجيل...</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-5 h-5" strokeWidth={2.5} />
-                      <span>إرسال الطلب</span>
+                      <span>إنشاء الحساب</span>
                     </>
                   )}
                 </div>
