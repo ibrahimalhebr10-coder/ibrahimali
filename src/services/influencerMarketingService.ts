@@ -128,7 +128,7 @@ export const influencerMarketingService = {
       return {
         isValid: false,
         partner: null,
-        message: 'هذا الشريك قيد المراجعة. سيتم تفعيل الكود خلال 24 ساعة'
+        message: 'الكود في انتظار التفعيل من قبل الإدارة'
       };
     }
 

@@ -138,7 +138,7 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
           setError('أنت مسجل بالفعل كشريك نجاح!');
           return;
         } else if (existingPartner.status === 'pending') {
-          setError('طلبك قيد المراجعة حالياً. سنتواصل معك قريباً.');
+          setError('طلبك قيد المراجعة. سيتم تفعيل الكود بعد موافقة الإدارة.');
           return;
         } else if (existingPartner.status === 'suspended') {
           setError('نأسف، تم إيقاف حسابك. يرجى التواصل مع الإدارة.');
@@ -224,22 +224,14 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
 
               <div className="space-y-3">
                 <h3 className="text-2xl font-black text-emerald-900">
-                  {isPending ? 'شكراً لانضمامك!' : 'مرحباً بك في شركاء النجاح!'}
+                  أهلاً بك مع منصة حصص زراعية
                 </h3>
                 <p className="text-lg text-emerald-800/80 leading-relaxed">
-                  {isPending ? (
-                    <>
-                      نشكرك على تسجيلك كشريك نجاح
-                      <br />
-                      سيتم تفعيل اسمك للمشاركة خلال 24 ساعة
-                    </>
-                  ) : (
-                    <>
-                      تم تسجيل حسابك بنجاح
-                      <br />
-                      يمكنك الآن الدخول ومتابعة أثرك
-                    </>
-                  )}
+                  تم تفعيل اسمك المسجل
+                  <br />
+                  <span className="font-bold text-emerald-600">
+                    {isPending ? 'سيتم تفعيل الكود بعد موافقة الإدارة' : 'يمكنك الآن الدخول ومتابعة أثرك'}
+                  </span>
                 </p>
               </div>
 
@@ -250,9 +242,9 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
                 <p className="text-sm text-emerald-700 font-medium">
                   {isPending ? (
                     <>
-                      <span className="font-bold">📋 مدة التفعيل:</span> خلال 24 ساعة من الآن
+                      <span className="font-bold">📋 في انتظار الموافقة</span>
                       <br />
-                      <span className="text-emerald-600">سنتواصل معك فور الموافقة على طلبك</span>
+                      <span className="text-emerald-600">سنتواصل معك فور تفعيل حسابك</span>
                     </>
                   ) : (
                     'جاري تسجيل دخولك تلقائياً...'
