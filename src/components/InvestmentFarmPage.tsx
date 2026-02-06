@@ -5,9 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import type { FarmProject, FarmContract } from '../services/farmService';
 import { investmentPackagesService, type InvestmentPackage } from '../services/investmentPackagesService';
 import InvestmentReviewScreen from './InvestmentReviewScreen';
-import PaymentMethodSelector from './PaymentMethodSelector';
-import PrePaymentRegistration from './PrePaymentRegistration';
-import PaymentSuccessScreen from './PaymentSuccessScreen';
+import PaymentFlow from './PaymentFlow';
 import InvestmentPackageDetailsModal from './InvestmentPackageDetailsModal';
 import { usePageTracking } from '../hooks/useLeadTracking';
 import InfluencerCodeInput from './InfluencerCodeInput';
@@ -67,13 +65,8 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showPackageDetailsModal, setShowPackageDetailsModal] = useState(false);
   const [showReviewScreen, setShowReviewScreen] = useState(false);
-  const [showPrePaymentRegistration, setShowPrePaymentRegistration] = useState(false);
-  const [showPaymentSelector, setShowPaymentSelector] = useState(false);
-  const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
-  const [isCreatingReservation, setIsCreatingReservation] = useState(false);
-  const [reservationData, setReservationData] = useState<any>(null);
-  const [registeredUserName, setRegisteredUserName] = useState<string>('');
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'mada' | 'bank_transfer' | null>(null);
+  const [showPaymentFlow, setShowPaymentFlow] = useState(false);
+  const [reservationId, setReservationId] = useState<string>('');
   const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
   const [isLoadingContract, setIsLoadingContract] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -303,43 +296,17 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
     setShowReviewScreen(true);
   };
 
-  const handleConfirmReview = () => {
-    setShowReviewScreen(false);
-
-    if (user) {
-      setShowPaymentSelector(true);
-    } else {
-      setShowPrePaymentRegistration(true);
-    }
-  };
-
-  const handleRegistrationSuccess = (userId: string, userName: string) => {
-    setRegisteredUserName(userName);
-    setShowPrePaymentRegistration(false);
-    setShowPaymentSelector(true);
-  };
-
-  const handlePaymentMethodSelected = async (method: 'mada' | 'bank_transfer') => {
+  const handleConfirmReview = async () => {
     if (!selectedContract || treeCount === 0) {
+      alert('يرجى اختيار باقة وعدد الأشجار');
       return;
     }
 
-    setSelectedPaymentMethod(method);
-    setIsCreatingReservation(true);
-
     try {
-      if (!user) {
-        alert('الرجاء تسجيل الدخول أولاً');
-        setIsCreatingReservation(false);
-        return;
-      }
-
       const totalPrice = calculateTotal();
-      const expiresAt = new Date();
-      expiresAt.setHours(expiresAt.getHours() + 24);
 
       console.log('💰 [INVESTMENT] بدء إنشاء الحجز...');
-      console.log('💰 [INVESTMENT] User ID:', user.id);
+      console.log('💰 [INVESTMENT] User ID:', user?.id || 'غير مسجل');
       console.log('💰 [INVESTMENT] Trees:', treeCount, 'Price:', totalPrice);
       console.log('💰 [INVESTMENT] Path Type: investment (أشجاري الذهبية)');
       if (influencerCode) {
@@ -349,7 +316,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       const { data: reservation, error: reservationError } = await supabase
         .from('reservations')
         .insert({
-          user_id: user.id,
+          user_id: user?.id || null,
           farm_id: farm.id,
           farm_name: farm.name,
           contract_id: selectedContract.id,
@@ -360,7 +327,6 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           total_price: totalPrice,
           path_type: 'investment',
           status: 'pending',
-          payment_method: method,
           influencer_code: influencerCode || null
         } as any)
         .select()
@@ -369,71 +335,19 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       if (reservationError) {
         console.error('❌ [INVESTMENT] خطأ في إنشاء الحجز:', reservationError);
         alert('حدث خطأ في إنشاء الحجز. يرجى المحاولة مرة أخرى');
-        setIsCreatingReservation(false);
         return;
       }
 
       console.log('✅ [INVESTMENT] تم إنشاء الحجز! ID:', reservation.id);
       console.log('✅ [INVESTMENT] Path Type المُحفوظ:', reservation.path_type);
-      console.log('🔄 [INVESTMENT] تحديث الحالة إلى confirmed...');
 
-      const { error: statusError } = await supabase
-        .from('reservations')
-        .update({ status: 'confirmed' })
-        .eq('id', reservation.id);
-
-      if (statusError) {
-        console.error('❌ [INVESTMENT] خطأ في تحديث الحالة:', statusError);
-      } else {
-        console.log('✅ [INVESTMENT] تم تأكيد الحجز بنجاح!');
-
-        if (influencerCode) {
-          console.log('🎁 [INVESTMENT] تحديث إحصائيات المؤثر...');
-          try {
-            const { data: influencerResult, error: influencerError } = await supabase
-              .rpc('update_influencer_stats_after_payment', {
-                p_influencer_code: influencerCode,
-                p_trees_count: treeCount,
-                p_reservation_id: reservation.id
-              });
-
-            if (influencerError) {
-              console.error('❌ [INVESTMENT] خطأ في تحديث إحصائيات المؤثر:', influencerError);
-            } else if (influencerResult?.success) {
-              console.log('✅ [INVESTMENT] تم تحديث إحصائيات المؤثر:', influencerResult);
-            } else {
-              console.warn('⚠️ [INVESTMENT] فشل تحديث إحصائيات المؤثر:', influencerResult?.message);
-            }
-          } catch (error) {
-            console.error('❌ [INVESTMENT] خطأ غير متوقع في تحديث المؤثر:', error);
-          }
-        }
-      }
-
-      setReservationData({
-        id: reservation.id,
-        farmName: farm.name,
-        contractName: selectedContract.contract_name,
-        treeCount,
-        durationYears: selectedContract.duration_years,
-        bonusYears: selectedContract.bonus_years,
-        totalPrice,
-        investmentNumber: reservation.id.substring(0, 8).toUpperCase(),
-        createdAt: reservation.created_at
-      });
-
-      setIsCreatingReservation(false);
-      handlePaymentSuccess();
+      setReservationId(reservation.id);
+      setShowReviewScreen(false);
+      setShowPaymentFlow(true);
     } catch (error) {
       console.error('Error creating reservation:', error);
       alert('حدث خطأ غير متوقع');
-      setIsCreatingReservation(false);
     }
-  };
-
-  const handlePaymentSuccess = () => {
-    setShowPaymentSelector(false);
-    setShowPaymentSuccess(true);
   };
 
   const handleGoToAccount = () => {
@@ -767,7 +681,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       </div>
 
       {/* Investment Summary - Fixed Bottom - Compact Design */}
-      {treeCount > 0 && selectedContract && !showReviewScreen && !showPrePaymentRegistration && !showPaymentSelector && !showPaymentSuccess && (
+      {treeCount > 0 && selectedContract && !showReviewScreen && !showPaymentFlow && (
           <div
             className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-xl border-t-2 border-[#D4AF37]/40 shadow-2xl z-[100000]"
             style={{ paddingBottom: 'max(4rem, env(safe-area-inset-bottom))' }}
@@ -946,42 +860,15 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
         />
       )}
 
-      {/* Pre-Payment Registration */}
-      {showPrePaymentRegistration && (
-        <PrePaymentRegistration
-          farmName={farm.name}
-          treeCount={treeCount}
-          farmCategory="investment"
-          onSuccess={handleRegistrationSuccess}
-          onBack={() => setShowPrePaymentRegistration(false)}
-        />
-      )}
-
-      {/* Payment Method Selector */}
-      {showPaymentSelector && (
-        <PaymentMethodSelector
-          totalAmount={calculateTotal()}
-          onSelectMethod={handlePaymentMethodSelected}
-          onBack={() => {
-            setShowPaymentSelector(false);
-            setShowPrePaymentRegistration(true);
+      {/* Payment Flow */}
+      {showPaymentFlow && reservationId && (
+        <PaymentFlow
+          reservationId={reservationId}
+          onComplete={handleGoToAccount}
+          onCancel={() => {
+            setShowPaymentFlow(false);
+            setShowReviewScreen(true);
           }}
-          isLoading={isCreatingReservation}
-        />
-      )}
-
-      {/* Payment Success Screen */}
-      {showPaymentSuccess && reservationData && (
-        <PaymentSuccessScreen
-          reservationId={reservationData.id}
-          farmName={reservationData.farmName}
-          treeCount={reservationData.treeCount}
-          durationYears={reservationData.durationYears}
-          bonusYears={reservationData.bonusYears}
-          totalPrice={reservationData.totalPrice}
-          investmentNumber={reservationData.investmentNumber}
-          farmCategory="investment"
-          onGoToAccount={handleGoToAccount}
         />
       )}
 
