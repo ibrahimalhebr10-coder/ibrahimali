@@ -41,14 +41,36 @@ class IdentityService {
 
   async setPrimaryIdentity(userId: string, identity: IdentityType): Promise<boolean> {
     try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ primary_identity: identity })
-        .eq('id', userId);
+      const currentProfile = await this.getUserIdentity(userId);
 
-      if (error) {
-        console.error('Error setting primary identity:', error);
+      if (!currentProfile) {
+        console.error('User profile not found');
         return false;
+      }
+
+      if (currentProfile.secondaryIdentity && currentProfile.secondaryIdentity === identity) {
+        const { error } = await supabase
+          .from('user_profiles')
+          .update({
+            primary_identity: identity,
+            secondary_identity: null
+          })
+          .eq('id', userId);
+
+        if (error) {
+          console.error('Error setting primary identity (with secondary reset):', error);
+          return false;
+        }
+      } else {
+        const { error } = await supabase
+          .from('user_profiles')
+          .update({ primary_identity: identity })
+          .eq('id', userId);
+
+        if (error) {
+          console.error('Error setting primary identity:', error);
+          return false;
+        }
       }
 
       return true;
