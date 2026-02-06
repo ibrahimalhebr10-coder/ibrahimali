@@ -41,8 +41,40 @@ export interface FAQ {
   intent_tags: string[];
   target_audience: string;
   confidence_threshold: number;
+  page_contexts: string[];
   is_active: boolean;
   is_approved: boolean;
+}
+
+export interface SensitiveScenario {
+  id: string;
+  scenario_name: string;
+  scenario_name_ar: string;
+  trigger_keywords: string[];
+  response_template_ar: string;
+  response_template_en: string;
+  escalation_required: boolean;
+  alert_admins: boolean;
+  redirect_to_support: boolean;
+  priority: string;
+  is_active: boolean;
+}
+
+export interface IntelligenceMetric {
+  id: string;
+  metric_date: string;
+  total_conversations: number;
+  answered_successfully: number;
+  unanswered_questions: number;
+  avg_confidence_score: number;
+  avg_response_time_ms: number;
+  satisfaction_rate: number;
+  helpfulness_rate: number;
+  learning_suggestions_count: number;
+  faqs_added: number;
+  topics_added: number;
+  unique_users: number;
+  returning_users: number;
 }
 
 export interface ConversationSession {
@@ -381,7 +413,46 @@ class AdvancedAssistantService {
         await this.addMessage(currentSessionId, question, 'user');
       }
 
-      const faqs = await this.searchFAQs(question, 'ar');
+      const userId = await this.getCurrentUserId();
+      if (userId) {
+        await this.trackUserBehavior(userId, question, context);
+      }
+
+      const sensitiveScenario = await this.checkSensitiveScenario(question);
+      if (sensitiveScenario) {
+        const response: AssistantResponse = {
+          answer: sensitiveScenario.response_template_ar,
+          confidence: 1,
+          intent_detected: sensitiveScenario.scenario_name,
+          suggested_actions: sensitiveScenario.redirect_to_support ? [
+            {
+              label: 'التواصل مع الدعم',
+              action: 'contact_support'
+            }
+          ] : []
+        };
+
+        if (currentSessionId) {
+          await this.addMessage(
+            currentSessionId,
+            response.answer,
+            'assistant',
+            {
+              intent: response.intent_detected,
+              confidence: response.confidence,
+              response_time_ms: Date.now() - startTime
+            }
+          );
+        }
+
+        return response;
+      }
+
+      let faqs = await this.getPageSpecificFAQs(context.current_page, context.user_type);
+
+      if (faqs.length === 0) {
+        faqs = await this.searchFAQs(question, 'ar');
+      }
 
       if (faqs.length > 0 && faqs[0].score > 3) {
         const bestMatch = faqs[0];
@@ -484,6 +555,169 @@ class AdvancedAssistantService {
       return user?.id || null;
     } catch {
       return null;
+    }
+  }
+
+  async getSensitiveScenarios(): Promise<SensitiveScenario[]> {
+    try {
+      const { data, error } = await supabase
+        .from('sensitive_scenarios')
+        .select('*')
+        .eq('is_active', true)
+        .order('priority', { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching sensitive scenarios:', error);
+      return [];
+    }
+  }
+
+  async checkSensitiveScenario(question: string): Promise<SensitiveScenario | null> {
+    try {
+      const scenarios = await this.getSensitiveScenarios();
+      const questionLower = question.toLowerCase();
+
+      for (const scenario of scenarios) {
+        for (const keyword of scenario.trigger_keywords) {
+          if (questionLower.includes(keyword.toLowerCase())) {
+            return scenario;
+          }
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error checking sensitive scenario:', error);
+      return null;
+    }
+  }
+
+  async getIntelligenceMetrics(days: number = 7): Promise<IntelligenceMetric[]> {
+    try {
+      const { data, error } = await supabase
+        .from('intelligence_metrics')
+        .select('*')
+        .order('metric_date', { ascending: false })
+        .limit(days);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching intelligence metrics:', error);
+      return [];
+    }
+  }
+
+  async calculateDailyMetrics(): Promise<void> {
+    try {
+      const { error } = await supabase.rpc('calculate_daily_intelligence_metrics');
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error calculating daily metrics:', error);
+    }
+  }
+
+  async getPageSpecificFAQs(page: string, userType: string): Promise<FAQ[]> {
+    try {
+      const { data, error } = await supabase
+        .from('assistant_faqs')
+        .select('*')
+        .eq('is_active', true)
+        .eq('is_approved', true)
+        .contains('page_contexts', [page])
+        .or(`target_audience.eq.all,target_audience.eq.${userType}`)
+        .limit(5);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.error('Error fetching page FAQs:', error);
+      return [];
+    }
+  }
+
+  async generateQuestionVariations(baseQuestion: string): Promise<string[]> {
+    try {
+      const { data, error } = await supabase
+        .rpc('generate_question_variations', {
+          p_base_question: baseQuestion
+        });
+
+      if (error) throw error;
+      return data || [baseQuestion];
+    } catch (error) {
+      console.error('Error generating variations:', error);
+      return [baseQuestion];
+    }
+  }
+
+  async logKnowledgeChange(
+    changeType: string,
+    entityType: string,
+    entityId: string,
+    changeReason: string,
+    oldValue: any = null,
+    newValue: any = null
+  ): Promise<void> {
+    try {
+      const userId = await this.getCurrentUserId();
+
+      await supabase
+        .from('knowledge_change_log')
+        .insert({
+          change_type: changeType,
+          entity_type: entityType,
+          entity_id: entityId,
+          changed_by: userId,
+          change_reason: changeReason,
+          old_value: oldValue,
+          new_value: newValue
+        });
+    } catch (error) {
+      console.error('Error logging change:', error);
+    }
+  }
+
+  async trackUserBehavior(
+    userId: string | null,
+    question: string,
+    context: UserContext
+  ): Promise<void> {
+    try {
+      if (!userId) return;
+
+      const { data: existing } = await supabase
+        .from('user_context_tracking')
+        .select('previous_questions, engagement_score')
+        .eq('user_id', userId)
+        .order('tracked_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const previousQuestions = existing?.previous_questions || [];
+      const updatedQuestions = [question, ...previousQuestions].slice(0, 5);
+
+      const engagementScore = Math.min(
+        100,
+        (existing?.engagement_score || 0) + 10
+      );
+
+      await supabase
+        .from('user_context_tracking')
+        .insert({
+          user_id: userId,
+          current_page: context.current_page,
+          previous_pages: context.previous_pages,
+          previous_questions: updatedQuestions,
+          engagement_score: engagementScore,
+          last_interaction_type: 'question',
+          actions_taken: context.user_investments || {},
+          tracked_at: new Date().toISOString()
+        });
+    } catch (error) {
+      console.error('Error tracking user behavior:', error);
     }
   }
 }

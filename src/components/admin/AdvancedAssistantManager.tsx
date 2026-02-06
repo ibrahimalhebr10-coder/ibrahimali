@@ -665,20 +665,94 @@ function SuggestionsTab({
 }
 
 function AnalyticsTab() {
+  const [metrics, setMetrics] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadMetrics();
+  }, []);
+
+  const loadMetrics = async () => {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from('intelligence_metrics')
+        .select('*')
+        .order('metric_date', { ascending: false })
+        .limit(7);
+
+      if (error) throw error;
+      setMetrics(data || []);
+    } catch (error) {
+      console.error('Error loading metrics:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const calculateImprovement = (current: number, previous: number) => {
+    if (previous === 0) return 0;
+    return ((current - previous) / previous * 100).toFixed(1);
+  };
+
+  const todayMetrics = metrics[0] || {
+    total_conversations: 0,
+    satisfaction_rate: 0,
+    avg_confidence_score: 0,
+    answered_successfully: 0,
+    unanswered_questions: 0,
+    avg_response_time_ms: 0
+  };
+
+  const yesterdayMetrics = metrics[1] || todayMetrics;
+
+  const conversationsChange = calculateImprovement(
+    todayMetrics.total_conversations,
+    yesterdayMetrics.total_conversations
+  );
+
+  const satisfactionChange = calculateImprovement(
+    todayMetrics.satisfaction_rate,
+    yesterdayMetrics.satisfaction_rate
+  );
+
+  const confidenceChange = calculateImprovement(
+    todayMetrics.avg_confidence_score,
+    yesterdayMetrics.avg_confidence_score
+  );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <h2 className="text-xl font-bold text-gray-900">الإحصائيات والتحليلات</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-900">الإحصائيات والتحليلات</h2>
+        <button
+          onClick={loadMetrics}
+          className="px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm transition-colors"
+        >
+          تحديث
+        </button>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-2">
             <MessageCircle className="w-8 h-8 text-blue-600" />
             <div>
-              <p className="text-sm text-blue-600 font-medium">المحادثات</p>
-              <p className="text-2xl font-bold text-blue-900">1,234</p>
+              <p className="text-sm text-blue-600 font-medium">المحادثات اليوم</p>
+              <p className="text-2xl font-bold text-blue-900">{todayMetrics.total_conversations}</p>
             </div>
           </div>
-          <p className="text-xs text-blue-700">+12% عن الأسبوع الماضي</p>
+          <p className={`text-xs ${Number(conversationsChange) >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+            {Number(conversationsChange) >= 0 ? '+' : ''}{conversationsChange}% عن الأمس
+          </p>
         </div>
 
         <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
@@ -686,10 +760,12 @@ function AnalyticsTab() {
             <TrendingUp className="w-8 h-8 text-green-600" />
             <div>
               <p className="text-sm text-green-600 font-medium">معدل الرضا</p>
-              <p className="text-2xl font-bold text-green-900">94%</p>
+              <p className="text-2xl font-bold text-green-900">{(todayMetrics.satisfaction_rate * 100).toFixed(0)}%</p>
             </div>
           </div>
-          <p className="text-xs text-green-700">+5% عن الأسبوع الماضي</p>
+          <p className={`text-xs ${Number(satisfactionChange) >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+            {Number(satisfactionChange) >= 0 ? '+' : ''}{satisfactionChange}% عن الأمس
+          </p>
         </div>
 
         <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6">
@@ -697,18 +773,124 @@ function AnalyticsTab() {
             <Brain className="w-8 h-8 text-purple-600" />
             <div>
               <p className="text-sm text-purple-600 font-medium">دقة الإجابات</p>
-              <p className="text-2xl font-bold text-purple-900">87%</p>
+              <p className="text-2xl font-bold text-purple-900">{(todayMetrics.avg_confidence_score * 100).toFixed(0)}%</p>
             </div>
           </div>
-          <p className="text-xs text-purple-700">+8% عن الأسبوع الماضي</p>
+          <p className={`text-xs ${Number(confidenceChange) >= 0 ? 'text-purple-700' : 'text-red-700'}`}>
+            {Number(confidenceChange) >= 0 ? '+' : ''}{confidenceChange}% عن الأمس
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <h3 className="font-bold text-gray-900 mb-4">الأداء التفصيلي</h3>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+              <span className="text-sm text-gray-600">إجابات ناجحة</span>
+              <span className="font-bold text-gray-900">{todayMetrics.answered_successfully}</span>
+            </div>
+            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+              <span className="text-sm text-gray-600">أسئلة غير مجابة</span>
+              <span className="font-bold text-red-600">{todayMetrics.unanswered_questions}</span>
+            </div>
+            <div className="flex items-center justify-between py-2 border-b border-gray-100">
+              <span className="text-sm text-gray-600">متوسط وقت الاستجابة</span>
+              <span className="font-bold text-gray-900">{todayMetrics.avg_response_time_ms}ms</span>
+            </div>
+            <div className="flex items-center justify-between py-2">
+              <span className="text-sm text-gray-600">معدل الفائدة</span>
+              <span className="font-bold text-green-600">{(todayMetrics.helpfulness_rate * 100).toFixed(0)}%</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-6">
+          <h3 className="font-bold text-gray-900 mb-4">مؤشر تطور الذكاء</h3>
+          <div className="space-y-4">
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">الفهم</span>
+                <span className="font-bold text-emerald-600">{(todayMetrics.avg_confidence_score * 100).toFixed(0)}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-emerald-500 h-2 rounded-full transition-all"
+                  style={{ width: `${todayMetrics.avg_confidence_score * 100}%` }}
+                ></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">التوجيه</span>
+                <span className="font-bold text-blue-600">{(todayMetrics.helpfulness_rate * 100).toFixed(0)}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-blue-500 h-2 rounded-full transition-all"
+                  style={{ width: `${todayMetrics.helpfulness_rate * 100}%` }}
+                ></div>
+              </div>
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm text-gray-600">نسبة النجاح</span>
+                <span className="font-bold text-purple-600">
+                  {todayMetrics.total_conversations > 0
+                    ? ((todayMetrics.answered_successfully / todayMetrics.total_conversations) * 100).toFixed(0)
+                    : 0}%
+                </span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-purple-500 h-2 rounded-full transition-all"
+                  style={{
+                    width: `${todayMetrics.total_conversations > 0
+                      ? (todayMetrics.answered_successfully / todayMetrics.total_conversations) * 100
+                      : 0}%`
+                  }}
+                ></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h3 className="font-bold text-gray-900 mb-4">الأداء خلال الأيام السبعة الماضية</h3>
-        <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-          <p className="text-gray-500">سيتم إضافة الرسوم البيانية قريباً</p>
-        </div>
+        <h3 className="font-bold text-gray-900 mb-4">التطور خلال آخر 7 أيام</h3>
+        {metrics.length > 0 ? (
+          <div className="space-y-2">
+            {metrics.slice(0, 7).reverse().map((metric, index) => {
+              const date = new Date(metric.metric_date);
+              const successRate = metric.total_conversations > 0
+                ? (metric.answered_successfully / metric.total_conversations) * 100
+                : 0;
+
+              return (
+                <div key={index} className="flex items-center gap-4">
+                  <span className="text-xs text-gray-500 w-24">{date.toLocaleDateString('ar-SA')}</span>
+                  <div className="flex-1 bg-gray-100 rounded-full h-6 relative overflow-hidden">
+                    <div
+                      className="bg-gradient-to-r from-emerald-400 to-emerald-500 h-6 rounded-full flex items-center justify-end px-2"
+                      style={{ width: `${successRate}%` }}
+                    >
+                      {successRate > 20 && (
+                        <span className="text-xs font-bold text-white">{successRate.toFixed(0)}%</span>
+                      )}
+                    </div>
+                  </div>
+                  <span className="text-xs text-gray-600 w-20">{metric.total_conversations} محادثة</span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="h-32 flex items-center justify-center bg-gray-50 rounded-lg">
+            <p className="text-gray-500">لا توجد بيانات متاحة حالياً</p>
+          </div>
+        )}
       </div>
     </div>
   );
