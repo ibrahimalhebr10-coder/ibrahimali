@@ -39,8 +39,17 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
 
   const handleReviewConfirm = async () => {
     try {
+      const guestId = !user?.id
+        ? `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        : null;
+
+      if (guestId) {
+        console.log('👤 [UNIFIED] إنشاء Guest ID للزائر:', guestId);
+      }
+
       const reservationPayload = {
         user_id: user?.id || null,
+        guest_id: guestId,
         farm_id: props.farmId,
         farm_name: props.farmName,
         contract_id: props.contractId,
@@ -51,12 +60,12 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         total_price: props.totalPrice,
         path_type: props.pathType,
         status: 'pending',
-        influencer_code: props.influencerCode || null,
-        tree_details: props.treeVarieties || []
+        influencer_code: props.influencerCode || null
       };
 
       console.log('🚀 [UNIFIED] إنشاء حجز جديد - البيانات:', reservationPayload);
-      console.log('🔍 [UNIFIED] تحقق: لا يوجد tree_varieties في الطلب!');
+      console.log('✅ [UNIFIED] user_id:', reservationPayload.user_id || 'null');
+      console.log('✅ [UNIFIED] guest_id:', reservationPayload.guest_id || 'null');
 
       const { data: reservation, error } = await supabase
         .from('reservations')
