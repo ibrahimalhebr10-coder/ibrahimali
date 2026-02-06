@@ -64,6 +64,8 @@ export default function QuickAccountAccess({
       console.log('   Primary Identity:', result?.primary_identity);
       console.log('   Has Regular:', result?.has_regular_account);
       console.log('   Has Partner:', result?.has_partner_account);
+      console.log('   Debug Has Reservations:', result?.debug_has_reservations);
+      console.log('   Debug Has Partner:', result?.debug_has_partner);
 
       setAccountType(type);
 
