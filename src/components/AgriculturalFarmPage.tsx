@@ -4,9 +4,8 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import type { FarmProject, FarmContract } from '../services/farmService';
 import { agriculturalPackagesService, type AgriculturalPackage } from '../services/agriculturalPackagesService';
-import AgriculturalReviewScreen from './AgriculturalReviewScreen';
 import PackageDetailsModal from './PackageDetailsModal';
-import PaymentPage from './PaymentPage';
+import UnifiedBookingFlow from './UnifiedBookingFlow';
 import { usePageTracking } from '../hooks/useLeadTracking';
 import InfluencerCodeInput from './InfluencerCodeInput';
 import FeaturedPackageOverlay from './FeaturedPackageOverlay';
@@ -64,12 +63,9 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showPackageDetailsModal, setShowPackageDetailsModal] = useState(false);
-  const [showReviewScreen, setShowReviewScreen] = useState(false);
-  const [showPaymentPage, setShowPaymentPage] = useState(false);
-  const [reservationId, setReservationId] = useState<string>('');
+  const [showBookingFlow, setShowBookingFlow] = useState(false);
   const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
   const [isLoadingContract, setIsLoadingContract] = useState(false);
-  const [isCreatingReservation, setIsCreatingReservation] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const packagesScrollRef = useRef<HTMLDivElement>(null);
   const [influencerCode, setInfluencerCode] = useState<string | null>(null);
@@ -257,81 +253,10 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       alert('يرجى اختيار باقة وعدد الأشجار');
       return;
     }
-    setShowReviewScreen(true);
+    console.log('🚀 [AGRICULTURAL] بدء تدفق الحجز الموحد...');
+    setShowBookingFlow(true);
   };
 
-  const handleConfirmReview = async () => {
-    if (isCreatingReservation) {
-      console.log('⚠️ [AGRICULTURAL] جاري إنشاء الحجز بالفعل، تم تجاهل الضغطة');
-      return;
-    }
-
-    if (!selectedContract || treeCount === 0) {
-      alert('يرجى اختيار باقة وعدد الأشجار');
-      return;
-    }
-
-    setIsCreatingReservation(true);
-
-    try {
-      const totalPrice = calculateTotal();
-
-      console.log('🌾 [AGRICULTURAL] بدء إنشاء الحجز...');
-      console.log('🌾 [AGRICULTURAL] User ID:', user?.id || 'غير مسجل');
-      console.log('🌾 [AGRICULTURAL] Trees:', treeCount, 'Price:', totalPrice);
-      console.log('🌾 [AGRICULTURAL] Path Type: agricultural (أشجاري الخضراء)');
-      if (influencerCode) {
-        console.log('🎁 [AGRICULTURAL] Influencer Code:', influencerCode);
-      }
-
-      const guestId = !user?.id
-        ? `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-        : null;
-
-      if (guestId) {
-        console.log('👤 [AGRICULTURAL] إنشاء Guest ID للزائر:', guestId);
-      }
-
-      const { data: reservation, error: reservationError } = await supabase
-        .from('reservations')
-        .insert({
-          user_id: user?.id || null,
-          guest_id: guestId,
-          farm_id: farm.id,
-          farm_name: farm.name,
-          contract_id: selectedContract.id,
-          contract_name: selectedPackage?.package_name || selectedContract.contract_name,
-          duration_years: selectedPackage?.contract_years || selectedContract.duration_years,
-          bonus_years: selectedPackage?.bonus_years || selectedContract.bonus_years,
-          total_trees: treeCount,
-          total_price: totalPrice,
-          path_type: 'agricultural',
-          status: 'pending',
-          influencer_code: influencerCode || null
-        } as any)
-        .select()
-        .single() as any;
-
-      if (reservationError) {
-        console.error('❌ [AGRICULTURAL] خطأ في إنشاء الحجز:', reservationError);
-        alert('حدث خطأ في إنشاء الحجز. يرجى المحاولة مرة أخرى');
-        setIsCreatingReservation(false);
-        return;
-      }
-
-      console.log('✅ [AGRICULTURAL] تم إنشاء الحجز! ID:', reservation.id);
-      console.log('✅ [AGRICULTURAL] Path Type المُحفوظ:', reservation.path_type);
-
-      setReservationId(reservation.id);
-      setShowReviewScreen(false);
-      setShowPaymentPage(true);
-      console.log('💳 [AGRICULTURAL] فتح صفحة الدفع');
-    } catch (error) {
-      console.error('Error creating reservation:', error);
-      alert('حدث خطأ غير متوقع');
-      setIsCreatingReservation(false);
-    }
-  };
 
   const handleGoToAccount = () => {
     onClose();
@@ -342,7 +267,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
   return (
     <>
-      {!showReviewScreen && (
+      {!showBookingFlow && (
       <>
       {/* Header - Fixed to viewport */}
       <div className="fixed top-0 left-0 right-0 z-[60] bg-white/80 backdrop-blur-lg border-b border-green-200/50">
@@ -815,40 +740,32 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         </div>
       )}
 
-      {/* Review Screen */}
-      {showReviewScreen && selectedContract && (
-        <AgriculturalReviewScreen
+      {/* Unified Booking Flow - Review → Registration → Payment */}
+      {showBookingFlow && selectedContract && (
+        <UnifiedBookingFlow
+          farmId={farm.id}
           farmName={farm.name}
           farmLocation={farm.location}
-          contractName={selectedPackage?.package_name || selectedContract.contract_name}
-          durationYears={selectedContract.duration_years}
-          bonusYears={selectedContract.bonus_years}
+          pathType="agricultural"
+          packageName={selectedPackage?.package_name || selectedContract.contract_name}
           treeCount={treeCount}
+          contractId={selectedContract.id}
+          contractName={selectedContract.contract_name}
+          durationYears={selectedPackage?.contract_years || selectedContract.duration_years}
+          bonusYears={selectedPackage?.bonus_years || selectedContract.bonus_years}
           totalPrice={calculateTotal()}
           pricePerTree={selectedPackage?.price_per_tree || selectedContract.farmer_price || selectedContract.investor_price || 0}
-          onConfirm={handleConfirmReview}
-          onBack={() => setShowReviewScreen(false)}
-          isLoading={isCreatingReservation}
+          influencerCode={influencerCode}
+          onBack={() => {
+            console.log('🔙 [AGRICULTURAL] العودة من تدفق الحجز');
+            setShowBookingFlow(false);
+          }}
+          onComplete={() => {
+            console.log('✅ [AGRICULTURAL] اكتمل تدفق الحجز بنجاح!');
+            setShowBookingFlow(false);
+            handleGoToAccount();
+          }}
         />
-      )}
-
-      {/* Payment Page */}
-      {showPaymentPage && reservationId && (
-        <div className="fixed inset-0 z-[60]">
-          <PaymentPage
-            reservationId={reservationId}
-            amount={calculateTotal()}
-            onSuccess={() => {
-              console.log('✅ [AGRICULTURAL] تم الدفع بنجاح!');
-              setShowPaymentPage(false);
-              handleGoToAccount();
-            }}
-            onBack={() => {
-              setShowPaymentPage(false);
-              setShowReviewScreen(true);
-            }}
-          />
-        </div>
       )}
 
       {/* Package Details Modal */}

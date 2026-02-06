@@ -8,7 +8,7 @@ interface AgriculturalReviewScreenProps {
   bonusYears: number;
   treeCount: number;
   totalPrice: number;
-  pricePerTree: number;
+  pricePerTree?: number;
   onConfirm: () => void;
   onBack: () => void;
   isLoading?: boolean;
@@ -27,6 +27,8 @@ export default function AgriculturalReviewScreen({
   onBack,
   isLoading = false
 }: AgriculturalReviewScreenProps) {
+  const calculatedPricePerTree = pricePerTree || (treeCount > 0 ? Math.round(totalPrice / treeCount) : 0);
+
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-green-50/98 via-emerald-50/95 to-teal-50/98 z-50 overflow-y-auto">
       <div className="min-h-screen p-4 flex items-center justify-center">
@@ -77,7 +79,7 @@ export default function AgriculturalReviewScreen({
                   <span className="text-sm font-semibold text-gray-600">عدد الأشجار</span>
                   <div className="text-right">
                     <p className="text-xl font-bold text-green-700">{treeCount} شجرة</p>
-                    <p className="text-xs text-gray-500">{pricePerTree.toLocaleString()} ر.س للشجرة</p>
+                    <p className="text-xs text-gray-500">{calculatedPricePerTree.toLocaleString()} ر.س للشجرة</p>
                   </div>
                 </div>
 

@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase';
 interface UnifiedBookingFlowProps {
   farmId: string;
   farmName: string;
+  farmLocation?: string;
   pathType: 'agricultural' | 'investment';
   packageName: string;
   treeCount: number;
@@ -17,6 +18,7 @@ interface UnifiedBookingFlowProps {
   durationYears: number;
   bonusYears: number;
   totalPrice: number;
+  pricePerTree?: number;
   treeVarieties?: any[];
   influencerCode?: string | null;
   onBack: () => void;
@@ -125,12 +127,13 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
     return props.pathType === 'agricultural' ? (
       <AgriculturalReviewScreen
         farmName={props.farmName}
-        packageName={props.packageName}
-        treeCount={props.treeCount}
+        farmLocation={props.farmLocation}
         contractName={props.contractName}
+        treeCount={props.treeCount}
         durationYears={props.durationYears}
         bonusYears={props.bonusYears}
         totalPrice={props.totalPrice}
+        pricePerTree={props.pricePerTree}
         onConfirm={handleReviewConfirm}
         onBack={props.onBack}
       />
