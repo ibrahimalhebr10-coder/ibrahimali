@@ -68,6 +68,7 @@ export interface InfluencerStats {
   trees_in_current_batch: number;
   trees_until_next_reward: number;
   progress_percentage: number;
+  trees_required_for_reward: number;
 }
 
 export interface InfluencerActivityLog {
@@ -267,7 +268,7 @@ export const influencerMarketingService = {
   async getMyInfluencerStats(): Promise<InfluencerStats | null> {
     const { data, error } = await supabase
       .from('influencer_rewards_details')
-      .select('total_bookings, total_trees_booked, total_rewards_earned, trees_in_current_batch, trees_until_next_reward, progress_percentage')
+      .select('total_bookings, total_trees_booked, total_rewards_earned, trees_in_current_batch, trees_until_next_reward, progress_percentage, trees_required_for_reward')
       .eq('is_active', true)
       .limit(1)
       .single();

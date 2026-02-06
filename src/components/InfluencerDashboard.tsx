@@ -212,7 +212,7 @@ export default function InfluencerDashboard() {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-amber-700">{stats.trees_in_current_batch}</span>
-              <span className="text-sm text-amber-600">/{stats.trees_required_for_reward || 20}</span>
+              <span className="text-sm text-amber-600">/{stats.trees_required_for_reward}</span>
             </div>
             <span className="text-sm font-medium text-amber-600 bg-amber-200 px-3 py-1 rounded-full">
               {Math.round(progressPercentage)}%
@@ -233,7 +233,7 @@ export default function InfluencerDashboard() {
           </p>
 
           <p className="text-xs text-amber-700 font-bold mt-3 text-center bg-white/50 py-2 rounded-lg">
-            📊 كل {stats.trees_required_for_reward || 20} شجرة = مكافأة واحدة
+            📊 كل {stats.trees_required_for_reward} شجرة = مكافأة واحدة
           </p>
         </div>
       </div>
@@ -503,12 +503,12 @@ export default function InfluencerDashboard() {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium text-slate-600">
-                          {log.trees_in_current_batch}/{stats.trees_required_for_reward || 20}
+                          {log.trees_in_current_batch}/{stats.trees_required_for_reward}
                         </span>
                         <div className="w-16 bg-slate-100 rounded-full h-1.5 overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-amber-400 to-amber-600"
-                            style={{ width: `${(log.trees_in_current_batch / (stats.trees_required_for_reward || 20)) * 100}%` }}
+                            style={{ width: `${(log.trees_in_current_batch / stats.trees_required_for_reward) * 100}%` }}
                           />
                         </div>
                       </div>
