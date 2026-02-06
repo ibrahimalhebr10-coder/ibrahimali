@@ -125,14 +125,16 @@ function AppContent() {
         ]);
 
         if (!cats || cats.length === 0) {
-          console.warn('[App] No categories found');
+          console.warn('[App] ⚠️ No categories found - retrying...');
           if (retryCount < MAX_RETRIES) {
             retryCount++;
             const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 10000);
+            console.log(`[App] 🔄 Retry ${retryCount}/${MAX_RETRIES} in ${retryDelay}ms`);
             setTimeout(() => loadData(true), retryDelay);
             return;
           }
 
+          console.error('[App] ❌ Max retries reached - no categories available');
           if (wasFirstLoad) {
             setCategories([]);
             setFarmProjects({});
@@ -144,7 +146,12 @@ function AppContent() {
         }
 
         retryCount = 0;
+        console.log(`[App] ✅ Loaded ${cats.length} categories:`, cats.map(c => c.name).join(', '));
         setCategories(cats);
+
+        const projectCount = Object.values(allProjects).flat().length;
+        console.log(`[App] ✅ Loaded ${projectCount} projects across ${Object.keys(allProjects).length} categories`);
+        console.log(`[App] 📊 Projects per category:`, Object.entries(allProjects).map(([cat, farms]) => `${cat}: ${farms.length}`).join(', '));
 
         if (wasFirstLoad) {
           setActiveCategory('all');
@@ -425,6 +432,15 @@ function AppContent() {
   const currentFarms = activeCategory === 'all'
     ? Object.values(farmProjects).flat()
     : farmProjects[activeCategory] || [];
+
+  console.log(`[App] 📍 Current View State:`, {
+    activeCategory,
+    totalCategories: categories.length,
+    farmsInCategory: currentFarms.length,
+    allProjectKeys: Object.keys(farmProjects),
+    loading
+  });
+
   const activeIconName = activeCategory === 'all' ? 'all' : categories.find(cat => cat.slug === activeCategory)?.icon || 'leaf';
   const activeColors = getColorForIcon(activeIconName, appMode);
 

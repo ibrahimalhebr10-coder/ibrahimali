@@ -193,12 +193,14 @@ export const farmService = {
       }
 
       if (!projects || projects.length === 0) {
-        console.warn('[farmService] No projects found')
+        console.warn('[farmService] ⚠️ No projects found - database returned empty')
+        console.warn('[farmService] ⚠️ Please check: 1) Are there farms with status=active? 2) Database connection?')
         return {}
       }
 
-      console.log(`[farmService] Found ${projects.length} projects`)
-      console.log('[farmService] First project structure:', JSON.stringify(projects[0], null, 2))
+      console.log(`[farmService] ✅ Found ${projects.length} active projects`)
+      console.log('[farmService] 📊 Project names:', projects.map(p => p.name_ar || p.name_en).join(', '))
+      console.log('[farmService] 🔍 First project full data:', JSON.stringify(projects[0], null, 2))
       const farmIds = projects.map(p => p.id)
 
       const { data: allContracts } = await supabase
@@ -214,26 +216,46 @@ export const farmService = {
 
       projects.forEach(project => {
         const categoryData = project.farm_categories;
-        console.log(`[farmService] Project "${project.name_ar}" -> category object:`, JSON.stringify(categoryData));
         const categorySlug = categoryData?.name_ar?.trim().replace(/\s+/g, '-') || 'other';
         const treeTypes = project.tree_types || []
         const projectContracts = (allContracts || []).filter(c => c.farm_id === project.id)
 
-        console.log(`[farmService] Project "${project.name_ar}" -> category slug: "${categorySlug}"`)
+        console.log(`[farmService] 🌳 Processing "${project.name_ar}"`);
+        console.log(`[farmService] ├─ Category: ${categorySlug}`);
+        console.log(`[farmService] ├─ Tree Types Count: ${treeTypes.length}`);
+        console.log(`[farmService] ├─ Tree Types Data:`, JSON.stringify(treeTypes, null, 2));
+        console.log(`[farmService] └─ Contracts Count: ${projectContracts.length}`)
 
-        const formattedTreeTypes: TreeType[] = treeTypes.map((tree: any) => ({
-          id: tree.id || `tree-${Date.now()}-${Math.random()}`,
-          slug: tree.name?.toLowerCase().replace(/\s+/g, '-') || '',
-          name: tree.name || '',
-          varieties: [{
-            id: tree.id || `variety-${Date.now()}-${Math.random()}`,
-            name: tree.subtitle || tree.name || '',
-            price: tree.base_price || tree.price || 0,
-            icon: '🌳',
-            available: tree.count || tree.available || 0,
-            maintenance_fee: tree.maintenance_fee || 0
-          }]
-        }))
+        const formattedTreeTypes: TreeType[] = treeTypes.map((tree: any, index: number) => {
+          const treeId = tree.id || `tree-${Date.now()}-${Math.random()}`;
+          const treeName = tree.name || '';
+          const treePrice = tree.base_price || tree.price || 0;
+          const treeCount = tree.count || tree.available || 0;
+          const maintenanceFee = tree.maintenance_fee || 0;
+
+          console.log(`[farmService]   ├─ Tree ${index + 1}:`, {
+            name: treeName,
+            price: treePrice,
+            count: treeCount,
+            maintenance_fee: maintenanceFee,
+            hasPrice: !!(tree.base_price || tree.price),
+            rawData: tree
+          });
+
+          return {
+            id: treeId,
+            slug: treeName.toLowerCase().replace(/\s+/g, '-'),
+            name: treeName,
+            varieties: [{
+              id: tree.id || `variety-${Date.now()}-${Math.random()}`,
+              name: tree.subtitle || treeName,
+              price: treePrice,
+              icon: '🌳',
+              available: treeCount,
+              maintenance_fee: maintenanceFee
+            }]
+          };
+        })
 
         const farmProject: FarmProject = {
           id: project.id,
