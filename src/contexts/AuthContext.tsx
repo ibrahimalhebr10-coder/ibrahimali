@@ -137,17 +137,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('🔐 [AuthContext] Auth state change:', event);
 
-      if (session?.user) {
-        loadIdentity(session.user.id);
-      } else {
+      if (event === 'TOKEN_REFRESHED') {
+        console.log('✅ [AuthContext] Token refreshed successfully');
+      }
+
+      if (event === 'SIGNED_OUT' && session === null) {
+        console.log('👋 [AuthContext] User signed out');
+        setSession(null);
+        setUser(null);
         const savedMode = localStorage.getItem('appMode');
         const fallbackIdentity: IdentityType =
           (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
         setIdentity(fallbackIdentity);
+        return;
+      }
+
+      if (event === 'USER_UPDATED' || event === 'INITIAL_SESSION' || event === 'SIGNED_IN') {
+        setSession(session);
+        setUser(session?.user ?? null);
+
+        if (session?.user) {
+          loadIdentity(session.user.id);
+        } else {
+          const savedMode = localStorage.getItem('appMode');
+          const fallbackIdentity: IdentityType =
+            (savedMode === 'agricultural' || savedMode === 'investment') ? savedMode : 'agricultural';
+          setIdentity(fallbackIdentity);
+        }
       }
     });
 
