@@ -87,7 +87,7 @@ export const farmLoadingService = {
   },
 
   /**
-   * Load fresh data - ONE SIMPLE CALL
+   * Load fresh data - SIMPLE & RELIABLE
    */
   async loadFresh(): Promise<{
     categories: FarmCategory[];
@@ -96,34 +96,40 @@ export const farmLoadingService = {
     console.log('[FarmLoading] 📡 Fetching from database');
 
     try {
-      // Load categories and farms in parallel
-      const [categoriesResult, farmsResult] = await Promise.all([
-        supabase
-          .from('farm_categories')
-          .select('name_ar, icon, display_order')
-          .eq('active', true)
-          .order('display_order', { ascending: true }),
+      // Step 1: Load categories
+      console.log('[FarmLoading] Step 1: Loading categories');
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('farm_categories')
+        .select('id, name_ar, icon, display_order')
+        .eq('active', true)
+        .order('display_order', { ascending: true });
 
-        supabase
-          .from('farms')
-          .select(`
-            *,
-            farm_categories!category_id(name_ar, icon)
-          `)
-          .eq('status', 'active')
-          .order('order_index')
-      ]);
+      if (categoriesError) {
+        console.error('[FarmLoading] Categories error:', categoriesError);
+        throw categoriesError;
+      }
 
-      if (categoriesResult.error) throw categoriesResult.error;
-      if (farmsResult.error) throw farmsResult.error;
+      console.log('[FarmLoading] ✅ Categories loaded:', categoriesData?.length || 0);
 
-      console.log('[FarmLoading] 📊 Loaded:', {
-        categories: categoriesResult.data?.length || 0,
-        farms: farmsResult.data?.length || 0
-      });
+      // Step 2: Load farms (simple, no join)
+      console.log('[FarmLoading] Step 2: Loading farms');
+      const { data: farmsData, error: farmsError } = await supabase
+        .from('farms')
+        .select('*')
+        .eq('status', 'active')
+        .order('order_index');
 
-      // Load contracts
-      const farmIds = farmsResult.data?.map(f => f.id) || [];
+      if (farmsError) {
+        console.error('[FarmLoading] Farms error:', farmsError);
+        throw farmsError;
+      }
+
+      console.log('[FarmLoading] ✅ Farms loaded:', farmsData?.length || 0);
+
+      // Step 3: Load contracts
+      const farmIds = farmsData?.map(f => f.id) || [];
+      console.log('[FarmLoading] Step 3: Loading contracts for', farmIds.length, 'farms');
+
       const { data: contracts } = await supabase
         .from('farm_contracts')
         .select('*')
@@ -131,18 +137,33 @@ export const farmLoadingService = {
         .eq('is_active', true)
         .order('display_order');
 
-      // Format data
-      const categories: FarmCategory[] = (categoriesResult.data || []).map(cat => ({
+      console.log('[FarmLoading] ✅ Contracts loaded:', contracts?.length || 0);
+
+      // Format categories
+      const categories: FarmCategory[] = (categoriesData || []).map(cat => ({
         slug: cat.name_ar?.trim().replace(/\s+/g, '-') || 'other',
         name: cat.name_ar || '',
         icon: cat.icon || '🌳'
       }));
 
-      const farms = this.formatFarms(farmsResult.data || [], contracts || []);
+      // Create category lookup map
+      const categoryMap = new Map(
+        (categoriesData || []).map(cat => [cat.id, cat])
+      );
+
+      // Format farms with category data
+      const farms = this.formatFarmsWithCategories(
+        farmsData || [],
+        contracts || [],
+        categoryMap
+      );
 
       console.log('[FarmLoading] ✅ Complete:', {
         categoriesCount: categories.length,
-        farmsCount: Object.values(farms).flat().length
+        farmsCount: Object.values(farms).flat().length,
+        farmsByCategory: Object.entries(farms).map(([cat, items]) =>
+          `${cat}: ${items.length}`
+        ).join(', ')
       });
 
       return { categories, farms };
@@ -153,14 +174,24 @@ export const farmLoadingService = {
   },
 
   /**
-   * Format farms data
+   * Format farms with category data
    */
-  formatFarms(farmsData: any[], contracts: any[]): Record<string, FarmProject[]> {
+  formatFarmsWithCategories(
+    farmsData: any[],
+    contracts: any[],
+    categoryMap: Map<string, any>
+  ): Record<string, FarmProject[]> {
     const farmsByCategory: Record<string, FarmProject[]> = {};
 
+    console.log('[FarmLoading] Formatting', farmsData.length, 'farms');
+
     farmsData.forEach(farm => {
-      const categoryData = farm.farm_categories;
+      // Get category data from map
+      const categoryData = categoryMap.get(farm.category_id);
       const categorySlug = categoryData?.name_ar?.trim().replace(/\s+/g, '-') || 'other';
+
+      console.log('[FarmLoading] Farm:', farm.name_ar, '| Category:', categorySlug);
+
       const treeTypes = farm.tree_types || [];
       const farmContracts = contracts.filter(c => c.farm_id === farm.id);
 
@@ -194,7 +225,8 @@ export const farmLoadingService = {
         comingSoonLabel: farm.coming_soon_label,
         firstYearMaintenanceFree: farm.first_year_maintenance_free ?? true,
         treeTypes: formattedTreeTypes,
-        contracts: farmContracts
+        contracts: farmContracts,
+        category: categorySlug
       };
 
       if (!farmsByCategory[categorySlug]) {
@@ -202,6 +234,8 @@ export const farmLoadingService = {
       }
       farmsByCategory[categorySlug].push(farmProject);
     });
+
+    console.log('[FarmLoading] Formatted farms by category:', Object.keys(farmsByCategory));
 
     return farmsByCategory;
   },
