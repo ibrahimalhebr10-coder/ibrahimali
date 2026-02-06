@@ -155,7 +155,7 @@ ${referralLink}
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-amber-700">{stats.trees_in_current_batch}</span>
-              <span className="text-sm text-amber-600">/20</span>
+              <span className="text-sm text-amber-600">/{stats.trees_required_for_reward || 20}</span>
             </div>
             <span className="text-sm font-medium text-amber-600 bg-amber-200 px-3 py-1 rounded-full">
               {Math.round(progressPercentage)}%
@@ -173,6 +173,10 @@ ${referralLink}
 
           <p className="text-xs text-amber-600 mt-2 text-center">
             {stats.trees_until_next_reward} {stats.trees_until_next_reward === 1 ? 'شجرة' : 'أشجار'} متبقية
+          </p>
+
+          <p className="text-xs text-amber-700 font-bold mt-3 text-center bg-white/50 py-2 rounded-lg">
+            📊 كل {stats.trees_required_for_reward || 20} شجرة = مكافأة واحدة
           </p>
         </div>
       </div>
@@ -309,12 +313,12 @@ ${referralLink}
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-medium text-slate-600">
-                          {log.trees_in_current_batch}/20
+                          {log.trees_in_current_batch}/{stats.trees_required_for_reward || 20}
                         </span>
                         <div className="w-16 bg-slate-100 rounded-full h-1.5 overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-amber-400 to-amber-600"
-                            style={{ width: `${(log.trees_in_current_batch / 20) * 100}%` }}
+                            style={{ width: `${(log.trees_in_current_batch / (stats.trees_required_for_reward || 20)) * 100}%` }}
                           />
                         </div>
                       </div>

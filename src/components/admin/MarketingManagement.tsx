@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Megaphone, TrendingUp, Users, Target, Package } from 'lucide-react';
+import { Megaphone, TrendingUp, Users, Target, Package, Settings } from 'lucide-react';
 import InfluencerPartnersManager from './InfluencerPartnersManager';
 import FeaturedPackageManager from './FeaturedPackageManager';
+import InfluencerSettingsManager from './InfluencerSettingsManager';
 
 const MarketingManagement = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'influencers' | 'featured'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'influencers' | 'featured' | 'settings'>('overview');
 
   return (
     <div className="space-y-6">
@@ -55,6 +56,19 @@ const MarketingManagement = () => {
             <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-amber-600" />
           )}
         </button>
+        <button
+          onClick={() => setActiveTab('settings')}
+          className={`px-6 py-3 font-medium transition-colors relative ${
+            activeTab === 'settings'
+              ? 'text-emerald-600'
+              : 'text-slate-600 hover:text-slate-900'
+          }`}
+        >
+          إعدادات النظام
+          {activeTab === 'settings' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-600" />
+          )}
+        </button>
       </div>
 
       {activeTab === 'overview' && (
@@ -87,6 +101,21 @@ const MarketingManagement = () => {
               </h3>
               <p className="text-sm text-gray-600">
                 تخصيص الباقة المؤقتة التي تظهر عند إدخال كود المؤثر
+              </p>
+            </button>
+
+            <button
+              onClick={() => setActiveTab('settings')}
+              className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition-all text-right group"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mb-4">
+                <Settings className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors">
+                إعدادات النظام
+              </h3>
+              <p className="text-sm text-gray-600">
+                إدارة قواعد المكافآت والإعدادات العامة
               </p>
             </button>
 
@@ -130,6 +159,8 @@ const MarketingManagement = () => {
       {activeTab === 'influencers' && <InfluencerPartnersManager />}
 
       {activeTab === 'featured' && <FeaturedPackageManager />}
+
+      {activeTab === 'settings' && <InfluencerSettingsManager />}
     </div>
   );
 };
