@@ -11,94 +11,213 @@ interface RequestBody {
   question: string;
   sessionId: string;
   userId?: string;
+  currentPage?: string;
+  userContext?: Record<string, any>;
 }
 
-interface ResponsePattern {
-  patterns: string[];
-  answer: string;
-  category: string;
+interface FAQ {
+  id: string;
+  question_ar: string;
+  answer_ar: string;
+  question_variations: any;
+  intent_tags: string[];
+  usage_count: number;
 }
 
-const responses: ResponsePattern[] = [
-  {
-    patterns: ["كيف", "طريقة", "خطوات", "استثمر", "احجز"],
-    answer: "الاستثمار في منصتنا سهل وبسيط! كل ما عليك هو اختيار المزرعة المناسبة، حدد عدد الأشجار، واحجز حصتك. رح نتابع معك كل تفاصيل استثمارك وتحصل على تقارير دورية وصور من مزرعتك.",
-    category: "investment"
-  },
-  {
-    patterns: ["عائد", "ربح", "مكسب", "أرباح", "فائدة", "كم", "مقدار"],
-    answer: "العائد يختلف حسب نوع المزرعة والأشجار اللي تختارها. كل مزرعة لها تفاصيلها الخاصة. تقدر تشوف كل التفاصيل المالية والعوائد المتوقعة في صفحة المزرعة قبل ما تحجز.",
-    category: "investment"
-  },
-  {
-    patterns: ["ضمان", "أمان", "آمن", "موثوق", "ثقة"],
-    answer: "نعم! استثمارك معنا مضمون ومؤمّن. عندنا شركاء موثوقين ونتابع المزارع بشكل يومي. كمان تقدر تزور مزرعتك في أي وقت وتشوف أشجارك بنفسك.",
-    category: "worried"
-  },
-  {
-    patterns: ["مشكلة", "خطر", "خسارة", "مخاطر", "خطورة"],
-    answer: "الاستثمار الزراعي من أكثر الاستثمارات استقراراً. احنا نتابع المزارع بشكل مستمر ونتخذ كل إجراءات الحماية اللازمة. في حال أي طارئ، فيه تأمين وضمانات تحمي استثمارك.",
-    category: "worried"
-  },
-  {
-    patterns: ["مدة", "متى", "وقت", "فترة", "موعد"],
-    answer: "مدة الاستثمار تعتمد على نوع الأشجار. في أنواع تبدأ تنتج بعد سنة، وفي أنواع تحتاج 3-5 سنوات. كل التفاصيل موجودة في صفحة المزرعة، وراح نوافيك بكل المستجدات.",
-    category: "curious"
-  },
-  {
-    patterns: ["صيانة", "رعاية", "اهتمام", "خدمة", "متابعة"],
-    answer: "لا تشيل هم! كل الصيانة والرعاية من مسؤوليتنا. عندنا فريق مختص يهتم بالمزارع 24/7، ويرسل لك تحديثات وصور دورية عن حالة أشجارك.",
-    category: "curious"
-  },
-  {
-    patterns: ["دفع", "تسديد", "مبلغ", "قسط", "تكلفة", "سعر"],
-    answer: "طرق الدفع متنوعة وسهلة! تقدر تدفع كامل المبلغ، أو على دفعات حسب راحتك. ندعم جميع وسائل الدفع الإلكترونية والتحويل البنكي.",
-    category: "investment"
-  },
-  {
-    patterns: ["موقع", "مكان", "أين", "وين", "منطقة"],
-    answer: "مزارعنا موزعة في مناطق زراعية متميزة في المملكة. كل مزرعة لها موقعها وخصائصها. تقدر تشوف تفاصيل الموقع في صفحة المزرعة، وطبعاً مرحب فيك تزورها!",
-    category: "curious"
-  },
-  {
-    patterns: ["زيارة", "أزور", "أشوف", "معاينة"],
-    answer: "أكيد! تقدر تزور مزرعتك في أي وقت وتشوف أشجارك بعينك. بس ننصحك تنسق معنا قبل الزيارة علشان نسهل لك الوصول ونرتب لك جولة مميزة.",
-    category: "curious"
-  },
-  {
-    patterns: ["بيع", "أبيع", "تنازل", "نقل"],
-    answer: "نعم، تقدر تبيع حصتك أو تنقلها لشخص آخر. عندنا إجراءات واضحة وسهلة للنقل والبيع. تواصل معنا وراح نساعدك في كل الخطوات.",
-    category: "investment"
-  },
-  {
-    patterns: ["مرحبا", "السلام", "هلا", "هاي", "أهلا"],
-    answer: "أهلاً وسهلاً! سعداء بوجودك معنا في منصة الاستثمار الزراعي. كيف أقدر أساعدك اليوم؟",
-    category: "greeting"
-  },
-  {
-    patterns: ["شكرا", "ممتاز", "رائع", "جميل"],
-    answer: "العفو! دايماً في الخدمة. إذا عندك أي سؤال ثاني، لا تتردد تسأل!",
-    category: "positive"
+interface SearchResult {
+  faq: FAQ;
+  score: number;
+  matchType: 'exact' | 'variation' | 'keyword';
+}
+
+async function searchInKnowledgeBase(
+  supabase: any,
+  question: string
+): Promise<SearchResult | null> {
+  const lowerQuestion = question.toLowerCase().trim();
+
+  const { data: faqs, error } = await supabase
+    .from('assistant_faqs')
+    .select('*')
+    .eq('is_active', true)
+    .eq('is_approved', true);
+
+  if (error || !faqs || faqs.length === 0) {
+    console.log('No FAQs found or error:', error);
+    return null;
   }
-];
 
-function generateAnswer(question: string): { answer: string; category: string } {
-  const lowerQuestion = question.toLowerCase();
+  let bestMatch: SearchResult | null = null;
+  let highestScore = 0;
 
-  for (const response of responses) {
-    if (response.patterns.some(pattern => lowerQuestion.includes(pattern))) {
-      return {
-        answer: response.answer,
-        category: response.category
+  for (const faq of faqs) {
+    let score = 0;
+    let matchType: 'exact' | 'variation' | 'keyword' = 'keyword';
+
+    const mainQuestion = faq.question_ar?.toLowerCase() || '';
+
+    if (mainQuestion === lowerQuestion) {
+      score = 100;
+      matchType = 'exact';
+    } else if (mainQuestion.includes(lowerQuestion) || lowerQuestion.includes(mainQuestion)) {
+      score = 90;
+      matchType = 'exact';
+    }
+
+    if (score === 0 && faq.question_variations) {
+      const variations = Array.isArray(faq.question_variations)
+        ? faq.question_variations
+        : [];
+
+      for (const variation of variations) {
+        const varLower = (typeof variation === 'string' ? variation : '').toLowerCase();
+        if (varLower === lowerQuestion) {
+          score = 95;
+          matchType = 'variation';
+          break;
+        } else if (varLower.includes(lowerQuestion) || lowerQuestion.includes(varLower)) {
+          score = Math.max(score, 85);
+          matchType = 'variation';
+        }
+      }
+    }
+
+    if (score === 0) {
+      const questionWords = lowerQuestion.split(/\s+/).filter(w => w.length > 2);
+      const faqWords = mainQuestion.split(/\s+/).filter(w => w.length > 2);
+
+      const matchingWords = questionWords.filter(word =>
+        faqWords.some(faqWord => faqWord.includes(word) || word.includes(faqWord))
+      );
+
+      if (matchingWords.length > 0) {
+        score = (matchingWords.length / questionWords.length) * 70;
+        matchType = 'keyword';
+      }
+    }
+
+    if (faq.intent_tags && Array.isArray(faq.intent_tags)) {
+      for (const tag of faq.intent_tags) {
+        if (lowerQuestion.includes(tag.toLowerCase())) {
+          score += 10;
+        }
+      }
+    }
+
+    if (score > highestScore && score >= 50) {
+      highestScore = score;
+      bestMatch = {
+        faq,
+        score,
+        matchType
       };
     }
   }
 
-  return {
-    answer: "شكراً على سؤالك! للحصول على إجابة دقيقة ومفصلة، أنصحك تتواصل مع فريق الدعم عبر واتساب. فريقنا جاهز يساعدك في أي وقت ويجاوب على كل استفساراتك.",
-    category: "general"
-  };
+  return bestMatch;
 }
+
+async function saveUnansweredQuestion(
+  supabase: any,
+  sessionId: string,
+  question: string,
+  userContext: Record<string, any>
+): Promise<void> {
+  try {
+    const { data: existing } = await supabase
+      .from('unanswered_questions')
+      .select('id, frequency')
+      .eq('question', question)
+      .eq('status', 'new')
+      .maybeSingle();
+
+    if (existing) {
+      await supabase
+        .from('unanswered_questions')
+        .update({
+          frequency: existing.frequency + 1,
+          session_id: sessionId
+        })
+        .eq('id', existing.id);
+    } else {
+      await supabase
+        .from('unanswered_questions')
+        .insert({
+          session_id: sessionId,
+          question,
+          user_context: userContext,
+          current_page: userContext.currentPage || null,
+          user_type: userContext.userType || 'visitor',
+          frequency: 1,
+          status: 'new'
+        });
+    }
+  } catch (error) {
+    console.error('Error saving unanswered question:', error);
+  }
+}
+
+async function saveConversationMessage(
+  supabase: any,
+  sessionId: string,
+  question: string,
+  answer: string,
+  matchedFaqId: string | null,
+  confidenceScore: number,
+  responseTimeMs: number
+): Promise<void> {
+  try {
+    await supabase.from('conversation_messages').insert([
+      {
+        session_id: sessionId,
+        message_type: 'user',
+        content: question,
+        created_at: new Date().toISOString()
+      },
+      {
+        session_id: sessionId,
+        message_type: 'assistant',
+        content: answer,
+        matched_faq_id: matchedFaqId,
+        confidence_score: confidenceScore,
+        response_time_ms: responseTimeMs,
+        created_at: new Date().toISOString()
+      }
+    ]);
+
+    await supabase
+      .from('conversation_sessions')
+      .update({ last_activity_at: new Date().toISOString() })
+      .eq('id', sessionId);
+
+    if (matchedFaqId) {
+      const { data } = await supabase
+        .from('assistant_faqs')
+        .select('usage_count')
+        .eq('id', matchedFaqId)
+        .maybeSingle();
+
+      if (data) {
+        await supabase
+          .from('assistant_faqs')
+          .update({ usage_count: (data.usage_count || 0) + 1 })
+          .eq('id', matchedFaqId);
+      }
+    }
+  } catch (error) {
+    console.error('Error saving conversation:', error);
+  }
+}
+
+const defaultAnswer = `شكراً على سؤالك!
+
+للأسف، لا أملك إجابة دقيقة على هذا السؤال حالياً. لكن فريقنا المتخصص جاهز لمساعدتك!
+
+يمكنك التواصل معنا عبر:
+• واتساب: للحصول على رد سريع ومباشر
+• فريق الدعم: متاح 24/7 لخدمتك
+
+سؤالك مهم بالنسبة لنا، وسنعمل على تحسين إجاباتنا لنخدمك بشكل أفضل.`;
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -108,12 +227,20 @@ Deno.serve(async (req: Request) => {
     });
   }
 
+  const startTime = Date.now();
+
   try {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    const { question, sessionId, userId }: RequestBody = await req.json();
+    const {
+      question,
+      sessionId,
+      userId,
+      currentPage,
+      userContext = {}
+    }: RequestBody = await req.json();
 
     if (!question || !sessionId) {
       return new Response(
@@ -125,23 +252,53 @@ Deno.serve(async (req: Request) => {
       );
     }
 
-    const { answer, category } = generateAnswer(question);
-    const sentiment = detectSentiment(question);
+    const searchResult = await searchInKnowledgeBase(supabase, question);
+    const responseTime = Date.now() - startTime;
 
-    await supabase.from("assistant_conversations").insert({
-      user_id: userId || null,
-      session_id: sessionId,
+    let answer: string;
+    let matchedFaqId: string | null = null;
+    let confidenceScore: number;
+    let category = 'general';
+
+    if (searchResult && searchResult.score >= 70) {
+      answer = searchResult.faq.answer_ar;
+      matchedFaqId = searchResult.faq.id;
+      confidenceScore = searchResult.score / 100;
+      category = 'knowledge_base';
+    } else {
+      answer = defaultAnswer;
+      confidenceScore = 0;
+
+      await saveUnansweredQuestion(
+        supabase,
+        sessionId,
+        question,
+        {
+          ...userContext,
+          currentPage,
+          userType: userId ? 'authenticated' : 'visitor'
+        }
+      );
+    }
+
+    await saveConversationMessage(
+      supabase,
+      sessionId,
       question,
       answer,
-      category,
-      sentiment,
-    });
+      matchedFaqId,
+      confidenceScore,
+      responseTime
+    );
 
     return new Response(
       JSON.stringify({
         answer,
         category,
-        sentiment,
+        confidence: confidenceScore,
+        matchedFaqId,
+        responseTime,
+        source: matchedFaqId ? 'knowledge_base' : 'default'
       }),
       {
         status: 200,
@@ -153,6 +310,7 @@ Deno.serve(async (req: Request) => {
     return new Response(
       JSON.stringify({
         error: error instanceof Error ? error.message : "Internal server error",
+        answer: defaultAnswer
       }),
       {
         status: 500,
@@ -161,39 +319,3 @@ Deno.serve(async (req: Request) => {
     );
   }
 });
-
-function detectCategory(question: string): string {
-  const lowerQuestion = question.toLowerCase();
-
-  const investmentKeywords = ["استثمار", "عائد", "ربح", "فائدة", "مالي", "تكلفة", "سعر"];
-  const worriedKeywords = ["مشكلة", "خطر", "خسارة", "ضمان", "تأمين", "ماذا لو", "هل يوجد"];
-  const curiousKeywords = ["كيف", "ماذا", "ما هو", "ما هي", "اشرح", "وضح"];
-
-  if (investmentKeywords.some(keyword => lowerQuestion.includes(keyword))) {
-    return "investment";
-  }
-  if (worriedKeywords.some(keyword => lowerQuestion.includes(keyword))) {
-    return "worried";
-  }
-  if (curiousKeywords.some(keyword => lowerQuestion.includes(keyword))) {
-    return "curious";
-  }
-
-  return "curious";
-}
-
-function detectSentiment(question: string): string {
-  const lowerQuestion = question.toLowerCase();
-
-  const negativeKeywords = ["مشكلة", "خطر", "خسارة", "قلق", "خوف", "سيء"];
-  const positiveKeywords = ["ممتاز", "رائع", "جيد", "اعجبني", "مهتم"];
-
-  if (negativeKeywords.some(keyword => lowerQuestion.includes(keyword))) {
-    return "negative";
-  }
-  if (positiveKeywords.some(keyword => lowerQuestion.includes(keyword))) {
-    return "positive";
-  }
-
-  return "neutral";
-}
