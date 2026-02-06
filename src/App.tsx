@@ -250,6 +250,14 @@ function AppContent() {
   }, [user, showAccountProfile]);
 
   useEffect(() => {
+    console.log('');
+    console.log('🔔'.repeat(50));
+    console.log('🔔 [STATE CHANGE] showSuccessPartnerAccount:', showSuccessPartnerAccount);
+    console.log('🔔'.repeat(50));
+    console.log('');
+  }, [showSuccessPartnerAccount]);
+
+  useEffect(() => {
     const scrollContainer = scrollContainerRef.current;
     if (!scrollContainer) {
       console.log('❌ Scroll container not found');
@@ -489,10 +497,19 @@ function AppContent() {
   };
 
   const handleMyAccountClick = () => {
-    console.log(`👤 [Header] My Account clicked`);
+    console.log('');
+    console.log('👤'.repeat(50));
+    console.log('👤 [HEADER] زر "حسابي" تم الضغط عليه!');
+    console.log('👤'.repeat(50));
+    console.log('🔐 User:', user?.id || '❌ NO USER');
+    console.log('🎭 Identity:', identity);
+    console.log('');
     // Always use QuickAccountAccess - it will check account type and route correctly
-    console.log(`🔄 [Header] Opening QuickAccountAccess to check account type`);
+    console.log('🔄 [Header] Opening QuickAccountAccess to check account type');
     setShowQuickAccountAccess(true);
+    console.log('✅ [Header] QuickAccountAccess state set to TRUE');
+    console.log('👤'.repeat(50));
+    console.log('');
   };
 
   const handleQuickAccessLogin = () => {
@@ -515,8 +532,19 @@ function AppContent() {
   };
 
   const handleOpenPartnerAccount = () => {
-    console.log('🌟 [QuickAccess] Opening Success Partner Account');
+    console.log('');
+    console.log('🌟'.repeat(50));
+    console.log('🌟 [App] handleOpenPartnerAccount called!');
+    console.log('🌟'.repeat(50));
+    console.log('👤 User:', user?.id || '❌ NO USER');
+    console.log('🎭 Identity:', identity);
+    console.log('📊 Current showSuccessPartnerAccount state:', showSuccessPartnerAccount);
+    console.log('');
+    console.log('✅ Setting showSuccessPartnerAccount to TRUE...');
     setShowSuccessPartnerAccount(true);
+    console.log('✅ State updated - SuccessPartnerAccount should now be visible');
+    console.log('🌟'.repeat(50));
+    console.log('');
   };
 
   const handleMyFarmClick = async () => {
@@ -546,14 +574,22 @@ function AppContent() {
       exitDemoMode();
     }
 
+    console.log('🔍 [Footer Button] Checking if user is an influencer...');
     const { influencerMarketingService } = await import('./services/influencerMarketingService');
     const isInfluencer = await influencerMarketingService.checkIfUserIsInfluencer();
+    console.log('📊 [Footer Button] isInfluencer result:', isInfluencer);
 
     if (isInfluencer) {
-      console.log('⭐ [Footer Button] User is a Success Partner');
+      console.log('');
+      console.log('⭐'.repeat(50));
+      console.log('⭐ [Footer Button] User IS a Success Partner!');
+      console.log('⭐ Setting showSuccessPartnerAccount to TRUE...');
       setShowSuccessPartnerAccount(true);
+      console.log('⭐ State updated - SuccessPartnerAccount should now be visible');
+      console.log('⭐'.repeat(50));
+      console.log('');
     } else {
-      console.log(`✅ [Footer Button] Opening My Trees for user ${user.id} with identity ${identity}`);
+      console.log(`✅ [Footer Button] User is NOT a partner - Opening My Trees for user ${user.id} with identity ${identity}`);
       setShowMyTrees(true);
     }
 
@@ -1374,9 +1410,14 @@ function AppContent() {
         />
       )}
 
+      {/* SuccessPartnerAccount Component - Always Rendered */}
+      {console.log('🎨 [RENDER] About to render SuccessPartnerAccount with isOpen:', showSuccessPartnerAccount)}
       <SuccessPartnerAccount
         isOpen={showSuccessPartnerAccount}
-        onClose={() => setShowSuccessPartnerAccount(false)}
+        onClose={() => {
+          console.log('🔴 [SuccessPartnerAccount] onClose called - setting state to FALSE');
+          setShowSuccessPartnerAccount(false);
+        }}
       />
 
       <AccountTypeSelector
