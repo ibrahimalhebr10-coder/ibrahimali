@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Users, TreePine, FileText, CheckCircle, DollarSign, Database, Wifi, HardDrive, Zap } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
+import PendingPartnersRequests from './PendingPartnersRequests';
 
 const DashboardOverview: React.FC = () => {
   const [stats, setStats] = useState({
@@ -75,6 +76,9 @@ const DashboardOverview: React.FC = () => {
           نظرة عامة على حالة المنصة
         </p>
       </div>
+
+      {/* طلبات شركاء النجاح الجديدة */}
+      <PendingPartnersRequests />
 
       {/* 1. شريط الحالة العام */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
