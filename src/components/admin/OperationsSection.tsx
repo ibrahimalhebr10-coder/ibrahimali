@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { Leaf, Receipt, ArrowLeft, TrendingUp } from 'lucide-react';
+import { Leaf, ArrowLeft, TrendingUp } from 'lucide-react';
 import GreenTreesTab from './GreenTreesTab';
-import MaintenancePaymentsTab from './MaintenancePaymentsTab';
 import GoldenTreesInvestmentTab from './GoldenTreesInvestmentTab';
 
 export default function OperationsSection() {
-  const [activeSection, setActiveSection] = useState<'green-trees' | 'golden-trees' | 'payments'>('green-trees');
+  const [activeSection, setActiveSection] = useState<'green-trees' | 'golden-trees'>('green-trees');
 
   return (
     <div className="space-y-6">
@@ -61,29 +60,11 @@ export default function OperationsSection() {
               <div className="absolute bottom-0 left-0 right-0 h-1 bg-amber-600"></div>
             )}
           </button>
-          <button
-            onClick={() => setActiveSection('payments')}
-            className={`flex items-center justify-center gap-3 px-8 py-4 font-semibold transition-all relative ${
-              activeSection === 'payments'
-                ? 'bg-gradient-to-b from-blue-50 to-white text-blue-700'
-                : 'text-gray-600 hover:bg-gray-50'
-            }`}
-          >
-            <Receipt className="w-5 h-5" />
-            <div className="flex flex-col items-start">
-              <span>متابعة السداد</span>
-              <span className="text-xs text-gray-500 font-normal">نتائج مالية مرتبطة بالصيانة</span>
-            </div>
-            {activeSection === 'payments' && (
-              <div className="absolute bottom-0 left-0 right-0 h-1 bg-blue-600"></div>
-            )}
-          </button>
         </div>
 
         <div className="p-6">
           {activeSection === 'green-trees' && <GreenTreesTab />}
           {activeSection === 'golden-trees' && <GoldenTreesInvestmentTab />}
-          {activeSection === 'payments' && <MaintenancePaymentsTab />}
         </div>
       </div>
     </div>
