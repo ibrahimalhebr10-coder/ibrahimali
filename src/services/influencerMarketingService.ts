@@ -280,10 +280,31 @@ export const influencerMarketingService = {
 
     console.log('🔍 [getMyInfluencerStats] Fetching stats for user:', user.id);
 
+    // Check for impersonation
+    const { impersonationService } = require('./impersonationService');
+    const impersonationData = impersonationService.getImpersonationData();
+
+    let userId = user.id;
+    if (impersonationData) {
+      console.log('🎭 [getMyInfluencerStats] Impersonation detected - using partner ID:', impersonationData.partnerId);
+
+      // Get partner user_id
+      const { data: partnerData } = await supabase
+        .from('influencer_partners')
+        .select('user_id')
+        .eq('id', impersonationData.partnerId)
+        .single();
+
+      if (partnerData?.user_id) {
+        userId = partnerData.user_id;
+        console.log('✅ [getMyInfluencerStats] Using partner user_id:', userId);
+      }
+    }
+
     const { data, error } = await supabase
       .from('influencer_rewards_details')
       .select('referral_code, partner_name, total_bookings, total_trees_booked, total_rewards_earned, trees_in_current_batch, trees_until_next_reward, progress_percentage, trees_required_for_reward')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('is_active', true)
       .maybeSingle();
 
@@ -316,10 +337,31 @@ export const influencerMarketingService = {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return [];
 
+    // Check for impersonation
+    const { impersonationService } = require('./impersonationService');
+    const impersonationData = impersonationService.getImpersonationData();
+
+    let userId = user.id;
+    if (impersonationData) {
+      console.log('🎭 [getMyActivityLog] Impersonation detected - using partner ID:', impersonationData.partnerId);
+
+      // Get partner user_id
+      const { data: partnerData } = await supabase
+        .from('influencer_partners')
+        .select('user_id')
+        .eq('id', impersonationData.partnerId)
+        .single();
+
+      if (partnerData?.user_id) {
+        userId = partnerData.user_id;
+        console.log('✅ [getMyActivityLog] Using partner user_id:', userId);
+      }
+    }
+
     const { data, error } = await supabase
       .from('influencer_activity_log')
       .select('id, created_at, activity_date, farm_name, farm_location, trees_referred, trees_earned, trees_in_current_batch, trees_until_next_reward, notes')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(50);
 

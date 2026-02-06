@@ -238,6 +238,28 @@ function AppContent() {
 
   useEffect(() => {
     if (user && !showAccountProfile) {
+      // Check for partner impersonation
+      const { impersonationService } = require('./services/impersonationService');
+      const impersonationData = impersonationService.getImpersonationData();
+
+      if (impersonationData) {
+        console.log('');
+        console.log('🎭'.repeat(50));
+        console.log('🎭 [App] Partner impersonation detected!');
+        console.log('🎭 Partner ID:', impersonationData.partnerId);
+        console.log('🎭 Partner Name:', impersonationData.partnerName);
+        console.log('🎭 Admin User ID:', impersonationData.adminUserId);
+        console.log('🎭 Opening Success Partner Account...');
+        console.log('🎭'.repeat(50));
+        console.log('');
+
+        setTimeout(() => {
+          setShowSuccessPartnerAccount(true);
+        }, 500);
+        return;
+      }
+
+      // Check for new partner registration
       const justRegistered = localStorage.getItem('successPartnerJustRegistered');
       if (justRegistered === 'true') {
         console.log('🌿 [Banner] Success Partner just registered and logged in - showing welcome banner');

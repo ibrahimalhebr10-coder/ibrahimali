@@ -1,9 +1,10 @@
-import { X, User, LogOut, Sparkles, Award, Shield, UserX } from 'lucide-react';
+import { X, User, LogOut, Sparkles, Award, Shield, UserX, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useState, useEffect } from 'react';
 import InfluencerDashboard from './InfluencerDashboard';
 import { deviceRecognitionService } from '../services/deviceRecognitionService';
 import { supabase } from '../lib/supabase';
+import { impersonationService } from '../services/impersonationService';
 
 interface SuccessPartnerAccountProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [isPartner, setIsPartner] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
+  const [impersonationData, setImpersonationData] = useState<any>(null);
 
   useEffect(() => {
     console.log('');
@@ -48,6 +50,34 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
 
     try {
       setLoading(true);
+
+      // Check for impersonation first
+      const impersonation = impersonationService.getImpersonationData();
+      if (impersonation) {
+        console.log('');
+        console.log('🎭'.repeat(50));
+        console.log('🎭 [SuccessPartnerAccount] IMPERSONATION DETECTED!');
+        console.log('🎭 Partner ID:', impersonation.partnerId);
+        console.log('🎭 Partner Name:', impersonation.partnerName);
+        console.log('🎭 Admin User ID:', impersonation.adminUserId);
+        console.log('🎭'.repeat(50));
+        console.log('');
+
+        setImpersonationData(impersonation);
+
+        // Get partner data
+        const partnerData = await impersonationService.getImpersonatedPartnerData(impersonation.partnerId);
+        if (partnerData) {
+          console.log('✅ [SuccessPartnerAccount] Impersonated partner data loaded:', partnerData);
+          setIsPartner(true);
+          setLoading(false);
+          return;
+        } else {
+          console.error('❌ [SuccessPartnerAccount] Failed to load impersonated partner data');
+        }
+      }
+
+      // Normal partner check
       console.log('🔍 [SuccessPartnerAccount] Checking partner status for user:', user.id);
 
       const { data, error } = await supabase
@@ -111,6 +141,19 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
     } else {
       handleSignOut(false);
     }
+  };
+
+  const handleExitImpersonation = () => {
+    console.log('');
+    console.log('🔴'.repeat(50));
+    console.log('🔴 [SuccessPartnerAccount] Exiting impersonation mode');
+    console.log('🔴'.repeat(50));
+    console.log('');
+
+    impersonationService.stopImpersonation();
+
+    // Redirect to admin dashboard
+    window.location.href = '/admin';
   };
 
   if (loading) {
@@ -231,6 +274,33 @@ export default function SuccessPartnerAccount({ isOpen, onClose }: SuccessPartne
             </div>
           </div>
         </div>
+
+        {impersonationData && (
+          <div className="bg-gradient-to-r from-blue-600 to-blue-700 border-b border-blue-800 py-3">
+            <div className="max-w-2xl mx-auto px-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 flex-1">
+                  <AlertTriangle className="w-5 h-5 text-yellow-300 flex-shrink-0" />
+                  <div className="flex-1">
+                    <p className="text-white font-bold text-sm text-right">
+                      وضع الإدارة: أنت تشاهد حساب {impersonationData.partnerName}
+                    </p>
+                    <p className="text-blue-200 text-xs text-right">
+                      جميع البيانات هي للشريك المحدد
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleExitImpersonation}
+                  className="px-4 py-2 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-bold transition-colors whitespace-nowrap flex items-center gap-2"
+                >
+                  <X className="w-4 h-4" />
+                  <span>الخروج</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {showProfileMenu && (
           <div className="absolute top-16 left-4 bg-white rounded-2xl shadow-2xl border border-amber-200 p-2 z-30 min-w-[200px]">

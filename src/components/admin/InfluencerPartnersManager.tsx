@@ -21,8 +21,11 @@ import {
   CreateInfluencerPartnerData
 } from '../../services/influencerMarketingService';
 import { supabase } from '../../lib/supabase';
+import { impersonationService } from '../../services/impersonationService';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function InfluencerPartnersManager() {
+  const { user } = useAuth();
   const [partners, setPartners] = useState<InfluencerPartner[]>([]);
   const [settings, setSettings] = useState<InfluencerSettings | null>(null);
   const [loading, setLoading] = useState(true);
@@ -147,7 +150,17 @@ export default function InfluencerPartnersManager() {
   const handleImpersonatePartner = async (partnerId: string, partnerName: string) => {
     if (!confirm(`هل تريد الدخول على حساب ${partnerName}؟`)) return;
 
+    if (!user) {
+      showMessage('error', 'يجب تسجيل الدخول أولاً');
+      return;
+    }
+
     try {
+      console.log('🎭 [Admin] Starting partner impersonation...');
+      console.log('   Partner ID:', partnerId);
+      console.log('   Partner Name:', partnerName);
+      console.log('   Admin User ID:', user.id);
+
       const { data, error } = await supabase.rpc('admin_get_partner_login_info', {
         partner_id: partnerId
       });
@@ -164,14 +177,24 @@ export default function InfluencerPartnersManager() {
         return;
       }
 
+      impersonationService.startImpersonation({
+        partnerId: partnerId,
+        partnerName: data.name || partnerName,
+        partnerPhone: data.phone || '',
+        adminUserId: user.id
+      });
+
       showMessage('success', `جارِ الدخول على حساب ${partnerName}...`);
+
+      console.log('✅ [Admin] Impersonation started successfully');
+      console.log('🔄 [Admin] Redirecting to homepage...');
 
       setTimeout(() => {
         window.location.href = '/';
       }, 1500);
 
     } catch (error) {
-      console.error('خطأ في محاولة الدخول:', error);
+      console.error('❌ [Admin] خطأ في محاولة الدخول:', error);
       showMessage('error', 'فشل في الدخول على الحساب');
     }
   };
