@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { CreditCard, ArrowRight, AlertCircle } from 'lucide-react';
 import { paymentService, PaymentMethod } from '../services/paymentService';
 import PaymentCardForm from './PaymentCardForm';
 import ApplePayButton from './ApplePayButton';
-import { useAuth } from '../contexts/AuthContext';
 
 interface PaymentPageProps {
   reservationId?: string;
@@ -18,20 +17,8 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
   onSuccess,
   onBack
 }) => {
-  const { user } = useAuth();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [needsAuth, setNeedsAuth] = useState(false);
-
-  useEffect(() => {
-    if (!user) {
-      setNeedsAuth(true);
-      setError('يجب تسجيل الدخول أولاً لإتمام عملية الدفع');
-    } else {
-      setNeedsAuth(false);
-      setError(null);
-    }
-  }, [user]);
 
   const handlePaymentSuccess = async (token: string, reference: string, method: PaymentMethod) => {
     try {
@@ -90,62 +77,31 @@ const PaymentPage: React.FC<PaymentPageProps> = ({
           </div>
         )}
 
-        {needsAuth ? (
-          <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-gray-200">
-            <div className="text-center mb-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-yellow-100 rounded-full mb-4">
-                <AlertCircle className="w-8 h-8 text-yellow-600" />
+        <PaymentCardForm
+          amount={amount}
+          onSuccess={(token, reference) => handlePaymentSuccess(token, reference, 'card')}
+          onError={setError}
+          disabled={isProcessing}
+        />
+
+        {paymentService.isApplePayAvailable() && (
+          <div className="mt-6">
+            <div className="relative mb-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                تسجيل الدخول مطلوب
-              </h2>
-              <p className="text-gray-600">
-                لإتمام عملية الدفع، يجب تسجيل الدخول أو إنشاء حساب جديد
-              </p>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-500 font-medium">أو</span>
+              </div>
             </div>
 
-            <div className="space-y-4">
-              <button
-                onClick={onBack}
-                className="w-full px-6 py-4 bg-darkgreen text-white rounded-xl font-bold text-lg hover:bg-green-700 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                الرجوع للتسجيل
-              </button>
-
-              <p className="text-sm text-gray-500 text-center">
-                سيتم حفظ حجزك وستتمكن من إتمام الدفع بعد تسجيل الدخول
-              </p>
-            </div>
-          </div>
-        ) : (
-          <>
-            <PaymentCardForm
+            <ApplePayButton
               amount={amount}
-              onSuccess={(token, reference) => handlePaymentSuccess(token, reference, 'card')}
+              onSuccess={(token, reference) => handlePaymentSuccess(token, reference, 'apple_pay')}
               onError={setError}
               disabled={isProcessing}
             />
-
-            {paymentService.isApplePayAvailable() && (
-              <div className="mt-6">
-                <div className="relative mb-4">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-gray-300"></div>
-                  </div>
-                  <div className="relative flex justify-center text-sm">
-                    <span className="px-4 bg-white text-gray-500 font-medium">أو</span>
-                  </div>
-                </div>
-
-                <ApplePayButton
-                  amount={amount}
-                  onSuccess={(token, reference) => handlePaymentSuccess(token, reference, 'apple_pay')}
-                  onError={setError}
-                  disabled={isProcessing}
-                />
-              </div>
-            )}
-          </>
+          </div>
         )}
 
         <div className="mt-8 text-center">

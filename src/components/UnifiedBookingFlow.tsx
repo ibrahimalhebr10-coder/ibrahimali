@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AgriculturalReviewScreen from './AgriculturalReviewScreen';
 import InvestmentReviewScreen from './InvestmentReviewScreen';
+import StandaloneAccountRegistration from './StandaloneAccountRegistration';
+import PaymentPage from './PaymentPage';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 
@@ -21,43 +23,85 @@ interface UnifiedBookingFlowProps {
   onComplete: () => void;
 }
 
-type FlowStep = 'review' | 'payment';
+type FlowStep = 'review' | 'registration' | 'payment' | 'success';
 
 export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<FlowStep>('review');
   const [reservationId, setReservationId] = useState<string>('');
+  const [reservationData, setReservationData] = useState<any>(null);
+
+  useEffect(() => {
+    if (user && currentStep === 'registration' && reservationId) {
+      handleRegistrationSuccess();
+    }
+  }, [user, currentStep, reservationId]);
 
   const handleReviewConfirm = async () => {
     try {
+      const reservationPayload = {
+        user_id: user?.id || null,
+        farm_id: props.farmId,
+        farm_name: props.farmName,
+        contract_id: props.contractId,
+        contract_name: props.contractName,
+        duration_years: props.durationYears,
+        bonus_years: props.bonusYears,
+        total_trees: props.treeCount,
+        total_price: props.totalPrice,
+        path_type: props.pathType,
+        status: 'pending',
+        influencer_code: props.influencerCode || null,
+        tree_varieties: props.treeVarieties || []
+      };
+
       const { data: reservation, error } = await supabase
         .from('reservations')
-        .insert({
-          user_id: user?.id || null,
-          farm_id: props.farmId,
-          farm_name: props.farmName,
-          contract_id: props.contractId,
-          contract_name: props.contractName,
-          duration_years: props.durationYears,
-          bonus_years: props.bonusYears,
-          total_trees: props.treeCount,
-          total_price: props.totalPrice,
-          path_type: props.pathType,
-          status: 'pending',
-          influencer_code: props.influencerCode || null,
-          tree_varieties: props.treeVarieties || []
-        } as any)
+        .insert(reservationPayload as any)
         .select()
         .single();
 
       if (error) throw error;
 
       setReservationId(reservation.id);
-      setCurrentStep('payment');
+      setReservationData(reservationPayload);
+
+      if (!user) {
+        setCurrentStep('registration');
+      } else {
+        setCurrentStep('payment');
+      }
     } catch (error) {
       console.error('Error creating reservation:', error);
       alert('حدث خطأ في إنشاء الحجز');
     }
+  };
+
+  const handleRegistrationSuccess = async () => {
+    if (reservationId && user) {
+      try {
+        await supabase
+          .from('reservations')
+          .update({ user_id: user.id })
+          .eq('id', reservationId);
+
+        setCurrentStep('payment');
+      } catch (error) {
+        console.error('Error updating reservation:', error);
+        setCurrentStep('payment');
+      }
+    } else {
+      setCurrentStep('payment');
+    }
+  };
+
+  const handlePaymentSuccess = async () => {
+    setCurrentStep('success');
+    props.onComplete();
+  };
+
+  const handleBackFromRegistration = () => {
+    setCurrentStep('review');
   };
 
   if (currentStep === 'review') {
@@ -89,8 +133,28 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
     );
   }
 
+  if (currentStep === 'registration') {
+    return (
+      <StandaloneAccountRegistration
+        onSuccess={handleRegistrationSuccess}
+        onBack={handleBackFromRegistration}
+        initialMode="register"
+      />
+    );
+  }
+
   if (currentStep === 'payment' && reservationId) {
-    props.onComplete();
+    return (
+      <PaymentPage
+        reservationId={reservationId}
+        amount={props.totalPrice}
+        onSuccess={handlePaymentSuccess}
+        onBack={handleBackFromRegistration}
+      />
+    );
+  }
+
+  if (currentStep === 'success') {
     return null;
   }
 
