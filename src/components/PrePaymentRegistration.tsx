@@ -182,7 +182,7 @@ export default function PrePaymentRegistration({
 
     try {
       const phoneNumber = formData.phoneNumber.replace(/\s/g, '');
-      const email = `${phoneNumber}@investor.harvest.local`;
+      const email = `${phoneNumber}@ashjari.local`;
 
       console.log('📝 [REGISTRATION] بدء إنشاء الحساب...');
       console.log('📝 [REGISTRATION] Phone:', phoneNumber);

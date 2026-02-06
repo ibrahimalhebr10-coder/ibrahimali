@@ -53,7 +53,7 @@ export default function StandaloneAccountRegistration({ onSuccess, onBack, initi
     setLoading(true);
 
     try {
-      const email = `${formData.phoneNumber}@investor.harvest.local`;
+      const email = `${formData.phoneNumber}@ashjari.local`;
 
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -102,7 +102,7 @@ export default function StandaloneAccountRegistration({ onSuccess, onBack, initi
     setLoading(true);
 
     try {
-      const email = `${formData.phoneNumber}@investor.harvest.local`;
+      const email = `${formData.phoneNumber}@ashjari.local`;
       const { error: signInError } = await signIn(email, formData.password);
 
       if (!signInError) {

@@ -68,7 +68,7 @@ export default function InvestorRegistrationForm({ guestId, onSuccess, onCancel 
 
     try {
       const phoneNumber = formData.phoneNumber.replace(/\s/g, '');
-      const email = `${phoneNumber}@investor.harvest.local`;
+      const email = `${phoneNumber}@ashjari.local`;
 
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,

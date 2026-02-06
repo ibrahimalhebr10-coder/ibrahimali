@@ -84,7 +84,7 @@ export default function SuccessPartnerRegistrationForm({ isOpen, onClose, onSucc
     setIsSubmitting(true);
 
     try {
-      const phoneEmail = `${phone.replace(/\s/g, '')}@temp.local`;
+      const phoneEmail = `${phone.replace(/\s/g, '')}@ashjari.local`;
 
       let userId: string | null = null;
       let isExistingUser = false;
