@@ -104,8 +104,8 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   }, [selectedContract]);
 
   useEffect(() => {
-    console.log('📊 [State Change] showReviewScreen:', showReviewScreen, 'reservationId:', reservationId);
-  }, [showReviewScreen, reservationId]);
+    console.log('📊 [State Change] showBookingFlow:', showBookingFlow);
+  }, [showBookingFlow]);
 
   useEffect(() => {
     const slider = packagesScrollRef.current;
@@ -639,7 +639,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       </div>
 
       {/* Investment Summary - Fixed Bottom - Compact Design */}
-      {treeCount > 0 && selectedContract && !showReviewScreen && (
+      {treeCount > 0 && selectedContract && !showBookingFlow && (
           <div
             className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-xl border-t-2 border-[#D4AF37]/40 shadow-2xl z-[100000]"
             style={{ paddingBottom: 'max(4rem, env(safe-area-inset-bottom))' }}
