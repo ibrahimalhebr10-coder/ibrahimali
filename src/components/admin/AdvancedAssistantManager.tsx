@@ -14,7 +14,8 @@ import {
   Eye,
   BarChart3,
   Lightbulb,
-  AlertCircle
+  AlertCircle,
+  Save
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 
@@ -23,6 +24,7 @@ interface Domain {
   name_ar: string;
   name_en: string;
   description_ar: string | null;
+  description_en: string | null;
   icon: string | null;
   color: string;
   display_order: number;
@@ -34,6 +36,8 @@ interface Topic {
   domain_id: string;
   title_ar: string;
   title_en: string;
+  summary_ar: string | null;
+  content_ar: string | null;
   target_audience: string;
   is_active: boolean;
   views_count: number;
@@ -78,7 +82,6 @@ export default function AdvancedAssistantManager() {
   const [unansweredQuestions, setUnansweredQuestions] = useState<UnansweredQuestion[]>([]);
   const [suggestions, setSuggestions] = useState<LearningSuggestion[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAddModal, setShowAddModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -153,14 +156,6 @@ export default function AdvancedAssistantManager() {
       .order('priority', { ascending: false })
       .order('frequency', { ascending: false });
     if (data) setSuggestions(data);
-  };
-
-  const toggleDomainStatus = async (id: string, currentStatus: boolean) => {
-    await supabase
-      .from('knowledge_domains')
-      .update({ is_active: !currentStatus })
-      .eq('id', id);
-    loadDomains();
   };
 
   const approveFAQ = async (id: string) => {
@@ -275,15 +270,11 @@ export default function AdvancedAssistantManager() {
             ) : (
               <>
                 {activeTab === 'domains' && (
-                  <DomainsTab
-                    domains={domains}
-                    onToggleStatus={toggleDomainStatus}
-                    onRefresh={loadDomains}
-                  />
+                  <DomainsTab domains={domains} onRefresh={loadDomains} />
                 )}
 
                 {activeTab === 'topics' && (
-                  <TopicsTab topics={topics} onRefresh={loadTopics} />
+                  <TopicsTab topics={topics} domains={domains} onRefresh={loadTopics} />
                 )}
 
                 {activeTab === 'faqs' && (
@@ -354,20 +345,104 @@ function TabButton({
   );
 }
 
-function DomainsTab({
-  domains,
-  onToggleStatus,
-  onRefresh
-}: {
-  domains: Domain[];
-  onToggleStatus: (id: string, currentStatus: boolean) => void;
-  onRefresh: () => void;
-}) {
+function DomainsTab({ domains, onRefresh }: { domains: Domain[]; onRefresh: () => void }) {
+  const [showModal, setShowModal] = useState(false);
+  const [editingDomain, setEditingDomain] = useState<Domain | null>(null);
+  const [formData, setFormData] = useState({
+    name_ar: '',
+    name_en: '',
+    description_ar: '',
+    description_en: '',
+    icon: '',
+    color: '#10b981',
+    display_order: 0,
+    is_active: true
+  });
+
+  const resetForm = () => {
+    setFormData({
+      name_ar: '',
+      name_en: '',
+      description_ar: '',
+      description_en: '',
+      icon: '',
+      color: '#10b981',
+      display_order: 0,
+      is_active: true
+    });
+    setEditingDomain(null);
+  };
+
+  const handleAdd = () => {
+    resetForm();
+    setShowModal(true);
+  };
+
+  const handleEdit = (domain: Domain) => {
+    setEditingDomain(domain);
+    setFormData({
+      name_ar: domain.name_ar,
+      name_en: domain.name_en,
+      description_ar: domain.description_ar || '',
+      description_en: domain.description_en || '',
+      icon: domain.icon || '',
+      color: domain.color,
+      display_order: domain.display_order,
+      is_active: domain.is_active
+    });
+    setShowModal(true);
+  };
+
+  const handleSave = async () => {
+    try {
+      if (editingDomain) {
+        await supabase
+          .from('knowledge_domains')
+          .update(formData)
+          .eq('id', editingDomain.id);
+      } else {
+        await supabase
+          .from('knowledge_domains')
+          .insert([formData]);
+      }
+      setShowModal(false);
+      resetForm();
+      onRefresh();
+    } catch (error) {
+      console.error('Error saving domain:', error);
+      alert('حدث خطأ أثناء الحفظ');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('هل أنت متأكد من حذف هذا المجال؟ سيتم حذف جميع المواضيع المرتبطة به.')) {
+      return;
+    }
+    try {
+      await supabase.from('knowledge_domains').delete().eq('id', id);
+      onRefresh();
+    } catch (error) {
+      console.error('Error deleting domain:', error);
+      alert('حدث خطأ أثناء الحذف');
+    }
+  };
+
+  const toggleStatus = async (id: string, currentStatus: boolean) => {
+    await supabase
+      .from('knowledge_domains')
+      .update({ is_active: !currentStatus })
+      .eq('id', id);
+    onRefresh();
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900">المجالات المعرفية</h2>
-        <button className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors">
+        <button
+          onClick={handleAdd}
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors"
+        >
           <Plus className="w-4 h-4" />
           إضافة مجال جديد
         </button>
@@ -390,11 +465,12 @@ function DomainsTab({
                 <div>
                   <h3 className="font-bold text-gray-900">{domain.name_ar}</h3>
                   <p className="text-sm text-gray-500">{domain.description_ar}</p>
+                  <p className="text-xs text-gray-400 mt-1">{domain.name_en}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={() => onToggleStatus(domain.id, domain.is_active)}
+                  onClick={() => toggleStatus(domain.id, domain.is_active)}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     domain.is_active
                       ? 'bg-green-100 text-green-700 hover:bg-green-200'
@@ -403,24 +479,286 @@ function DomainsTab({
                 >
                   {domain.is_active ? 'نشط' : 'غير نشط'}
                 </button>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                <button
+                  onClick={() => handleEdit(domain)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
                   <Edit2 className="w-4 h-4 text-gray-600" />
+                </button>
+                <button
+                  onClick={() => handleDelete(domain.id)}
+                  className="p-2 hover:bg-red-100 rounded-lg transition-colors"
+                >
+                  <Trash2 className="w-4 h-4 text-red-600" />
                 </button>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900">
+                {editingDomain ? 'تعديل المجال المعرفي' : 'إضافة مجال معرفي جديد'}
+              </h3>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  الاسم بالعربية
+                </label>
+                <input
+                  type="text"
+                  value={formData.name_ar}
+                  onChange={(e) => setFormData({ ...formData, name_ar: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="مثل: الاستثمار الزراعي"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Name in English
+                </label>
+                <input
+                  type="text"
+                  value={formData.name_en}
+                  onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="e.g: Agricultural Investment"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  الوصف بالعربية
+                </label>
+                <textarea
+                  value={formData.description_ar}
+                  onChange={(e) => setFormData({ ...formData, description_ar: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="وصف مختصر للمجال المعرفي"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Description in English
+                </label>
+                <textarea
+                  value={formData.description_en}
+                  onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Short description of the domain"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    الأيقونة (Emoji)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.icon}
+                    onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-2xl text-center"
+                    placeholder="🌾"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    اللون
+                  </label>
+                  <input
+                    type="color"
+                    value={formData.color}
+                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                    className="w-full h-10 border border-gray-300 rounded-lg cursor-pointer"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  ترتيب العرض
+                </label>
+                <input
+                  type="number"
+                  value={formData.display_order}
+                  onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="is_active"
+                  checked={formData.is_active}
+                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                  className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                />
+                <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+                  نشط
+                </label>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  resetForm();
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={handleSave}
+                className="flex items-center gap-2 px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors"
+              >
+                <Save className="w-4 h-4" />
+                حفظ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function TopicsTab({ topics, onRefresh }: { topics: Topic[]; onRefresh: () => void }) {
+function TopicsTab({
+  topics,
+  domains,
+  onRefresh
+}: {
+  topics: Topic[];
+  domains: Domain[];
+  onRefresh: () => void;
+}) {
+  const [showModal, setShowModal] = useState(false);
+  const [editingTopic, setEditingTopic] = useState<Topic | null>(null);
+  const [formData, setFormData] = useState({
+    domain_id: '',
+    title_ar: '',
+    title_en: '',
+    summary_ar: '',
+    content_ar: '',
+    target_audience: 'all',
+    is_active: true
+  });
+
+  const resetForm = () => {
+    setFormData({
+      domain_id: '',
+      title_ar: '',
+      title_en: '',
+      summary_ar: '',
+      content_ar: '',
+      target_audience: 'all',
+      is_active: true
+    });
+    setEditingTopic(null);
+  };
+
+  const handleAdd = () => {
+    resetForm();
+    setShowModal(true);
+  };
+
+  const handleEdit = (topic: Topic) => {
+    setEditingTopic(topic);
+    setFormData({
+      domain_id: topic.domain_id,
+      title_ar: topic.title_ar,
+      title_en: topic.title_en,
+      summary_ar: topic.summary_ar || '',
+      content_ar: topic.content_ar || '',
+      target_audience: topic.target_audience,
+      is_active: topic.is_active
+    });
+    setShowModal(true);
+  };
+
+  const handleSave = async () => {
+    if (!formData.domain_id) {
+      alert('يرجى اختيار المجال المعرفي');
+      return;
+    }
+    if (!formData.title_ar) {
+      alert('يرجى إدخال العنوان بالعربية');
+      return;
+    }
+
+    try {
+      if (editingTopic) {
+        await supabase
+          .from('knowledge_topics')
+          .update(formData)
+          .eq('id', editingTopic.id);
+      } else {
+        await supabase
+          .from('knowledge_topics')
+          .insert([formData]);
+      }
+      setShowModal(false);
+      resetForm();
+      onRefresh();
+    } catch (error) {
+      console.error('Error saving topic:', error);
+      alert('حدث خطأ أثناء الحفظ');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('هل أنت متأكد من حذف هذا الموضوع؟')) {
+      return;
+    }
+    try {
+      await supabase.from('knowledge_topics').delete().eq('id', id);
+      onRefresh();
+    } catch (error) {
+      console.error('Error deleting topic:', error);
+      alert('حدث خطأ أثناء الحذف');
+    }
+  };
+
+  const toggleStatus = async (id: string, currentStatus: boolean) => {
+    await supabase
+      .from('knowledge_topics')
+      .update({ is_active: !currentStatus })
+      .eq('id', id);
+    onRefresh();
+  };
+
+  const getDomainName = (domainId: string) => {
+    const domain = domains.find((d) => d.id === domainId);
+    return domain?.name_ar || 'غير محدد';
+  };
+
+  const getDomainIcon = (domainId: string) => {
+    const domain = domains.find((d) => d.id === domainId);
+    return domain?.icon || '';
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900">المواضيع</h2>
-        <button className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors">
+        <button
+          onClick={handleAdd}
+          className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors"
+        >
           <Plus className="w-4 h-4" />
           إضافة موضوع جديد
         </button>
@@ -434,7 +772,27 @@ function TopicsTab({ topics, onRefresh }: { topics: Topic[]; onRefresh: () => vo
           >
             <div className="flex items-center justify-between">
               <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-medium">
+                    {getDomainIcon(topic.domain_id)} {getDomainName(topic.domain_id)}
+                  </span>
+                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                    {topic.target_audience === 'all' ? 'الجميع' : topic.target_audience}
+                  </span>
+                  <span
+                    className={`px-2 py-1 rounded text-xs ${
+                      topic.is_active
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 text-gray-700'
+                    }`}
+                  >
+                    {topic.is_active ? 'نشط' : 'غير نشط'}
+                  </span>
+                </div>
                 <h3 className="font-bold text-gray-900">{topic.title_ar}</h3>
+                {topic.summary_ar && (
+                  <p className="text-sm text-gray-500 mt-1">{topic.summary_ar}</p>
+                )}
                 <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                   <span className="flex items-center gap-1">
                     <Eye className="w-4 h-4" />
@@ -444,29 +802,168 @@ function TopicsTab({ topics, onRefresh }: { topics: Topic[]; onRefresh: () => vo
                     <Check className="w-4 h-4" />
                     {topic.helpful_count} مفيد
                   </span>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                    {topic.target_audience}
-                  </span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span
-                  className={`px-3 py-1 rounded-lg text-sm ${
+                <button
+                  onClick={() => toggleStatus(topic.id, topic.is_active)}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     topic.is_active
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 text-gray-700'
+                      ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {topic.is_active ? 'نشط' : 'غير نشط'}
-                </span>
-                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                </button>
+                <button
+                  onClick={() => handleEdit(topic)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
                   <Edit2 className="w-4 h-4 text-gray-600" />
+                </button>
+                <button
+                  onClick={() => handleDelete(topic.id)}
+                  className="p-2 hover:bg-red-100 rounded-lg transition-colors"
+                >
+                  <Trash2 className="w-4 h-4 text-red-600" />
                 </button>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-gray-900">
+                {editingTopic ? 'تعديل الموضوع' : 'إضافة موضوع جديد'}
+              </h3>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  المجال المعرفي
+                </label>
+                <select
+                  value={formData.domain_id}
+                  onChange={(e) => setFormData({ ...formData, domain_id: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                >
+                  <option value="">اختر المجال المعرفي</option>
+                  {domains.filter(d => d.is_active).map((domain) => (
+                    <option key={domain.id} value={domain.id}>
+                      {domain.icon} {domain.name_ar}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  العنوان بالعربية
+                </label>
+                <input
+                  type="text"
+                  value={formData.title_ar}
+                  onChange={(e) => setFormData({ ...formData, title_ar: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="مثل: كيف تبدأ الاستثمار في المزارع"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Title in English
+                </label>
+                <input
+                  type="text"
+                  value={formData.title_en}
+                  onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="e.g: How to Start Farm Investment"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  ملخص الموضوع
+                </label>
+                <textarea
+                  value={formData.summary_ar}
+                  onChange={(e) => setFormData({ ...formData, summary_ar: e.target.value })}
+                  rows={2}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="ملخص قصير عن الموضوع"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  المحتوى التفصيلي
+                </label>
+                <textarea
+                  value={formData.content_ar}
+                  onChange={(e) => setFormData({ ...formData, content_ar: e.target.value })}
+                  rows={8}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="المحتوى الكامل للموضوع"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  الجمهور المستهدف
+                </label>
+                <select
+                  value={formData.target_audience}
+                  onChange={(e) => setFormData({ ...formData, target_audience: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                >
+                  <option value="all">الجميع</option>
+                  <option value="visitor">الزوار</option>
+                  <option value="investor">المستثمرون</option>
+                  <option value="partner">شركاء النجاح</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="topic_active"
+                  checked={formData.is_active}
+                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                  className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                />
+                <label htmlFor="topic_active" className="text-sm font-medium text-gray-700">
+                  نشط
+                </label>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowModal(false);
+                  resetForm();
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={handleSave}
+                className="flex items-center gap-2 px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors"
+              >
+                <Save className="w-4 h-4" />
+                حفظ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -572,9 +1069,6 @@ function UnansweredTab({
                     className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors"
                   >
                     تمت المراجعة
-                  </button>
-                  <button className="px-4 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg text-sm transition-colors">
-                    إنشاء FAQ
                   </button>
                 </div>
               </div>
@@ -701,7 +1195,8 @@ function AnalyticsTab() {
     avg_confidence_score: 0,
     answered_successfully: 0,
     unanswered_questions: 0,
-    avg_response_time_ms: 0
+    avg_response_time_ms: 0,
+    helpfulness_rate: 0
   };
 
   const yesterdayMetrics = metrics[1] || todayMetrics;
@@ -782,115 +1277,26 @@ function AnalyticsTab() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <h3 className="font-bold text-gray-900 mb-4">الأداء التفصيلي</h3>
-          <div className="space-y-3">
-            <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-600">إجابات ناجحة</span>
-              <span className="font-bold text-gray-900">{todayMetrics.answered_successfully}</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-600">أسئلة غير مجابة</span>
-              <span className="font-bold text-red-600">{todayMetrics.unanswered_questions}</span>
-            </div>
-            <div className="flex items-center justify-between py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-600">متوسط وقت الاستجابة</span>
-              <span className="font-bold text-gray-900">{todayMetrics.avg_response_time_ms}ms</span>
-            </div>
-            <div className="flex items-center justify-between py-2">
-              <span className="text-sm text-gray-600">معدل الفائدة</span>
-              <span className="font-bold text-green-600">{(todayMetrics.helpfulness_rate * 100).toFixed(0)}%</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white border border-gray-200 rounded-xl p-6">
-          <h3 className="font-bold text-gray-900 mb-4">مؤشر تطور الذكاء</h3>
-          <div className="space-y-4">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">الفهم</span>
-                <span className="font-bold text-emerald-600">{(todayMetrics.avg_confidence_score * 100).toFixed(0)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-emerald-500 h-2 rounded-full transition-all"
-                  style={{ width: `${todayMetrics.avg_confidence_score * 100}%` }}
-                ></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">التوجيه</span>
-                <span className="font-bold text-blue-600">{(todayMetrics.helpfulness_rate * 100).toFixed(0)}%</span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-blue-500 h-2 rounded-full transition-all"
-                  style={{ width: `${todayMetrics.helpfulness_rate * 100}%` }}
-                ></div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">نسبة النجاح</span>
-                <span className="font-bold text-purple-600">
-                  {todayMetrics.total_conversations > 0
-                    ? ((todayMetrics.answered_successfully / todayMetrics.total_conversations) * 100).toFixed(0)
-                    : 0}%
-                </span>
-              </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
-                <div
-                  className="bg-purple-500 h-2 rounded-full transition-all"
-                  style={{
-                    width: `${todayMetrics.total_conversations > 0
-                      ? (todayMetrics.answered_successfully / todayMetrics.total_conversations) * 100
-                      : 0}%`
-                  }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <div className="bg-white border border-gray-200 rounded-xl p-6">
-        <h3 className="font-bold text-gray-900 mb-4">التطور خلال آخر 7 أيام</h3>
-        {metrics.length > 0 ? (
-          <div className="space-y-2">
-            {metrics.slice(0, 7).reverse().map((metric, index) => {
-              const date = new Date(metric.metric_date);
-              const successRate = metric.total_conversations > 0
-                ? (metric.answered_successfully / metric.total_conversations) * 100
-                : 0;
-
-              return (
-                <div key={index} className="flex items-center gap-4">
-                  <span className="text-xs text-gray-500 w-24">{date.toLocaleDateString('ar-SA')}</span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-6 relative overflow-hidden">
-                    <div
-                      className="bg-gradient-to-r from-emerald-400 to-emerald-500 h-6 rounded-full flex items-center justify-end px-2"
-                      style={{ width: `${successRate}%` }}
-                    >
-                      {successRate > 20 && (
-                        <span className="text-xs font-bold text-white">{successRate.toFixed(0)}%</span>
-                      )}
-                    </div>
-                  </div>
-                  <span className="text-xs text-gray-600 w-20">{metric.total_conversations} محادثة</span>
-                </div>
-              );
-            })}
+        <h3 className="font-bold text-gray-900 mb-4">الأداء التفصيلي</h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+            <span className="text-sm text-gray-600">إجابات ناجحة</span>
+            <span className="font-bold text-gray-900">{todayMetrics.answered_successfully}</span>
           </div>
-        ) : (
-          <div className="h-32 flex items-center justify-center bg-gray-50 rounded-lg">
-            <p className="text-gray-500">لا توجد بيانات متاحة حالياً</p>
+          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+            <span className="text-sm text-gray-600">أسئلة غير مجابة</span>
+            <span className="font-bold text-red-600">{todayMetrics.unanswered_questions}</span>
           </div>
-        )}
+          <div className="flex items-center justify-between py-2 border-b border-gray-100">
+            <span className="text-sm text-gray-600">متوسط وقت الاستجابة</span>
+            <span className="font-bold text-gray-900">{todayMetrics.avg_response_time_ms}ms</span>
+          </div>
+          <div className="flex items-center justify-between py-2">
+            <span className="text-sm text-gray-600">معدل الفائدة</span>
+            <span className="font-bold text-green-600">{(todayMetrics.helpfulness_rate * 100).toFixed(0)}%</span>
+          </div>
+        </div>
       </div>
     </div>
   );
