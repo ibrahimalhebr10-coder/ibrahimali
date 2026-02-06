@@ -17,8 +17,6 @@ import StandaloneAccountRegistration from './components/StandaloneAccountRegistr
 import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
 import MyReservations from './components/MyReservations';
 import MyTrees from './components/MyTrees';
-import MaintenancePaymentPage from './components/MaintenancePaymentPage';
-import MaintenancePaymentResult from './components/MaintenancePaymentResult';
 import QuickAccountAccess from './components/QuickAccountAccess';
 import AccountTypeIndicator from './components/AccountTypeIndicator';
 import Header from './components/Header';
@@ -71,9 +69,6 @@ function AppContent() {
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
   const [showMyTrees, setShowMyTrees] = useState(false);
-  const [showMaintenancePayment, setShowMaintenancePayment] = useState(false);
-  const [selectedMaintenanceId, setSelectedMaintenanceId] = useState<string | null>(null);
-  const [showPaymentResult, setShowPaymentResult] = useState(false);
   const [showStandaloneRegistration, setShowStandaloneRegistration] = useState(false);
   const [standaloneRegistrationMode, setStandaloneRegistrationMode] = useState<'register' | 'login'>('register');
   const [showWelcomeToAccount, setShowWelcomeToAccount] = useState(false);
@@ -95,9 +90,6 @@ function AppContent() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('payment_id')) {
-      setShowPaymentResult(true);
-    }
 
     // Check for referral link parameter
     const refCode = urlParams.get('ref');
@@ -1539,9 +1531,7 @@ function AppContent() {
             }
           }}
           onNavigateToPayment={(maintenanceId) => {
-            setSelectedMaintenanceId(maintenanceId);
-            setShowMyTrees(false);
-            setShowMaintenancePayment(true);
+            console.log('Payment navigation requested for:', maintenanceId);
           }}
           onShowAuth={(mode) => {
             setShowMyTrees(false);
@@ -1563,35 +1553,6 @@ function AppContent() {
         />
       )}
 
-      {showMaintenancePayment && selectedMaintenanceId && (
-        <div className="fixed inset-0 z-50 bg-white overflow-auto">
-          <MaintenancePaymentPage
-            maintenanceId={selectedMaintenanceId}
-            onClose={() => {
-              setShowMaintenancePayment(false);
-              setSelectedMaintenanceId(null);
-              setShowMyTrees(true);
-            }}
-            onSuccess={() => {
-              setShowMaintenancePayment(false);
-              setSelectedMaintenanceId(null);
-              setShowPaymentResult(true);
-            }}
-          />
-        </div>
-      )}
-
-      {showPaymentResult && (
-        <div className="fixed inset-0 z-50 bg-white overflow-auto">
-          <MaintenancePaymentResult
-            onReturnHome={() => {
-              setShowPaymentResult(false);
-              setShowMyTrees(true);
-              window.history.replaceState({}, '', window.location.pathname);
-            }}
-          />
-        </div>
-      )}
 
       </div>
     </ErrorBoundary>

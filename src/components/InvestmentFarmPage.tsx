@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext';
 import type { FarmProject, FarmContract } from '../services/farmService';
 import { investmentPackagesService, type InvestmentPackage } from '../services/investmentPackagesService';
 import InvestmentReviewScreen from './InvestmentReviewScreen';
-import PaymentFlow from './PaymentFlow';
 import InvestmentPackageDetailsModal from './InvestmentPackageDetailsModal';
 import { usePageTracking } from '../hooks/useLeadTracking';
 import InfluencerCodeInput from './InfluencerCodeInput';
@@ -65,7 +64,6 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showPackageDetailsModal, setShowPackageDetailsModal] = useState(false);
   const [showReviewScreen, setShowReviewScreen] = useState(false);
-  const [showPaymentFlow, setShowPaymentFlow] = useState(false);
   const [reservationId, setReservationId] = useState<string>('');
   const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
   const [isLoadingContract, setIsLoadingContract] = useState(false);
@@ -108,8 +106,8 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   }, [selectedContract]);
 
   useEffect(() => {
-    console.log('📊 [State Change] showReviewScreen:', showReviewScreen, 'showPaymentFlow:', showPaymentFlow, 'reservationId:', reservationId);
-  }, [showReviewScreen, showPaymentFlow, reservationId]);
+    console.log('📊 [State Change] showReviewScreen:', showReviewScreen, 'reservationId:', reservationId);
+  }, [showReviewScreen, reservationId]);
 
   useEffect(() => {
     const slider = packagesScrollRef.current;
@@ -354,11 +352,8 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       console.log('✅ [INVESTMENT] تم إنشاء الحجز! ID:', reservation.id);
       console.log('✅ [INVESTMENT] Path Type المُحفوظ:', reservation.path_type);
 
-      console.log('🔄 [INVESTMENT] تغيير الحالة: showReviewScreen -> false, showPaymentFlow -> true');
-      setReservationId(reservation.id);
-      setShowReviewScreen(false);
-      setShowPaymentFlow(true);
-      console.log('✅ [INVESTMENT] تم تعيين الحالة بنجاح');
+      console.log('🔄 [INVESTMENT] التوجه إلى الحساب بعد إنشاء الحجز');
+      handleGoToAccount();
     } catch (error) {
       console.error('Error creating reservation:', error);
       alert('حدث خطأ غير متوقع');
@@ -375,7 +370,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
 
   return (
     <>
-    {!showReviewScreen && !showPaymentFlow && (
+    {!showReviewScreen && (
     <div className="fixed inset-0 bg-gradient-to-br from-amber-50/95 via-yellow-50/90 to-orange-50/95 z-50 overflow-y-auto">
       <div className={`min-h-screen ${treeCount > 0 ? 'pb-96' : 'pb-32'}`}>
         {/* Header with Back Button */}
@@ -698,7 +693,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       </div>
 
       {/* Investment Summary - Fixed Bottom - Compact Design */}
-      {treeCount > 0 && selectedContract && !showReviewScreen && !showPaymentFlow && (
+      {treeCount > 0 && selectedContract && !showReviewScreen && (
           <div
             className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-xl border-t-2 border-[#D4AF37]/40 shadow-2xl z-[100000]"
             style={{ paddingBottom: 'max(4rem, env(safe-area-inset-bottom))' }}
@@ -866,18 +861,6 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           onConfirm={handleConfirmReview}
           onBack={() => setShowReviewScreen(false)}
           isLoading={isCreatingReservation}
-        />
-      )}
-
-      {/* Payment Flow */}
-      {showPaymentFlow && reservationId && (
-        <PaymentFlow
-          reservationId={reservationId}
-          onComplete={handleGoToAccount}
-          onCancel={() => {
-            setShowPaymentFlow(false);
-            setShowReviewScreen(true);
-          }}
         />
       )}
 

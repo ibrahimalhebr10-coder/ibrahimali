@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import PaymentFlow from './PaymentFlow';
 import AgriculturalReviewScreen from './AgriculturalReviewScreen';
 import InvestmentReviewScreen from './InvestmentReviewScreen';
 
@@ -91,13 +90,8 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
   }
 
   if (currentStep === 'payment' && reservationId) {
-    return (
-      <PaymentFlow
-        reservationId={reservationId}
-        onComplete={props.onComplete}
-        onCancel={() => setCurrentStep('review')}
-      />
-    );
+    props.onComplete();
+    return null;
   }
 
   return null;

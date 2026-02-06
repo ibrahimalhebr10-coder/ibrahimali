@@ -5,7 +5,6 @@ import { useAuth } from '../contexts/AuthContext';
 import type { FarmProject, FarmContract } from '../services/farmService';
 import { agriculturalPackagesService, type AgriculturalPackage } from '../services/agriculturalPackagesService';
 import AgriculturalReviewScreen from './AgriculturalReviewScreen';
-import PaymentFlow from './PaymentFlow';
 import PackageDetailsModal from './PackageDetailsModal';
 import { usePageTracking } from '../hooks/useLeadTracking';
 import InfluencerCodeInput from './InfluencerCodeInput';
@@ -65,7 +64,6 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [showPackageDetailsModal, setShowPackageDetailsModal] = useState(false);
   const [showReviewScreen, setShowReviewScreen] = useState(false);
-  const [showPaymentFlow, setShowPaymentFlow] = useState(false);
   const [reservationId, setReservationId] = useState<string>('');
   const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
   const [isLoadingContract, setIsLoadingContract] = useState(false);
@@ -324,7 +322,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
       setReservationId(reservation.id);
       setShowReviewScreen(false);
-      setShowPaymentFlow(true);
+      console.log('🔄 [AGRICULTURAL] التوجه إلى الحساب بعد إنشاء الحجز');
+      handleGoToAccount();
     } catch (error) {
       console.error('Error creating reservation:', error);
       alert('حدث خطأ غير متوقع');
@@ -341,7 +340,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
   return (
     <>
-      {!showReviewScreen && !showPaymentFlow && (
+      {!showReviewScreen && (
       <>
       {/* Header - Fixed to viewport */}
       <div className="fixed top-0 left-0 right-0 z-[60] bg-white/80 backdrop-blur-lg border-b border-green-200/50">
@@ -662,7 +661,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       )}
 
       {/* Purchase Summary - Fixed Bottom - Compact Design */}
-      {treeCount > 0 && selectedContract && !showReviewScreen && !showPaymentFlow && (() => {
+      {treeCount > 0 && selectedContract && !showReviewScreen && (() => {
         console.log('📊 عرض الشريط السفلي - العقد المختار:', {
           name: selectedContract.contract_name,
           duration: selectedContract.duration_years,
@@ -828,18 +827,6 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           onConfirm={handleConfirmReview}
           onBack={() => setShowReviewScreen(false)}
           isLoading={isCreatingReservation}
-        />
-      )}
-
-      {/* Payment Flow */}
-      {showPaymentFlow && reservationId && (
-        <PaymentFlow
-          reservationId={reservationId}
-          onComplete={handleGoToAccount}
-          onCancel={() => {
-            setShowPaymentFlow(false);
-            setShowReviewScreen(true);
-          }}
         />
       )}
 
