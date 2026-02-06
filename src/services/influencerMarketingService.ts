@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { impersonationService } from './impersonationService';
 
 export interface InfluencerPartner {
   id: string;
@@ -281,7 +282,6 @@ export const influencerMarketingService = {
     console.log('🔍 [getMyInfluencerStats] Fetching stats for user:', user.id);
 
     // Check for impersonation
-    const { impersonationService } = require('./impersonationService');
     const impersonationData = impersonationService.getImpersonationData();
 
     let userId = user.id;
@@ -338,7 +338,6 @@ export const influencerMarketingService = {
     if (!user) return [];
 
     // Check for impersonation
-    const { impersonationService } = require('./impersonationService');
     const impersonationData = impersonationService.getImpersonationData();
 
     let userId = user.id;

@@ -39,6 +39,7 @@ import { useDemoMode } from './contexts/DemoModeContext';
 import DemoWelcomeScreen from './components/DemoWelcomeScreen';
 import { initializeSupabase } from './lib/supabase';
 import { useLeadTracking } from './hooks/useLeadTracking';
+import { impersonationService } from './services/impersonationService';
 
 function AppContent() {
   const { user, identity, updateIdentity } = useAuth();
@@ -239,7 +240,6 @@ function AppContent() {
   useEffect(() => {
     if (user && !showAccountProfile) {
       // Check for partner impersonation
-      const { impersonationService } = require('./services/impersonationService');
       const impersonationData = impersonationService.getImpersonationData();
 
       if (impersonationData) {
