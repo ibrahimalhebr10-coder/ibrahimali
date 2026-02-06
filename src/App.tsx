@@ -520,11 +520,8 @@ function AppContent() {
   };
 
   const handleOpenPartnerAccount = () => {
-    console.log('🌟 [QuickAccess] Opening partner account');
-    setShowAccountProfile(true);
-    setAccountContractFilter(null);
-    setAccountIndicatorType('partner');
-    setShowAccountIndicator(true);
+    console.log('🌟 [QuickAccess] Opening Success Partner Account');
+    setShowSuccessPartnerAccount(true);
   };
 
   const handleMyFarmClick = async () => {
