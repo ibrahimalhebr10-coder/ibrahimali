@@ -58,6 +58,7 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
   const [showVideoIntro, setShowVideoIntro] = useState(false);
   const [showHowToStart, setShowHowToStart] = useState(false);
+  const [showAdvancedAssistant, setShowAdvancedAssistant] = useState(false);
   const [showSuccessPartnerIntro, setShowSuccessPartnerIntro] = useState(false);
   const [showSuccessPartnerOnboarding, setShowSuccessPartnerOnboarding] = useState(false);
   const [showSuccessPartnerRegistration, setShowSuccessPartnerRegistration] = useState(false);
@@ -1128,6 +1129,28 @@ function AppContent() {
           </button>
 
           <button
+            onClick={() => setShowAdvancedAssistant(true)}
+            className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 hover:scale-105 relative group"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.18) 100%)';
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <div className="relative">
+              <Sparkles className="w-6 h-6 text-emerald-600 transition-transform duration-300 group-hover:scale-110" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full animate-pulse" style={{
+                background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
+                boxShadow: '0 0 10px rgba(212,175,55,0.6)'
+              }}></div>
+            </div>
+            <span className="text-sm font-bold text-emerald-600">المساعد الذكي</span>
+          </button>
+
+          <button
             onClick={handleMyFarmClick}
             className="flex flex-col items-center gap-2 px-8 py-4 rounded-3xl transition-all duration-300 hover:scale-105 group relative"
             style={{
@@ -1236,6 +1259,30 @@ function AppContent() {
               </div>
             </div>
             <span className="text-[9px] font-bold" style={{ color: '#b8942f' }}>اعرض مزرعتك</span>
+          </button>
+
+          <button
+            onClick={() => setShowAdvancedAssistant(true)}
+            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
+          >
+            <div
+              className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 relative group-active:scale-90 overflow-hidden"
+              style={{
+                background: 'linear-gradient(145deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.10) 100%)',
+                boxShadow: '0 4px 8px rgba(16, 185, 129, 0.2), inset 0 2px 4px rgba(255,255,255,0.9)',
+                border: '2px solid rgba(16, 185, 129, 0.35)'
+              }}
+            >
+              <Sparkles className="w-5 h-5 text-emerald-600 transition-all duration-300 group-active:scale-110" />
+              <div
+                className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full animate-pulse"
+                style={{
+                  background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
+                  boxShadow: '0 0 8px rgba(212,175,55,0.6)'
+                }}
+              />
+            </div>
+            <span className="text-[9px] font-bold text-emerald-600">المساعد</span>
           </button>
 
           <button
@@ -1503,7 +1550,10 @@ function AppContent() {
         />
       )}
 
-      <AdvancedAIAssistant />
+      <AdvancedAIAssistant
+        isOpen={showAdvancedAssistant}
+        onClose={() => setShowAdvancedAssistant(false)}
+      />
 
       </div>
     </ErrorBoundary>

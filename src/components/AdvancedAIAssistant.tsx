@@ -16,9 +16,13 @@ interface Message {
   }>;
 }
 
-export default function AdvancedAIAssistant() {
+interface AdvancedAIAssistantProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export default function AdvancedAIAssistant({ isOpen, onClose }: AdvancedAIAssistantProps) {
   const { user, identity } = useAuth();
-  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -153,25 +157,9 @@ export default function AdvancedAIAssistant() {
     }
   };
 
-  return (
-    <>
-      {!isOpen && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 left-6 z-50 bg-gradient-to-br from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white p-4 rounded-full shadow-2xl transition-all duration-300 hover:scale-110 group"
-          aria-label="فتح المساعد الذكي"
-        >
-          <div className="relative">
-            <Sparkles className="w-6 h-6" />
-            <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse"></div>
-          </div>
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-sm px-3 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-            المساعد الذكي المتقدم
-          </div>
-        </button>
-      )}
+  if (!isOpen) return null;
 
-      {isOpen && (
+  return (
         <div className="fixed bottom-6 left-6 z-50 w-96 h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200">
           <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -187,7 +175,7 @@ export default function AdvancedAIAssistant() {
               </div>
             </div>
             <button
-              onClick={() => setIsOpen(false)}
+              onClick={onClose}
               className="text-white hover:bg-white/20 p-2 rounded-lg transition-colors"
             >
               <X className="w-5 h-5" />
@@ -298,7 +286,5 @@ export default function AdvancedAIAssistant() {
             </div>
           </div>
         </div>
-      )}
-    </>
   );
 }
