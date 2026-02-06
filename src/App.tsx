@@ -5,6 +5,7 @@ import HowToStart from './components/HowToStart';
 import SmartAssistant from './components/SmartAssistant';
 import SuccessPartnerIntro from './components/SuccessPartnerIntro';
 import SuccessPartnerOnboarding from './components/SuccessPartnerOnboarding';
+import SuccessPartnerRegistrationForm from './components/SuccessPartnerRegistrationForm';
 import NotificationCenter from './components/NotificationCenter';
 import AccountProfile from './components/AccountProfile';
 import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
@@ -55,6 +56,7 @@ function AppContent() {
   const [showAssistant, setShowAssistant] = useState(false);
   const [showSuccessPartnerIntro, setShowSuccessPartnerIntro] = useState(false);
   const [showSuccessPartnerOnboarding, setShowSuccessPartnerOnboarding] = useState(false);
+  const [showSuccessPartnerRegistration, setShowSuccessPartnerRegistration] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showAccountProfile, setShowAccountProfile] = useState(false);
   const [showMyReservations, setShowMyReservations] = useState(false);
@@ -1250,7 +1252,15 @@ function AppContent() {
         onClose={() => setShowSuccessPartnerOnboarding(false)}
         onComplete={() => {
           setShowSuccessPartnerOnboarding(false);
-          alert('قريباً: نموذج التسجيل كشريك نجاح - المرحلة الرابعة');
+          setShowSuccessPartnerRegistration(true);
+        }}
+      />
+
+      <SuccessPartnerRegistrationForm
+        isOpen={showSuccessPartnerRegistration}
+        onClose={() => setShowSuccessPartnerRegistration(false)}
+        onSuccess={() => {
+          setShowSuccessPartnerRegistration(false);
         }}
       />
 
