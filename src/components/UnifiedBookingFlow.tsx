@@ -55,13 +55,21 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         tree_details: props.treeVarieties || []
       };
 
+      console.log('🚀 [UNIFIED] إنشاء حجز جديد - البيانات:', reservationPayload);
+      console.log('🔍 [UNIFIED] تحقق: لا يوجد tree_varieties في الطلب!');
+
       const { data: reservation, error } = await supabase
         .from('reservations')
         .insert(reservationPayload as any)
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ [UNIFIED] فشل إنشاء الحجز:', error);
+        throw error;
+      }
+
+      console.log('✅ [UNIFIED] تم إنشاء الحجز بنجاح! ID:', reservation?.id);
 
       setReservationId(reservation.id);
       setReservationData(reservationPayload);
