@@ -284,10 +284,19 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         console.log('🎁 [AGRICULTURAL] Influencer Code:', influencerCode);
       }
 
+      const guestId = !user?.id
+        ? `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        : null;
+
+      if (guestId) {
+        console.log('👤 [AGRICULTURAL] إنشاء Guest ID للزائر:', guestId);
+      }
+
       const { data: reservation, error: reservationError } = await supabase
         .from('reservations')
         .insert({
           user_id: user?.id || null,
+          guest_id: guestId,
           farm_id: farm.id,
           farm_name: farm.name,
           contract_id: selectedContract.id,
