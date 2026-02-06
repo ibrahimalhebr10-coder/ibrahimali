@@ -272,19 +272,18 @@ export const influencerMarketingService = {
   },
 
   async getMyInfluencerStats(): Promise<InfluencerStats | null> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return null;
+
     const { data, error } = await supabase
       .from('influencer_rewards_details')
       .select('referral_code, partner_name, total_bookings, total_trees_booked, total_rewards_earned, trees_in_current_batch, trees_until_next_reward, progress_percentage, trees_required_for_reward')
+      .eq('user_id', user.id)
       .eq('is_active', true)
-      .limit(1)
-      .single();
+      .maybeSingle();
 
-    if (error) {
-      if (error.code === 'PGRST116') {
-        return null;
-      }
-      throw error;
-    }
+    if (error) throw error;
+    if (!data) return null;
 
     return {
       name: data.referral_code,
@@ -300,9 +299,13 @@ export const influencerMarketingService = {
   },
 
   async getMyActivityLog(): Promise<InfluencerActivityLog[]> {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return [];
+
     const { data, error } = await supabase
       .from('influencer_activity_log')
       .select('id, created_at, activity_date, farm_name, farm_location, trees_referred, trees_earned, trees_in_current_batch, trees_until_next_reward, notes')
+      .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .limit(50);
 
@@ -319,15 +322,9 @@ export const influencerMarketingService = {
       .select('id')
       .eq('user_id', user.id)
       .eq('is_active', true)
-      .limit(1)
-      .single();
+      .maybeSingle();
 
-    if (error) {
-      if (error.code === 'PGRST116') {
-        return false;
-      }
-      throw error;
-    }
+    if (error) throw error;
 
     return !!data;
   },
