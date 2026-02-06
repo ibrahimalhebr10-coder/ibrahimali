@@ -69,6 +69,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   const [reservationId, setReservationId] = useState<string>('');
   const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
   const [isLoadingContract, setIsLoadingContract] = useState(false);
+  const [isCreatingReservation, setIsCreatingReservation] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const packagesScrollRef = useRef<HTMLDivElement>(null);
   const [influencerCode, setInfluencerCode] = useState<string | null>(null);
@@ -297,10 +298,17 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   };
 
   const handleConfirmReview = async () => {
+    if (isCreatingReservation) {
+      console.log('⚠️ [INVESTMENT] جاري إنشاء الحجز بالفعل، تم تجاهل الضغطة');
+      return;
+    }
+
     if (!selectedContract || treeCount === 0) {
       alert('يرجى اختيار باقة وعدد الأشجار');
       return;
     }
+
+    setIsCreatingReservation(true);
 
     try {
       const totalPrice = calculateTotal();
@@ -335,6 +343,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       if (reservationError) {
         console.error('❌ [INVESTMENT] خطأ في إنشاء الحجز:', reservationError);
         alert('حدث خطأ في إنشاء الحجز. يرجى المحاولة مرة أخرى');
+        setIsCreatingReservation(false);
         return;
       }
 
@@ -347,6 +356,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
     } catch (error) {
       console.error('Error creating reservation:', error);
       alert('حدث خطأ غير متوقع');
+      setIsCreatingReservation(false);
     }
   };
 
@@ -847,6 +857,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
           pricePerTree={selectedPackage?.price_per_tree || selectedContract.investor_price}
           onConfirm={handleConfirmReview}
           onBack={() => setShowReviewScreen(false)}
+          isLoading={isCreatingReservation}
         />
       )}
 

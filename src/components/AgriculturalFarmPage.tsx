@@ -69,6 +69,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [reservationId, setReservationId] = useState<string>('');
   const [currentPackageIndex, setCurrentPackageIndex] = useState(0);
   const [isLoadingContract, setIsLoadingContract] = useState(false);
+  const [isCreatingReservation, setIsCreatingReservation] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const packagesScrollRef = useRef<HTMLDivElement>(null);
   const [influencerCode, setInfluencerCode] = useState<string | null>(null);
@@ -260,10 +261,17 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   };
 
   const handleConfirmReview = async () => {
+    if (isCreatingReservation) {
+      console.log('⚠️ [AGRICULTURAL] جاري إنشاء الحجز بالفعل، تم تجاهل الضغطة');
+      return;
+    }
+
     if (!selectedContract || treeCount === 0) {
       alert('يرجى اختيار باقة وعدد الأشجار');
       return;
     }
+
+    setIsCreatingReservation(true);
 
     try {
       const totalPrice = calculateTotal();
@@ -298,6 +306,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       if (reservationError) {
         console.error('❌ [AGRICULTURAL] خطأ في إنشاء الحجز:', reservationError);
         alert('حدث خطأ في إنشاء الحجز. يرجى المحاولة مرة أخرى');
+        setIsCreatingReservation(false);
         return;
       }
 
@@ -310,6 +319,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     } catch (error) {
       console.error('Error creating reservation:', error);
       alert('حدث خطأ غير متوقع');
+      setIsCreatingReservation(false);
     }
   };
 
@@ -804,6 +814,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           pricePerTree={selectedPackage?.price_per_tree || selectedContract.farmer_price || selectedContract.investor_price || 0}
           onConfirm={handleConfirmReview}
           onBack={() => setShowReviewScreen(false)}
+          isLoading={isCreatingReservation}
         />
       )}
 
