@@ -3,6 +3,7 @@ import {
   Sparkles,
   Brain,
   MessageCircle,
+  MessageSquare,
   FileText,
   HelpCircle,
   TrendingUp,
@@ -10,6 +11,7 @@ import {
   Edit2,
   Trash2,
   Check,
+  CheckCircle,
   X,
   Eye,
   BarChart3,
@@ -1410,41 +1412,387 @@ function UnansweredTab({
   onMarkReviewed: (id: string) => void;
   onRefresh: () => void;
 }) {
+  const [selectedQuestion, setSelectedQuestion] = useState<UnansweredQuestion | null>(null);
+  const [showAnswerModal, setShowAnswerModal] = useState(false);
+  const [domains, setDomains] = useState<Domain[]>([]);
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [answerForm, setAnswerForm] = useState({
+    topic_id: '',
+    domain_id: '',
+    question_ar: '',
+    question_en: '',
+    answer_ar: '',
+    answer_en: '',
+    target_audience: 'all',
+    is_active: true,
+    is_approved: true
+  });
+
+  useEffect(() => {
+    loadDomainsAndTopics();
+  }, []);
+
+  const loadDomainsAndTopics = async () => {
+    const { data: domainsData } = await supabase
+      .from('knowledge_domains')
+      .select('*')
+      .eq('is_active', true)
+      .order('display_order');
+
+    const { data: topicsData } = await supabase
+      .from('knowledge_topics')
+      .select('*')
+      .eq('is_active', true)
+      .order('title_ar');
+
+    if (domainsData) setDomains(domainsData);
+    if (topicsData) setTopics(topicsData);
+  };
+
+  const handleOpenAnswer = (question: UnansweredQuestion) => {
+    setSelectedQuestion(question);
+    setAnswerForm({
+      topic_id: '',
+      domain_id: '',
+      question_ar: question.question,
+      question_en: '',
+      answer_ar: '',
+      answer_en: '',
+      target_audience: question.user_type || 'all',
+      is_active: true,
+      is_approved: true
+    });
+    setShowAnswerModal(true);
+  };
+
+  const handleConvertToFAQ = async () => {
+    if (!answerForm.answer_ar) {
+      alert('يرجى إدخال الجواب بالعربية');
+      return;
+    }
+
+    if (!selectedQuestion) return;
+
+    try {
+      const faqData = {
+        ...answerForm,
+        topic_id: answerForm.topic_id || null,
+        domain_id: answerForm.domain_id || null
+      };
+
+      await supabase.from('assistant_faqs').insert([faqData]);
+
+      await supabase
+        .from('unanswered_questions')
+        .update({ status: 'answered', reviewed_at: new Date().toISOString() })
+        .eq('id', selectedQuestion.id);
+
+      setShowAnswerModal(false);
+      setSelectedQuestion(null);
+      onRefresh();
+    } catch (error) {
+      console.error('Error converting to FAQ:', error);
+      alert('حدث خطأ أثناء التحويل إلى FAQ');
+    }
+  };
+
+  const handleIgnore = async (id: string) => {
+    if (!confirm('هل أنت متأكد من تجاهل هذا السؤال؟')) {
+      return;
+    }
+    try {
+      await supabase
+        .from('unanswered_questions')
+        .update({ status: 'ignored', reviewed_at: new Date().toISOString() })
+        .eq('id', id);
+      onRefresh();
+    } catch (error) {
+      console.error('Error ignoring question:', error);
+    }
+  };
+
+  const filteredTopics = answerForm.domain_id
+    ? topics.filter((t) => t.domain_id === answerForm.domain_id)
+    : topics;
+
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">الأسئلة غير المجابة</h2>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h2 className="text-xl font-bold text-gray-900">الأسئلة غير المجابة</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            قم بالرد على الأسئلة وتحويلها إلى FAQs لتحسين المساعد الذكي
+          </p>
+        </div>
+        {questions.length > 0 && (
+          <span className="px-3 py-1.5 bg-orange-100 text-orange-700 rounded-full text-sm font-medium">
+            {questions.length} سؤال معلق
+          </span>
+        )}
+      </div>
 
       {questions.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 rounded-xl">
           <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
           <p className="text-gray-600">لا توجد أسئلة غير مجابة</p>
+          <p className="text-sm text-gray-500 mt-2">جميع الأسئلة تمت الإجابة عليها</p>
         </div>
       ) : (
         <div className="grid gap-3">
           {questions.map((q) => (
             <div
               key={q.id}
-              className="bg-white border border-gray-200 rounded-lg p-4"
+              className="bg-white border-2 border-orange-200 rounded-lg p-5 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
-                  <p className="font-medium text-gray-900">{q.question}</p>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                    <span>تكرر {q.frequency} مرة</span>
-                    <span>{new Date(q.created_at).toLocaleDateString('ar-SA')}</span>
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-medium">
+                      جديد
+                    </span>
+                    {q.frequency > 1 && (
+                      <span className="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-medium">
+                        تكرر {q.frequency} مرة
+                      </span>
+                    )}
+                    {q.user_type && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium">
+                        {q.user_type === 'visitor' ? 'زائر' : q.user_type === 'investor' ? 'مستثمر' : 'شريك'}
+                      </span>
+                    )}
+                    {q.current_page && (
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
+                        {q.current_page}
+                      </span>
+                    )}
+                  </div>
+                  <p className="font-bold text-gray-900 text-lg">{q.question}</p>
+                  <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+                    <span>{new Date(q.created_at).toLocaleDateString('ar-SA', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-2">
+                  <button
+                    onClick={() => handleOpenAnswer(q)}
+                    className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg text-sm transition-colors font-medium"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    الرد وتحويل لـ FAQ
+                  </button>
                   <button
                     onClick={() => onMarkReviewed(q.id)}
                     className="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm transition-colors"
                   >
                     تمت المراجعة
                   </button>
+                  <button
+                    onClick={() => handleIgnore(q.id)}
+                    className="px-4 py-2 hover:bg-gray-100 text-gray-600 rounded-lg text-sm transition-colors"
+                  >
+                    تجاهل
+                  </button>
                 </div>
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {showAnswerModal && selectedQuestion && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-gray-200">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-gray-900">الرد على السؤال وتحويله إلى FAQ</h3>
+                  <div className="mt-3 p-4 bg-orange-50 border border-orange-200 rounded-lg">
+                    <p className="text-sm text-gray-600 mb-1">السؤال الأصلي:</p>
+                    <p className="font-bold text-gray-900">{selectedQuestion.question}</p>
+                    <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
+                      {selectedQuestion.frequency > 1 && (
+                        <span className="font-medium text-red-600">
+                          تكرر {selectedQuestion.frequency} مرة
+                        </span>
+                      )}
+                      <span>{new Date(selectedQuestion.created_at).toLocaleDateString('ar-SA')}</span>
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowAnswerModal(false);
+                    setSelectedQuestion(null);
+                  }}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    المجال المعرفي (اختياري)
+                  </label>
+                  <select
+                    value={answerForm.domain_id}
+                    onChange={(e) => {
+                      setAnswerForm({ ...answerForm, domain_id: e.target.value, topic_id: '' });
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  >
+                    <option value="">اختر المجال المعرفي</option>
+                    {domains.map((domain) => (
+                      <option key={domain.id} value={domain.id}>
+                        {domain.icon} {domain.name_ar}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    الموضوع (اختياري)
+                  </label>
+                  <select
+                    value={answerForm.topic_id}
+                    onChange={(e) => setAnswerForm({ ...answerForm, topic_id: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                    disabled={!answerForm.domain_id}
+                  >
+                    <option value="">اختر الموضوع</option>
+                    {filteredTopics.map((topic) => (
+                      <option key={topic.id} value={topic.id}>
+                        {topic.title_ar}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  السؤال بالعربية (يمكن تعديله)
+                </label>
+                <input
+                  type="text"
+                  value={answerForm.question_ar}
+                  onChange={(e) => setAnswerForm({ ...answerForm, question_ar: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Question in English
+                </label>
+                <input
+                  type="text"
+                  value={answerForm.question_en}
+                  onChange={(e) => setAnswerForm({ ...answerForm, question_en: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="e.g: How do I start investing?"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  الجواب بالعربية <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={answerForm.answer_ar}
+                  onChange={(e) => setAnswerForm({ ...answerForm, answer_ar: e.target.value })}
+                  rows={6}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="اكتب الجواب التفصيلي هنا..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Answer in English
+                </label>
+                <textarea
+                  value={answerForm.answer_en}
+                  onChange={(e) => setAnswerForm({ ...answerForm, answer_en: e.target.value })}
+                  rows={4}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                  placeholder="Write the detailed answer here..."
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  الجمهور المستهدف
+                </label>
+                <select
+                  value={answerForm.target_audience}
+                  onChange={(e) => setAnswerForm({ ...answerForm, target_audience: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                >
+                  <option value="all">الجميع</option>
+                  <option value="visitor">الزوار</option>
+                  <option value="investor">المستثمرون</option>
+                  <option value="partner">شركاء النجاح</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="answer_active"
+                    checked={answerForm.is_active}
+                    onChange={(e) => setAnswerForm({ ...answerForm, is_active: e.target.checked })}
+                    className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                  />
+                  <label htmlFor="answer_active" className="text-sm font-medium text-gray-700">
+                    نشط فوراً
+                  </label>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="answer_approved"
+                    checked={answerForm.is_approved}
+                    onChange={(e) => setAnswerForm({ ...answerForm, is_approved: e.target.checked })}
+                    className="w-4 h-4 text-emerald-500 border-gray-300 rounded focus:ring-emerald-500"
+                  />
+                  <label htmlFor="answer_approved" className="text-sm font-medium text-gray-700">
+                    معتمد فوراً
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200 flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowAnswerModal(false);
+                  setSelectedQuestion(null);
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                إلغاء
+              </button>
+              <button
+                onClick={handleConvertToFAQ}
+                className="flex items-center gap-2 px-6 py-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors font-medium"
+              >
+                <CheckCircle className="w-5 h-5" />
+                حفظ كـ FAQ وإزالة من القائمة
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
