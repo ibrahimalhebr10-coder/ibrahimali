@@ -690,20 +690,10 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                 {/* Action Button */}
                 <button
                   onClick={handleBuyNow}
-                  disabled={isCreatingReservation}
-                  className="px-6 py-4 bg-white text-darkgreen font-bold rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                  className="px-6 py-4 bg-white text-darkgreen font-bold rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap"
                 >
-                  {isCreatingReservation ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-darkgreen border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-sm">جاري...</span>
-                    </>
-                  ) : (
-                    <>
-                      <ShoppingCart className="w-5 h-5" />
-                      <span className="text-sm">احجز الآن</span>
-                    </>
-                  )}
+                  <ShoppingCart className="w-5 h-5" />
+                  <span className="text-sm">احجز الآن</span>
                 </button>
               </div>
             </div>
