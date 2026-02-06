@@ -18,8 +18,6 @@ export default function CustomersList({ onCustomerSelect, onViewGroups, onViewDu
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ type: 'single' | 'multiple', userId?: string }>({ type: 'multiple' });
-  const [deleteConfirmation, setDeleteConfirmation] = useState('');
-  const [deleteReason, setDeleteReason] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
@@ -111,8 +109,6 @@ export default function CustomersList({ onCustomerSelect, onViewGroups, onViewDu
   const handleDeleteSingle = (userId: string) => {
     setDeleteTarget({ type: 'single', userId });
     setShowDeleteModal(true);
-    setDeleteConfirmation('');
-    setDeleteReason('');
   };
 
   const handleDeleteMultiple = () => {
@@ -122,31 +118,19 @@ export default function CustomersList({ onCustomerSelect, onViewGroups, onViewDu
     }
     setDeleteTarget({ type: 'multiple' });
     setShowDeleteModal(true);
-    setDeleteConfirmation('');
-    setDeleteReason('');
   };
 
   const handleConfirmDelete = async () => {
-    if (deleteConfirmation !== 'DELETE') {
-      alert('الرجاء كتابة كلمة DELETE للتأكيد');
-      return;
-    }
-
-    if (!deleteReason.trim()) {
-      alert('الرجاء إدخال سبب الحذف');
-      return;
-    }
-
     setIsDeleting(true);
     try {
       if (deleteTarget.type === 'single' && deleteTarget.userId) {
-        await customerManagementService.deleteCustomerAccount(deleteTarget.userId, 'DELETE', deleteReason);
+        await customerManagementService.deleteCustomerAccount(deleteTarget.userId, 'DELETE', 'حذف من لوحة التحكم');
         alert('تم حذف العميل بنجاح');
       } else {
         const result = await customerManagementService.deleteCustomersInBatch(
           selectedCustomers,
           'DELETE',
-          deleteReason
+          'حذف جماعي من لوحة التحكم'
         );
         alert(`تم حذف ${result.deleted} عميل بنجاح${result.failed > 0 ? `\nفشل حذف ${result.failed} عميل` : ''}`);
         setSelectedCustomers([]);
@@ -447,64 +431,32 @@ export default function CustomersList({ onCustomerSelect, onViewGroups, onViewDu
               <h3 className="text-xl font-bold text-gray-900">تأكيد الحذف</h3>
             </div>
             <div className="p-6 space-y-4">
-              <div className="bg-red-50 border-r-4 border-red-600 rounded-lg p-4">
-                <p className="text-sm text-red-800 font-medium">
+              <div className="text-center py-4">
+                <p className="text-lg text-gray-800 font-medium">
                   {deleteTarget.type === 'single'
-                    ? 'أنت على وشك حذف عميل واحد نهائياً'
-                    : `أنت على وشك حذف ${selectedCustomers.length} عميل نهائياً`
+                    ? 'هل تريد حذف هذا العميل؟'
+                    : `هل تريد حذف ${selectedCustomers.length} عميل؟`
                   }
                 </p>
-                <p className="text-xs text-red-700 mt-2">
-                  سيتم حذف جميع بيانات العميل بما في ذلك الحجوزات والعقود والمدفوعات
+                <p className="text-sm text-gray-500 mt-2">
+                  سيتم حذف جميع البيانات المرتبطة
                 </p>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  سبب الحذف <span className="text-red-600">*</span>
-                </label>
-                <textarea
-                  value={deleteReason}
-                  onChange={(e) => setDeleteReason(e.target.value)}
-                  rows={3}
-                  placeholder="يرجى توضيح سبب حذف هذا العميل..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  اكتب كلمة <span className="font-bold text-red-600">DELETE</span> للتأكيد
-                </label>
-                <input
-                  type="text"
-                  value={deleteConfirmation}
-                  onChange={(e) => setDeleteConfirmation(e.target.value)}
-                  placeholder="DELETE"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent font-mono"
-                  required
-                />
-              </div>
-
-              <div className="flex gap-2 pt-4">
+              <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={handleConfirmDelete}
-                  disabled={isDeleting || deleteConfirmation !== 'DELETE' || !deleteReason.trim()}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  disabled={isDeleting}
+                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                 >
-                  {isDeleting ? 'جاري الحذف...' : 'تأكيد الحذف'}
+                  {isDeleting ? 'جاري الحذف...' : 'حذف'}
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowDeleteModal(false);
-                    setDeleteConfirmation('');
-                    setDeleteReason('');
-                  }}
+                  onClick={() => setShowDeleteModal(false)}
                   disabled={isDeleting}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50"
+                  className="flex-1 px-4 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors disabled:opacity-50 font-medium"
                 >
                   إلغاء
                 </button>
