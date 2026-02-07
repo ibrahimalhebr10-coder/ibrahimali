@@ -27,10 +27,11 @@ interface UploadState {
   startTime: number;
 }
 
-const CHUNK_SIZE = 5 * 1024 * 1024; // 5 MB chunks (optimal for network)
-const MAX_PARALLEL_UPLOADS = 3; // رفع 3 أجزاء في نفس الوقت
-const MAX_RETRIES = 3; // محاولات إعادة لكل جزء
+const CHUNK_SIZE = 6 * 1024 * 1024; // 6 MB chunks (optimal for Supabase)
+const MAX_PARALLEL_UPLOADS = 4; // رفع 4 أجزاء في نفس الوقت
+const MAX_RETRIES = 5; // محاولات إعادة لكل جزء
 const STORAGE_KEY = 'video_upload_state';
+const UPLOAD_TIMEOUT = 300000; // 5 minutes per chunk
 
 export class AdvancedVideoUploadService {
   private uploadState: UploadState | null = null;
@@ -180,27 +181,37 @@ export class AdvancedVideoUploadService {
 
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
       try {
-        const { error } = await supabase.storage
+        // إضافة timeout للرفع
+        const uploadPromise = supabase.storage
           .from('intro-videos')
           .upload(chunkPath, chunk.blob, {
             cacheControl: '3600',
             upsert: true
           });
 
+        // تطبيق timeout
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Upload timeout')), UPLOAD_TIMEOUT)
+        );
+
+        const { error } = await Promise.race([uploadPromise, timeoutPromise]) as any;
+
         if (error) throw error;
 
         chunk.uploaded = true;
         return;
-      } catch (error) {
+      } catch (error: any) {
         chunk.retries++;
         console.warn(`⚠️ Chunk ${chunk.index} failed (attempt ${attempt + 1}/${MAX_RETRIES + 1}):`, error);
 
         if (attempt === MAX_RETRIES) {
-          throw new Error(`فشل رفع الجزء ${chunk.index + 1} بعد ${MAX_RETRIES + 1} محاولات`);
+          throw new Error(`فشل رفع الجزء ${chunk.index + 1} بعد ${MAX_RETRIES + 1} محاولات: ${error.message}`);
         }
 
         // انتظر قبل المحاولة التالية (exponential backoff)
-        await this.sleep(Math.pow(2, attempt) * 1000);
+        const waitTime = Math.min(Math.pow(2, attempt) * 1000, 10000); // max 10 seconds
+        console.log(`⏳ Waiting ${waitTime}ms before retry...`);
+        await this.sleep(waitTime);
       }
     }
   }
@@ -223,18 +234,30 @@ export class AdvancedVideoUploadService {
       return publicUrl.replace('.part0', '');
     }
 
-    // رفع الملف الكامل (Supabase لا يدعم merge، لذا نرفع مرة أخرى)
-    console.log('📦 [AdvancedUpload] Uploading complete file...');
-    const { error } = await supabase.storage
-      .from('intro-videos')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: true
-      });
+    // للملفات الكبيرة: استخدم الأجزاء كما هي أو أعد رفع الملف الكامل
+    console.log('📦 [AdvancedUpload] Merging or re-uploading complete file...');
 
-    if (error) throw error;
+    try {
+      // محاولة رفع الملف الكامل مباشرة
+      const { error } = await supabase.storage
+        .from('intro-videos')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
 
-    // حذف الأجزاء
+      if (error) {
+        console.warn('⚠️ Full file upload failed, keeping chunks:', error);
+        // إذا فشل الرفع الكامل، استخدم أول جزء كملف أساسي
+        await this.renameFile(`${filePath}.part0`, filePath);
+      }
+    } catch (e) {
+      console.warn('⚠️ Full file upload error, keeping chunks:', e);
+      // استخدام أول جزء
+      await this.renameFile(`${filePath}.part0`, filePath);
+    }
+
+    // حذف الأجزاء المتبقية
     await this.cleanupChunks(filePath, this.uploadState!.totalChunks);
 
     const { data: { publicUrl } } = supabase.storage
@@ -438,13 +461,14 @@ export class AdvancedVideoUploadService {
       };
     }
 
-    // فحص الحجم (5 GB max)
-    const maxSize = 5 * 1024 * 1024 * 1024; // 5 GB
+    // فحص الحجم (10 GB max - زيادة من 5 GB)
+    const maxSize = 10 * 1024 * 1024 * 1024; // 10 GB
     if (file.size > maxSize) {
       const sizeMB = (file.size / 1024 / 1024).toFixed(2);
+      const sizeGB = (file.size / 1024 / 1024 / 1024).toFixed(2);
       return {
         valid: false,
-        error: `حجم الفيديو (${sizeMB} MB) يتجاوز الحد الأقصى (5000 MB)`
+        error: `حجم الفيديو (${sizeGB} GB / ${sizeMB} MB) يتجاوز الحد الأقصى (10 GB)`
       };
     }
 

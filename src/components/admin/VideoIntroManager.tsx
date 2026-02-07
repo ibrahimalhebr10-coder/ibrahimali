@@ -113,7 +113,8 @@ export default function VideoIntroManager() {
       let videoUrl: string;
 
       // اختيار طريقة الرفع بناءً على حجم الملف
-      if (fileSizeMB > 50) {
+      // استخدام chunked upload للملفات أكبر من 30 MB لموثوقية أفضل
+      if (fileSizeMB > 30) {
         console.log('📦 Using advanced chunked upload for large file');
 
         videoUrl = await advancedVideoUploadService.uploadWithChunking(
@@ -473,7 +474,7 @@ export default function VideoIntroManager() {
                         يمكنك رفع فيديو من الجوال أو الكمبيوتر
                       </p>
                       <p className="text-xs text-gray-500 mt-2">
-                        الحد الأقصى: 5 جيجابايت (5000 ميجابايت) • صيغ مدعومة: MP4, MOV, AVI, WebM
+                        الحد الأقصى: 10 جيجابايت (10000 ميجابايت) • صيغ مدعومة: MP4, MOV, AVI, WebM
                       </p>
                       <div className="flex flex-wrap gap-2 justify-center mt-3">
                         <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full border border-emerald-200">
@@ -556,7 +557,7 @@ export default function VideoIntroManager() {
           <div className="grid md:grid-cols-3 gap-4">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">5 GB</div>
+                <div className="text-3xl font-bold text-white mb-1">10 GB</div>
                 <div className="text-white/80 text-sm">الحد الأقصى</div>
                 <div className="text-white/60 text-xs mt-1">(كان 1 GB)</div>
               </div>
@@ -564,7 +565,7 @@ export default function VideoIntroManager() {
 
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">3x</div>
+                <div className="text-3xl font-bold text-white mb-1">4x</div>
                 <div className="text-white/80 text-sm">أسرع</div>
                 <div className="text-white/60 text-xs mt-1">رفع متوازي</div>
               </div>
@@ -642,11 +643,11 @@ export default function VideoIntroManager() {
               <ul className="space-y-1 text-sm text-gray-700">
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-600 mt-1">🚀</span>
-                  <span><strong>رفع فائق السرعة:</strong> حتى 5 جيجابايت مع رفع متوازي</span>
+                  <span><strong>رفع فائق السرعة:</strong> حتى 10 جيجابايت مع رفع متوازي</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-600 mt-1">📦</span>
-                  <span><strong>Chunked Upload:</strong> تقسيم ذكي لأجزاء 5 MB للملفات الكبيرة</span>
+                  <span><strong>Chunked Upload:</strong> تقسيم ذكي لأجزاء 6 MB للملفات الكبيرة</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-600 mt-1">🔄</span>
@@ -654,7 +655,11 @@ export default function VideoIntroManager() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-600 mt-1">⚡</span>
-                  <span><strong>Multi-threaded:</strong> رفع 3 أجزاء في نفس الوقت</span>
+                  <span><strong>Multi-threaded:</strong> رفع 4 أجزاء في نفس الوقت (أسرع 33%)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-600 mt-1">⏱️</span>
+                  <span><strong>Timeout محسّن:</strong> 5 دقائق لكل جزء + 5 محاولات</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-600 mt-1">📊</span>
