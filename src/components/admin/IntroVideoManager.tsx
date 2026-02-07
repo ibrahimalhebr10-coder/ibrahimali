@@ -23,6 +23,7 @@ export default function IntroVideoManager() {
   const [dragActive, setDragActive] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<string | null>(null);
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState({
@@ -73,7 +74,7 @@ export default function IntroVideoManager() {
     }
   };
 
-  const handleFileSelect = async (file: File) => {
+  const handleFileSelect = (file: File) => {
     if (!file.type.startsWith('video/')) {
       alert('الرجاء اختيار ملف فيديو فقط');
       return;
@@ -85,6 +86,7 @@ export default function IntroVideoManager() {
       return;
     }
 
+    setSelectedFile(file);
     const videoUrl = URL.createObjectURL(file);
     setPreviewVideo(videoUrl);
 
@@ -93,42 +95,57 @@ export default function IntroVideoManager() {
     video.onloadedmetadata = () => {
       console.log('Duration:', Math.round(video.duration), 'seconds');
     };
-
-    await uploadVideo(file);
   };
 
   const uploadVideo = async (file: File) => {
-    if (!formData.title.trim()) {
-      alert('الرجاء إدخال عنوان للفيديو');
-      return;
-    }
-
     try {
       setUploading(true);
       setUploadProgress(0);
+
+      console.log('Starting upload for file:', file.name, 'Size:', file.size);
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `intro-videos/${fileName}`;
 
-      const { error: uploadError } = await supabase.storage
+      console.log('Uploading to path:', filePath);
+
+      setUploadProgress(10);
+
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 500);
+
+      const { data: uploadData, error: uploadError } = await supabase.storage
         .from('farm-videos')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false,
-          onUploadProgress: (progress) => {
-            const percent = (progress.loaded / progress.total) * 100;
-            setUploadProgress(Math.round(percent));
-          }
+          upsert: false
         });
 
-      if (uploadError) throw uploadError;
+      clearInterval(progressInterval);
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      console.log('File uploaded successfully:', uploadData);
+      setUploadProgress(95);
 
       const { data: { publicUrl } } = supabase.storage
         .from('farm-videos')
         .getPublicUrl(filePath);
 
-      const { error: dbError } = await supabase
+      console.log('Public URL:', publicUrl);
+
+      const { data: dbData, error: dbError } = await supabase
         .from('intro_videos')
         .insert({
           title: formData.title,
@@ -137,9 +154,17 @@ export default function IntroVideoManager() {
           file_size: file.size,
           device_type: formData.device_type,
           is_active: formData.is_active
-        });
+        })
+        .select()
+        .single();
 
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error('Database error:', dbError);
+        throw dbError;
+      }
+
+      console.log('Video saved to database:', dbData);
+      setUploadProgress(100);
 
       setFormData({
         title: '',
@@ -148,12 +173,18 @@ export default function IntroVideoManager() {
         is_active: true
       });
       setPreviewVideo(null);
+      setSelectedFile(null);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+
       await loadVideos();
 
       alert('تم رفع الفيديو بنجاح!');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading video:', error);
-      alert('حدث خطأ أثناء رفع الفيديو');
+      alert(`حدث خطأ أثناء رفع الفيديو: ${error.message || 'خطأ غير معروف'}`);
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -332,8 +363,20 @@ export default function IntroVideoManager() {
                   controls
                   className="mx-auto max-h-64 rounded-xl shadow-lg"
                 />
+                {selectedFile && (
+                  <div className="text-sm text-gray-600">
+                    <p className="font-medium">{selectedFile.name}</p>
+                    <p>{formatFileSize(selectedFile.size)}</p>
+                  </div>
+                )}
                 <button
-                  onClick={() => setPreviewVideo(null)}
+                  onClick={() => {
+                    setPreviewVideo(null);
+                    setSelectedFile(null);
+                    if (fileInputRef.current) {
+                      fileInputRef.current.value = '';
+                    }
+                  }}
                   className="text-red-600 hover:text-red-700 font-medium"
                 >
                   <X className="w-5 h-5 inline ml-2" />
@@ -380,8 +423,16 @@ export default function IntroVideoManager() {
 
           {previewVideo && !uploading && (
             <button
-              onClick={() => fileInputRef.current?.files?.[0] && uploadVideo(fileInputRef.current.files[0])}
-              disabled={!formData.title.trim()}
+              onClick={() => {
+                if (!formData.title.trim()) {
+                  alert('الرجاء إدخال عنوان للفيديو');
+                  return;
+                }
+                if (selectedFile) {
+                  uploadVideo(selectedFile);
+                }
+              }}
+              disabled={!formData.title.trim() || !selectedFile}
               className="w-full py-4 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-xl hover:from-emerald-700 hover:to-emerald-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-bold text-lg"
             >
               <Upload className="w-5 h-5 inline ml-2" />
