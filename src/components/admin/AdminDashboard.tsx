@@ -30,6 +30,7 @@ import FinanceSection from './FinanceSection';
 import CustomersSection from './CustomersSection';
 import HotLeadsDashboard from './HotLeadsDashboard';
 import SmartAssistantManager from './SmartAssistantManager';
+import IntroVideoManager from './IntroVideoManager';
 
 type AdminSection =
   | 'overview'
@@ -42,6 +43,7 @@ type AdminSection =
   | 'packages'
   | 'marketing'
   | 'content'
+  | 'videos'
   | 'assistant'
   | 'settings';
 
@@ -61,6 +63,7 @@ const AdminDashboard: React.FC = () => {
     { id: 'packages' as AdminSection, label: 'الباقات', icon: Package, color: 'purple' },
     { id: 'marketing' as AdminSection, label: 'التسويق', icon: Megaphone, color: 'pink' },
     { id: 'content' as AdminSection, label: 'المحتوى', icon: MessageSquare, color: 'indigo' },
+    { id: 'videos' as AdminSection, label: 'الفيديو التعريفي', icon: Video, color: 'blue' },
     { id: 'assistant' as AdminSection, label: 'المساعد الذكي', icon: Sparkles, color: 'emerald' },
     { id: 'settings' as AdminSection, label: 'الإعدادات', icon: Settings, color: 'gray' },
   ];
@@ -100,6 +103,8 @@ const AdminDashboard: React.FC = () => {
         return <MarketingManagement />;
       case 'content':
         return <ContentManagement />;
+      case 'videos':
+        return <IntroVideoManager />;
       case 'assistant':
         return <SmartAssistantManager />;
       case 'settings':
