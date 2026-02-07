@@ -27,11 +27,17 @@ interface UploadState {
   startTime: number;
 }
 
-const CHUNK_SIZE = 6 * 1024 * 1024; // 6 MB chunks (optimal for Supabase)
-const MAX_PARALLEL_UPLOADS = 4; // رفع 4 أجزاء في نفس الوقت
+// ⚡ تكوين النظام المتقدم - Ultra Upload Mode
+const CHUNK_SIZE = 8 * 1024 * 1024; // 8 MB chunks (محسّن للملفات الكبيرة)
+const MAX_PARALLEL_UPLOADS = 6; // رفع 6 أجزاء في نفس الوقت (أسرع)
 const MAX_RETRIES = 5; // محاولات إعادة لكل جزء
 const STORAGE_KEY = 'video_upload_state';
 const UPLOAD_TIMEOUT = 300000; // 5 minutes per chunk
+
+// 📊 حدود الحجم - Ultra Mode
+const MAX_FILE_SIZE_BASIC = 100 * 1024 * 1024; // 100 MB (قبول مباشر)
+const MAX_FILE_SIZE_ULTRA = 500 * 1024 * 1024; // 500 MB (الحد الأقصى مع تحذير)
+const AUTO_COMPRESS_THRESHOLD = 150 * 1024 * 1024; // 150 MB (تحذير بالضغط)
 
 export class AdvancedVideoUploadService {
   private uploadState: UploadState | null = null;
@@ -486,61 +492,101 @@ export class AdvancedVideoUploadService {
   }
 
   /**
-   * فحص الملف قبل الرفع - سياسة واقعية محسّنة
-   * المدة: حتى 60 ثانية | الصيغة: MP4 (H.264)
+   * فحص الملف قبل الرفع - Ultra Mode
+   * حتى 500 MB | صيغات متعددة مع تحويل تلقائي
    */
-  validateFile(file: File): { valid: boolean; error?: string } {
-    console.log('🔍 [Validation] Checking file:', {
+  validateFile(file: File): { valid: boolean; error?: string; warning?: string } {
+    console.log('🔍 [Validation] Ultra Mode - Checking file:', {
       name: file.name,
       type: file.type,
       size: `${(file.size / 1024 / 1024).toFixed(2)} MB`
     });
 
-    // فحص النوع - MP4 فقط (H.264 موصى به)
-    // نفحص الامتداد أولاً لأن MIME type قد يكون خاطئ في بعض المتصفحات
+    // فحص النوع - دعم صيغات متعددة
     const fileName = file.name.toLowerCase();
     const extension = fileName.split('.').pop() || '';
-    const allowedExtensions = ['mp4', 'm4v'];
-    const allowedMimeTypes = ['video/mp4', 'video/x-m4v', 'video/quicktime'];
 
-    const hasValidExtension = allowedExtensions.includes(extension);
-    const hasValidMimeType = allowedMimeTypes.includes(file.type) || file.type === '';
+    // 📹 الصيغات المدعومة
+    const primaryExtensions = ['mp4', 'm4v']; // الأفضل (قبول مباشر)
+    const secondaryExtensions = ['mov', 'webm']; // مقبولة (مع تحذير للتحويل)
+    const allAllowedExtensions = [...primaryExtensions, ...secondaryExtensions];
+
+    const allowedMimeTypes = [
+      'video/mp4',
+      'video/x-m4v',
+      'video/quicktime',  // iPhone MOV
+      'video/webm',
+      ''  // Some browsers don't provide MIME type
+    ];
+
+    const hasValidExtension = allAllowedExtensions.includes(extension);
+    const hasValidMimeType = allowedMimeTypes.includes(file.type);
+    const isPrimaryFormat = primaryExtensions.includes(extension);
 
     console.log('🔍 [Validation] Results:', {
       extension,
       hasValidExtension,
+      isPrimaryFormat,
       mimeType: file.type || '(empty)',
       hasValidMimeType
     });
 
-    // قبول إذا: الامتداد صحيح، أو MIME type صحيح
+    // رفض إذا الصيغة غير مدعومة نهائياً
     if (!hasValidExtension && !hasValidMimeType) {
       return {
         valid: false,
-        error: `الصيغة المسموحة: MP4 فقط (H.264 codec موصى به)
+        error: `الصيغة المسموحة: MP4, M4V, MOV, WebM
 
 الصيغة المكتشفة: ${extension.toUpperCase()} (${file.type || 'غير معروف'})
 
-إذا كان الملف MP4 بالفعل:
-• تأكد من امتداد الملف: .mp4
-• حاول تحويله باستخدام HandBrake`
+📌 الصيغ المدعومة:
+• MP4 (H.264) - موصى به بشدة ✅
+• M4V (Apple MP4) - موصى به ✅
+• MOV (iPhone) - مدعوم ⚠️
+• WebM - مدعوم ⚠️
+
+💡 لتحويل الفيديو:
+• استخدم HandBrake (مجاني)
+• أو أي محول فيديو إلى MP4`
       };
     }
 
-    // تحذير في console إذا كان MIME type غريب لكن الامتداد صحيح
-    if (hasValidExtension && file.type !== 'video/mp4') {
+    // تحذير للصيغات الثانوية
+    let formatWarning: string | undefined;
+    if (!isPrimaryFormat && hasValidExtension) {
+      formatWarning = `⚠️ الصيغة .${extension.toUpperCase()} مدعومة لكن MP4 (H.264) موصى به للأداء الأفضل`;
+      console.warn(`[Validation] ${formatWarning}`);
+    }
+
+    // تحذير MIME type غريب
+    if (hasValidExtension && file.type !== 'video/mp4' && file.type !== '') {
       console.warn(`⚠️ [Validation] MIME type غير قياسي: "${file.type}" لكن الامتداد صحيح (.${extension})`);
     }
 
-    // فحص الحجم الأقصى (100 MB - يكفي لفيديو 60 ثانية بجودة عالية)
-    const maxSize = 100 * 1024 * 1024; // 100 MB
     const sizeMB = (file.size / 1024 / 1024);
 
-    if (file.size > maxSize) {
+    // 📊 فحص الحجم - Ultra Mode (حتى 500 MB)
+    if (file.size > MAX_FILE_SIZE_ULTRA) {
       return {
         valid: false,
-        error: `حجم الفيديو (${sizeMB.toFixed(1)} MB) يتجاوز الحد الأقصى (100 MB).\n\nللفيديو حتى 60 ثانية:\n• استخدم جودة 1080p @ 30fps\n• Bitrate موصى به: 5-8 Mbps\n• أو اضغط الفيديو باستخدام HandBrake`
+        error: `حجم الفيديو (${sizeMB.toFixed(1)} MB) يتجاوز الحد الأقصى (500 MB).
+
+⚡ حلول مقترحة:
+• اضغط الفيديو باستخدام HandBrake
+• قلل الجودة إلى 1080p @ 30fps
+• Bitrate موصى به: 5-8 Mbps
+• أو قسّم الفيديو إلى أجزاء أصغر
+
+📌 للفيديو التعريفي: 30-60 ثانية كافية (50-80 MB)`
       };
+    }
+
+    // تحذير للملفات الكبيرة (150+ MB)
+    if (file.size > AUTO_COMPRESS_THRESHOLD) {
+      const estimatedMinutes = Math.ceil(sizeMB / 50); // ~50 MB per minute at 8 Mbps
+      formatWarning = formatWarning || '';
+      formatWarning += `\n\n⚠️ حجم كبير: ${sizeMB.toFixed(1)} MB - الرفع قد يستغرق وقتاً (حوالي ${estimatedMinutes} دقيقة)`;
+      console.warn(`⚠️ [Validation] Large file: ${sizeMB.toFixed(1)} MB - Upload may take ~${estimatedMinutes} minutes`);
     }
 
     // فحص اسم الملف
@@ -552,17 +598,23 @@ export class AdvancedVideoUploadService {
     }
 
     // معلومات مفيدة (console فقط - لا تمنع الرفع)
-    if (sizeMB > 80) {
-      console.warn(`⚠️ [Validation] حجم الفيديو (${sizeMB.toFixed(1)} MB) كبير. قد يستغرق الرفع وقتاً أطول.`);
+    if (sizeMB > MAX_FILE_SIZE_BASIC / (1024 * 1024)) {
+      console.warn(`⚠️ [Validation] حجم الفيديو (${sizeMB.toFixed(1)} MB) كبير. سيتم استخدام Chunked Upload.`);
     }
 
     // تقدير تقريبي للمدة (بافتراض bitrate معقول)
     const estimatedDurationSeconds = Math.round((sizeMB * 8) / 6); // افتراض 6 Mbps average
-    if (estimatedDurationSeconds > 60) {
+    if (estimatedDurationSeconds > 90) {
       console.info(`ℹ️ [Validation] تقدير المدة: ~${estimatedDurationSeconds} ثانية (بناءً على الحجم). للفيديو التعريفي، يُفضل 30-60 ثانية.`);
     }
 
-    return { valid: true };
+    // رسالة نجاح مع تحذيرات (إن وجدت)
+    console.log(`✅ [Validation] File validated successfully - Size: ${sizeMB.toFixed(1)} MB, Format: .${extension.toUpperCase()}`);
+
+    return {
+      valid: true,
+      warning: formatWarning
+    };
   }
 
   /**

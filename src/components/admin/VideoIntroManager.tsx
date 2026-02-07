@@ -74,11 +74,17 @@ export default function VideoIntroManager() {
       type: file.type
     });
 
-    // التحقق باستخدام النظام المتقدم
+    // التحقق باستخدام النظام المتقدم - Ultra Mode
     const validation = advancedVideoUploadService.validateFile(file);
     if (!validation.valid) {
       setError(validation.error || 'ملف غير صالح');
       return;
+    }
+
+    // عرض تحذيرات إن وجدت (لكن لا نمنع الرفع)
+    if (validation.warning) {
+      console.warn('⚠️ [Upload] Validation warning:', validation.warning);
+      // يمكن عرض تحذير للمستخدم هنا إذا أردت
     }
 
     const fileSizeMB = file.size / (1024 * 1024);
