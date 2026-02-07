@@ -1,6 +1,7 @@
-import { User, Handshake, Sprout, Wheat, Apple, Grape, Leaf, HelpCircle, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X } from 'lucide-react';
+import { User, Handshake, Sprout, Wheat, Apple, Grape, Leaf, HelpCircle, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X, Video } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import HowToStart from './components/HowToStart';
+import StreamingVideoPlayer from './components/StreamingVideoPlayer';
 import AdvancedAIAssistant from './components/AdvancedAIAssistant';
 import SuccessPartnerIntro from './components/SuccessPartnerIntro';
 import SuccessPartnerOnboarding from './components/SuccessPartnerOnboarding';
@@ -59,6 +60,7 @@ function AppContent() {
   const [loading, setLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState<LoadingProgress | null>(null);
   const [fromCache, setFromCache] = useState(false);
+  const [showStreamingVideo, setShowStreamingVideo] = useState(false);
   const [showHowToStart, setShowHowToStart] = useState(false);
   const [showAdvancedAssistant, setShowAdvancedAssistant] = useState(false);
   const [showSuccessPartnerIntro, setShowSuccessPartnerIntro] = useState(false);
@@ -677,6 +679,19 @@ function AppContent() {
                         border: 'rgba(16, 185, 129, 0.25)',
                         shadow: 'rgba(16, 185, 129, 0.15)',
                         glow: 'rgba(16, 185, 129, 0.08)'
+                      },
+                      {
+                        icon: Video,
+                        label: 'فيديو تعريفي',
+                        onClick: () => setShowStreamingVideo(true),
+                        delay: '100ms',
+                        gradient: 'linear-gradient(135deg, rgba(236, 72, 153, 0.12) 0%, rgba(219, 39, 119, 0.15) 50%, rgba(236, 72, 153, 0.12) 100%)',
+                        hoverGradient: 'linear-gradient(135deg, rgba(244, 114, 182, 0.18) 0%, rgba(236, 72, 153, 0.22) 50%, rgba(244, 114, 182, 0.18) 100%)',
+                        iconColor: '#db2777',
+                        textColor: '#be185d',
+                        border: 'rgba(236, 72, 153, 0.25)',
+                        shadow: 'rgba(236, 72, 153, 0.15)',
+                        glow: 'rgba(236, 72, 153, 0.08)'
                       },
                       {
                         icon: HelpCircle,
@@ -1337,6 +1352,15 @@ function AppContent() {
         </div>
       </nav>
       )}
+
+      <StreamingVideoPlayer
+        isOpen={showStreamingVideo}
+        onClose={() => setShowStreamingVideo(false)}
+        onComplete={() => {
+          setShowStreamingVideo(false);
+          setShowAdvancedAssistant(true);
+        }}
+      />
 
       <HowToStart
         isOpen={showHowToStart}

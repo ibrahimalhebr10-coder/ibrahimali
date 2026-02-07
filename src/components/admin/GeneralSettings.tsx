@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { Settings, Palette, Key, Database, CreditCard } from 'lucide-react';
+import { Settings, Palette, Key, Database, CreditCard, Video } from 'lucide-react';
 import PaymentProvidersManager from './PaymentProvidersManager';
+import StreamingVideoManager from './StreamingVideoManager';
 
-type SettingsTab = 'system' | 'branding' | 'api-keys' | 'database' | 'payments';
+type SettingsTab = 'system' | 'branding' | 'api-keys' | 'database' | 'payments' | 'streaming-video';
 
 const GeneralSettings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('system');
 
   const tabs = [
     { id: 'system' as SettingsTab, label: 'إعدادات النظام', icon: Settings },
+    { id: 'streaming-video' as SettingsTab, label: 'فيديو تعريفي', icon: Video },
     { id: 'payments' as SettingsTab, label: 'بوابات الدفع', icon: CreditCard },
     { id: 'branding' as SettingsTab, label: 'الهوية العامة', icon: Palette },
     { id: 'api-keys' as SettingsTab, label: 'مفاتيح التشغيل', icon: Key },
@@ -47,7 +49,17 @@ const GeneralSettings: React.FC = () => {
       </div>
 
       {/* Content */}
-      {activeTab === 'payments' ? (
+      {activeTab === 'streaming-video' ? (
+        <div>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">إدارة الفيديو التعريفي</h2>
+            <p className="text-gray-600">
+              قم بإدارة الفيديو التعريفي الذي يظهر للزوار عند دخول المنصة (نظام Streaming)
+            </p>
+          </div>
+          <StreamingVideoManager />
+        </div>
+      ) : activeTab === 'payments' ? (
         <div>
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">إدارة بوابات الدفع</h2>
