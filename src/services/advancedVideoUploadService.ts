@@ -486,34 +486,40 @@ export class AdvancedVideoUploadService {
   }
 
   /**
-   * فحص الملف قبل الرفع
+   * فحص الملف قبل الرفع - سياسة صارمة واقعية
+   * المدة القصوى: 30 ثانية | الصيغة: MP4 فقط
    */
   validateFile(file: File): { valid: boolean; error?: string } {
-    // فحص النوع
-    if (!file.type.startsWith('video/')) {
+    // فحص النوع - MP4 فقط
+    if (file.type !== 'video/mp4') {
       return {
         valid: false,
-        error: 'الرجاء اختيار ملف فيديو صالح'
+        error: 'الصيغة المسموحة: MP4 فقط'
       };
     }
 
-    // فحص الحجم (10 GB max - زيادة من 5 GB)
-    const maxSize = 10 * 1024 * 1024 * 1024; // 10 GB
+    // فحص الحجم الأقصى (50 MB - واقعي لفيديو 30 ثانية)
+    const maxSize = 50 * 1024 * 1024; // 50 MB
+    const sizeMB = (file.size / 1024 / 1024);
+
     if (file.size > maxSize) {
-      const sizeMB = (file.size / 1024 / 1024).toFixed(2);
-      const sizeGB = (file.size / 1024 / 1024 / 1024).toFixed(2);
       return {
         valid: false,
-        error: `حجم الفيديو (${sizeGB} GB / ${sizeMB} MB) يتجاوز الحد الأقصى (10 GB)`
+        error: `حجم الفيديو (${sizeMB.toFixed(1)} MB) يتجاوز الحد المسموح (50 MB). الرجاء ضغط الفيديو أو تقليل مدته.`
       };
     }
 
-    // فحص الاسم
+    // فحص اسم الملف
     if (file.name.length > 255) {
       return {
         valid: false,
         error: 'اسم الملف طويل جداً'
       };
+    }
+
+    // تحذير إذا كان الملف كبير (قد يشير لمدة أطول من 30 ثانية)
+    if (sizeMB > 30) {
+      console.warn(`⚠️ [Validation] حجم الفيديو (${sizeMB.toFixed(1)} MB) كبير نسبياً. تأكد أن المدة لا تتجاوز 30 ثانية.`);
     }
 
     return { valid: true };
