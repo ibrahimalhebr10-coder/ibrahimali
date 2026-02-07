@@ -113,9 +113,10 @@ export default function VideoIntroManager() {
       let videoUrl: string;
 
       // اختيار طريقة الرفع بناءً على حجم الملف
-      // استخدام chunked upload للملفات أكبر من 30 MB لموثوقية أفضل
-      if (fileSizeMB > 30) {
-        console.log('📦 Using advanced chunked upload for large file');
+      // استخدام chunked upload للملفات أكبر من 15 MB لموثوقية أفضل
+      // (فيديو 45 ثانية غالباً 15-40 MB حسب الجودة)
+      if (fileSizeMB > 15) {
+        console.log('📦 Using advanced chunked upload for medium/large file');
 
         videoUrl = await advancedVideoUploadService.uploadWithChunking(
           file,
@@ -659,7 +660,11 @@ export default function VideoIntroManager() {
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-600 mt-1">⏱️</span>
-                  <span><strong>Timeout محسّن:</strong> 5 دقائق لكل جزء + 5 محاولات</span>
+                  <span><strong>Timeout محسّن:</strong> 10 دقائق للملفات الصغيرة، 5 دقائق/جزء للكبيرة</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-600 mt-1">🔁</span>
+                  <span><strong>محاولات متعددة:</strong> 3 محاولات للملفات الصغيرة، 5 للأجزاء</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-600 mt-1">📊</span>

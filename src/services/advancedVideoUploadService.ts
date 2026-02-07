@@ -418,7 +418,7 @@ export class AdvancedVideoUploadService {
   }
 
   /**
-   * رفع بسيط للملفات الصغيرة (أقل من 50 MB)
+   * رفع بسيط للملفات الصغيرة (أقل من 50 MB) مع timeout محسّن
    */
   async uploadSimple(
     file: File,
@@ -429,14 +429,49 @@ export class AdvancedVideoUploadService {
 
     onProgress?.(10);
 
-    const { error } = await supabase.storage
-      .from('intro-videos')
-      .upload(filePath, file, {
-        cacheControl: '3600',
-        upsert: false
-      });
+    // إضافة timeout طويل (10 دقائق) مع retry mechanism
+    const SIMPLE_UPLOAD_TIMEOUT = 600000; // 10 دقائق
+    const MAX_SIMPLE_RETRIES = 3;
 
-    if (error) throw error;
+    for (let attempt = 1; attempt <= MAX_SIMPLE_RETRIES; attempt++) {
+      try {
+        console.log(`📤 [SimpleUpload] Attempt ${attempt}/${MAX_SIMPLE_RETRIES}`);
+
+        // إنشاء promise مع timeout
+        const uploadPromise = supabase.storage
+          .from('intro-videos')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Upload timeout - الرفع استغرق وقتاً طويلاً')), SIMPLE_UPLOAD_TIMEOUT)
+        );
+
+        const { error } = await Promise.race([uploadPromise, timeoutPromise]) as any;
+
+        if (error) {
+          if (attempt === MAX_SIMPLE_RETRIES) {
+            throw error;
+          }
+          console.warn(`⚠️ [SimpleUpload] Attempt ${attempt} failed:`, error.message);
+          // انتظر قبل المحاولة التالية
+          await this.sleep(2000 * attempt); // 2s, 4s, 6s
+          continue;
+        }
+
+        // نجح الرفع
+        break;
+      } catch (error: any) {
+        if (attempt === MAX_SIMPLE_RETRIES) {
+          console.error('❌ [SimpleUpload] All attempts failed:', error);
+          throw new Error(`فشل رفع الفيديو بعد ${MAX_SIMPLE_RETRIES} محاولات: ${error.message}`);
+        }
+        console.warn(`⚠️ [SimpleUpload] Attempt ${attempt} error:`, error.message);
+        await this.sleep(2000 * attempt);
+      }
+    }
 
     onProgress?.(90);
 
@@ -446,6 +481,7 @@ export class AdvancedVideoUploadService {
 
     onProgress?.(100);
 
+    console.log('✅ [SimpleUpload] Upload completed successfully');
     return publicUrl;
   }
 
