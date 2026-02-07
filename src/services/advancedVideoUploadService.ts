@@ -490,12 +490,46 @@ export class AdvancedVideoUploadService {
    * المدة: حتى 60 ثانية | الصيغة: MP4 (H.264)
    */
   validateFile(file: File): { valid: boolean; error?: string } {
+    console.log('🔍 [Validation] Checking file:', {
+      name: file.name,
+      type: file.type,
+      size: `${(file.size / 1024 / 1024).toFixed(2)} MB`
+    });
+
     // فحص النوع - MP4 فقط (H.264 موصى به)
-    if (file.type !== 'video/mp4') {
+    // نفحص الامتداد أولاً لأن MIME type قد يكون خاطئ في بعض المتصفحات
+    const fileName = file.name.toLowerCase();
+    const extension = fileName.split('.').pop() || '';
+    const allowedExtensions = ['mp4', 'm4v'];
+    const allowedMimeTypes = ['video/mp4', 'video/x-m4v', 'video/quicktime'];
+
+    const hasValidExtension = allowedExtensions.includes(extension);
+    const hasValidMimeType = allowedMimeTypes.includes(file.type) || file.type === '';
+
+    console.log('🔍 [Validation] Results:', {
+      extension,
+      hasValidExtension,
+      mimeType: file.type || '(empty)',
+      hasValidMimeType
+    });
+
+    // قبول إذا: الامتداد صحيح، أو MIME type صحيح
+    if (!hasValidExtension && !hasValidMimeType) {
       return {
         valid: false,
-        error: 'الصيغة المسموحة: MP4 فقط (H.264 codec موصى به)'
+        error: `الصيغة المسموحة: MP4 فقط (H.264 codec موصى به)
+
+الصيغة المكتشفة: ${extension.toUpperCase()} (${file.type || 'غير معروف'})
+
+إذا كان الملف MP4 بالفعل:
+• تأكد من امتداد الملف: .mp4
+• حاول تحويله باستخدام HandBrake`
       };
+    }
+
+    // تحذير في console إذا كان MIME type غريب لكن الامتداد صحيح
+    if (hasValidExtension && file.type !== 'video/mp4') {
+      console.warn(`⚠️ [Validation] MIME type غير قياسي: "${file.type}" لكن الامتداد صحيح (.${extension})`);
     }
 
     // فحص الحجم الأقصى (100 MB - يكفي لفيديو 60 ثانية بجودة عالية)
