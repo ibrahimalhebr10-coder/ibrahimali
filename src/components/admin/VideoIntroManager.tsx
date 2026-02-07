@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Upload, Video, Trash2, Eye, AlertCircle, CheckCircle, Loader2, Zap, Clock, HardDrive, TrendingUp } from 'lucide-react';
+import { Upload, Video, Trash2, Eye, AlertCircle, CheckCircle, Loader2, Zap, Clock, HardDrive, TrendingUp, Scissors, CheckCircle2, XCircle } from 'lucide-react';
 import { videoIntroService, type VideoIntro } from '../../services/videoIntroService';
 import { largeVideoUploadService } from '../../services/largeVideoUploadService';
+import { videoCompressionService } from '../../services/videoCompressionService';
 
 export default function VideoIntroManager() {
   const [video, setVideo] = useState<VideoIntro | null>(null);
@@ -20,6 +21,14 @@ export default function VideoIntroManager() {
   const [totalChunks, setTotalChunks] = useState<number>(0);
   const [uploadedMB, setUploadedMB] = useState<number>(0);
   const [totalMB, setTotalMB] = useState<number>(0);
+
+  // Compression states
+  const [compressing, setCompressing] = useState(false);
+  const [compressionProgress, setCompressionProgress] = useState(0);
+  const [compressionStage, setCompressionStage] = useState<string>('');
+  const [showCompressionDialog, setShowCompressionDialog] = useState(false);
+  const [compressionAnalysis, setCompressionAnalysis] = useState<any>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const [formData, setFormData] = useState({
     title: 'تعرّف على جود',
@@ -74,6 +83,25 @@ export default function VideoIntroManager() {
       type: file.type
     });
 
+    // حفظ الملف المختار
+    setSelectedFile(file);
+
+    // تحليل الفيديو للتحقق من حاجته للضغط
+    const analysis = await videoCompressionService.analyzeVideo(file);
+    console.log('📊 Compression analysis:', analysis);
+
+    if (analysis.needsCompression && videoCompressionService.isSupported()) {
+      // عرض نافذة خيار الضغط
+      setCompressionAnalysis(analysis);
+      setShowCompressionDialog(true);
+      return; // انتظار قرار المستخدم
+    }
+
+    // إذا لم يحتاج للضغط، رفع مباشرة
+    await uploadVideoFile(file);
+  }
+
+  async function uploadVideoFile(file: File) {
     // استخدام نظام رفع الفيديو الكبير بشكل إجباري (حتى 5 GB)
     const fileSizeMB = file.size / (1024 * 1024);
     const fileSizeGB = file.size / (1024 * 1024 * 1024);
@@ -199,6 +227,69 @@ export default function VideoIntroManager() {
       console.error('Error updating video:', err);
       setError('حدث خطأ أثناء تحديث البيانات');
     }
+  }
+
+  async function handleCompress() {
+    if (!selectedFile) return;
+
+    try {
+      setCompressing(true);
+      setCompressionProgress(0);
+      setError(null);
+      setShowCompressionDialog(false);
+
+      console.log('🎬 Starting video compression...');
+
+      const compressedFile = await videoCompressionService.smartCompress(
+        selectedFile,
+        (progress) => {
+          setCompressionProgress(progress.percentage);
+
+          const stages = {
+            analyzing: 'تحليل الفيديو',
+            compressing: 'ضغط الفيديو',
+            finalizing: 'إتمام العملية'
+          };
+          setCompressionStage(stages[progress.stage]);
+
+          if (progress.currentSize) {
+            const reduction = ((1 - (progress.currentSize / progress.originalSize)) * 100).toFixed(0);
+            setSuccess(`جاري الضغط... تم التقليل بنسبة ${reduction}%`);
+          }
+        }
+      );
+
+      const originalSizeMB = selectedFile.size / (1024 * 1024);
+      const compressedSizeMB = compressedFile.size / (1024 * 1024);
+      const reduction = ((1 - (compressedFile.size / selectedFile.size)) * 100).toFixed(1);
+
+      console.log(`✅ Compression complete!`);
+      console.log(`📊 Original: ${originalSizeMB.toFixed(2)} MB`);
+      console.log(`📊 Compressed: ${compressedSizeMB.toFixed(2)} MB`);
+      console.log(`📉 Reduction: ${reduction}%`);
+
+      setSuccess(`تم الضغط بنجاح! تم تقليل الحجم بنسبة ${reduction}% (من ${originalSizeMB.toFixed(1)} ميجابايت إلى ${compressedSizeMB.toFixed(1)} ميجابايت)`);
+
+      // الآن رفع الملف المضغوط
+      await uploadVideoFile(compressedFile);
+    } catch (err) {
+      console.error('❌ Compression error:', err);
+      setError('حدث خطأ أثناء ضغط الفيديو. سيتم رفع الملف الأصلي.');
+
+      // في حالة فشل الضغط، رفع الملف الأصلي
+      if (selectedFile) {
+        await uploadVideoFile(selectedFile);
+      }
+    } finally {
+      setCompressing(false);
+      setCompressionProgress(0);
+    }
+  }
+
+  async function handleSkipCompression() {
+    if (!selectedFile) return;
+    setShowCompressionDialog(false);
+    await uploadVideoFile(selectedFile);
   }
 
   async function handleDelete() {
@@ -687,6 +778,143 @@ export default function VideoIntroManager() {
           </div>
         </div>
       </div>
+
+      {/* نافذة خيار الضغط */}
+      {showCompressionDialog && compressionAnalysis && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Scissors className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                هل تريد ضغط الفيديو؟
+              </h3>
+              <p className="text-gray-600">
+                {compressionAnalysis.reason}
+              </p>
+            </div>
+
+            {/* معلومات الضغط */}
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 mb-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700 font-medium">الحجم الحالي:</span>
+                <span className="text-xl font-bold text-gray-900">
+                  {compressionAnalysis.currentSizeMB.toFixed(1)} ميجابايت
+                </span>
+              </div>
+
+              <div className="flex items-center justify-center">
+                <div className="text-3xl">→</div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="text-gray-700 font-medium">الحجم المتوقع:</span>
+                <span className="text-xl font-bold text-emerald-600">
+                  {compressionAnalysis.estimatedCompressedSizeMB?.toFixed(1)} ميجابايت
+                </span>
+              </div>
+
+              <div className="pt-4 border-t border-indigo-200">
+                <div className="flex items-center justify-center gap-2 text-emerald-600 font-semibold">
+                  <TrendingUp className="w-5 h-5" />
+                  <span>
+                    توفير ~{((1 - (compressionAnalysis.estimatedCompressedSizeMB / compressionAnalysis.currentSizeMB)) * 100).toFixed(0)}%
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* الفوائد */}
+            <div className="bg-green-50 rounded-xl p-4 mb-6">
+              <div className="flex items-start gap-3 mb-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-gray-700">
+                  <strong>رفع أسرع</strong> - يستغرق وقت أقل للرفع
+                </span>
+              </div>
+              <div className="flex items-start gap-3 mb-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-gray-700">
+                  <strong>تحميل أسرع</strong> - تجربة أفضل للزوار
+                </span>
+              </div>
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <span className="text-sm text-gray-700">
+                  <strong>جودة ممتازة</strong> - الضغط الذكي يحافظ على الجودة
+                </span>
+              </div>
+            </div>
+
+            {/* الأزرار */}
+            <div className="flex gap-3">
+              <button
+                onClick={handleCompress}
+                className="flex-1 bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-3 rounded-xl font-semibold hover:from-emerald-600 hover:to-green-700 transition-all flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+              >
+                <Scissors className="w-5 h-5" />
+                <span>ضغط ورفع</span>
+              </button>
+
+              <button
+                onClick={handleSkipCompression}
+                className="flex-1 bg-gray-100 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+              >
+                <XCircle className="w-5 h-5" />
+                <span>تخطي ورفع</span>
+              </button>
+            </div>
+
+            <p className="text-xs text-gray-500 text-center mt-4">
+              عملية الضغط تتم في متصفحك ولا تُرسل البيانات لأي خادم خارجي
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* شاشة الضغط */}
+      {compressing && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-8">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+                <Scissors className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                جاري ضغط الفيديو...
+              </h3>
+              <p className="text-gray-600">{compressionStage}</p>
+            </div>
+
+            {/* شريط التقدم */}
+            <div className="mb-6">
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <span>التقدم</span>
+                <span className="font-bold">{compressionProgress.toFixed(0)}%</span>
+              </div>
+              <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-300 rounded-full"
+                  style={{ width: `${compressionProgress}%` }}
+                />
+              </div>
+            </div>
+
+            <div className="bg-blue-50 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <Clock className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                <div className="text-sm text-gray-700">
+                  <p className="font-semibold mb-1">يرجى الانتظار...</p>
+                  <p className="text-xs text-gray-600">
+                    هذه العملية قد تستغرق عدة دقائق حسب حجم الفيديو
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
