@@ -160,7 +160,7 @@ export default function AdvancedAIAssistant({ isOpen, onClose }: AdvancedAIAssis
   if (!isOpen) return null;
 
   return (
-        <div className="fixed bottom-6 left-6 w-96 h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200" style={{ zIndex: 50100 }}>
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-96 max-w-[calc(100vw-2rem)] h-[600px] max-h-[calc(100vh-8rem)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200" style={{ zIndex: 50100 }}>
           <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="relative">
