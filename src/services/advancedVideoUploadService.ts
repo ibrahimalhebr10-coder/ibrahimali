@@ -486,26 +486,26 @@ export class AdvancedVideoUploadService {
   }
 
   /**
-   * فحص الملف قبل الرفع - سياسة صارمة واقعية
-   * المدة القصوى: 30 ثانية | الصيغة: MP4 فقط
+   * فحص الملف قبل الرفع - سياسة واقعية محسّنة
+   * المدة: حتى 60 ثانية | الصيغة: MP4 (H.264)
    */
   validateFile(file: File): { valid: boolean; error?: string } {
-    // فحص النوع - MP4 فقط
+    // فحص النوع - MP4 فقط (H.264 موصى به)
     if (file.type !== 'video/mp4') {
       return {
         valid: false,
-        error: 'الصيغة المسموحة: MP4 فقط'
+        error: 'الصيغة المسموحة: MP4 فقط (H.264 codec موصى به)'
       };
     }
 
-    // فحص الحجم الأقصى (50 MB - واقعي لفيديو 30 ثانية)
-    const maxSize = 50 * 1024 * 1024; // 50 MB
+    // فحص الحجم الأقصى (100 MB - يكفي لفيديو 60 ثانية بجودة عالية)
+    const maxSize = 100 * 1024 * 1024; // 100 MB
     const sizeMB = (file.size / 1024 / 1024);
 
     if (file.size > maxSize) {
       return {
         valid: false,
-        error: `حجم الفيديو (${sizeMB.toFixed(1)} MB) يتجاوز الحد المسموح (50 MB). الرجاء ضغط الفيديو أو تقليل مدته.`
+        error: `حجم الفيديو (${sizeMB.toFixed(1)} MB) يتجاوز الحد الأقصى (100 MB).\n\nللفيديو حتى 60 ثانية:\n• استخدم جودة 1080p @ 30fps\n• Bitrate موصى به: 5-8 Mbps\n• أو اضغط الفيديو باستخدام HandBrake`
       };
     }
 
@@ -513,13 +513,19 @@ export class AdvancedVideoUploadService {
     if (file.name.length > 255) {
       return {
         valid: false,
-        error: 'اسم الملف طويل جداً'
+        error: 'اسم الملف طويل جداً (الحد الأقصى: 255 حرف)'
       };
     }
 
-    // تحذير إذا كان الملف كبير (قد يشير لمدة أطول من 30 ثانية)
-    if (sizeMB > 30) {
-      console.warn(`⚠️ [Validation] حجم الفيديو (${sizeMB.toFixed(1)} MB) كبير نسبياً. تأكد أن المدة لا تتجاوز 30 ثانية.`);
+    // معلومات مفيدة (console فقط - لا تمنع الرفع)
+    if (sizeMB > 80) {
+      console.warn(`⚠️ [Validation] حجم الفيديو (${sizeMB.toFixed(1)} MB) كبير. قد يستغرق الرفع وقتاً أطول.`);
+    }
+
+    // تقدير تقريبي للمدة (بافتراض bitrate معقول)
+    const estimatedDurationSeconds = Math.round((sizeMB * 8) / 6); // افتراض 6 Mbps average
+    if (estimatedDurationSeconds > 60) {
+      console.info(`ℹ️ [Validation] تقدير المدة: ~${estimatedDurationSeconds} ثانية (بناءً على الحجم). للفيديو التعريفي، يُفضل 30-60 ثانية.`);
     }
 
     return { valid: true };

@@ -248,21 +248,21 @@ export default function VideoIntroManager() {
         </div>
       )}
 
-      <div className="bg-gradient-to-r from-red-600 to-orange-600 rounded-xl shadow-lg p-6 text-white">
+      <div className="bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl shadow-lg p-6 text-white">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center flex-shrink-0">
-            <AlertCircle className="w-7 h-7 text-white" />
+            <Video className="w-7 h-7 text-white" />
           </div>
           <div className="flex-1">
-            <h3 className="text-xl font-bold mb-2">⚠️ سياسة صارمة للفيديو التعريفي</h3>
+            <h3 className="text-xl font-bold mb-2">متطلبات الفيديو التعريفي</h3>
             <div className="space-y-1 text-white/95 text-sm">
-              <p>✓ <strong>المدة القصوى:</strong> 30 ثانية فقط (لا استثناءات)</p>
-              <p>✓ <strong>الصيغة:</strong> MP4 فقط</p>
-              <p>✓ <strong>الحجم الأقصى:</strong> 50 MB</p>
-              <p>✓ <strong>الجودة الموصى بها:</strong> 1080p @ 30fps، H.264 codec</p>
+              <p>✓ <strong>المدة الموصى بها:</strong> 30-60 ثانية (مثالي للتعريف السريع)</p>
+              <p>✓ <strong>الصيغة:</strong> MP4 (H.264 codec)</p>
+              <p>✓ <strong>الحجم الأقصى:</strong> 100 MB</p>
+              <p>✓ <strong>الجودة:</strong> 1080p @ 30fps، Bitrate: 5-8 Mbps</p>
             </div>
             <p className="text-xs text-white/80 mt-3 bg-white/10 px-3 py-2 rounded-lg">
-              ملاحظة: هذه السياسة مبنية على الواقع الفعلي لنظام الرفع. فيديو 45 ثانية يفشل دائماً.
+              💡 نصيحة: فيديو 50-60 ثانية بجودة 1080p عادةً يكون 50-80 MB. استخدم HandBrake للضغط إذا لزم الأمر.
             </p>
           </div>
         </div>
@@ -494,18 +494,18 @@ export default function VideoIntroManager() {
                       <p className="text-sm text-gray-600">
                         يمكنك رفع فيديو من الجوال أو الكمبيوتر
                       </p>
-                      <p className="text-xs font-semibold text-red-600 mt-2 bg-red-50 px-3 py-2 rounded-lg border border-red-200 inline-block">
-                        ⚠️ المدة القصوى: 30 ثانية • الصيغة: MP4 فقط • الحجم: حتى 50 MB
+                      <p className="text-xs font-semibold text-blue-700 mt-2 bg-blue-50 px-3 py-2 rounded-lg border border-blue-200 inline-block">
+                        ✓ المدة: 30-60 ثانية • MP4 (H.264) • حتى 100 MB
                       </p>
                       <div className="flex flex-wrap gap-2 justify-center mt-3">
                         <span className="px-3 py-1 bg-emerald-50 text-emerald-700 text-xs font-semibold rounded-full border border-emerald-200">
-                          ✅ MP4 فقط
+                          ✅ MP4 (H.264)
                         </span>
                         <span className="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-full border border-blue-200">
-                          ⏱️ حتى 30 ثانية
+                          ⏱️ 30-60 ثانية
                         </span>
-                        <span className="px-3 py-1 bg-purple-50 text-purple-700 text-xs font-semibold rounded-full border border-purple-200">
-                          📦 حتى 50 MB
+                        <span className="px-3 py-1 bg-cyan-50 text-cyan-700 text-xs font-semibold rounded-full border border-cyan-200">
+                          📦 حتى 100 MB
                         </span>
                       </div>
                     </div>
@@ -575,17 +575,17 @@ export default function VideoIntroManager() {
           <div className="grid md:grid-cols-3 gap-4">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">30 ثانية</div>
-                <div className="text-white/80 text-sm">المدة القصوى</div>
-                <div className="text-white/60 text-xs mt-1">سياسة واقعية</div>
+                <div className="text-3xl font-bold text-white mb-1">30-60 ثانية</div>
+                <div className="text-white/80 text-sm">المدة المثالية</div>
+                <div className="text-white/60 text-xs mt-1">تعريف سريع وفعّال</div>
               </div>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-1">50 MB</div>
+                <div className="text-3xl font-bold text-white mb-1">100 MB</div>
                 <div className="text-white/80 text-sm">الحجم الأقصى</div>
-                <div className="text-white/60 text-xs mt-1">MP4 فقط</div>
+                <div className="text-white/60 text-xs mt-1">MP4 (H.264)</div>
               </div>
             </div>
 
@@ -593,26 +593,26 @@ export default function VideoIntroManager() {
               <div className="text-center">
                 <div className="text-3xl font-bold text-white mb-1">100%</div>
                 <div className="text-white/80 text-sm">موثوق</div>
-                <div className="text-white/60 text-xs mt-1">3 محاولات</div>
+                <div className="text-white/60 text-xs mt-1">رفع مضمون</div>
               </div>
             </div>
           </div>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            <span className="px-3 py-1 bg-red-500/90 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
-              ⚠️ 30 ثانية فقط
-            </span>
-            <span className="px-3 py-1 bg-red-500/90 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
-              ⚠️ MP4 فقط
+            <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
+              ✓ 30-60 ثانية
             </span>
             <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
-              ✓ 50 MB حد أقصى
+              ✓ MP4 (H.264)
             </span>
             <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
-              ✓ 3 محاولات
+              ✓ 100 MB حد أقصى
             </span>
             <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
-              ✓ H.264 موصى به
+              ✓ 1080p @ 30fps
+            </span>
+            <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
+              ✓ Auto Resume
             </span>
           </div>
         </div>
@@ -629,15 +629,15 @@ export default function VideoIntroManager() {
               <ul className="space-y-1 text-sm text-gray-700">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 mt-1">•</span>
-                  <span>اجعل الفيديو قصيراً ومباشراً (الحد الأقصى: 30 ثانية)</span>
+                  <span>اجعل الفيديو مركّزاً ومباشراً (30-60 ثانية مثالي)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 mt-1">•</span>
-                  <span>ابدأ بعرض فكرة المنصة بشكل واضح وجذاب</span>
+                  <span>ابدأ بعرض فكرة المنصة بشكل واضح وجذاب في أول 10 ثوانٍ</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 mt-1">•</span>
-                  <span>استخدم صور حقيقية من المزارع لبناء الثقة</span>
+                  <span>استخدم صور حقيقية من المزارع لبناء الثقة والمصداقية</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 mt-1">•</span>
@@ -654,31 +654,31 @@ export default function VideoIntroManager() {
               <Upload className="w-4 h-4 text-emerald-600" />
             </div>
             <div>
-              <h4 className="font-semibold text-gray-900 mb-2">متطلبات الفيديو التعريفي</h4>
+              <h4 className="font-semibold text-gray-900 mb-2">المواصفات التقنية</h4>
               <ul className="space-y-1 text-sm text-gray-700">
                 <li className="flex items-start gap-2">
-                  <span className="text-red-600 mt-1">⚠️</span>
-                  <span><strong>المدة القصوى:</strong> 30 ثانية (سياسة صارمة)</span>
+                  <span className="text-blue-600 mt-1">⏱️</span>
+                  <span><strong>المدة:</strong> 30-60 ثانية (مثالي للتعريف السريع)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-red-600 mt-1">📹</span>
-                  <span><strong>الصيغة:</strong> MP4 فقط (لا MOV، لا AVI، لا WebM)</span>
+                  <span className="text-blue-600 mt-1">📹</span>
+                  <span><strong>الصيغة:</strong> MP4 (H.264 codec)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-red-600 mt-1">📦</span>
-                  <span><strong>الحجم الأقصى:</strong> 50 MB (فيديو 30 ثانية عادة 20-40 MB)</span>
+                  <span className="text-blue-600 mt-1">📦</span>
+                  <span><strong>الحجم الأقصى:</strong> 100 MB (فيديو 60 ثانية @ 1080p: 50-80 MB)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-600 mt-1">✅</span>
-                  <span><strong>الجودة الموصى بها:</strong> 1080p @ 30fps، H.264 codec</span>
+                  <span><strong>الجودة:</strong> 1080p @ 30fps، Bitrate: 5-8 Mbps</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-emerald-600 mt-1">🔁</span>
-                  <span><strong>محاولات متعددة:</strong> 3 محاولات تلقائية عند الفشل</span>
+                  <span><strong>موثوقية:</strong> 3 محاولات تلقائية + Auto Resume</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-emerald-600 mt-1">⏱️</span>
-                  <span><strong>Timeout:</strong> 10 دقائق كحد أقصى للرفع</span>
+                  <span className="text-emerald-600 mt-1">🛠️</span>
+                  <span><strong>أداة الضغط:</strong> HandBrake (H.264, RF: 23, 1080p)</span>
                 </li>
               </ul>
             </div>
