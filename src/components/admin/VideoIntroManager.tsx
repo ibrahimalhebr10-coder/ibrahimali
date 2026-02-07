@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Upload, Video, Trash2, Eye, AlertCircle, CheckCircle, Loader2, Zap, Clock, HardDrive, TrendingUp } from 'lucide-react';
 import { videoIntroService, type VideoIntro } from '../../services/videoIntroService';
-import { advancedVideoUploadService } from '../../services/advancedVideoUploadService';
 import { largeVideoUploadService } from '../../services/largeVideoUploadService';
 
 export default function VideoIntroManager() {
@@ -75,18 +74,14 @@ export default function VideoIntroManager() {
       type: file.type
     });
 
-    // التحقق باستخدام النظام الأفضل حسب حجم الملف
+    // استخدام نظام رفع الفيديو الكبير بشكل إجباري (حتى 5 GB)
     const fileSizeMB = file.size / (1024 * 1024);
     const fileSizeGB = file.size / (1024 * 1024 * 1024);
 
-    // للملفات الكبيرة جداً (> 1 GB): استخدام النظام المتقدم
-    let validation;
-    if (fileSizeGB > 1) {
-      console.log('🚀 [Upload] Large file detected, using advanced system');
-      validation = largeVideoUploadService.validateFile(file);
-    } else {
-      validation = advancedVideoUploadService.validateFile(file);
-    }
+    console.log('🚀 [Upload] Using large video upload system (supports up to 5 GB)');
+
+    // التحقق من صحة الملف
+    const validation = largeVideoUploadService.validateFile(file);
 
     if (!validation.valid) {
       setError(validation.error || 'ملف غير صالح');
@@ -101,13 +96,13 @@ export default function VideoIntroManager() {
       setTimeout(() => setSuccess(null), 5000);
     }
 
-    if (fileSizeGB > 1) {
+    // عرض الحجم بالوحدة المناسبة
+    if (fileSizeGB >= 1) {
       setFileSize(`${fileSizeGB.toFixed(2)} جيجابايت`);
-      setTotalMB(fileSizeMB);
     } else {
       setFileSize(`${fileSizeMB.toFixed(2)} ميجابايت`);
-      setTotalMB(fileSizeMB);
     }
+    setTotalMB(fileSizeMB);
 
     try {
       setUploading(true);
@@ -128,61 +123,28 @@ export default function VideoIntroManager() {
         await videoIntroService.deleteVideo(video.id);
       }
 
-      console.log('🚀 Starting upload...');
+      console.log('🚀 Starting upload with large video system...');
+      console.log(`📊 File size: ${fileSizeGB >= 1 ? fileSizeGB.toFixed(2) + ' GB' : fileSizeMB.toFixed(2) + ' MB'}`);
 
       const fileExt = file.name.split('.').pop();
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${fileName}`;
 
-      let videoUrl: string;
+      // استخدام نظام رفع الفيديو الكبير لجميع الملفات
+      const videoUrl = await largeVideoUploadService.uploadLargeVideo(
+        file,
+        filePath,
+        (progress) => {
+          setUploadProgress(progress.percentage);
+          setUploadSpeed(progress.speed);
+          setTimeRemaining(progress.timeRemaining);
+          setChunksCompleted(progress.currentChunk);
+          setTotalChunks(progress.totalChunks);
+          setUploadedMB(progress.loaded / (1024 * 1024));
 
-      // اختيار طريقة الرفع بناءً على حجم الملف
-      if (fileSizeGB > 0.5) {
-        // ملفات كبيرة جداً (> 500 MB): استخدام النظام المتقدم مع chunking
-        console.log(`📦 [Upload] Using large video system for ${fileSizeGB.toFixed(2)} GB file`);
-
-        videoUrl = await largeVideoUploadService.uploadLargeVideo(
-          file,
-          filePath,
-          (progress) => {
-            setUploadProgress(progress.percentage);
-            setUploadSpeed(progress.speed);
-            setTimeRemaining(progress.timeRemaining);
-            setChunksCompleted(progress.currentChunk);
-            setTotalChunks(progress.totalChunks);
-            setUploadedMB(progress.loaded / (1024 * 1024));
-
-            console.log(`📊 Progress: ${progress.percentage.toFixed(1)}% | Speed: ${(progress.speed / 1024 / 1024).toFixed(2)} MB/s | Chunk: ${progress.currentChunk}/${progress.totalChunks}`);
-          }
-        );
-      } else if (fileSizeMB > 15) {
-        // ملفات متوسطة (15-500 MB): استخدام النظام العادي
-        console.log('📦 Using standard upload for medium file');
-
-        videoUrl = await advancedVideoUploadService.uploadWithChunking(
-          file,
-          filePath,
-          (progress) => {
-            setUploadProgress(progress.percentage);
-            setUploadSpeed(progress.speed);
-            setTimeRemaining(progress.timeRemaining);
-            setChunksCompleted(progress.chunksCompleted);
-            setTotalChunks(progress.totalChunks);
-            setUploadedMB(progress.loaded / (1024 * 1024));
-          }
-        );
-      } else {
-        // ملفات صغيرة (< 15 MB): رفع مباشر
-        console.log('📤 Using simple upload for small file');
-
-        videoUrl = await advancedVideoUploadService.uploadSimple(
-          file,
-          filePath,
-          (progress) => {
-            setUploadProgress(progress);
-          }
-        );
-      }
+          console.log(`📊 Progress: ${progress.percentage.toFixed(1)}% | Speed: ${(progress.speed / 1024 / 1024).toFixed(2)} MB/s | Chunk: ${progress.currentChunk}/${progress.totalChunks}`);
+        }
+      );
 
       if (!videoUrl) {
         throw new Error('فشل رفع الفيديو - لم يتم الحصول على رابط');
