@@ -47,14 +47,14 @@ export class AdvancedVideoUploadService {
   private lastUploadedBytes: number = 0;
 
   /**
-   * رفع متقدم مع Chunking و Resume
+   * رفع متقدم مع تتبع التقدم - محسّن لـ Supabase
    */
   async uploadWithChunking(
     file: File,
     filePath: string,
     onProgress?: (progress: UploadProgress) => void
   ): Promise<string> {
-    console.log('🚀 [AdvancedUpload] Starting advanced chunked upload');
+    console.log('🚀 [AdvancedUpload] Starting optimized Supabase upload');
     console.log(`📊 File: ${file.name} | Size: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
 
     this.uploadStartTime = Date.now();
@@ -62,262 +62,87 @@ export class AdvancedVideoUploadService {
     this.lastUpdateTime = Date.now();
     this.lastUploadedBytes = 0;
 
-    // تحميل الحالة المحفوظة (Resume)
-    const savedState = this.loadUploadState();
-    if (savedState && savedState.fileName === file.name && savedState.fileSize === file.size) {
-      console.log('📦 [AdvancedUpload] Resuming previous upload');
-      this.uploadState = savedState;
-      this.uploadedBytes = savedState.uploadedChunks.size * CHUNK_SIZE;
-    } else {
-      this.uploadState = {
-        fileName: file.name,
-        fileSize: file.size,
-        totalChunks: Math.ceil(file.size / CHUNK_SIZE),
-        uploadedChunks: new Set(),
-        startTime: Date.now()
-      };
-    }
+    // استخدام Supabase's native upload مع XMLHttpRequest للحصول على progress
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
 
-    // تقسيم الملف إلى أجزاء
-    const chunks = this.createChunks(file);
-    const totalChunks = chunks.length;
+      // تتبع التقدم
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable && onProgress) {
+          const now = Date.now();
+          const timeDiff = (now - this.lastUpdateTime) / 1000;
+          const bytesDiff = e.loaded - this.lastUploadedBytes;
+          const speed = timeDiff > 0 ? bytesDiff / timeDiff : 0;
+          const remainingBytes = e.total - e.loaded;
+          const timeRemaining = speed > 0 ? remainingBytes / speed : 0;
 
-    console.log(`📦 [AdvancedUpload] File divided into ${totalChunks} chunks (${(CHUNK_SIZE / 1024 / 1024).toFixed(2)} MB each)`);
+          this.lastUpdateTime = now;
+          this.lastUploadedBytes = e.loaded;
 
-    // رفع الأجزاء بالتوازي
-    await this.uploadChunksInParallel(chunks, file.name, filePath, onProgress);
-
-    // دمج الأجزاء (إذا لزم الأمر)
-    const finalUrl = await this.finalizeUpload(file, filePath);
-
-    // حذف الحالة المحفوظة
-    this.clearUploadState();
-
-    console.log('✅ [AdvancedUpload] Upload completed successfully');
-    return finalUrl;
-  }
-
-  /**
-   * تقسيم الملف إلى أجزاء
-   */
-  private createChunks(file: File): ChunkInfo[] {
-    const chunks: ChunkInfo[] = [];
-    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
-
-    for (let i = 0; i < totalChunks; i++) {
-      const start = i * CHUNK_SIZE;
-      const end = Math.min(start + CHUNK_SIZE, file.size);
-      const blob = file.slice(start, end);
-
-      chunks.push({
-        index: i,
-        start,
-        end,
-        blob,
-        uploaded: this.uploadState?.uploadedChunks.has(i) || false,
-        retries: 0
-      });
-    }
-
-    return chunks;
-  }
-
-  /**
-   * رفع الأجزاء بالتوازي
-   */
-  private async uploadChunksInParallel(
-    chunks: ChunkInfo[],
-    fileName: string,
-    filePath: string,
-    onProgress?: (progress: UploadProgress) => void
-  ): Promise<void> {
-    const pendingChunks = chunks.filter(c => !c.uploaded);
-    const totalChunks = chunks.length;
-    let completedChunks = chunks.filter(c => c.uploaded).length;
-
-    console.log(`🔄 [AdvancedUpload] Uploading ${pendingChunks.length} remaining chunks (${completedChunks} already uploaded)`);
-
-    // رفع بالتوازي مع حد أقصى
-    const uploadQueue = [...pendingChunks];
-    const activeUploads: Set<Promise<void>> = new Set();
-
-    while (uploadQueue.length > 0 || activeUploads.size > 0) {
-      // ابدأ رفع جديد إذا كان هناك مكان
-      while (uploadQueue.length > 0 && activeUploads.size < MAX_PARALLEL_UPLOADS) {
-        const chunk = uploadQueue.shift()!;
-
-        const uploadPromise = this.uploadChunk(chunk, filePath).then(() => {
-          completedChunks++;
-          this.uploadedBytes += chunk.blob.size;
-
-          // حفظ التقدم
-          this.uploadState?.uploadedChunks.add(chunk.index);
-          this.saveUploadState();
-
-          // حساب التقدم والسرعة
-          const progress = this.calculateProgress(
-            this.uploadedBytes,
-            chunks.reduce((sum, c) => sum + c.blob.size, 0),
-            completedChunks,
-            totalChunks
-          );
-
-          onProgress?.(progress);
-
-          console.log(`✅ Chunk ${chunk.index + 1}/${totalChunks} uploaded (${progress.percentage.toFixed(1)}% | Speed: ${(progress.speed / 1024).toFixed(2)} MB/s | ETA: ${this.formatTime(progress.timeRemaining)})`);
-        }).finally(() => {
-          activeUploads.delete(uploadPromise);
-        });
-
-        activeUploads.add(uploadPromise);
-      }
-
-      // انتظر أي رفع ينتهي قبل إضافة رفع جديد
-      if (activeUploads.size > 0) {
-        await Promise.race(activeUploads);
-      }
-    }
-  }
-
-  /**
-   * رفع جزء واحد مع إعادة المحاولة
-   */
-  private async uploadChunk(chunk: ChunkInfo, filePath: string): Promise<void> {
-    const chunkPath = `${filePath}.part${chunk.index}`;
-
-    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        // إضافة timeout للرفع
-        const uploadPromise = supabase.storage
-          .from('intro-videos')
-          .upload(chunkPath, chunk.blob, {
-            cacheControl: '3600',
-            upsert: true
+          onProgress({
+            loaded: e.loaded,
+            total: e.total,
+            percentage: (e.loaded / e.total) * 100,
+            speed,
+            timeRemaining,
+            chunksCompleted: 0,
+            totalChunks: 1
           });
 
-        // تطبيق timeout
-        const timeoutPromise = new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Upload timeout')), UPLOAD_TIMEOUT)
-        );
-
-        const { error } = await Promise.race([uploadPromise, timeoutPromise]) as any;
-
-        if (error) throw error;
-
-        chunk.uploaded = true;
-        return;
-      } catch (error: any) {
-        chunk.retries++;
-        console.warn(`⚠️ Chunk ${chunk.index} failed (attempt ${attempt + 1}/${MAX_RETRIES + 1}):`, error);
-
-        if (attempt === MAX_RETRIES) {
-          throw new Error(`فشل رفع الجزء ${chunk.index + 1} بعد ${MAX_RETRIES + 1} محاولات: ${error.message}`);
+          console.log(`📊 Progress: ${((e.loaded / e.total) * 100).toFixed(1)}% | Speed: ${(speed / 1024 / 1024).toFixed(2)} MB/s`);
         }
+      });
 
-        // انتظر قبل المحاولة التالية (exponential backoff)
-        const waitTime = Math.min(Math.pow(2, attempt) * 1000, 10000); // max 10 seconds
-        console.log(`⏳ Waiting ${waitTime}ms before retry...`);
-        await this.sleep(waitTime);
-      }
-    }
+      xhr.upload.addEventListener('error', () => {
+        console.error('❌ Upload error');
+        reject(new Error('فشل رفع الفيديو'));
+      });
+
+      xhr.addEventListener('load', async () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          console.log('✅ Upload completed, getting public URL...');
+
+          // الحصول على الرابط العام
+          const { data: { publicUrl } } = supabase.storage
+            .from('intro-videos')
+            .getPublicUrl(filePath);
+
+          resolve(publicUrl);
+        } else {
+          console.error('❌ Upload failed with status:', xhr.status);
+          reject(new Error(`فشل رفع الفيديو: ${xhr.statusText}`));
+        }
+      });
+
+      // رفع الملف باستخدام Supabase API
+      this.uploadViaXHR(xhr, file, filePath).catch(reject);
+    });
   }
 
   /**
-   * إنهاء الرفع ودمج الأجزاء
+   * رفع عبر XMLHttpRequest مباشرة إلى Supabase
    */
-  private async finalizeUpload(file: File, filePath: string): Promise<string> {
-    console.log('🔄 [AdvancedUpload] Finalizing upload...');
+  private async uploadViaXHR(xhr: XMLHttpRequest, file: File, filePath: string): Promise<void> {
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
 
-    // للملفات الصغيرة أو التي تم رفعها كجزء واحد
-    if (this.uploadState!.totalChunks === 1) {
-      const { data: { publicUrl } } = supabase.storage
-        .from('intro-videos')
-        .getPublicUrl(`${filePath}.part0`);
-
-      // إعادة تسمية الملف
-      await this.renameFile(`${filePath}.part0`, filePath);
-
-      return publicUrl.replace('.part0', '');
+    if (!token) {
+      throw new Error('يجب تسجيل الدخول أولاً');
     }
 
-    // للملفات الكبيرة: استخدم الأجزاء كما هي أو أعد رفع الملف الكامل
-    console.log('📦 [AdvancedUpload] Merging or re-uploading complete file...');
+    const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+    const url = `${SUPABASE_URL}/storage/v1/object/intro-videos/${filePath}`;
 
-    try {
-      // محاولة رفع الملف الكامل مباشرة
-      const { error } = await supabase.storage
-        .from('intro-videos')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true
-        });
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+    xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
+    xhr.setRequestHeader('x-upsert', 'true');
 
-      if (error) {
-        console.warn('⚠️ Full file upload failed, keeping chunks:', error);
-        // إذا فشل الرفع الكامل، استخدم أول جزء كملف أساسي
-        await this.renameFile(`${filePath}.part0`, filePath);
-      }
-    } catch (e) {
-      console.warn('⚠️ Full file upload error, keeping chunks:', e);
-      // استخدام أول جزء
-      await this.renameFile(`${filePath}.part0`, filePath);
-    }
-
-    // حذف الأجزاء المتبقية
-    await this.cleanupChunks(filePath, this.uploadState!.totalChunks);
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('intro-videos')
-      .getPublicUrl(filePath);
-
-    return publicUrl;
+    xhr.send(file);
   }
 
   /**
-   * حذف الأجزاء المؤقتة
-   */
-  private async cleanupChunks(filePath: string, totalChunks: number): Promise<void> {
-    console.log('🧹 [AdvancedUpload] Cleaning up temporary chunks...');
-
-    const chunkPaths = Array.from({ length: totalChunks }, (_, i) => `${filePath}.part${i}`);
-
-    try {
-      await supabase.storage
-        .from('intro-videos')
-        .remove(chunkPaths);
-
-      console.log('✅ [AdvancedUpload] Chunks cleaned up');
-    } catch (error) {
-      console.warn('⚠️ [AdvancedUpload] Failed to cleanup chunks:', error);
-    }
-  }
-
-  /**
-   * إعادة تسمية ملف
-   */
-  private async renameFile(oldPath: string, newPath: string): Promise<void> {
-    try {
-      // Supabase لا يدعم rename مباشرة، لذا نستخدم copy + delete
-      const { data: file } = await supabase.storage
-        .from('intro-videos')
-        .download(oldPath);
-
-      if (file) {
-        await supabase.storage
-          .from('intro-videos')
-          .upload(newPath, file, { upsert: true });
-
-        await supabase.storage
-          .from('intro-videos')
-          .remove([oldPath]);
-      }
-    } catch (error) {
-      console.warn('⚠️ Failed to rename file:', error);
-    }
-  }
-
-  /**
-   * حساب التقدم والسرعة
+   * حساب التقدم والسرعة (مبسّط)
    */
   private calculateProgress(
     loaded: number,
@@ -326,13 +151,10 @@ export class AdvancedVideoUploadService {
     totalChunks: number
   ): UploadProgress {
     const now = Date.now();
-    const timeDiff = (now - this.lastUpdateTime) / 1000; // بالثواني
+    const timeDiff = (now - this.lastUpdateTime) / 1000;
     const bytesDiff = loaded - this.lastUploadedBytes;
 
-    // حساب السرعة (bytes/second)
     const speed = timeDiff > 0 ? bytesDiff / timeDiff : 0;
-
-    // حساب الوقت المتبقي
     const remainingBytes = total - loaded;
     const timeRemaining = speed > 0 ? remainingBytes / speed : 0;
 
@@ -431,64 +253,45 @@ export class AdvancedVideoUploadService {
     filePath: string,
     onProgress?: (progress: number) => void
   ): Promise<string> {
-    console.log('📤 [SimpleUpload] Using simple upload for small file');
+    console.log('📤 [SimpleUpload] Using optimized upload for small file');
 
-    onProgress?.(10);
+    onProgress?.(5);
 
-    // إضافة timeout طويل (10 دقائق) مع retry mechanism
-    const SIMPLE_UPLOAD_TIMEOUT = 600000; // 10 دقائق
-    const MAX_SIMPLE_RETRIES = 3;
+    // استخدام XMLHttpRequest مع progress tracking
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
 
-    for (let attempt = 1; attempt <= MAX_SIMPLE_RETRIES; attempt++) {
-      try {
-        console.log(`📤 [SimpleUpload] Attempt ${attempt}/${MAX_SIMPLE_RETRIES}`);
-
-        // إنشاء promise مع timeout
-        const uploadPromise = supabase.storage
-          .from('intro-videos')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Upload timeout - الرفع استغرق وقتاً طويلاً')), SIMPLE_UPLOAD_TIMEOUT)
-        );
-
-        const { error } = await Promise.race([uploadPromise, timeoutPromise]) as any;
-
-        if (error) {
-          if (attempt === MAX_SIMPLE_RETRIES) {
-            throw error;
-          }
-          console.warn(`⚠️ [SimpleUpload] Attempt ${attempt} failed:`, error.message);
-          // انتظر قبل المحاولة التالية
-          await this.sleep(2000 * attempt); // 2s, 4s, 6s
-          continue;
+      xhr.upload.addEventListener('progress', (e) => {
+        if (e.lengthComputable && onProgress) {
+          const percentage = (e.loaded / e.total) * 100;
+          onProgress(percentage);
+          console.log(`📊 Upload progress: ${percentage.toFixed(1)}%`);
         }
+      });
 
-        // نجح الرفع
-        break;
-      } catch (error: any) {
-        if (attempt === MAX_SIMPLE_RETRIES) {
-          console.error('❌ [SimpleUpload] All attempts failed:', error);
-          throw new Error(`فشل رفع الفيديو بعد ${MAX_SIMPLE_RETRIES} محاولات: ${error.message}`);
+      xhr.upload.addEventListener('error', () => {
+        console.error('❌ Upload error');
+        reject(new Error('فشل رفع الفيديو'));
+      });
+
+      xhr.addEventListener('load', async () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          console.log('✅ Upload completed successfully');
+          onProgress?.(100);
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('intro-videos')
+            .getPublicUrl(filePath);
+
+          resolve(publicUrl);
+        } else {
+          console.error('❌ Upload failed with status:', xhr.status);
+          reject(new Error(`فشل رفع الفيديو: ${xhr.statusText}`));
         }
-        console.warn(`⚠️ [SimpleUpload] Attempt ${attempt} error:`, error.message);
-        await this.sleep(2000 * attempt);
-      }
-    }
+      });
 
-    onProgress?.(90);
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('intro-videos')
-      .getPublicUrl(filePath);
-
-    onProgress?.(100);
-
-    console.log('✅ [SimpleUpload] Upload completed successfully');
-    return publicUrl;
+      this.uploadViaXHR(xhr, file, filePath).catch(reject);
+    });
   }
 
   /**
