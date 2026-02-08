@@ -18,6 +18,15 @@ interface PlatformStats {
   recentReservations: number;
 }
 
+interface IntroVideo {
+  id: string;
+  title: string;
+  description: string | null;
+  file_url: string;
+  thumbnail_url: string | null;
+  duration: number | null;
+}
+
 const NewHomePage: React.FC<NewHomePageProps> = ({
   onStartInvestment,
   onOpenPartnerProgram,
@@ -25,6 +34,8 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   onOpenAssistant
 }) => {
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
+  const [introVideo, setIntroVideo] = useState<IntroVideo | null>(null);
+  const [loadingVideo, setLoadingVideo] = useState(true);
   const [stats, setStats] = useState<PlatformStats>({
     totalReservations: 0,
     totalUsers: 0,
@@ -72,6 +83,55 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
 
     fetchStats();
   }, []);
+
+  // Fetch active intro video
+  useEffect(() => {
+    const fetchIntroVideo = async () => {
+      try {
+        setLoadingVideo(true);
+
+        // Detect device type
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const deviceType = isMobile ? 'mobile' : 'desktop';
+
+        // Get active intro video for this device
+        const { data, error } = await supabase
+          .rpc('get_active_intro_video', { p_device_type: deviceType });
+
+        if (error) {
+          console.error('Error fetching intro video:', error);
+          return;
+        }
+
+        if (data && data.length > 0) {
+          setIntroVideo(data[0]);
+          console.log('✅ Loaded intro video:', data[0].title);
+        } else {
+          console.log('ℹ️ No active intro video found for', deviceType);
+        }
+      } catch (error) {
+        console.error('Error fetching intro video:', error);
+      } finally {
+        setLoadingVideo(false);
+      }
+    };
+
+    fetchIntroVideo();
+  }, []);
+
+  const handleVideoPlay = async () => {
+    if (!introVideo) return;
+
+    // Increment view count
+    try {
+      await supabase.rpc('increment_video_views', { video_id: introVideo.id });
+      console.log('📊 Video view count incremented');
+    } catch (error) {
+      console.error('Error incrementing view count:', error);
+    }
+
+    setShowVideoPlayer(true);
+  };
 
   return (
     <div style={{ minHeight: '100vh', minHeight: '100dvh', position: 'relative' }}>
@@ -204,18 +264,20 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
             </div>
 
             {/* Video Button - Compact */}
-            <button
-              onClick={() => setShowVideoPlayer(true)}
-              className="bg-white/80 backdrop-blur-md rounded-full px-5 py-2.5 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 border border-white/60 w-full justify-center"
-            >
-              <div className="bg-green-700 rounded-full p-1.5 shadow-lg">
-                <Play className="w-3.5 h-3.5 text-white fill-white" />
-              </div>
-              <span className="text-gray-900 font-bold text-sm">
-                فيديو تعريفي (دقيقة واحدة)
-              </span>
-              <ChevronLeft className="w-4 h-4 text-gray-700" />
-            </button>
+            {!loadingVideo && introVideo && (
+              <button
+                onClick={handleVideoPlay}
+                className="bg-white/80 backdrop-blur-md rounded-full px-5 py-2.5 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 border border-white/60 w-full justify-center"
+              >
+                <div className="bg-green-700 rounded-full p-1.5 shadow-lg">
+                  <Play className="w-3.5 h-3.5 text-white fill-white" />
+                </div>
+                <span className="text-gray-900 font-bold text-sm">
+                  {introVideo.title}
+                </span>
+                <ChevronLeft className="w-4 h-4 text-gray-700" />
+              </button>
+            )}
 
             {/* What Are You Looking For Section - Compact */}
             <h2 className="text-lg md:text-xl font-bold text-gray-900 text-center pt-2 drop-shadow-sm">
@@ -364,11 +426,11 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
       )}
 
       {/* Video Player Modal */}
-      {showVideoPlayer && (
+      {showVideoPlayer && introVideo && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
           <div className="w-full max-w-4xl">
             <StreamingVideoPlayer
-              videoUrl=""
+              videoUrl={introVideo.file_url}
               onClose={() => setShowVideoPlayer(false)}
             />
           </div>
