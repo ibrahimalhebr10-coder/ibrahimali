@@ -246,28 +246,57 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
             left: 0,
             right: 0,
             zIndex: 9998,
-            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(217, 119, 6, 0.95) 100%)',
-            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
-            backdropFilter: 'blur(12px)'
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.98) 0%, rgba(217, 119, 6, 0.98) 100%)',
+            boxShadow: '0 4px 16px rgba(245, 158, 11, 0.4), 0 2px 8px rgba(0, 0, 0, 0.1)',
+            backdropFilter: 'blur(12px)',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.3)'
           }}
           className="lg:top-16"
         >
-          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+          <div className="max-w-7xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
             <button
-              onClick={onOpenPartnerProgram}
-              className="flex items-center gap-2 flex-1 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              onClick={(e) => {
+                e.preventDefault();
+                console.log('Partner banner clicked!');
+                if (onOpenPartnerProgram) {
+                  onOpenPartnerProgram();
+                }
+              }}
+              className="flex items-center gap-2 flex-1 min-w-0 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
+              style={{
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '12px',
+                padding: '8px 12px',
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              }}
             >
-              <Handshake className="w-5 h-5 text-white drop-shadow-md flex-shrink-0" />
-              <span className="text-white font-bold text-sm lg:text-base">
-                انضم لبرنامج شركاء النجاح واربح من كل حجز!
-              </span>
-              <ChevronLeft className="w-4 h-4 text-white/90 flex-shrink-0" />
+              <Handshake className="w-5 h-5 lg:w-6 lg:h-6 text-white drop-shadow-lg flex-shrink-0" />
+              <div className="flex items-center gap-1.5 flex-1 min-w-0 overflow-hidden">
+                <span className="text-white font-black text-xs sm:text-sm lg:text-base whitespace-nowrap tracking-tight">
+                  برنامج شركاء النجاح
+                </span>
+                <span className="text-white/90 font-bold text-xs sm:text-sm hidden sm:inline whitespace-nowrap">
+                  •
+                </span>
+                <span className="text-white/90 font-semibold text-xs sm:text-sm hidden sm:inline whitespace-nowrap">
+                  اربح من كل حجز
+                </span>
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <span className="text-white/95 font-bold text-xs hidden md:inline whitespace-nowrap">
+                  انضم الآن
+                </span>
+                <ChevronLeft className="w-4 h-4 lg:w-5 lg:h-5 text-white/95 flex-shrink-0" />
+              </div>
             </button>
             <button
               onClick={() => setShowPartnerBanner(false)}
-              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors ml-2"
+              className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center rounded-full hover:bg-white/20 active:bg-white/30 transition-all duration-200 flex-shrink-0"
+              style={{
+                border: '1px solid rgba(255, 255, 255, 0.2)'
+              }}
             >
-              <X className="w-4 h-4 text-white" />
+              <X className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
             </button>
           </div>
         </div>
