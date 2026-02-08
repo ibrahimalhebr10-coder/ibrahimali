@@ -18,10 +18,10 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden">
       {/* Background Image with Overlay */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat"
         style={{
           backgroundImage: `url('https://images.pexels.com/photos/2132250/pexels-photo-2132250.jpeg?auto=compress&cs=tinysrgb&w=1920')`,
         }}
@@ -30,21 +30,21 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col h-screen">
+      <div className="relative z-10 flex flex-col">
         {/* Hero Section */}
-        <div className="flex-1 flex flex-col items-center justify-start px-4 pt-8 pb-20">
+        <div className="flex flex-col items-center justify-start px-4 pt-2 pb-16">
           {/* Main Heading */}
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 text-center mb-1.5 leading-tight">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-800 text-center mb-1 leading-tight">
             استثمر في الزراعة بثقة
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base md:text-lg text-gray-700 text-center mb-3">
+          <p className="text-base md:text-lg text-gray-700 text-center mb-2">
             أصول حقيقية • إدارة احترافية
           </p>
 
           {/* Trust Badge */}
-          <div className="bg-white/80 backdrop-blur-md rounded-xl px-4 py-2 shadow-lg mb-3">
+          <div className="bg-white/80 backdrop-blur-md rounded-xl px-4 py-1.5 shadow-lg mb-2">
             <div className="flex items-center justify-center gap-1.5">
               <Shield className="w-4 h-4 text-amber-600" />
               <span className="text-gray-800 font-semibold text-xs">أكثر من 500 مستثمر</span>
@@ -56,7 +56,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
           {/* Video Button */}
           <button
             onClick={() => setShowVideoPlayer(true)}
-            className="bg-white/80 backdrop-blur-md rounded-full px-5 py-2.5 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 mb-3"
+            className="bg-white/80 backdrop-blur-md rounded-full px-5 py-2.5 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 mb-2"
           >
             <div className="bg-green-700 rounded-full p-1">
               <Play className="w-3.5 h-3.5 text-white fill-white" />
@@ -67,12 +67,12 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
           </button>
 
           {/* What Are You Looking For Section */}
-          <h2 className="text-lg md:text-xl font-bold text-gray-800 text-center mb-3">
+          <h2 className="text-lg md:text-xl font-bold text-gray-800 text-center mb-2">
             ما الذي تبحث عنه؟
           </h2>
 
           {/* Three Cards */}
-          <div className="grid grid-cols-3 gap-2 w-full max-w-xl mb-3 px-2">
+          <div className="grid grid-cols-3 gap-2 w-full max-w-xl mb-2 px-2">
             {/* Card 1: Stable Income */}
             <div className="bg-white/70 backdrop-blur-md rounded-lg p-2.5 shadow-lg flex flex-col items-center justify-center min-h-[95px]">
               <div className="relative mb-1.5">
