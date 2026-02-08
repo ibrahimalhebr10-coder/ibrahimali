@@ -5,8 +5,12 @@ import FeaturedPackageManager from './FeaturedPackageManager';
 import InfluencerSettingsManager from './InfluencerSettingsManager';
 import PartnerShareMessageManager from './PartnerShareMessageManager';
 
-const MarketingManagement = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'influencers' | 'featured' | 'settings' | 'share-message'>('overview');
+interface MarketingManagementProps {
+  initialTab?: 'overview' | 'influencers' | 'featured' | 'settings' | 'share-message';
+}
+
+const MarketingManagement = ({ initialTab = 'overview' }: MarketingManagementProps) => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'influencers' | 'featured' | 'settings' | 'share-message'>(initialTab);
 
   return (
     <div className="space-y-6">

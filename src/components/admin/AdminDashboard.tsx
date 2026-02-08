@@ -47,8 +47,16 @@ type AdminSection =
   | 'assistant'
   | 'settings';
 
-const AdminDashboard: React.FC = () => {
-  const [activeSection, setActiveSection] = useState<AdminSection>('overview');
+interface AdminDashboardProps {
+  initialSection?: AdminSection;
+  initialMarketingTab?: 'overview' | 'influencers' | 'featured' | 'settings' | 'share-message';
+}
+
+const AdminDashboard: React.FC<AdminDashboardProps> = ({
+  initialSection = 'overview',
+  initialMarketingTab
+}) => {
+  const [activeSection, setActiveSection] = useState<AdminSection>(initialSection);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { logout } = useAdminAuth();
 
@@ -100,7 +108,7 @@ const AdminDashboard: React.FC = () => {
       case 'packages':
         return <PackagesManagement />;
       case 'marketing':
-        return <MarketingManagement />;
+        return <MarketingManagement initialTab={initialMarketingTab} />;
       case 'content':
         return <ContentManagement />;
       case 'videos':

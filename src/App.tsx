@@ -82,6 +82,8 @@ function AppContent() {
   const [showQuickAccountAccess, setShowQuickAccountAccess] = useState(false);
   const [showAdminDashboard, setShowAdminDashboard] = useState(false);
   const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminInitialSection, setAdminInitialSection] = useState<'overview' | 'farms' | 'farm-offers' | 'hot-leads' | 'customers' | 'operations' | 'finance' | 'packages' | 'marketing' | 'content' | 'videos' | 'assistant' | 'settings'>('overview');
+  const [adminInitialMarketingTab, setAdminInitialMarketingTab] = useState<'overview' | 'influencers' | 'featured' | 'settings' | 'share-message' | undefined>(undefined);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [selectedInvestmentFarm, setSelectedInvestmentFarm] = useState<FarmProject | null>(null);
   const [selectedFarmMode, setSelectedFarmMode] = useState<AppMode | null>(null);
@@ -685,7 +687,12 @@ function AppContent() {
       <ErrorBoundary>
         <NewHomePage
           onStartInvestment={handleStartInvestment}
-          onOpenPartnerProgram={() => setShowSuccessPartnerIntro(true)}
+          onOpenPartnerProgram={() => {
+            console.log('🎯 Opening Partner Program - Going to Admin Dashboard');
+            setAdminInitialSection('marketing');
+            setAdminInitialMarketingTab('influencers');
+            setShowAdminLogin(true);
+          }}
           onOpenAccount={() => setShowQuickAccountAccess(true)}
           onOpenAssistant={() => setShowAdvancedAssistant(true)}
           onOfferFarm={handleOfferFarmClick}
@@ -1524,12 +1531,20 @@ function AppContent() {
       {(showAdminDashboard || showAdminLogin) && (
         <>
           {admin ? (
-            <AdminDashboard />
+            <AdminDashboard
+              initialSection={adminInitialSection}
+              initialMarketingTab={adminInitialMarketingTab}
+            />
           ) : (
             <AdminLogin
               onLoginSuccess={() => {
                 setShowAdminLogin(false);
                 setShowAdminDashboard(true);
+                // Reset to defaults after successful login
+                setTimeout(() => {
+                  setAdminInitialSection('overview');
+                  setAdminInitialMarketingTab(undefined);
+                }, 1000);
               }}
             />
           )}
