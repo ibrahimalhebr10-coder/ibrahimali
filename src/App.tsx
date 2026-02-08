@@ -752,37 +752,33 @@ function AppContent() {
                   </h2>
                 </div>
 
-                {/* Tree Type Filters - Square Cards with Images */}
-                <section className="px-3 pb-2">
+                {/* Tree Type Filters - Exact Design Match */}
+                <section className="px-4 pb-3">
           {categories.length === 0 ? (
             <div className="text-center py-4 text-gray-500 animate-pulse">
               <p className="text-sm">جاري تحميل الفئات...</p>
             </div>
           ) : (
-          <div className="flex gap-2 justify-center">
-            {[{ slug: 'all', name: 'الكل', icon: 'all', image: 'https://images.pexels.com/photos/1132047/pexels-photo-1132047.jpeg?auto=compress&cs=tinysrgb&w=150' },
-              ...categories.map(cat => ({
-                ...cat,
-                image: cat.icon === 'palm-tree' || cat.icon === 'treepine'
-                  ? 'https://images.pexels.com/photos/1420440/pexels-photo-1420440.jpeg?auto=compress&cs=tinysrgb&w=150'
-                  : cat.icon === 'leaf'
-                    ? 'https://images.pexels.com/photos/1407305/pexels-photo-1407305.jpeg?auto=compress&cs=tinysrgb&w=150'
-                    : 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=150'
-              }))
-            ].map((category, idx) => {
+          <div className="flex gap-3 justify-center">
+            {[
+              { slug: 'all', name: 'الكل', icon: 'all', image: 'https://images.pexels.com/photos/1132047/pexels-photo-1132047.jpeg?auto=compress&cs=tinysrgb&w=200' },
+              { slug: 'palm', name: 'النخيل', icon: 'palm-tree', image: 'https://images.pexels.com/photos/1591447/pexels-photo-1591447.jpeg?auto=compress&cs=tinysrgb&w=200' },
+              { slug: 'olive', name: 'الزيتون', icon: 'leaf', image: 'https://images.pexels.com/photos/1407305/pexels-photo-1407305.jpeg?auto=compress&cs=tinysrgb&w=200' },
+              { slug: 'mango', name: 'المانجا', icon: 'fruit', image: 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=200' }
+            ].map((category) => {
               const isActive = activeCategory === category.slug;
 
               return (
-                <div key={category.slug} className="flex flex-col items-center gap-1">
+                <div key={category.slug} className="flex flex-col items-center gap-1.5">
                   <button
                     onClick={() => handleCategoryChange(category.slug)}
-                    className="w-12 h-12 rounded-lg overflow-hidden transition-all duration-300 relative"
+                    className="w-16 h-16 rounded-xl overflow-hidden transition-all duration-300 relative"
                     style={{
                       boxShadow: isActive
-                        ? '0 4px 12px rgba(45, 106, 79, 0.5), inset 0 0 0 3px #3d8b6e'
-                        : '0 2px 8px rgba(0,0,0,0.1)',
-                      border: isActive ? '3px solid #3d8b6e' : '1px solid #e0e0e0',
-                      background: '#f5f5f5'
+                        ? '0 6px 20px rgba(45, 106, 79, 0.5)'
+                        : '0 4px 12px rgba(0,0,0,0.12)',
+                      border: isActive ? '3px solid #3d8b6e' : '2px solid #e5e5e5',
+                      background: '#f8f8f8'
                     }}
                   >
                     <img
@@ -791,10 +787,13 @@ function AppContent() {
                       className="w-full h-full object-cover"
                     />
                     {isActive && (
-                      <div className="absolute inset-0 bg-green-800/20" />
+                      <div className="absolute inset-0 bg-green-700/15" />
                     )}
                   </button>
-                  <span className={`text-xs font-bold ${isActive ? 'text-green-800' : 'text-gray-600'}`}>
+                  <span
+                    className="text-xs font-bold"
+                    style={{ color: isActive ? '#2d6a4f' : '#6b7280' }}
+                  >
                     {category.name}
                   </span>
                 </div>
@@ -809,7 +808,7 @@ function AppContent() {
                 ref={scrollContainerRef}
                 className="flex-1 overflow-y-auto overflow-x-hidden"
                 style={{
-                  paddingBottom: '0',
+                  paddingBottom: '110px',
                   WebkitOverflowScrolling: 'touch',
                   overscrollBehavior: 'contain',
                   scrollBehavior: 'auto',
@@ -817,7 +816,7 @@ function AppContent() {
                 }}
               >
                 <div className="max-w-7xl mx-auto">
-                  <section className="px-3 lg:px-4 pb-0 lg:pb-0 pt-6 lg:pt-4">
+                  <section className="px-4 lg:px-4 pb-4 lg:pb-3 pt-2 lg:pt-4">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-4 animate-fadeIn">
               <div className="relative">
@@ -924,20 +923,20 @@ function AppContent() {
                         setSelectedInvestmentFarm(farm);
                         setSelectedFarmMode(appMode);
                       }}
-                      className="flex-shrink-0 w-[92%] lg:w-[calc(50%-1rem)] xl:w-[calc(33.333%-1rem)] rounded-3xl overflow-hidden text-right relative cursor-pointer transition-all duration-500 group animate-fadeIn snap-center"
+                      className="flex-shrink-0 w-[88%] lg:w-[calc(50%-1rem)] xl:w-[calc(33.333%-1rem)] rounded-3xl overflow-hidden text-right relative cursor-pointer transition-all duration-500 group animate-fadeIn snap-center"
                       style={{
-                        background: 'linear-gradient(180deg, #faf8f5 0%, #f5f3ef 100%)',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0,0,0,0.08)',
-                        border: '1px solid rgba(200,195,185,0.4)',
+                        background: 'linear-gradient(180deg, #fdfcfa 0%, #f7f5f2 100%)',
+                        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0,0,0,0.08)',
+                        border: '1px solid rgba(220,215,205,0.5)',
                         animationDelay: `${idx * 100}ms`
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-4px)';
-                        e.currentTarget.style.boxShadow = '0 16px 48px rgba(0, 0, 0, 0.2)';
+                        e.currentTarget.style.transform = 'translateY(-6px)';
+                        e.currentTarget.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.18)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.15)';
+                        e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.12)';
                       }}
                       onTouchStart={(e) => {
                         e.currentTarget.style.transform = 'scale(0.98)';
@@ -946,61 +945,62 @@ function AppContent() {
                         e.currentTarget.style.transform = 'scale(1)';
                       }}
                     >
-                      {/* Farm Image Section */}
-                      <div className="relative w-full h-28 overflow-hidden rounded-t-3xl">
+                      {/* Farm Image Section - Larger */}
+                      <div className="relative w-full h-44 overflow-hidden rounded-t-3xl">
                         <img
                           src={farm.image}
                           alt={farm.name}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
 
                         {/* Farm Name Badge - Top Center */}
                         <div
-                          className="absolute top-3 left-1/2 -translate-x-1/2 px-5 py-2 rounded-full"
+                          className="absolute top-4 left-1/2 -translate-x-1/2 px-6 py-2.5 rounded-full"
                           style={{
                             background: 'linear-gradient(135deg, #3d8b6e 0%, #2d6a4f 100%)',
-                            boxShadow: '0 4px 12px rgba(45, 106, 79, 0.5)'
+                            boxShadow: '0 6px 20px rgba(45, 106, 79, 0.5)'
                           }}
                         >
-                          <span className="text-sm font-bold text-white whitespace-nowrap">
+                          <span className="text-base font-bold text-white whitespace-nowrap">
                             {farm.name}
                           </span>
                         </div>
 
-                        {/* Return Rate Badge - Right Side */}
+                        {/* Return Rate Badge - Left Side (looks right in RTL) */}
                         <div
-                          className="absolute top-1/2 -translate-y-1/2 -left-1 w-16 h-16 rounded-full flex flex-col items-center justify-center"
+                          className="absolute top-1/2 -translate-y-1/2 left-3 w-20 h-20 rounded-full flex flex-col items-center justify-center"
                           style={{
-                            background: 'linear-gradient(135deg, #f5edd6 0%, #d4b85a 40%, #c9a227 60%, #f5edd6 100%)',
-                            border: '3px solid rgba(255,255,255,0.95)',
-                            boxShadow: '0 4px 16px rgba(169, 124, 0, 0.4), inset 0 2px 4px rgba(255,255,255,0.6)'
+                            background: 'linear-gradient(145deg, #f8f0d4 0%, #e8c84a 30%, #c9a227 70%, #f5edd6 100%)',
+                            border: '4px solid rgba(255,255,255,0.95)',
+                            boxShadow: '0 8px 24px rgba(169, 124, 0, 0.45), inset 0 2px 6px rgba(255,255,255,0.7)'
                           }}
                         >
-                          <span className="text-[9px] text-amber-900 font-semibold">عائد سنوي</span>
-                          <div className="flex items-center">
-                            <span className="text-xl font-black text-amber-900">{farm.returnRate}</span>
-                            <TrendingUp className="w-3 h-3 text-amber-700 mr-0.5" strokeWidth={3} />
+                          <span className="text-[10px] text-amber-900 font-bold">عائد سنوي</span>
+                          <div className="flex items-center gap-0.5">
+                            <span className="text-2xl font-black text-amber-900">{farm.returnRate}</span>
+                            <TrendingUp className="w-4 h-4 text-green-700" strokeWidth={3} />
                           </div>
                         </div>
                       </div>
 
                       {/* Card Content */}
-                      <div className="p-3 space-y-2">
+                      <div className="p-4 space-y-3">
                         {/* Available Trees */}
                         <div className="flex items-center justify-center gap-2">
-                          <span className="text-base font-bold text-gray-800">
+                          <span className="text-lg font-bold text-gray-800">
                             {totalTrees} شجرة متاحة للاستثمار
                           </span>
-                          <CheckCircle2 className="w-5 h-5 text-green-600" strokeWidth={2.5} />
+                          <CheckCircle2 className="w-6 h-6 text-green-600" strokeWidth={2.5} />
                         </div>
 
                         {/* Progress Bar - Exact Design */}
-                        <div className="space-y-2">
+                        <div className="space-y-2.5">
                           <div
-                            className="relative h-4 rounded-full overflow-hidden"
+                            className="relative h-5 rounded-full overflow-hidden"
                             style={{
-                              background: '#e8e4dc',
-                              boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)'
+                              background: 'linear-gradient(180deg, #e5e2db 0%, #ddd9d0 100%)',
+                              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
                             }}
                           >
                             {/* Available Section - Green from right */}
@@ -1008,7 +1008,7 @@ function AppContent() {
                               className="absolute right-0 top-0 h-full rounded-r-full"
                               style={{
                                 width: `${availablePercentage}%`,
-                                background: 'linear-gradient(90deg, #4ade80 0%, #22c55e 50%, #16a34a 100%)',
+                                background: 'linear-gradient(90deg, #6ee7b7 0%, #34d399 30%, #10b981 70%, #059669 100%)',
                               }}
                             />
                             {/* Reserved Section - Yellow/Gold */}
@@ -1017,31 +1017,31 @@ function AppContent() {
                               style={{
                                 right: `${availablePercentage}%`,
                                 width: `${reservationPercentage}%`,
-                                background: 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)',
+                                background: 'linear-gradient(90deg, #fde047 0%, #facc15 50%, #eab308 100%)',
                               }}
                             />
                           </div>
 
                           {/* Status Labels Row */}
-                          <div className="flex items-center justify-between text-xs px-1">
-                            <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 rounded-full bg-green-500" />
-                              <span className="font-semibold text-gray-700">متاح</span>
+                          <div className="flex items-center justify-between text-sm px-1">
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-3.5 h-3.5 rounded-full" style={{ background: 'linear-gradient(135deg, #34d399 0%, #059669 100%)' }} />
+                              <span className="font-bold text-gray-700">متاح</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <div className="w-3 h-3 rounded-full bg-amber-400" />
-                              <span className="font-semibold text-gray-700">محجوز</span>
+                            <div className="flex items-center gap-1.5">
+                              <div className="w-3.5 h-3.5 rounded-full" style={{ background: 'linear-gradient(135deg, #fde047 0%, #eab308 100%)' }} />
+                              <span className="font-bold text-gray-700">محجوز</span>
                             </div>
-                            <span className="font-bold text-gray-800">
+                            <span className="font-black text-gray-900 text-base">
                               {reservationPercentage.toFixed(0)}%
                             </span>
                           </div>
                         </div>
 
                         {/* Management Info */}
-                        <div className="flex items-center justify-center gap-1.5 pt-1 text-sm text-gray-600">
-                          <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                          <span className="font-medium">الإدارة والمتابعة من فريق متخصص</span>
+                        <div className="flex items-center justify-center gap-2 pt-1 text-sm text-gray-600">
+                          <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+                          <span className="font-semibold">الإدارة والمتابعة من فريق متخصص</span>
                         </div>
                       </div>
                     </div>
