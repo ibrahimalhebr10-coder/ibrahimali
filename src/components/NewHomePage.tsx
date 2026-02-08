@@ -327,7 +327,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
       {/* Content */}
       <div className="scrollbar-hide" style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', minHeight: '100dvh', paddingTop: partnerBannerEnabled && showPartnerBanner ? '96px' : '56px', overflowX: 'hidden', width: '100%' }}>
         {/* Hero Section */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', paddingBottom: '100px' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', paddingBottom: isMobile ? '180px' : '200px' }}>
           <div className="w-full max-w-lg space-y-3">
             {/* Main Heading - Compact */}
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 text-center leading-tight drop-shadow-md">
@@ -497,17 +497,17 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
         </div>
       </div>
 
-      {/* Smart Assistant Icon - Floating Above Footer - Right Side */}
+      {/* Smart Assistant Icon - Floating Above Footer - Right Side - Smaller Size */}
       {!hideFooter && ReactDOM.createPortal(
         <div
           style={{
             position: 'fixed',
-            bottom: isMobile ? '90px' : '100px',
+            bottom: isMobile ? '110px' : '120px',
             right: isMobile ? '16px' : '24px',
             zIndex: 2147483648
           }}
         >
-          <SmartAssistantIcon onClick={onOpenAssistant} />
+          <SmartAssistantIcon size={48} onClick={onOpenAssistant} />
         </div>,
         document.body
       )}

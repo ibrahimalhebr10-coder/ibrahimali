@@ -14,8 +14,8 @@ const SmartAssistantIcon: React.FC<SmartAssistantIconProps> = ({ size = 70, onCl
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '8px',
-        padding: '8px'
+        gap: size >= 60 ? '8px' : '6px',
+        padding: size >= 60 ? '8px' : '6px'
       }}
     >
       {/* الروبوت المتطور */}
@@ -195,7 +195,7 @@ const SmartAssistantIcon: React.FC<SmartAssistantIconProps> = ({ size = 70, onCl
       <div
         style={{
           fontFamily: '"Tajawal", "Cairo", "Almarai", -apple-system, sans-serif',
-          fontSize: '13px',
+          fontSize: size >= 60 ? '13px' : '11px',
           fontWeight: 700,
           background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%)',
           WebkitBackgroundClip: 'text',
