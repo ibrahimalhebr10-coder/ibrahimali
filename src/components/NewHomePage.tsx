@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { Play, Shield, TrendingUp, Star, Handshake, User, Sprout, Sparkles, CheckCircle, ChevronLeft, Users, TreePine, Calendar, Award, Zap } from 'lucide-react';
 import StreamingVideoPlayer from './StreamingVideoPlayer';
 import { supabase } from '../lib/supabase';
@@ -73,25 +74,31 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   }, []);
 
   return (
-    <>
-    <div className="relative h-screen overflow-hidden">
+    <div style={{ minHeight: '100vh', minHeight: '100dvh', position: 'relative' }}>
       {/* Background Image with Gradient Overlay */}
       <div
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat"
         style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
           backgroundImage: `url('https://images.pexels.com/photos/2132250/pexels-photo-2132250.jpeg?auto=compress&cs=tinysrgb&w=1920')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          zIndex: 0
         }}
       >
-        {/* Multi-layer Gradient: Clear top, white fog bottom */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/10 to-white/80"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent opacity-60"></div>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(255,255,255,0.3), rgba(255,255,255,0.1), rgba(255,255,255,0.8))' }}></div>
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, white, transparent, transparent)', opacity: 0.6 }}></div>
       </div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col h-full">
-        {/* Hero Section - Optimized for Single Screen View */}
-        <div className="flex-1 flex flex-col items-center justify-center px-4 py-4 safe-top overflow-y-auto scrollbar-hide">
-          <div className="w-full max-w-lg space-y-3 pb-24">
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', minHeight: '100vh', minHeight: '100dvh' }}>
+        {/* Hero Section */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', paddingBottom: '100px' }}>
+          <div className="w-full max-w-lg space-y-3">
             {/* Main Heading - Compact */}
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900 text-center leading-tight drop-shadow-md">
               استثمر في الزراعة بثقة
@@ -267,103 +274,107 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
             </button>
           </div>
         </div>
-
       </div>
-    </div>
 
-    {/* Fixed Bottom Footer - OUTSIDE overflow-hidden container */}
-    <div
-      id="main-footer"
-      style={{
-        position: 'fixed',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        zIndex: 99999,
-        background: 'linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.98) 100%)',
-        borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-        boxShadow: '0 -8px 30px rgba(0, 0, 0, 0.12)',
-        WebkitTransform: 'translate3d(0, 0, 0)',
-        transform: 'translate3d(0, 0, 0)'
-      }}
-    >
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '12px 16px',
-          paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
-          maxWidth: '500px',
-          margin: '0 auto'
-        }}
-      >
-        <button
-          onClick={onOpenAccount}
+      {/* Fixed Bottom Footer - Rendered via Portal to body */}
+      {ReactDOM.createPortal(
+        <div
+          id="home-footer-portal"
           style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '4px',
-            minWidth: '60px',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer'
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 2147483647,
+            background: '#ffffff',
+            borderTop: '1px solid #e5e7eb',
+            boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.15)',
+            WebkitTransform: 'translate3d(0, 0, 0)',
+            transform: 'translate3d(0, 0, 0)',
+            willChange: 'transform'
           }}
         >
-          <User style={{ width: '24px', height: '24px', color: '#374151' }} />
-          <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>حسابي</span>
-        </button>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '14px 20px',
+              paddingBottom: 'max(14px, env(safe-area-inset-bottom))',
+              maxWidth: '500px',
+              margin: '0 auto'
+            }}
+          >
+            <button
+              onClick={onOpenAccount}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
+                minWidth: '60px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px'
+              }}
+            >
+              <User style={{ width: '24px', height: '24px', color: '#374151' }} />
+              <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>حسابي</span>
+            </button>
 
-        <button
-          onClick={onStartInvestment}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '12px 24px',
-            borderRadius: '9999px',
-            background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
-            boxShadow: '0 4px 15px rgba(21, 128, 61, 0.4)',
-            border: 'none',
-            cursor: 'pointer'
-          }}
-        >
-          <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} />
-          <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '14px' }}>ابدأ الاستثمار</span>
-        </button>
+            <button
+              onClick={onStartInvestment}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '14px 28px',
+                borderRadius: '9999px',
+                background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
+                boxShadow: '0 4px 15px rgba(21, 128, 61, 0.4)',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} />
+              <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '15px' }}>ابدأ الاستثمار</span>
+            </button>
 
-        <button
-          onClick={onOpenAssistant}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '4px',
-            minWidth: '60px',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer'
-          }}
-        >
-          <Sparkles style={{ width: '24px', height: '24px', color: '#374151' }} />
-          <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>المساعد</span>
-        </button>
-      </div>
-    </div>
+            <button
+              onClick={onOpenAssistant}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
+                minWidth: '60px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px'
+              }}
+            >
+              <Sparkles style={{ width: '24px', height: '24px', color: '#374151' }} />
+              <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>المساعد</span>
+            </button>
+          </div>
+        </div>,
+        document.body
+      )}
 
-    {/* Video Player Modal */}
-    {showVideoPlayer && (
-      <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
-        <div className="w-full max-w-4xl">
-          <StreamingVideoPlayer
-            videoUrl=""
-            onClose={() => setShowVideoPlayer(false)}
-          />
+      {/* Video Player Modal */}
+      {showVideoPlayer && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
+          <div className="w-full max-w-4xl">
+            <StreamingVideoPlayer
+              videoUrl=""
+              onClose={() => setShowVideoPlayer(false)}
+            />
+          </div>
         </div>
-      </div>
-    )}
-    </>
+      )}
+    </div>
   );
 };
 
