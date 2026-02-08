@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Play, Shield, TrendingUp, Star, Handshake, User, Sprout, Sparkles, CheckCircle, ChevronLeft, Users, TreePine, Calendar, Award, Zap, Bell, X } from 'lucide-react';
 import IntroVideoPlayer from './IntroVideoPlayer';
+import NotificationCenter from './NotificationCenter';
 import { supabase } from '../lib/supabase';
 import { partnerShareMessageService } from '../services/partnerShareMessageService';
+import { getUnreadCount } from '../services/messagesService';
 
 interface NewHomePageProps {
   onStartInvestment: () => void;
@@ -39,6 +41,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   const [loadingVideo, setLoadingVideo] = useState(true);
   const [showPartnerBanner, setShowPartnerBanner] = useState(true);
   const [partnerBannerEnabled, setPartnerBannerEnabled] = useState(false);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [stats, setStats] = useState<PlatformStats>({
     totalReservations: 0,
     totalUsers: 0,
@@ -159,6 +162,19 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
     setShowVideoPlayer(true);
     console.log('✅ Video player opened');
   };
+
+  const handleUnreadCountChange = async () => {
+    try {
+      const count = await getUnreadCount();
+      setUnreadMessagesCount(count);
+    } catch (error) {
+      console.error('Error updating unread count:', error);
+    }
+  };
+
+  useEffect(() => {
+    handleUnreadCountChange();
+  }, []);
 
   return (
     <div style={{ minHeight: '100vh', minHeight: '100dvh', position: 'relative' }}>
@@ -466,42 +482,13 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
               gap: '8px'
             }}
           >
-            <button
-              onClick={onOpenAccount}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                minWidth: '60px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '4px'
-              }}
-            >
-              <User style={{ width: '24px', height: '24px', color: '#374151' }} />
-              <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>حسابي</span>
-            </button>
-
-            <button
-              onClick={() => {/* TODO: Implement notifications */}}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                minWidth: '60px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '4px',
-                position: 'relative'
-              }}
-            >
-              <Bell style={{ width: '24px', height: '24px', color: '#374151' }} />
-              <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>الإشعارات</span>
-            </button>
+            <div style={{ minWidth: '60px', display: 'flex', justifyContent: 'center' }}>
+              <NotificationCenter
+                unreadCount={unreadMessagesCount}
+                onCountChange={handleUnreadCountChange}
+                onOpenChange={() => {}}
+              />
+            </div>
 
             <button
               onClick={onStartInvestment}
