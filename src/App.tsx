@@ -692,6 +692,80 @@ function AppContent() {
           onOpenAssistant={() => setShowAdvancedAssistant(true)}
           onOfferFarm={handleOfferFarmClick}
         />
+
+        {/* Partner Program Modals - Must be inside NewHomePage render */}
+        <SuccessPartnerIntro
+          isOpen={showSuccessPartnerIntro}
+          onClose={() => setShowSuccessPartnerIntro(false)}
+          onDiscover={() => {
+            setShowSuccessPartnerIntro(false);
+            setShowSuccessPartnerOnboarding(true);
+          }}
+        />
+
+        <SuccessPartnerOnboarding
+          isOpen={showSuccessPartnerOnboarding}
+          onClose={() => setShowSuccessPartnerOnboarding(false)}
+          onComplete={() => {
+            setShowSuccessPartnerOnboarding(false);
+            setShowSuccessPartnerRegistration(true);
+          }}
+        />
+
+        <SuccessPartnerRegistrationForm
+          isOpen={showSuccessPartnerRegistration}
+          onClose={() => setShowSuccessPartnerRegistration(false)}
+          onSuccess={() => {
+            setShowSuccessPartnerRegistration(false);
+            setShowSuccessPartnerWelcome(true);
+          }}
+        />
+
+        <SuccessPartnerWelcome
+          isOpen={showSuccessPartnerWelcome}
+          onExplore={() => {
+            setShowSuccessPartnerWelcome(false);
+            setShowHowItWorksPartner(true);
+          }}
+        />
+
+        <HowItWorksPartner
+          isOpen={showHowItWorksPartner}
+          onClose={() => setShowHowItWorksPartner(false)}
+        />
+
+        <AdvancedAIAssistant
+          isOpen={showAdvancedAssistant}
+          onClose={() => setShowAdvancedAssistant(false)}
+        />
+
+        {showQuickAccountAccess && (
+          <QuickAccountAccess
+            onLogin={handleQuickAccessLogin}
+            onRegister={handleQuickAccessRegister}
+            onOpenRegularAccount={handleOpenRegularAccount}
+            onOpenPartnerAccount={handleOpenPartnerAccount}
+            onClose={() => setShowQuickAccountAccess(false)}
+          />
+        )}
+
+        {showWelcomeToAccount && (
+          <WelcomeToAccountScreen
+            onStartNow={handleWelcomeStartNow}
+            onClose={() => setShowWelcomeToAccount(false)}
+          />
+        )}
+
+        {showStandaloneRegistration && (
+          <StandaloneAccountRegistration
+            onSuccess={handleRegistrationSuccess}
+            onBack={() => {
+              setShowStandaloneRegistration(false);
+              setStandaloneRegistrationMode('register');
+            }}
+            initialMode={standaloneRegistrationMode}
+          />
+        )}
       </ErrorBoundary>
     );
   }
