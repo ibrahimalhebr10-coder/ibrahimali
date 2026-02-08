@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Play, Shield, TrendingUp, Star, Handshake, User, Sprout, Sparkles, CheckCircle, ChevronLeft, Users, TreePine, Calendar, Award, Zap } from 'lucide-react';
+import { Play, Shield, TrendingUp, Star, Handshake, User, Sprout, Sparkles, CheckCircle, ChevronLeft, Users, TreePine, Calendar, Award, Zap, Bell, X } from 'lucide-react';
 import IntroVideoPlayer from './IntroVideoPlayer';
 import { supabase } from '../lib/supabase';
+import { partnerShareMessageService } from '../services/partnerShareMessageService';
 
 interface NewHomePageProps {
   onStartInvestment: () => void;
@@ -36,6 +37,8 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [introVideo, setIntroVideo] = useState<IntroVideo | null>(null);
   const [loadingVideo, setLoadingVideo] = useState(true);
+  const [showPartnerBanner, setShowPartnerBanner] = useState(true);
+  const [partnerBannerEnabled, setPartnerBannerEnabled] = useState(false);
   const [stats, setStats] = useState<PlatformStats>({
     totalReservations: 0,
     totalUsers: 0,
@@ -82,6 +85,20 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
     };
 
     fetchStats();
+  }, []);
+
+  // Fetch partner banner status
+  useEffect(() => {
+    const fetchPartnerBannerStatus = async () => {
+      try {
+        const template = await partnerShareMessageService.getTemplate();
+        setPartnerBannerEnabled(template.enabled);
+      } catch (error) {
+        console.error('Error fetching partner banner status:', error);
+      }
+    };
+
+    fetchPartnerBannerStatus();
   }, []);
 
   // Fetch active intro video
@@ -145,6 +162,88 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
 
   return (
     <div style={{ minHeight: '100vh', minHeight: '100dvh', position: 'relative' }}>
+      {/* Header */}
+      <header
+        className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between backdrop-blur-2xl flex-shrink-0 fixed left-0 right-0 top-0"
+        style={{
+          background: 'linear-gradient(135deg, rgba(248, 250, 249, 0.98) 0%, rgba(242, 247, 244, 0.96) 100%)',
+          borderBottom: '3px solid rgba(58,161,126,0.4)',
+          boxShadow: '0 6px 24px rgba(0, 0, 0, 0.1), inset 0 -1px 0 rgba(255,255,255,0.8)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          zIndex: 9999
+        }}
+      >
+        <button
+          onClick={() => window.location.href = '/'}
+          className="flex items-center gap-2 lg:gap-4 transition-all duration-300 hover:scale-105 active:scale-95 group"
+        >
+          <div
+            className="relative w-10 h-10 lg:w-12 lg:h-12 rounded-xl flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:shadow-xl"
+            style={{
+              background: 'linear-gradient(145deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)',
+              boxShadow: '0 4px 12px rgba(58,161,126,0.4), inset 0 1px 2px rgba(255,255,255,0.3)',
+              border: '2px solid rgba(255,255,255,0.3)'
+            }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-white/20 pointer-events-none"></div>
+            <Sprout className="w-5 h-5 lg:w-7 lg:h-7 text-white drop-shadow-2xl relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }} />
+          </div>
+          <div className="flex flex-col leading-none">
+            <h1
+              className="text-sm lg:text-2xl font-black transition-all duration-300 group-hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #3AA17E 0%, #2F8266 50%, #3AA17E 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                letterSpacing: '-0.01em'
+              }}
+            >
+              حصص زراعية
+            </h1>
+            <p className="text-[8px] lg:text-sm text-darkgreen/70 font-bold mt-0.5">
+              استثمر واربح
+            </p>
+          </div>
+        </button>
+      </header>
+
+      {/* Partner Success Banner */}
+      {partnerBannerEnabled && showPartnerBanner && (
+        <div
+          style={{
+            position: 'fixed',
+            top: '56px',
+            left: 0,
+            right: 0,
+            zIndex: 9998,
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.95) 0%, rgba(217, 119, 6, 0.95) 100%)',
+            boxShadow: '0 4px 12px rgba(245, 158, 11, 0.3)',
+            backdropFilter: 'blur(12px)'
+          }}
+          className="lg:top-16"
+        >
+          <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
+            <button
+              onClick={onOpenPartnerProgram}
+              className="flex items-center gap-2 flex-1 transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Handshake className="w-5 h-5 text-white drop-shadow-md flex-shrink-0" />
+              <span className="text-white font-bold text-sm lg:text-base">
+                انضم لبرنامج شركاء النجاح واربح من كل حجز!
+              </span>
+              <ChevronLeft className="w-4 h-4 text-white/90 flex-shrink-0" />
+            </button>
+            <button
+              onClick={() => setShowPartnerBanner(false)}
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors ml-2"
+            >
+              <X className="w-4 h-4 text-white" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Background Image with Gradient Overlay */}
       <div
         style={{
@@ -165,7 +264,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
       </div>
 
       {/* Content */}
-      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', minHeight: '100vh', minHeight: '100dvh' }}>
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', minHeight: '100vh', minHeight: '100dvh', paddingTop: partnerBannerEnabled && showPartnerBanner ? '96px' : '56px' }}>
         {/* Hero Section */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', paddingBottom: '100px' }}>
           <div className="w-full max-w-lg space-y-3">
@@ -333,22 +432,11 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
               </div>
             </div>
 
-            {/* Success Partner Button - Compact */}
-            <button
-              onClick={onOpenPartnerProgram}
-              className="bg-white/80 backdrop-blur-md rounded-full px-5 py-2.5 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 border border-white/60 w-full justify-center"
-            >
-              <Handshake className="w-4 h-4 text-amber-600 drop-shadow-md" />
-              <span className="text-gray-900 font-bold text-sm">
-                كن شريك نجاح
-              </span>
-              <ChevronLeft className="w-4 h-4 text-gray-700" />
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Fixed Bottom Footer - Rendered via Portal to body */}
+      {/* Fixed Bottom Footer - Unified Design for Mobile & Desktop */}
       {ReactDOM.createPortal(
         <div
           id="home-footer-portal"
@@ -373,8 +461,9 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
               justifyContent: 'space-between',
               padding: '14px 20px',
               paddingBottom: 'max(14px, env(safe-area-inset-bottom))',
-              maxWidth: '500px',
-              margin: '0 auto'
+              maxWidth: '600px',
+              margin: '0 auto',
+              gap: '8px'
             }}
           >
             <button
@@ -396,12 +485,31 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
             </button>
 
             <button
+              onClick={() => {/* TODO: Implement notifications */}}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
+                minWidth: '60px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '4px',
+                position: 'relative'
+              }}
+            >
+              <Bell style={{ width: '24px', height: '24px', color: '#374151' }} />
+              <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>الإشعارات</span>
+            </button>
+
+            <button
               onClick={onStartInvestment}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                padding: '14px 28px',
+                padding: '14px 24px',
                 borderRadius: '9999px',
                 background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
                 boxShadow: '0 4px 15px rgba(21, 128, 61, 0.4)',
@@ -410,7 +518,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
               }}
             >
               <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} />
-              <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '15px' }}>ابدأ الاستثمار</span>
+              <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '15px' }}>ابدأ</span>
             </button>
 
             <button
