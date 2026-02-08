@@ -809,7 +809,7 @@ function AppContent() {
                 ref={scrollContainerRef}
                 className="flex-1 overflow-y-auto overflow-x-hidden"
                 style={{
-                  paddingBottom: '80px',
+                  paddingBottom: '0',
                   WebkitOverflowScrolling: 'touch',
                   overscrollBehavior: 'contain',
                   scrollBehavior: 'auto',
@@ -817,7 +817,7 @@ function AppContent() {
                 }}
               >
                 <div className="max-w-7xl mx-auto">
-                  <section className="px-3 lg:px-4 pb-1 lg:pb-2 pt-2 lg:pt-2">
+                  <section className="px-3 lg:px-4 pb-0 lg:pb-0 pt-6 lg:pt-4">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-4 animate-fadeIn">
               <div className="relative">
