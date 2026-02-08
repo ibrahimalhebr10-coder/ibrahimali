@@ -1216,121 +1216,143 @@ function AppContent() {
         <nav
           className="hidden lg:flex fixed left-0 right-0 backdrop-blur-2xl"
           style={{
-            background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.98) 0%, rgba(242, 247, 244, 0.98) 100%)',
-            borderTop: '3px solid rgba(58,161,126,0.4)',
-            boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.15)',
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 252, 250, 0.98) 100%)',
+            borderTop: '2px solid rgba(58,161,126,0.2)',
+            boxShadow: '0 -12px 40px rgba(0, 0, 0, 0.12)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             bottom: 0,
             zIndex: 99999
           }}
         >
-        <div className="max-w-7xl mx-auto w-full px-8 py-5 pb-8 flex items-center justify-around">
+        <div className="max-w-7xl mx-auto w-full px-8 py-6 flex items-center justify-around gap-8">
+          {/* زر اعرض مزرعتك - تصميم ثلاثي الأبعاد */}
           <button
             onClick={handleOfferFarmClick}
-            className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group relative overflow-hidden"
+            className="flex flex-col items-center gap-2.5 px-8 py-4 rounded-2xl transition-all duration-300 group relative overflow-hidden"
             style={{
-              background: 'linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%)',
-              boxShadow: '0 4px 12px rgba(212,175,55,0.4), inset 0 2px 4px rgba(255,255,255,0.9)',
-              border: '2px solid #b8942f'
+              background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+              boxShadow: '0 10px 25px rgba(240, 147, 251, 0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)',
+              border: 'none'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 8px 24px rgba(212,175,55,0.6), inset 0 2px 4px rgba(255,255,255,0.9)';
-              e.currentTarget.style.transform = 'scale(1.08)';
+              e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 15px 35px rgba(240, 147, 251, 0.5), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(212,175,55,0.4), inset 0 2px 4px rgba(255,255,255,0.9)';
-              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.transform = 'translateY(0) scale(1)';
+              e.currentTarget.style.boxShadow = '0 10px 25px rgba(240, 147, 251, 0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent"></div>
             <div className="relative">
-              <Plus className="w-4 h-4 absolute -top-1 -right-1 text-white group-hover:rotate-90 transition-transform duration-300" />
-              <Sprout className="w-6 h-6 text-white transition-transform duration-300 group-hover:scale-110" />
+              <div className="w-10 h-10 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center">
+                <Sprout className="w-5 h-5 text-white" strokeWidth={2.5} />
+                <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white/40 flex items-center justify-center">
+                  <Plus className="w-3 h-3 text-white group-hover:rotate-90 transition-transform duration-300" strokeWidth={3} />
+                </div>
+              </div>
             </div>
             <span className="text-sm font-bold text-white relative">اعرض مزرعتك</span>
           </button>
 
+          {/* زر المساعد الذكي */}
           <button
             onClick={() => setShowAdvancedAssistant(true)}
-            className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 hover:scale-105 relative group"
+            className="flex flex-col items-center gap-2.5 px-8 py-4 rounded-2xl transition-all duration-300 hover:scale-105 relative group"
+            style={{
+              background: 'linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.12) 100%)',
+              border: '2px solid rgba(16, 185, 129, 0.2)'
+            }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(16, 185, 129, 0.12) 0%, rgba(16, 185, 129, 0.18) 100%)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.2) 100%)';
+              e.currentTarget.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.25)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.12) 100%)';
               e.currentTarget.style.boxShadow = 'none';
             }}
           >
             <div className="relative">
-              <Sparkles className="w-6 h-6 text-emerald-600 transition-transform duration-300 group-hover:scale-110" />
+              <Sparkles className="w-7 h-7 text-emerald-600 transition-transform duration-300 group-hover:scale-110" strokeWidth={2} />
               <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full animate-pulse" style={{
                 background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
-                boxShadow: '0 0 10px rgba(212,175,55,0.6)'
+                boxShadow: '0 0 12px rgba(212,175,55,0.7)'
               }}></div>
             </div>
             <span className="text-sm font-bold text-emerald-600">المساعد الذكي</span>
           </button>
 
+          {/* زر أشجاري - تصميم ثلاثي الأبعاد محسّن */}
           <button
             onClick={handleMyFarmClick}
-            className="flex flex-col items-center gap-2 px-8 py-4 rounded-3xl transition-all duration-300 hover:scale-105 group relative"
+            className="flex flex-col items-center gap-2.5 px-10 py-5 rounded-3xl transition-all duration-300 group relative"
             style={{
               background: appMode === 'agricultural'
-                ? 'linear-gradient(145deg, rgba(58,161,126,0.25) 0%, rgba(58,161,126,0.15) 50%, rgba(58,161,126,0.25) 100%)'
-                : 'linear-gradient(145deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.15) 50%, rgba(212,175,55,0.25) 100%)',
+                ? 'linear-gradient(135deg, #3aa17e 0%, #2d7a5f 100%)'
+                : 'linear-gradient(135deg, #d4af37 0%, #b8942f 100%)',
               boxShadow: appMode === 'agricultural'
-                ? '0 8px 24px rgba(58,161,126,0.35), 0 4px 12px rgba(58,161,126,0.25), inset 0 2px 4px rgba(255,255,255,0.8)'
-                : '0 8px 24px rgba(212,175,55,0.35), 0 4px 12px rgba(212,175,55,0.25), inset 0 2px 4px rgba(255,255,255,0.8)',
-              border: appMode === 'agricultural' ? '3px solid rgba(58,161,126,0.5)' : '3px solid rgba(212,175,55,0.5)',
-              transform: 'scale(1.1)'
+                ? '0 12px 30px rgba(58,161,126,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)'
+                : '0 12px 30px rgba(212,175,55,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)',
+              border: 'none',
+              transform: 'scale(1.08)'
             }}
             onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'translateY(-4px) scale(1.12)';
               if (appMode === 'agricultural') {
-                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.35) 0%, rgba(58,161,126,0.25) 50%, rgba(58,161,126,0.35) 100%)';
-                e.currentTarget.style.boxShadow = '0 12px 32px rgba(58,161,126,0.45), 0 6px 16px rgba(58,161,126,0.35)';
+                e.currentTarget.style.boxShadow = '0 16px 40px rgba(58,161,126,0.5), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
               } else {
-                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(212,175,55,0.35) 0%, rgba(212,175,55,0.25) 50%, rgba(212,175,55,0.35) 100%)';
-                e.currentTarget.style.boxShadow = '0 12px 32px rgba(212,175,55,0.45), 0 6px 16px rgba(212,175,55,0.35)';
+                e.currentTarget.style.boxShadow = '0 16px 40px rgba(212,175,55,0.5), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
               }
             }}
             onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0) scale(1.08)';
               if (appMode === 'agricultural') {
-                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.25) 0%, rgba(58,161,126,0.15) 50%, rgba(58,161,126,0.25) 100%)';
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(58,161,126,0.35), 0 4px 12px rgba(58,161,126,0.25)';
+                e.currentTarget.style.boxShadow = '0 12px 30px rgba(58,161,126,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
               } else {
-                e.currentTarget.style.background = 'linear-gradient(145deg, rgba(212,175,55,0.25) 0%, rgba(212,175,55,0.15) 50%, rgba(212,175,55,0.25) 100%)';
-                e.currentTarget.style.boxShadow = '0 8px 24px rgba(212,175,55,0.35), 0 4px 12px rgba(212,175,55,0.25)';
+                e.currentTarget.style.boxShadow = '0 12px 30px rgba(212,175,55,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
               }
             }}
           >
-            <TreePine className="w-7 h-7 transition-transform duration-300 group-hover:scale-110" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37' }} />
-            <span className="text-sm font-bold" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37' }}>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent rounded-3xl"></div>
+            <div className="w-12 h-12 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center relative" style={{ boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+              <TreePine className="w-7 h-7 text-white transition-transform duration-300 group-hover:scale-110" strokeWidth={2.5} />
+            </div>
+            <span className="text-sm font-bold text-white relative">
               {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
             </span>
           </button>
 
+          {/* مركز الإشعارات */}
           <NotificationCenter
             unreadCount={unreadMessagesCount}
             onCountChange={handleUnreadCountChange}
             onOpenChange={setShowNotifications}
           />
 
+          {/* زر حسابي - تصميم ثلاثي الأبعاد */}
           <button
             onClick={handleMyAccountClick}
-            className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 hover:scale-105 group"
+            className="flex flex-col items-center gap-2.5 px-8 py-4 rounded-2xl transition-all duration-300 group relative overflow-hidden"
+            style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              boxShadow: '0 10px 25px rgba(102, 126, 234, 0.35), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)',
+              border: 'none'
+            }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(58,161,126,0.08) 0%, rgba(58,161,126,0.12) 100%)';
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(58,161,126,0.2)';
+              e.currentTarget.style.transform = 'translateY(-3px) scale(1.05)';
+              e.currentTarget.style.boxShadow = '0 15px 35px rgba(102, 126, 234, 0.45), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.boxShadow = 'none';
+              e.currentTarget.style.transform = 'translateY(0) scale(1)';
+              e.currentTarget.style.boxShadow = '0 10px 25px rgba(102, 126, 234, 0.35), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
             }}
           >
-            <User className="w-6 h-6 text-darkgreen transition-transform duration-300 group-hover:scale-110" />
-            <span className="text-sm font-bold text-darkgreen">حسابي</span>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent"></div>
+            <div className="w-10 h-10 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center relative" style={{ boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
+              <User className="w-5 h-5 text-white transition-transform duration-300 group-hover:scale-110" strokeWidth={2.5} />
+            </div>
+            <span className="text-sm font-bold text-white relative">حسابي</span>
           </button>
         </div>
       </nav>
@@ -1344,9 +1366,11 @@ function AppContent() {
             bottom: 0,
             left: 0,
             right: 0,
-            background: 'linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%)',
-            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-            boxShadow: '0 -8px 30px rgba(0, 0, 0, 0.15)',
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 252, 250, 0.98) 100%)',
+            borderTop: '1px solid rgba(58, 161, 126, 0.15)',
+            boxShadow: '0 -10px 40px rgba(0, 0, 0, 0.12)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
             zIndex: 2147483647,
             WebkitTransform: 'translate3d(0, 0, 0)',
             transform: 'translate3d(0, 0, 0)',
@@ -1356,118 +1380,205 @@ function AppContent() {
         >
           <div
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '12px 20px 14px 20px',
-              maxWidth: '1200px',
-              margin: '0 auto',
-              gap: '12px'
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr 1fr',
+              gap: '10px',
+              padding: '12px 16px 16px 16px',
+              maxWidth: '500px',
+              margin: '0 auto'
             }}
           >
-            {/* Smart Assistant Button - Far Left */}
-            <button
-              onClick={() => setShowAdvancedAssistant(true)}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '5px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                minWidth: '60px',
-                position: 'relative'
-              }}
-            >
-              <div style={{ position: 'relative' }}>
-                <Sparkles style={{ width: '26px', height: '26px', color: '#d4af37' }} strokeWidth={1.5} />
-                <div style={{
-                  position: 'absolute',
-                  top: '-2px',
-                  right: '-2px',
-                  width: '8px',
-                  height: '8px',
-                  borderRadius: '50%',
-                  background: '#10b981',
-                  boxShadow: '0 0 8px rgba(16, 185, 129, 0.6)',
-                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
-                }}></div>
-              </div>
-              <span style={{ fontSize: '11px', color: '#d4af37', fontWeight: 600 }}>المساعد</span>
-            </button>
-
-            {/* Account Button - Left */}
+            {/* زر حسابي - تصميم ثلاثي الأبعاد أنيق */}
             <button
               onClick={handleMyAccountClick}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '5px',
-                background: 'none',
+                gap: '6px',
+                padding: '12px 8px',
+                borderRadius: '18px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                boxShadow: '0 8px 20px rgba(102, 126, 234, 0.35), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)',
                 border: 'none',
                 cursor: 'pointer',
-                minWidth: '60px'
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onTouchStart={(e) => {
+                e.currentTarget.style.transform = 'scale(0.95)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)';
+              }}
+              onTouchEnd={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(102, 126, 234, 0.35), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)';
               }}
             >
-              <User style={{ width: '26px', height: '26px', color: '#9ca3af' }} strokeWidth={1.5} />
-              <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: 600 }}>حسابي</span>
+              {/* تأثير الإضاءة */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '50%',
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%)',
+                borderRadius: '18px 18px 0 0'
+              }}></div>
+
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.25)',
+                backdropFilter: 'blur(10px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3)',
+                position: 'relative'
+              }}>
+                <User style={{ width: '20px', height: '20px', color: '#ffffff' }} strokeWidth={2.5} />
+              </div>
+              <span style={{ fontSize: '11px', color: '#ffffff', fontWeight: 700, position: 'relative' }}>حسابي</span>
             </button>
 
-            {/* My Trees Button - Center */}
+            {/* زر أشجاري - تصميم ثلاثي الأبعاد محسّن */}
             <button
               onClick={handleMyFarmClick}
               style={{
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                gap: '10px',
-                padding: '14px 28px',
-                borderRadius: '9999px',
-                background: 'linear-gradient(145deg, #4a9d7c 0%, #2d6a4f 100%)',
-                boxShadow: '0 6px 24px rgba(45, 106, 79, 0.45), inset 0 2px 0 rgba(255,255,255,0.15)',
+                gap: '6px',
+                padding: '12px 8px',
+                borderRadius: '18px',
+                background: appMode === 'agricultural'
+                  ? 'linear-gradient(135deg, #3aa17e 0%, #2d7a5f 100%)'
+                  : 'linear-gradient(135deg, #d4af37 0%, #b8942f 100%)',
+                boxShadow: appMode === 'agricultural'
+                  ? '0 8px 20px rgba(58, 161, 126, 0.4), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)'
+                  : '0 8px 20px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)',
                 border: 'none',
                 cursor: 'pointer',
-                flexShrink: 0
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onTouchStart={(e) => {
+                e.currentTarget.style.transform = 'scale(0.95)';
+                if (appMode === 'agricultural') {
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(58, 161, 126, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)';
+                } else {
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(212, 175, 55, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)';
+                }
+              }}
+              onTouchEnd={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                if (appMode === 'agricultural') {
+                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(58, 161, 126, 0.4), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)';
+                } else {
+                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)';
+                }
               }}
             >
-              <Sprout style={{ width: '22px', height: '22px', color: '#ffffff' }} />
-              <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '15px' }}>أشجاري</span>
+              {/* تأثير البريق */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '50%',
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)',
+                borderRadius: '18px 18px 0 0'
+              }}></div>
+
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.25)',
+                backdropFilter: 'blur(10px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3)',
+                position: 'relative'
+              }}>
+                <TreePine style={{ width: '20px', height: '20px', color: '#ffffff' }} strokeWidth={2.5} />
+              </div>
+              <span style={{ fontSize: '11px', color: '#ffffff', fontWeight: 700, position: 'relative' }}>أشجاري</span>
             </button>
 
-            {/* Offer Farm Button - Right */}
+            {/* زر اعرض مزرعتك - تصميم ثلاثي الأبعاد مبتكر */}
             <button
               onClick={handleOfferFarmClick}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '4px',
-                minWidth: '60px',
-                background: 'linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%)',
-                border: '2px solid #b8942f',
-                borderRadius: '12px',
+                gap: '6px',
+                padding: '12px 8px',
+                borderRadius: '18px',
+                background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                boxShadow: '0 8px 20px rgba(240, 147, 251, 0.4), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)',
+                border: 'none',
                 cursor: 'pointer',
-                padding: '8px 12px',
-                boxShadow: '0 4px 12px rgba(212, 175, 55, 0.4)',
-                transition: 'all 0.3s ease',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 position: 'relative',
                 overflow: 'hidden'
               }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'scale(1.05)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(212, 175, 55, 0.6)';
+              onTouchStart={(e) => {
+                e.currentTarget.style.transform = 'scale(0.95)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(240, 147, 251, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)';
               }}
-              onMouseOut={(e) => {
+              onTouchEnd={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(212, 175, 55, 0.4)';
+                e.currentTarget.style.boxShadow = '0 8px 20px rgba(240, 147, 251, 0.4), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)';
               }}
             >
-              <div style={{ position: 'relative' }}>
-                <Plus style={{ width: '14px', height: '14px', color: '#ffffff', position: 'absolute', top: '-4px', right: '-4px' }} />
-                <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} />
+              {/* تأثير التموج */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                height: '50%',
+                background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)',
+                borderRadius: '18px 18px 0 0'
+              }}></div>
+
+              <div style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '12px',
+                background: 'rgba(255, 255, 255, 0.25)',
+                backdropFilter: 'blur(10px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3)',
+                position: 'relative'
+              }}>
+                <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} strokeWidth={2.5} />
+                <div style={{
+                  position: 'absolute',
+                  top: '-2px',
+                  right: '-2px',
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  background: 'rgba(255, 255, 255, 0.4)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  <Plus style={{ width: '8px', height: '8px', color: '#ffffff' }} strokeWidth={3} />
+                </div>
               </div>
-              <span style={{ fontSize: '10px', color: '#ffffff', fontWeight: 600, textAlign: 'center', lineHeight: '1.2' }}>اعرض مزرعتك</span>
+              <span style={{ fontSize: '10px', color: '#ffffff', fontWeight: 700, position: 'relative', textAlign: 'center', lineHeight: '1.2' }}>
+                اعرض<br/>مزرعتك
+              </span>
             </button>
           </div>
         </div>,
