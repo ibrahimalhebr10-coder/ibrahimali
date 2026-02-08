@@ -1250,8 +1250,7 @@ function AppContent() {
 
       {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && !showAdvancedAssistant && ReactDOM.createPortal(
         <div
-          id="mobile-footer"
-          className="lg:hidden"
+          id="unified-footer"
           style={{
             position: 'fixed',
             bottom: 0,
@@ -1272,7 +1271,9 @@ function AppContent() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '12px 24px 14px 24px'
+              padding: '12px 24px 14px 24px',
+              maxWidth: '1200px',
+              margin: '0 auto'
             }}
           >
             {/* Account Button - Left */}
