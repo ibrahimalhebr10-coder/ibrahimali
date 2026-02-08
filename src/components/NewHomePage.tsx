@@ -497,7 +497,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
         </div>
       </div>
 
-      {/* Fixed Bottom Footer - Unified Design for Mobile & Desktop */}
+      {/* Fixed Bottom Footer - Redesigned with 3 Sections */}
       {!hideFooter && ReactDOM.createPortal(
         <div
           id="home-footer-portal"
@@ -507,9 +507,10 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
             left: 0,
             right: 0,
             zIndex: 2147483647,
-            background: '#ffffff',
-            borderTop: '1px solid #e5e7eb',
-            boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.15)',
+            background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 250, 252, 0.98) 100%)',
+            borderTop: '2px solid rgba(16, 185, 129, 0.15)',
+            boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12), 0 -2px 8px rgba(16, 185, 129, 0.1)',
+            backdropFilter: 'blur(20px)',
             WebkitTransform: 'translate3d(0, 0, 0)',
             transform: 'translate3d(0, 0, 0)',
             willChange: 'transform'
@@ -517,43 +518,46 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
         >
           <div
             style={{
-              display: 'flex',
+              display: 'grid',
+              gridTemplateColumns: 'auto 1fr auto',
               alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '14px 20px',
-              paddingBottom: 'max(14px, env(safe-area-inset-bottom))',
-              maxWidth: '600px',
+              padding: isMobile ? '12px 16px' : '16px 24px',
+              paddingBottom: isMobile ? 'max(12px, env(safe-area-inset-bottom))' : 'max(16px, env(safe-area-inset-bottom))',
+              maxWidth: '800px',
               margin: '0 auto',
-              gap: '8px'
+              gap: isMobile ? '10px' : '16px'
             }}
           >
+            {/* Center Section: Main CTA Button - Dominant & Eye-Catching */}
             <button
               onClick={onStartInvestment}
               style={{
-                flex: 1,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: isMobile ? '8px' : '12px',
-                padding: isMobile ? '14px 16px' : '18px 24px',
-                borderRadius: isMobile ? '16px' : '20px',
-                background: 'linear-gradient(135deg, #059669 0%, #047857 25%, #065f46 50%, #064e3b 75%, #14532d 100%)',
+                gap: isMobile ? '10px' : '14px',
+                padding: isMobile ? '16px 28px' : '20px 40px',
+                borderRadius: isMobile ? '20px' : '24px',
+                background: 'linear-gradient(135deg, #059669 0%, #047857 20%, #065f46 40%, #064e3b 60%, #047857 80%, #059669 100%)',
+                backgroundSize: '200% 200%',
                 boxShadow: `
-                  0 0 40px rgba(16, 185, 129, 0.6),
-                  0 8px 32px rgba(5, 150, 105, 0.5),
-                  0 4px 16px rgba(4, 120, 87, 0.4),
-                  inset 0 2px 0 rgba(255, 255, 255, 0.3),
-                  inset 0 -4px 0 rgba(0, 0, 0, 0.3),
-                  0 0 0 1px rgba(16, 185, 129, 0.5)
+                  0 0 50px rgba(16, 185, 129, 0.7),
+                  0 10px 40px rgba(5, 150, 105, 0.6),
+                  0 5px 20px rgba(4, 120, 87, 0.5),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.35),
+                  inset 0 -5px 0 rgba(0, 0, 0, 0.35),
+                  0 0 0 2px rgba(52, 211, 153, 0.6),
+                  0 0 30px rgba(52, 211, 153, 0.4)
                 `,
-                border: '2px solid rgba(52, 211, 153, 0.6)',
+                border: '2.5px solid rgba(52, 211, 153, 0.7)',
                 cursor: 'pointer',
                 position: 'relative',
-                transform: 'translateY(0) perspective(1000px) rotateX(0deg)',
+                transform: 'translateY(0) perspective(1200px) rotateX(0deg)',
                 transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 overflow: 'visible',
-                minHeight: isMobile ? '56px' : '64px',
-                transformStyle: 'preserve-3d'
+                minHeight: isMobile ? '62px' : '72px',
+                transformStyle: 'preserve-3d',
+                animation: 'gradientShift 3s ease infinite'
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.transform = 'translateY(-4px) perspective(1000px) rotateX(5deg) scale(1.02)';
@@ -675,23 +679,25 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
                 }} />
               </div>
 
-              {/* Glowing Text */}
+              {/* Glowing Text - Bigger & Bolder */}
               <span style={{
+                fontFamily: '"Tajawal", "Cairo", "Almarai", sans-serif',
                 fontWeight: 900,
                 color: '#ffffff',
-                fontSize: isMobile ? '15px' : '18px',
+                fontSize: isMobile ? '17px' : '20px',
                 textShadow: `
-                  0 0 20px rgba(52, 211, 153, 0.8),
-                  0 0 10px rgba(16, 185, 129, 0.6),
-                  0 2px 8px rgba(0, 0, 0, 0.6),
-                  0 1px 3px rgba(0, 0, 0, 0.8)
+                  0 0 30px rgba(52, 211, 153, 1),
+                  0 0 20px rgba(16, 185, 129, 0.8),
+                  0 0 10px rgba(110, 231, 183, 0.6),
+                  0 3px 10px rgba(0, 0, 0, 0.7),
+                  0 1px 4px rgba(0, 0, 0, 0.9)
                 `,
-                letterSpacing: isMobile ? '0.2px' : '0.5px',
+                letterSpacing: isMobile ? '0.4px' : '0.8px',
                 position: 'relative',
                 zIndex: 5,
                 whiteSpace: 'nowrap',
                 textAlign: 'center',
-                lineHeight: '1.2'
+                lineHeight: '1.3'
               }}>
                 احجز أشجارك المثمرة
               </span>
@@ -745,21 +751,112 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
                   0%, 100% { opacity: 0; transform: scale(0); }
                   50% { opacity: 1; transform: scale(1); }
                 }
+                @keyframes gradientShift {
+                  0%, 100% { background-position: 0% 50%; }
+                  50% { background-position: 100% 50%; }
+                }
               `}</style>
             </button>
 
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-              <div style={{ minWidth: '60px', display: 'flex', justifyContent: 'center' }}>
-                <NotificationCenter
-                  unreadCount={unreadMessagesCount}
-                  onCountChange={handleUnreadCountChange}
-                  onOpenChange={() => {}}
-                />
-              </div>
+            {/* Right Section: Account Button */}
+            <button
+              onClick={onOpenAccount}
+              className="group"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '4px',
+                padding: isMobile ? '8px 12px' : '10px 16px',
+                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%)',
+                borderRadius: '16px',
+                border: '1.5px solid rgba(99, 102, 241, 0.15)',
+                cursor: 'pointer',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                minWidth: isMobile ? '70px' : '85px',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)';
+                e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.4)';
+                e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(99, 102, 241, 0.25)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = 'linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.08) 100%)';
+                e.currentTarget.style.borderColor = 'rgba(99, 102, 241, 0.15)';
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'radial-gradient(circle at center, rgba(99, 102, 241, 0.1) 0%, transparent 70%)',
+                  opacity: 0,
+                  transition: 'opacity 0.3s ease'
+                }}
+                className="group-hover:opacity-100"
+              />
+              <User
+                style={{
+                  width: isMobile ? '20px' : '24px',
+                  height: isMobile ? '20px' : '24px',
+                  color: '#6366f1',
+                  position: 'relative',
+                  zIndex: 1,
+                  filter: 'drop-shadow(0 2px 4px rgba(99, 102, 241, 0.3))'
+                }}
+              />
+              <span
+                style={{
+                  fontSize: isMobile ? '10px' : '11px',
+                  fontWeight: 700,
+                  color: '#6366f1',
+                  letterSpacing: '0.3px',
+                  position: 'relative',
+                  zIndex: 1,
+                  fontFamily: '"Tajawal", "Cairo", sans-serif'
+                }}
+              >
+                حسابي
+              </span>
+            </button>
 
-              <SmartAssistantIcon onClick={onOpenAssistant} size={70} />
+            {/* Left Section: Notifications */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: isMobile ? '70px' : '85px'
+              }}
+            >
+              <NotificationCenter
+                unreadCount={unreadMessagesCount}
+                onCountChange={handleUnreadCountChange}
+                onOpenChange={() => {}}
+              />
             </div>
           </div>
+
+          {/* Bottom Indicator Bar */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '60px',
+              height: '4px',
+              background: 'linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.6), transparent)',
+              borderRadius: '4px 4px 0 0',
+              boxShadow: '0 -2px 8px rgba(16, 185, 129, 0.3)'
+            }}
+          />
         </div>,
         document.body
       )}
