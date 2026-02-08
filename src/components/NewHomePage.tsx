@@ -5,7 +5,6 @@ import IntroVideoPlayer from './IntroVideoPlayer';
 import NotificationCenter from './NotificationCenter';
 import SmartAssistantIcon from './SmartAssistantIcon';
 import { supabase } from '../lib/supabase';
-import { partnerShareMessageService } from '../services/partnerShareMessageService';
 import { getUnreadCount } from '../services/messagesService';
 
 interface NewHomePageProps {
@@ -44,8 +43,6 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [introVideo, setIntroVideo] = useState<IntroVideo | null>(null);
   const [loadingVideo, setLoadingVideo] = useState(true);
-  const [showPartnerBanner, setShowPartnerBanner] = useState(true);
-  const [partnerBannerEnabled, setPartnerBannerEnabled] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const [stats, setStats] = useState<PlatformStats>({
@@ -96,19 +93,6 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
     fetchStats();
   }, []);
 
-  // Fetch partner banner status
-  useEffect(() => {
-    const fetchPartnerBannerStatus = async () => {
-      try {
-        const template = await partnerShareMessageService.getTemplate();
-        setPartnerBannerEnabled(template.enabled);
-      } catch (error) {
-        console.error('Error fetching partner banner status:', error);
-      }
-    };
-
-    fetchPartnerBannerStatus();
-  }, []);
 
   // Fetch active intro video
   useEffect(() => {
@@ -240,70 +224,6 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
         </button>
       </header>
 
-      {/* Partner Success Banner */}
-      {partnerBannerEnabled && showPartnerBanner && (
-        <div
-          style={{
-            position: 'fixed',
-            top: '56px',
-            left: 0,
-            right: 0,
-            zIndex: 9998,
-            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.98) 0%, rgba(217, 119, 6, 0.98) 100%)',
-            boxShadow: '0 4px 16px rgba(245, 158, 11, 0.4), 0 2px 8px rgba(0, 0, 0, 0.1)',
-            backdropFilter: 'blur(12px)',
-            borderBottom: '1px solid rgba(255, 255, 255, 0.3)'
-          }}
-          className="lg:top-16"
-        >
-          <div className="max-w-7xl mx-auto px-3 py-2.5 flex items-center justify-between gap-2">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                console.log('Partner banner clicked!');
-                if (onOpenPartnerProgram) {
-                  onOpenPartnerProgram();
-                }
-              }}
-              className="flex items-center gap-2 flex-1 min-w-0 transition-all duration-200 hover:scale-[1.01] active:scale-[0.99] cursor-pointer"
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: '12px',
-                padding: '8px 12px',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-              }}
-            >
-              <Handshake className="w-5 h-5 lg:w-6 lg:h-6 text-white drop-shadow-lg flex-shrink-0" />
-              <div className="flex items-center gap-1.5 flex-1 min-w-0 overflow-hidden">
-                <span className="text-white font-black text-xs sm:text-sm lg:text-base whitespace-nowrap tracking-tight">
-                  برنامج شركاء النجاح
-                </span>
-                <span className="text-white/90 font-bold text-xs sm:text-sm hidden sm:inline whitespace-nowrap">
-                  •
-                </span>
-                <span className="text-white/90 font-semibold text-xs sm:text-sm hidden sm:inline whitespace-nowrap">
-                  اربح من كل حجز
-                </span>
-              </div>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <span className="text-white/95 font-bold text-xs hidden md:inline whitespace-nowrap">
-                  انضم الآن
-                </span>
-                <ChevronLeft className="w-4 h-4 lg:w-5 lg:h-5 text-white/95 flex-shrink-0" />
-              </div>
-            </button>
-            <button
-              onClick={() => setShowPartnerBanner(false)}
-              className="w-8 h-8 lg:w-9 lg:h-9 flex items-center justify-center rounded-full hover:bg-white/20 active:bg-white/30 transition-all duration-200 flex-shrink-0"
-              style={{
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-              }}
-            >
-              <X className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Background Image with Gradient Overlay */}
       <div
@@ -325,7 +245,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
       </div>
 
       {/* Content */}
-      <div className="scrollbar-hide" style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', minHeight: '100dvh', paddingTop: partnerBannerEnabled && showPartnerBanner ? (isMobile ? '110px' : '120px') : '56px', overflowX: 'hidden', width: '100%' }}>
+      <div className="scrollbar-hide" style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', minHeight: '100dvh', paddingTop: '56px', overflowX: 'hidden', width: '100%' }}>
         {/* Hero Section */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', paddingBottom: isMobile ? '180px' : '200px' }}>
           <div className="w-full max-w-lg space-y-3">
@@ -468,17 +388,34 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
                 <CheckCircle className="w-3.5 h-3.5 text-green-600 mt-1.5 drop-shadow-md" />
               </div>
 
-              {/* Card 2: Annual Returns */}
-              <div className="bg-white/80 backdrop-blur-md rounded-xl p-3 shadow-xl border border-white/60 flex flex-col items-center justify-center min-h-[100px] hover:scale-105 transition-transform duration-300">
+              {/* Card 2: Success Partner Program */}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  console.log('Partner program clicked from card!');
+                  if (onOpenPartnerProgram) {
+                    onOpenPartnerProgram();
+                  }
+                }}
+                className="bg-gradient-to-br from-amber-500 to-orange-600 backdrop-blur-md rounded-xl p-3 shadow-xl border border-amber-400/60 flex flex-col items-center justify-center min-h-[100px] hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer"
+                style={{
+                  boxShadow: '0 8px 24px rgba(245, 158, 11, 0.4), 0 4px 12px rgba(217, 119, 6, 0.3)'
+                }}
+              >
                 <div className="relative mb-1.5">
-                  <TrendingUp className="w-8 h-8 text-green-700 drop-shadow-lg" />
-                  <CheckCircle className="w-3.5 h-3.5 text-green-600 absolute -top-0.5 -right-0.5 bg-white rounded-full shadow-md" />
+                  <Handshake className="w-8 h-8 text-white drop-shadow-lg" strokeWidth={2.5} />
+                  <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white flex items-center justify-center shadow-md">
+                    <Plus className="w-2.5 h-2.5 text-amber-600" strokeWidth={3} />
+                  </div>
                 </div>
-                <p className="text-gray-900 font-bold text-center text-xs leading-tight">
-                  عوائد سنوية
+                <p className="text-white font-bold text-center text-xs leading-tight drop-shadow-md">
+                  برنامج شركاء النجاح
                 </p>
-                <CheckCircle className="w-3.5 h-3.5 text-green-600 mt-1.5 drop-shadow-md" />
-              </div>
+                <div className="flex items-center gap-0.5 mt-1">
+                  <ChevronLeft className="w-3 h-3 text-white/90 drop-shadow-md" />
+                  <span className="text-[10px] text-white/90 font-semibold drop-shadow-md">انضم الآن</span>
+                </div>
+              </button>
 
               {/* Card 3: Safe First Experience */}
               <div className="bg-white/80 backdrop-blur-md rounded-xl p-3 shadow-xl border border-white/60 flex flex-col items-center justify-center min-h-[100px] hover:scale-105 transition-transform duration-300">
