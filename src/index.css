@@ -176,6 +176,17 @@
     padding-top: env(safe-area-inset-top);
   }
 
+  .safe-top {
+    padding-top: max(env(safe-area-inset-top), 2rem);
+  }
+
+  @supports (-webkit-touch-callout: none) {
+    .safe-top {
+      padding-top: max(constant(safe-area-inset-top), 2rem);
+      padding-top: max(env(safe-area-inset-top), 2rem);
+    }
+  }
+
   @supports (-webkit-touch-callout: none) {
     nav[style*="bottom: 0"] {
       position: fixed !important;

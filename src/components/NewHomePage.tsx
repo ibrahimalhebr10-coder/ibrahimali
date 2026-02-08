@@ -26,102 +26,105 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
           backgroundImage: `url('https://images.pexels.com/photos/2132250/pexels-photo-2132250.jpeg?auto=compress&cs=tinysrgb&w=1920')`,
         }}
       >
-        {/* Gradient: Clear top, white bottom (fog effect) */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-white/70"></div>
+        {/* Multi-layer Gradient: Clear top, white fog bottom */}
+        <div className="absolute inset-0 bg-gradient-to-b from-white/30 via-white/10 to-white/80"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent opacity-60"></div>
       </div>
 
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Hero Section */}
-        <div className="flex-1 flex flex-col items-center justify-start px-4 pt-20 pb-24">
-          {/* Main Heading */}
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 text-center mb-2 leading-tight">
-            استثمر في الزراعة بثقة
-          </h1>
+        <div className="flex-1 flex flex-col items-center justify-start px-4 pt-8 pb-24 safe-top">
+          {/* Main Heading with Extra Safe Space */}
+          <div className="w-full mt-4 mb-4">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 text-center leading-tight drop-shadow-md">
+              استثمر في الزراعة بثقة
+            </h1>
+          </div>
 
           {/* Subtitle */}
-          <p className="text-lg md:text-xl text-gray-700 text-center mb-6">
+          <p className="text-lg md:text-xl text-gray-800 font-medium text-center mb-6 drop-shadow-sm">
             أصول حقيقية • إدارة احترافية
           </p>
 
           {/* Trust Badge */}
-          <div className="bg-white/70 backdrop-blur-md rounded-2xl px-6 py-3 shadow-lg mb-6">
+          <div className="bg-white/80 backdrop-blur-md rounded-2xl px-6 py-3 shadow-xl border border-white/60 mb-6">
             <div className="flex items-center justify-center gap-2">
-              <Shield className="w-5 h-5 text-amber-500" />
-              <span className="text-gray-800 font-semibold text-sm">أكثر من 500 مستثمر</span>
-              <CheckCircle className="w-4 h-4 text-green-600" />
+              <Shield className="w-5 h-5 text-amber-500 drop-shadow-md" />
+              <span className="text-gray-900 font-bold text-sm">أكثر من 500 مستثمر</span>
+              <CheckCircle className="w-4 h-4 text-green-600 drop-shadow-md" />
             </div>
-            <p className="text-gray-700 text-center text-sm mt-1">بدأوا خلال 30 آخر يوم</p>
+            <p className="text-gray-800 text-center text-sm font-medium mt-1">بدأوا خلال 30 آخر يوم</p>
           </div>
 
           {/* Video Button */}
           <button
             onClick={() => setShowVideoPlayer(true)}
-            className="bg-white/70 backdrop-blur-md rounded-full px-6 py-3.5 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-3 mb-8 border border-white/50 w-full max-w-sm justify-center"
+            className="bg-white/80 backdrop-blur-md rounded-full px-6 py-3.5 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-3 mb-8 border border-white/60 w-full max-w-sm justify-center"
           >
-            <div className="bg-green-700 rounded-full p-2">
+            <div className="bg-green-700 rounded-full p-2 shadow-lg">
               <Play className="w-4 h-4 text-white fill-white" />
             </div>
-            <span className="text-gray-800 font-semibold text-base">
+            <span className="text-gray-900 font-bold text-base">
               فيديو تعريفي (دقيقة واحدة)
             </span>
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-5 h-5 text-gray-700" />
           </button>
 
           {/* What Are You Looking For Section */}
-          <h2 className="text-xl md:text-2xl font-bold text-gray-800 text-center mb-5">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 text-center mb-5 drop-shadow-sm">
             ما الذي تبحث عنه؟
           </h2>
 
           {/* Three Cards */}
           <div className="grid grid-cols-3 gap-3 w-full max-w-2xl mb-6 px-2">
             {/* Card 1: Stable Income */}
-            <div className="bg-white/70 backdrop-blur-md rounded-2xl p-4 shadow-lg flex flex-col items-center justify-center min-h-[120px]">
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/60 flex flex-col items-center justify-center min-h-[120px] hover:scale-105 transition-transform duration-300">
               <div className="relative mb-2">
-                <Shield className="w-10 h-10 text-amber-500" />
-                <CheckCircle className="w-4 h-4 text-green-600 absolute -top-1 -right-1 bg-white rounded-full" />
+                <Shield className="w-10 h-10 text-amber-500 drop-shadow-lg" />
+                <CheckCircle className="w-4 h-4 text-green-600 absolute -top-1 -right-1 bg-white rounded-full shadow-md" />
               </div>
-              <p className="text-gray-800 font-semibold text-center text-sm leading-tight">
+              <p className="text-gray-900 font-bold text-center text-sm leading-tight">
                 دخل ثابت
               </p>
-              <CheckCircle className="w-4 h-4 text-green-600 mt-2" />
+              <CheckCircle className="w-4 h-4 text-green-600 mt-2 drop-shadow-md" />
             </div>
 
             {/* Card 2: Annual Returns */}
-            <div className="bg-white/70 backdrop-blur-md rounded-2xl p-4 shadow-lg flex flex-col items-center justify-center min-h-[120px]">
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/60 flex flex-col items-center justify-center min-h-[120px] hover:scale-105 transition-transform duration-300">
               <div className="relative mb-2">
-                <TrendingUp className="w-10 h-10 text-green-700" />
-                <CheckCircle className="w-4 h-4 text-green-600 absolute -top-1 -right-1 bg-white rounded-full" />
+                <TrendingUp className="w-10 h-10 text-green-700 drop-shadow-lg" />
+                <CheckCircle className="w-4 h-4 text-green-600 absolute -top-1 -right-1 bg-white rounded-full shadow-md" />
               </div>
-              <p className="text-gray-800 font-semibold text-center text-sm leading-tight">
+              <p className="text-gray-900 font-bold text-center text-sm leading-tight">
                 عوائد سنوية
               </p>
-              <CheckCircle className="w-4 h-4 text-green-600 mt-2" />
+              <CheckCircle className="w-4 h-4 text-green-600 mt-2 drop-shadow-md" />
             </div>
 
             {/* Card 3: Safe First Experience */}
-            <div className="bg-white/70 backdrop-blur-md rounded-2xl p-4 shadow-lg flex flex-col items-center justify-center min-h-[120px]">
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-white/60 flex flex-col items-center justify-center min-h-[120px] hover:scale-105 transition-transform duration-300">
               <div className="relative mb-2">
-                <Star className="w-10 h-10 text-amber-500 fill-amber-500" />
-                <CheckCircle className="w-4 h-4 text-green-600 absolute -top-1 -right-1 bg-white rounded-full" />
+                <Star className="w-10 h-10 text-amber-500 fill-amber-500 drop-shadow-lg" />
+                <CheckCircle className="w-4 h-4 text-green-600 absolute -top-1 -right-1 bg-white rounded-full shadow-md" />
               </div>
-              <p className="text-gray-800 font-semibold text-center text-sm leading-tight">
+              <p className="text-gray-900 font-bold text-center text-sm leading-tight">
                 تجربة أولى آمنة
               </p>
-              <CheckCircle className="w-4 h-4 text-green-600 mt-2" />
+              <CheckCircle className="w-4 h-4 text-green-600 mt-2 drop-shadow-md" />
             </div>
           </div>
 
           {/* Success Partner Button */}
           <button
             onClick={onOpenPartnerProgram}
-            className="bg-white/70 backdrop-blur-md rounded-full px-6 py-3.5 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-3 border border-white/50 w-full max-w-sm justify-center"
+            className="bg-white/80 backdrop-blur-md rounded-full px-6 py-3.5 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-3 border border-white/60 w-full max-w-sm justify-center"
           >
-            <Handshake className="w-5 h-5 text-amber-600" />
-            <span className="text-gray-800 font-semibold text-base">
+            <Handshake className="w-5 h-5 text-amber-600 drop-shadow-md" />
+            <span className="text-gray-900 font-bold text-base">
               كن شريك نجاح
             </span>
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-5 h-5 text-gray-700" />
           </button>
         </div>
 
