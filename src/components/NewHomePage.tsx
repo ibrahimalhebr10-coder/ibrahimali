@@ -272,51 +272,85 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
     </div>
 
     {/* Fixed Bottom Footer - OUTSIDE overflow-hidden container */}
-    <nav
+    <div
+      id="main-footer"
       style={{
         position: 'fixed',
         bottom: 0,
         left: 0,
         right: 0,
         zIndex: 99999,
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(20px)',
-        WebkitBackdropFilter: 'blur(20px)',
-        borderTop: '1px solid rgba(0, 0, 0, 0.1)',
-        boxShadow: '0 -4px 30px rgba(0, 0, 0, 0.1)',
-        paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+        background: 'linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.98) 100%)',
+        borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+        boxShadow: '0 -8px 30px rgba(0, 0, 0, 0.12)',
+        WebkitTransform: 'translate3d(0, 0, 0)',
+        transform: 'translate3d(0, 0, 0)'
       }}
     >
-      <div className="flex items-center justify-between px-4 py-3 max-w-2xl mx-auto">
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '12px 16px',
+          paddingBottom: 'max(12px, env(safe-area-inset-bottom))',
+          maxWidth: '500px',
+          margin: '0 auto'
+        }}
+      >
         <button
           onClick={onOpenAccount}
-          className="flex flex-col items-center gap-1 active:scale-95 transition-transform min-w-[60px]"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '4px',
+            minWidth: '60px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer'
+          }}
         >
-          <User className="w-6 h-6 text-gray-700" />
-          <span className="text-xs text-gray-700 font-medium">حسابي</span>
+          <User style={{ width: '24px', height: '24px', color: '#374151' }} />
+          <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>حسابي</span>
         </button>
 
         <button
           onClick={onStartInvestment}
-          className="flex items-center gap-2 px-6 py-3 rounded-full active:scale-95 transition-transform"
           style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '12px 24px',
+            borderRadius: '9999px',
             background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
-            boxShadow: '0 4px 15px rgba(21, 128, 61, 0.4)'
+            boxShadow: '0 4px 15px rgba(21, 128, 61, 0.4)',
+            border: 'none',
+            cursor: 'pointer'
           }}
         >
-          <Sprout className="w-5 h-5 text-white" />
-          <span className="font-bold text-white">ابدأ الاستثمار</span>
+          <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} />
+          <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '14px' }}>ابدأ الاستثمار</span>
         </button>
 
         <button
           onClick={onOpenAssistant}
-          className="flex flex-col items-center gap-1 active:scale-95 transition-transform min-w-[60px]"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '4px',
+            minWidth: '60px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer'
+          }}
         >
-          <Sparkles className="w-6 h-6 text-gray-700" />
-          <span className="text-xs text-gray-700 font-medium">المساعد</span>
+          <Sparkles style={{ width: '24px', height: '24px', color: '#374151' }} />
+          <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>المساعد</span>
         </button>
       </div>
-    </nav>
+    </div>
 
     {/* Video Player Modal */}
     {showVideoPlayer && (

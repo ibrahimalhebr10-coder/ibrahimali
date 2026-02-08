@@ -1208,69 +1208,109 @@ function AppContent() {
       )}
 
       {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && !showAdvancedAssistant && (
-        <nav
+        <div
+          id="mobile-footer"
           className="lg:hidden"
           style={{
             position: 'fixed',
             bottom: 0,
             left: 0,
             right: 0,
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,248,248,0.98) 100%)',
-            borderTop: '1px solid rgba(200,195,185,0.5)',
-            boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.12)',
-            paddingTop: '0.75rem',
-            paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))',
+            background: 'linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.98) 100%)',
+            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+            boxShadow: '0 -8px 30px rgba(0, 0, 0, 0.12)',
             zIndex: 99999,
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)'
+            WebkitTransform: 'translate3d(0, 0, 0)',
+            transform: 'translate3d(0, 0, 0)'
           }}
         >
-        <div className="flex items-center justify-between px-6">
-          {/* حسابي - Right */}
-          <button
-            onClick={handleMyAccountClick}
-            className="flex flex-col items-center gap-1 active:scale-95 transition-transform"
-          >
-            <User className="w-6 h-6 text-gray-500" strokeWidth={1.5} />
-            <span className="text-xs text-gray-600 font-medium">حسابي</span>
-          </button>
-
-          {/* أشجاري - Center (Main Button) */}
-          <button
-            onClick={handleMyFarmClick}
-            className="flex items-center gap-2 px-6 py-3 rounded-full active:scale-95 transition-transform"
+          <div
             style={{
-              background: 'linear-gradient(135deg, #3d8b6e 0%, #2d6a4f 100%)',
-              boxShadow: '0 4px 16px rgba(45, 106, 79, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)'
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 24px',
+              paddingBottom: 'max(16px, env(safe-area-inset-bottom))'
             }}
           >
-            <Sprout className="w-5 h-5 text-white" />
-            <span className="text-sm font-bold text-white">أشجاري</span>
-          </button>
+            <button
+              onClick={handleMyAccountClick}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <User style={{ width: '24px', height: '24px', color: '#6b7280' }} strokeWidth={1.5} />
+              <span style={{ fontSize: '11px', color: '#4b5563', fontWeight: 500 }}>حسابي</span>
+            </button>
 
-          {/* الإشعارات - Left */}
-          <button
-            onClick={() => setShowNotifications(true)}
-            className="flex flex-col items-center gap-1 active:scale-95 transition-transform relative"
-          >
-            <div className="relative">
-              <svg className="w-6 h-6 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-              {unreadMessagesCount > 0 && (
-                <div
-                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
-                  style={{ background: '#dc2626' }}
-                >
-                  {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
-                </div>
-              )}
-            </div>
-            <span className="text-xs text-gray-600 font-medium">الإشعارات</span>
-          </button>
+            <button
+              onClick={handleMyFarmClick}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                borderRadius: '9999px',
+                background: 'linear-gradient(135deg, #3d8b6e 0%, #2d6a4f 100%)',
+                boxShadow: '0 4px 16px rgba(45, 106, 79, 0.4)',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} />
+              <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '14px' }}>أشجاري</span>
+            </button>
+
+            <button
+              onClick={() => setShowNotifications(true)}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                position: 'relative'
+              }}
+            >
+              <div style={{ position: 'relative' }}>
+                <svg style={{ width: '24px', height: '24px', color: '#6b7280' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                </svg>
+                {unreadMessagesCount > 0 && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '-4px',
+                      right: '-4px',
+                      width: '16px',
+                      height: '16px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '10px',
+                      fontWeight: 700,
+                      color: '#ffffff',
+                      background: '#dc2626'
+                    }}
+                  >
+                    {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                  </div>
+                )}
+              </div>
+              <span style={{ fontSize: '11px', color: '#4b5563', fontWeight: 500 }}>الإشعارات</span>
+            </button>
+          </div>
         </div>
-      </nav>
       )}
 
       <StreamingVideoPlayer
