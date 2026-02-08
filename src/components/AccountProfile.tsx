@@ -301,6 +301,26 @@ export default function AccountProfile({ isOpen, currentContext, onClose, onOpen
 
                 <IdentityManager />
 
+                {/* Logout Button Section */}
+                <div className="mt-8 space-y-4">
+                  <button
+                    onClick={handleLogoutClick}
+                    className="w-full py-4 rounded-2xl font-bold text-lg transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-3 shadow-lg group"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%)',
+                      border: '2px solid rgba(239, 68, 68, 0.3)',
+                      color: '#dc2626'
+                    }}
+                  >
+                    <LogOut className="w-6 h-6 transition-transform group-hover:rotate-180" strokeWidth={2.5} />
+                    <span>تسجيل الخروج</span>
+                  </button>
+
+                  <p className="text-xs text-center text-gray-500 leading-relaxed">
+                    سيتم الاحتفاظ بحسابك وبياناتك بشكل آمن
+                  </p>
+                </div>
+
                 <div className="text-center text-gray-500 text-sm py-6">
                   <p>المزيد من المزايا قريباً</p>
                 </div>
