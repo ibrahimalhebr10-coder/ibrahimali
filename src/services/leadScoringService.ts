@@ -98,13 +98,23 @@ class LeadScoringService {
       const { data, error } = await supabase.from('lead_activities').insert(activity).select();
 
       if (error) {
+        // Ignore duplicate key errors (happens when trigger tries to create lead_score for existing session)
+        if (error.code === '23505' && error.message.includes('idx_lead_scores_session_id')) {
+          console.log('⚠️ [Lead Tracking] Session already exists, continuing...');
+          return;
+        }
         console.error('❌ [Lead Tracking] Database error:', error);
         throw error;
       }
 
       console.log(`✅ [Lead Tracking] Activity saved successfully:`, data);
       console.log(`✅ Activity tracked: ${activityType} (+${points} points)`);
-    } catch (error) {
+    } catch (error: any) {
+      // Ignore duplicate key errors silently
+      if (error?.code === '23505') {
+        console.log('⚠️ [Lead Tracking] Duplicate session, ignored');
+        return;
+      }
       console.error('❌ [Lead Tracking] Error tracking activity:', error);
     }
   }

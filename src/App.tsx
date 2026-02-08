@@ -622,7 +622,13 @@ function AppContent() {
     );
   }
 
+  // Debug log
+  console.log('🏠 [App] showNewHomePage:', showNewHomePage);
+  console.log('🏠 [App] showAdminDashboard:', showAdminDashboard);
+  console.log('🏠 [App] showAdminLogin:', showAdminLogin);
+
   if (showNewHomePage && !showAdminDashboard && !showAdminLogin) {
+    console.log('✅ [App] Showing New Home Page!');
     return (
       <ErrorBoundary>
         <NewHomePage
@@ -634,6 +640,8 @@ function AppContent() {
       </ErrorBoundary>
     );
   }
+
+  console.log('📄 [App] Showing Current Interface (Second Page)');
 
   return (
     <ErrorBoundary>
