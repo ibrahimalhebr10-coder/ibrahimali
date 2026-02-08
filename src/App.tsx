@@ -783,13 +783,14 @@ function AppContent() {
   return (
     <ErrorBoundary>
       <div
-        className="flex flex-col relative"
+        className="flex flex-col relative scrollbar-hide"
         style={{
-          height: '100vh',
           height: '100dvh',
-          maxHeight: '100vh',
           maxHeight: '100dvh',
           overflow: 'hidden',
+          overflowX: 'hidden',
+          width: '100%',
+          maxWidth: '100vw',
           background: 'linear-gradient(135deg, rgba(250, 252, 251, 1) 0%, rgba(245, 250, 247, 1) 50%, rgba(248, 252, 250, 1) 100%)',
           backdropFilter: 'blur(10px)',
           WebkitBackdropFilter: 'blur(10px)'
@@ -813,12 +814,14 @@ function AppContent() {
         {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && (
           <>
             <div
-              className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden"
+              className="flex-1 flex flex-col scrollbar-hide"
               style={{
                 background: 'linear-gradient(180deg, #e8e6e2 0%, #dddbd7 100%)',
                 paddingTop: '64px',
                 paddingBottom: 'calc(90px + env(safe-area-inset-bottom, 20px))',
-                WebkitOverflowScrolling: 'touch'
+                WebkitOverflowScrolling: 'touch',
+                overflowY: 'auto',
+                overflowX: 'hidden'
               }}
             >
               {/* Top Section - Mode Selector & Filters */}

@@ -172,13 +172,29 @@
 }
 
 @layer utilities {
+  /* إخفاء scrollbars كاملاً */
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
 
   .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
+    scrollbar-color: transparent transparent !important;
+  }
+
+  /* منع أي scrollbar من الظهور */
+  *::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+  }
+
+  * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
   }
 
   .safe-area-bottom {

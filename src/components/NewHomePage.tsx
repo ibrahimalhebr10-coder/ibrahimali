@@ -192,7 +192,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   }, []);
 
   return (
-    <div style={{ minHeight: '100vh', minHeight: '100dvh', position: 'relative' }}>
+    <div className="scrollbar-hide" style={{ minHeight: '100dvh', position: 'relative', overflowX: 'hidden', width: '100%', maxWidth: '100vw' }}>
       {/* Header */}
       <header
         className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between backdrop-blur-2xl flex-shrink-0 fixed left-0 right-0 top-0"
@@ -324,7 +324,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
       </div>
 
       {/* Content */}
-      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', minHeight: '100vh', minHeight: '100dvh', paddingTop: partnerBannerEnabled && showPartnerBanner ? '96px' : '56px' }}>
+      <div className="scrollbar-hide" style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', minHeight: '100dvh', paddingTop: partnerBannerEnabled && showPartnerBanner ? '96px' : '56px', overflowX: 'hidden', width: '100%' }}>
         {/* Hero Section */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', paddingBottom: '100px' }}>
           <div className="w-full max-w-lg space-y-3">
