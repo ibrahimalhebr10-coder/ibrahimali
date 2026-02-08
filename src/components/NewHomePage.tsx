@@ -73,6 +73,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   }, []);
 
   return (
+    <>
     <div className="relative h-screen overflow-hidden">
       {/* Background Image with Gradient Overlay */}
       <div
@@ -267,51 +268,68 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
           </div>
         </div>
 
-        {/* Fixed Bottom Footer with Safe Area */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-gray-200/50 shadow-2xl z-50 safe-area-bottom">
-          <div className="flex items-center justify-between px-4 py-2.5 max-w-2xl mx-auto">
-            {/* Left: My Account */}
-            <button
-              onClick={onOpenAccount}
-              className="flex flex-col items-center gap-0.5 hover:scale-105 active:scale-95 transition-transform min-w-[56px]"
-            >
-              <User className="w-5 h-5 text-gray-700" />
-              <span className="text-[10px] text-gray-700 font-medium">حسابي</span>
-            </button>
+      </div>
+    </div>
 
-            {/* Center: Start Investment (Primary Button) */}
-            <button
-              onClick={onStartInvestment}
-              className="bg-green-700 hover:bg-green-800 text-white rounded-full px-5 py-2.5 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-1.5"
-            >
-              <Sprout className="w-4 h-4" />
-              <span className="font-bold text-sm">ابدأ الاستثمار</span>
-            </button>
+    {/* Fixed Bottom Footer - OUTSIDE overflow-hidden container */}
+    <nav
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        zIndex: 99999,
+        background: 'rgba(255, 255, 255, 0.95)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+        boxShadow: '0 -4px 30px rgba(0, 0, 0, 0.1)',
+        paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+      }}
+    >
+      <div className="flex items-center justify-between px-4 py-3 max-w-2xl mx-auto">
+        <button
+          onClick={onOpenAccount}
+          className="flex flex-col items-center gap-1 active:scale-95 transition-transform min-w-[60px]"
+        >
+          <User className="w-6 h-6 text-gray-700" />
+          <span className="text-xs text-gray-700 font-medium">حسابي</span>
+        </button>
 
-            {/* Right: Assistant */}
-            <button
-              onClick={onOpenAssistant}
-              className="flex flex-col items-center gap-0.5 hover:scale-105 active:scale-95 transition-transform min-w-[56px]"
-            >
-              <Sparkles className="w-5 h-5 text-gray-700" />
-              <span className="text-[10px] text-gray-700 font-medium">المساعد</span>
-            </button>
-          </div>
+        <button
+          onClick={onStartInvestment}
+          className="flex items-center gap-2 px-6 py-3 rounded-full active:scale-95 transition-transform"
+          style={{
+            background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
+            boxShadow: '0 4px 15px rgba(21, 128, 61, 0.4)'
+          }}
+        >
+          <Sprout className="w-5 h-5 text-white" />
+          <span className="font-bold text-white">ابدأ الاستثمار</span>
+        </button>
+
+        <button
+          onClick={onOpenAssistant}
+          className="flex flex-col items-center gap-1 active:scale-95 transition-transform min-w-[60px]"
+        >
+          <Sparkles className="w-6 h-6 text-gray-700" />
+          <span className="text-xs text-gray-700 font-medium">المساعد</span>
+        </button>
+      </div>
+    </nav>
+
+    {/* Video Player Modal */}
+    {showVideoPlayer && (
+      <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
+        <div className="w-full max-w-4xl">
+          <StreamingVideoPlayer
+            videoUrl=""
+            onClose={() => setShowVideoPlayer(false)}
+          />
         </div>
       </div>
-
-      {/* Video Player Modal */}
-      {showVideoPlayer && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="w-full max-w-4xl">
-            <StreamingVideoPlayer
-              videoUrl=""
-              onClose={() => setShowVideoPlayer(false)}
-            />
-          </div>
-        </div>
-      )}
-    </div>
+    )}
+    </>
   );
 };
 

@@ -1085,19 +1085,15 @@ function AppContent() {
 
       {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && !showAdvancedAssistant && (
         <nav
-          className="hidden lg:flex fixed left-0 right-0 z-50 backdrop-blur-2xl"
+          className="hidden lg:flex fixed left-0 right-0 backdrop-blur-2xl"
           style={{
-            background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.95) 0%, rgba(242, 247, 244, 0.92) 100%)',
+            background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.98) 0%, rgba(242, 247, 244, 0.98) 100%)',
             borderTop: '3px solid rgba(58,161,126,0.4)',
-            boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
+            boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.15)',
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             bottom: 0,
-            transform: (!allowHideFooter || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
-            transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
-            willChange: 'transform',
-            WebkitTransform: (!allowHideFooter || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
-            WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
+            zIndex: 99999
           }}
         >
         <div className="max-w-7xl mx-auto w-full px-8 py-5 pb-8 flex items-center justify-around">
@@ -1213,23 +1209,22 @@ function AppContent() {
 
       {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && !showAdvancedAssistant && (
         <nav
-          className="fixed left-0 right-0 lg:hidden"
-        style={{
-          transform: (!allowHideFooter || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
-          bottom: 0,
-          background: 'linear-gradient(180deg, #f8f6f2 0%, #f0ede7 100%)',
-          borderTop: '1px solid rgba(200,195,185,0.5)',
-          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)',
-          paddingTop: '0.75rem',
-          paddingBottom: '2rem',
-          zIndex: 50000,
-          position: 'fixed',
-          transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
-          willChange: 'transform',
-          WebkitTransform: (!allowHideFooter || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
-          WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
-        }}
-      >
+          className="lg:hidden"
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,248,248,0.98) 100%)',
+            borderTop: '1px solid rgba(200,195,185,0.5)',
+            boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.12)',
+            paddingTop: '0.75rem',
+            paddingBottom: 'calc(2rem + env(safe-area-inset-bottom, 0px))',
+            zIndex: 99999,
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)'
+          }}
+        >
         <div className="flex items-center justify-between px-6">
           {/* حسابي - Right */}
           <button
