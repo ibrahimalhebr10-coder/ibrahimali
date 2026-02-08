@@ -512,6 +512,278 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
         document.body
       )}
 
+      {/* Fixed Bottom Footer - Clean & Simple */}
+      {!hideFooter && ReactDOM.createPortal(
+        <div
+          id="home-footer-portal"
+          style={{
+            position: 'fixed',
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 2147483647,
+            background: '#ffffff',
+            borderTop: '1px solid #e5e7eb',
+            boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.15)',
+            WebkitTransform: 'translate3d(0, 0, 0)',
+            transform: 'translate3d(0, 0, 0)',
+            willChange: 'transform'
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '14px 20px',
+              paddingBottom: 'max(14px, env(safe-area-inset-bottom))',
+              maxWidth: '600px',
+              margin: '0 auto',
+              gap: '12px'
+            }}
+          >
+            {/* Main CTA Button - Simple but Attractive */}
+            <button
+              onClick={onStartInvestment}
+              style={{
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: isMobile ? '8px' : '12px',
+                padding: isMobile ? '14px 16px' : '18px 24px',
+                borderRadius: isMobile ? '16px' : '20px',
+                background: 'linear-gradient(135deg, #059669 0%, #047857 25%, #065f46 50%, #064e3b 75%, #14532d 100%)',
+                boxShadow: `
+                  0 0 40px rgba(16, 185, 129, 0.6),
+                  0 8px 32px rgba(5, 150, 105, 0.5),
+                  0 4px 16px rgba(4, 120, 87, 0.4),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.3),
+                  inset 0 -4px 0 rgba(0, 0, 0, 0.3),
+                  0 0 0 1px rgba(16, 185, 129, 0.5)
+                `,
+                border: '2px solid rgba(52, 211, 153, 0.6)',
+                cursor: 'pointer',
+                position: 'relative',
+                transform: 'translateY(0) perspective(1000px) rotateX(0deg)',
+                transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                overflow: 'visible',
+                minHeight: isMobile ? '56px' : '64px',
+                transformStyle: 'preserve-3d'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px) perspective(1000px) rotateX(5deg) scale(1.02)';
+                e.currentTarget.style.boxShadow = `
+                  0 0 60px rgba(16, 185, 129, 0.8),
+                  0 12px 48px rgba(5, 150, 105, 0.6),
+                  0 6px 24px rgba(4, 120, 87, 0.5),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.4),
+                  inset 0 -4px 0 rgba(0, 0, 0, 0.3),
+                  0 0 0 2px rgba(52, 211, 153, 0.8),
+                  0 0 20px rgba(52, 211, 153, 0.6)
+                `;
+                e.currentTarget.style.borderColor = 'rgba(52, 211, 153, 1)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) perspective(1000px) rotateX(0deg) scale(1)';
+                e.currentTarget.style.boxShadow = `
+                  0 0 40px rgba(16, 185, 129, 0.6),
+                  0 8px 32px rgba(5, 150, 105, 0.5),
+                  0 4px 16px rgba(4, 120, 87, 0.4),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.3),
+                  inset 0 -4px 0 rgba(0, 0, 0, 0.3),
+                  0 0 0 1px rgba(16, 185, 129, 0.5)
+                `;
+                e.currentTarget.style.borderColor = 'rgba(52, 211, 153, 0.6)';
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = 'translateY(2px) perspective(1000px) rotateX(-2deg) scale(0.98)';
+                e.currentTarget.style.boxShadow = `
+                  0 0 20px rgba(16, 185, 129, 0.5),
+                  0 4px 16px rgba(5, 150, 105, 0.4),
+                  0 2px 8px rgba(4, 120, 87, 0.3),
+                  inset 0 4px 12px rgba(0, 0, 0, 0.4)
+                `;
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = 'translateY(-4px) perspective(1000px) rotateX(5deg) scale(1.02)';
+                e.currentTarget.style.boxShadow = `
+                  0 0 60px rgba(16, 185, 129, 0.8),
+                  0 12px 48px rgba(5, 150, 105, 0.6),
+                  0 6px 24px rgba(4, 120, 87, 0.5),
+                  inset 0 2px 0 rgba(255, 255, 255, 0.4),
+                  inset 0 -4px 0 rgba(0, 0, 0, 0.3),
+                  0 0 0 2px rgba(52, 211, 153, 0.8)
+                `;
+              }}
+            >
+              {/* Animated Background Particles */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: `
+                  radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.3) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 50%, rgba(52, 211, 153, 0.3) 0%, transparent 50%),
+                  radial-gradient(circle at 50% 20%, rgba(110, 231, 183, 0.2) 0%, transparent 50%)
+                `,
+                animation: 'pulse 3s ease-in-out infinite',
+                pointerEvents: 'none',
+                zIndex: 1
+              }} />
+
+              {/* Glass Morphism Layer */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.25) 0%, transparent 30%, rgba(0, 0, 0, 0.2) 100%)',
+                borderRadius: '18px',
+                pointerEvents: 'none',
+                zIndex: 2
+              }} />
+
+              {/* Animated Light Wave */}
+              <div style={{
+                position: 'absolute',
+                top: '-50%',
+                left: '-100%',
+                width: '300%',
+                height: '300%',
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%)',
+                transform: 'rotate(30deg)',
+                animation: 'wave 4s linear infinite',
+                pointerEvents: 'none',
+                zIndex: 3
+              }} />
+
+              {/* Pulsing Neon Border */}
+              <div style={{
+                position: 'absolute',
+                top: '-2px',
+                left: '-2px',
+                right: '-2px',
+                bottom: '-2px',
+                borderRadius: '20px',
+                background: 'linear-gradient(135deg, rgba(52, 211, 153, 0.6), rgba(16, 185, 129, 0.6), rgba(5, 150, 105, 0.6))',
+                filter: 'blur(4px)',
+                animation: 'neonPulse 2s ease-in-out infinite',
+                pointerEvents: 'none',
+                zIndex: 0
+              }} />
+
+              {/* Animated Icon */}
+              <div style={{
+                position: 'relative',
+                zIndex: 5,
+                animation: 'iconBounce 2s ease-in-out infinite',
+                flexShrink: 0
+              }}>
+                <Sprout style={{
+                  width: isMobile ? '22px' : '28px',
+                  height: isMobile ? '22px' : '28px',
+                  color: '#ffffff',
+                  filter: 'drop-shadow(0 0 8px rgba(52, 211, 153, 0.8)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))'
+                }} />
+              </div>
+
+              {/* Glowing Text */}
+              <span style={{
+                position: 'relative',
+                zIndex: 5,
+                fontFamily: '"Tajawal", "Cairo", "Almarai", sans-serif',
+                fontWeight: 900,
+                color: '#ffffff',
+                fontSize: isMobile ? '15px' : '18px',
+                textShadow: `
+                  0 0 20px rgba(52, 211, 153, 0.8),
+                  0 0 10px rgba(16, 185, 129, 0.6),
+                  0 2px 8px rgba(0, 0, 0, 0.6),
+                  0 1px 3px rgba(0, 0, 0, 0.8)
+                `,
+                letterSpacing: isMobile ? '0.2px' : '0.5px',
+                whiteSpace: 'nowrap',
+                textAlign: 'center',
+                lineHeight: '1.2'
+              }}>
+                احجز أشجارك المثمرة
+              </span>
+
+              {/* Sparkle Effects */}
+              <div style={{
+                position: 'absolute',
+                top: '10%',
+                right: '10%',
+                width: '4px',
+                height: '4px',
+                borderRadius: '50%',
+                background: 'white',
+                boxShadow: '0 0 8px rgba(255, 255, 255, 0.8)',
+                animation: 'sparkle 1.5s ease-in-out infinite',
+                pointerEvents: 'none',
+                zIndex: 4
+              }} />
+              <div style={{
+                position: 'absolute',
+                bottom: '20%',
+                left: '15%',
+                width: '3px',
+                height: '3px',
+                borderRadius: '50%',
+                background: 'white',
+                boxShadow: '0 0 6px rgba(255, 255, 255, 0.8)',
+                animation: 'sparkle 2s ease-in-out infinite 0.5s',
+                pointerEvents: 'none',
+                zIndex: 4
+              }} />
+
+              <style>{`
+                @keyframes pulse {
+                  0%, 100% { opacity: 0.5; transform: scale(1); }
+                  50% { opacity: 1; transform: scale(1.1); }
+                }
+                @keyframes wave {
+                  0% { transform: translateX(-100%) rotate(30deg); }
+                  100% { transform: translateX(100%) rotate(30deg); }
+                }
+                @keyframes neonPulse {
+                  0%, 100% { opacity: 0.6; }
+                  50% { opacity: 1; }
+                }
+                @keyframes iconBounce {
+                  0%, 100% { transform: translateY(0px); }
+                  50% { transform: translateY(-3px); }
+                }
+                @keyframes sparkle {
+                  0%, 100% { opacity: 0; transform: scale(0); }
+                  50% { opacity: 1; transform: scale(1); }
+                }
+              `}</style>
+            </button>
+
+            {/* Notifications */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: '60px'
+              }}
+            >
+              <NotificationCenter
+                unreadCount={unreadMessagesCount}
+                onCountChange={handleUnreadCountChange}
+                onOpenChange={() => {}}
+              />
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {/* Video Player Modal */}
       {showVideoPlayer && introVideo && (
