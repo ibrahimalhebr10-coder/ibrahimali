@@ -270,7 +270,7 @@ function AppContent() {
   }, []);
 
   useEffect(() => {
-    if (user && !showAccountProfile) {
+    if (user && !showAccountProfile && !showSuccessPartnerAccount) {
       // Check for partner impersonation
       const impersonationData = impersonationService.getImpersonationData();
 
@@ -286,6 +286,8 @@ function AppContent() {
         console.log('');
 
         setTimeout(() => {
+          // Close regular account to prevent overlap
+          setShowAccountProfile(false);
           setShowSuccessPartnerAccount(true);
         }, 500);
         return;
@@ -301,7 +303,7 @@ function AppContent() {
         }, 500);
       }
     }
-  }, [user, showAccountProfile]);
+  }, [user, showAccountProfile, showSuccessPartnerAccount]);
 
   useEffect(() => {
     console.log('');
@@ -580,6 +582,8 @@ function AppContent() {
 
   const handleOpenRegularAccount = () => {
     console.log('📱 [QuickAccess] Opening regular account');
+    // Close partner account to prevent overlap
+    setShowSuccessPartnerAccount(false);
     setShowAccountProfile(true);
     setAccountContractFilter(null);
     setAccountIndicatorType('regular');
@@ -595,7 +599,9 @@ function AppContent() {
     console.log('🎭 Identity:', identity);
     console.log('📊 Current showSuccessPartnerAccount state:', showSuccessPartnerAccount);
     console.log('');
-    console.log('✅ Setting showSuccessPartnerAccount to TRUE...');
+    console.log('✅ Closing regular account and setting showSuccessPartnerAccount to TRUE...');
+    // Close regular account to prevent overlap
+    setShowAccountProfile(false);
     setShowSuccessPartnerAccount(true);
     console.log('✅ State updated - SuccessPartnerAccount should now be visible');
     console.log('🌟'.repeat(50));
@@ -638,13 +644,17 @@ function AppContent() {
       console.log('');
       console.log('⭐'.repeat(50));
       console.log('⭐ [Footer Button] User IS a Success Partner!');
-      console.log('⭐ Setting showSuccessPartnerAccount to TRUE...');
+      console.log('⭐ Closing regular account and setting showSuccessPartnerAccount to TRUE...');
+      // Close regular account to prevent overlap
+      setShowAccountProfile(false);
       setShowSuccessPartnerAccount(true);
       console.log('⭐ State updated - SuccessPartnerAccount should now be visible');
       console.log('⭐'.repeat(50));
       console.log('');
     } else {
       console.log(`✅ [Footer Button] User is NOT a partner - Opening My Trees for user ${user.id} with identity ${identity}`);
+      // Close partner account to prevent overlap
+      setShowSuccessPartnerAccount(false);
       setShowMyTrees(true);
     }
 
@@ -1493,6 +1503,8 @@ function AppContent() {
         }}
         onSelectPartnerAccount={() => {
           setShowAccountTypeSelector(false);
+          // Close regular account to prevent overlap
+          setShowAccountProfile(false);
           setShowSuccessPartnerAccount(true);
         }}
       />
@@ -1536,7 +1548,11 @@ function AppContent() {
                 setSelectedInvestmentFarm(null);
                 setSelectedFarmMode(null);
               }}
-              onGoToAccount={() => setShowAccountProfile(true)}
+              onGoToAccount={() => {
+                // Close partner account to prevent overlap
+                setShowSuccessPartnerAccount(false);
+                setShowAccountProfile(true);
+              }}
             />
           ) : (
             <AgriculturalFarmPage
@@ -1545,7 +1561,11 @@ function AppContent() {
                 setSelectedInvestmentFarm(null);
                 setSelectedFarmMode(null);
               }}
-              onGoToAccount={() => setShowAccountProfile(true)}
+              onGoToAccount={() => {
+                // Close partner account to prevent overlap
+                setShowSuccessPartnerAccount(false);
+                setShowAccountProfile(true);
+              }}
             />
           )}
         </>
@@ -1594,6 +1614,8 @@ function AppContent() {
             setShowMyTrees(false);
             exitDemoMode();
             if (mode === 'login') {
+              // Close partner account to prevent overlap
+              setShowSuccessPartnerAccount(false);
               setShowAccountProfile(true);
             } else {
               setShowStandaloneRegistration(true);
