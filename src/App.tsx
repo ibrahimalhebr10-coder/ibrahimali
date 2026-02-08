@@ -6,6 +6,7 @@ import HowToStart from './components/HowToStart';
 import StreamingVideoPlayer from './components/StreamingVideoPlayer';
 import AdvancedAIAssistant from './components/AdvancedAIAssistant';
 import SuccessPartnerIntro from './components/SuccessPartnerIntro';
+import SuccessPartnerIntroExperience from './components/SuccessPartnerIntroExperience';
 import SuccessPartnerOnboarding from './components/SuccessPartnerOnboarding';
 import SuccessPartnerRegistrationForm from './components/SuccessPartnerRegistrationForm';
 import SuccessPartnerWelcome from './components/SuccessPartnerWelcome';
@@ -67,6 +68,7 @@ function AppContent() {
   const [showHowToStart, setShowHowToStart] = useState(false);
   const [showAdvancedAssistant, setShowAdvancedAssistant] = useState(false);
   const [showSuccessPartnerIntro, setShowSuccessPartnerIntro] = useState(false);
+  const [showSuccessPartnerIntroExperience, setShowSuccessPartnerIntroExperience] = useState(false);
   const [showSuccessPartnerOnboarding, setShowSuccessPartnerOnboarding] = useState(false);
   const [showSuccessPartnerRegistration, setShowSuccessPartnerRegistration] = useState(false);
   const [showSuccessPartnerWelcome, setShowSuccessPartnerWelcome] = useState(false);
@@ -103,6 +105,7 @@ function AppContent() {
 
     // إغلاق جميع الـ modals الأخرى
     setShowSuccessPartnerIntro(false);
+    setShowSuccessPartnerIntroExperience(false);
     setShowAdvancedAssistant(false);
     setShowQuickAccountAccess(false);
     setShowAccountProfile(false);
@@ -684,17 +687,17 @@ function AppContent() {
   if (showNewHomePage && !showAdminDashboard && !showAdminLogin) {
     console.log('✅ [App] Showing New Home Page!');
 
-    const shouldHideFooter = showSuccessPartnerIntro || showSuccessPartnerOnboarding ||
-                             showSuccessPartnerRegistration || showSuccessPartnerWelcome ||
-                             showHowItWorksPartner || showAdvancedAssistant ||
-                             showQuickAccountAccess || showWelcomeToAccount ||
-                             showStandaloneRegistration;
+    const shouldHideFooter = showSuccessPartnerIntro || showSuccessPartnerIntroExperience ||
+                             showSuccessPartnerOnboarding || showSuccessPartnerRegistration ||
+                             showSuccessPartnerWelcome || showHowItWorksPartner ||
+                             showAdvancedAssistant || showQuickAccountAccess ||
+                             showWelcomeToAccount || showStandaloneRegistration;
 
     return (
       <ErrorBoundary>
         <NewHomePage
           onStartInvestment={handleStartInvestment}
-          onOpenPartnerProgram={() => setShowSuccessPartnerIntro(true)}
+          onOpenPartnerProgram={() => setShowSuccessPartnerIntroExperience(true)}
           onOpenAccount={() => setShowQuickAccountAccess(true)}
           onOpenAssistant={() => setShowAdvancedAssistant(true)}
           onOfferFarm={handleOfferFarmClick}
@@ -702,6 +705,14 @@ function AppContent() {
         />
 
         {/* Partner Program Modals - Must be inside NewHomePage render */}
+        <SuccessPartnerIntroExperience
+          isOpen={showSuccessPartnerIntroExperience}
+          onContinue={() => {
+            setShowSuccessPartnerIntroExperience(false);
+            setShowSuccessPartnerOnboarding(true);
+          }}
+        />
+
         <SuccessPartnerIntro
           isOpen={showSuccessPartnerIntro}
           onClose={() => setShowSuccessPartnerIntro(false)}
@@ -1213,7 +1224,7 @@ function AppContent() {
         )}
 
 
-      {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && !showAdvancedAssistant && ReactDOM.createPortal(
+      {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerIntroExperience && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && !showAdvancedAssistant && ReactDOM.createPortal(
         <div
           id="unified-footer"
           style={{
