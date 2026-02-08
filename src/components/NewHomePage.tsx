@@ -104,7 +104,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
             {/* Live Stats Ticker - Scrolling */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl py-2 shadow-xl border border-white/60 overflow-hidden">
               <div className="relative w-full">
-                <div className="flex animate-scroll-rtl whitespace-nowrap">
+                <div className="flex animate-scroll-ltr whitespace-nowrap">
                   {/* First Set of Stats */}
                   <div className="flex items-center gap-4 px-4">
                     {/* Total Reservations */}
