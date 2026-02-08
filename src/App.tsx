@@ -51,7 +51,7 @@ function AppContent() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const farmsSliderRef = useRef<HTMLDivElement>(null);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
-  const [pageInitialized, setPageInitialized] = useState(false);
+  const [allowHideFooter, setAllowHideFooter] = useState(false);
   const lastScrollYRef = useRef(0);
   const [currentFarmIndex, setCurrentFarmIndex] = useState(0);
   const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
@@ -94,12 +94,12 @@ function AppContent() {
   useEffect(() => {
     if (!showNewHomePage) {
       setIsScrollingDown(false);
-      setPageInitialized(false);
+      setAllowHideFooter(false);
       lastScrollYRef.current = 0;
 
       const timer = setTimeout(() => {
-        setPageInitialized(true);
-      }, 500);
+        setAllowHideFooter(true);
+      }, 1000);
 
       return () => clearTimeout(timer);
     }
@@ -1093,10 +1093,10 @@ function AppContent() {
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             bottom: 0,
-            transform: (!pageInitialized || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
+            transform: (!allowHideFooter || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
             transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
             willChange: 'transform',
-            WebkitTransform: (!pageInitialized || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
+            WebkitTransform: (!allowHideFooter || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
             WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
           }}
         >
@@ -1215,7 +1215,7 @@ function AppContent() {
         <nav
           className="fixed left-0 right-0 lg:hidden"
         style={{
-          transform: (!pageInitialized || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
+          transform: (!allowHideFooter || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
           bottom: 0,
           background: 'linear-gradient(180deg, #f8f6f2 0%, #f0ede7 100%)',
           borderTop: '1px solid rgba(200,195,185,0.5)',
@@ -1226,7 +1226,7 @@ function AppContent() {
           position: 'fixed',
           transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
           willChange: 'transform',
-          WebkitTransform: (!pageInitialized || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
+          WebkitTransform: (!allowHideFooter || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
           WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
         }}
       >
