@@ -13,6 +13,7 @@ interface NewHomePageProps {
   onOpenAccount: () => void;
   onOpenAssistant: () => void;
   onOfferFarm: () => void;
+  hideFooter?: boolean;
 }
 
 interface PlatformStats {
@@ -36,7 +37,8 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   onOpenPartnerProgram,
   onOpenAccount,
   onOpenAssistant,
-  onOfferFarm
+  onOfferFarm,
+  hideFooter = false
 }) => {
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [introVideo, setIntroVideo] = useState<IntroVideo | null>(null);
@@ -495,7 +497,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
       </div>
 
       {/* Fixed Bottom Footer - Unified Design for Mobile & Desktop */}
-      {ReactDOM.createPortal(
+      {!hideFooter && ReactDOM.createPortal(
         <div
           id="home-footer-portal"
           style={{

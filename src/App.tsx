@@ -683,6 +683,13 @@ function AppContent() {
 
   if (showNewHomePage && !showAdminDashboard && !showAdminLogin) {
     console.log('✅ [App] Showing New Home Page!');
+
+    const shouldHideFooter = showSuccessPartnerIntro || showSuccessPartnerOnboarding ||
+                             showSuccessPartnerRegistration || showSuccessPartnerWelcome ||
+                             showHowItWorksPartner || showAdvancedAssistant ||
+                             showQuickAccountAccess || showWelcomeToAccount ||
+                             showStandaloneRegistration;
+
     return (
       <ErrorBoundary>
         <NewHomePage
@@ -691,6 +698,7 @@ function AppContent() {
           onOpenAccount={() => setShowQuickAccountAccess(true)}
           onOpenAssistant={() => setShowAdvancedAssistant(true)}
           onOfferFarm={handleOfferFarmClick}
+          hideFooter={shouldHideFooter}
         />
 
         {/* Partner Program Modals - Must be inside NewHomePage render */}
