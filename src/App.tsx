@@ -1226,33 +1226,25 @@ function AppContent() {
           }}
         >
         <div className="max-w-7xl mx-auto w-full px-8 py-6 flex items-center justify-around gap-8">
-          {/* زر اعرض مزرعتك - تصميم ثلاثي الأبعاد */}
+          {/* زر اعرض مزرعتك - أيقونة مجسمة فقط */}
           <button
             onClick={handleOfferFarmClick}
-            className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 group relative overflow-hidden"
-            style={{
-              background: 'linear-gradient(135deg, #3aa17e 0%, #2d7a5f 100%)',
-              boxShadow: '0 8px 20px rgba(58, 161, 126, 0.35), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)',
-              border: 'none'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
-              e.currentTarget.style.boxShadow = '0 12px 28px rgba(58, 161, 126, 0.45), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0) scale(1)';
-              e.currentTarget.style.boxShadow = '0 8px 20px rgba(58, 161, 126, 0.35), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
-            }}
+            className="flex flex-col items-center gap-2.5 transition-all duration-300 group"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent"></div>
-            {/* أيقونة الغصن مباشرة مع Plus بدون مربع - أصغر */}
+            {/* أيقونة الغصن مجسمة مع ظلال 3D */}
             <div className="relative">
-              <Sprout className="w-6 h-6 text-white" strokeWidth={2.5} />
-              <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white/40 flex items-center justify-center" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-                <Plus className="w-2.5 h-2.5 text-white group-hover:rotate-90 transition-transform duration-300" strokeWidth={3} />
+              <Sprout
+                className="w-10 h-10 text-emerald-600 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-500"
+                strokeWidth={2.5}
+                style={{
+                  filter: 'drop-shadow(0 4px 8px rgba(58, 161, 126, 0.4)) drop-shadow(0 2px 4px rgba(58, 161, 126, 0.3))',
+                }}
+              />
+              <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center transition-all duration-300 group-hover:scale-110" style={{ boxShadow: '0 3px 8px rgba(58, 161, 126, 0.5)' }}>
+                <Plus className="w-3 h-3 text-white group-hover:rotate-90 transition-transform duration-300" strokeWidth={3} />
               </div>
             </div>
-            <span className="text-xs font-bold text-white relative">اعرض مزرعتك</span>
+            <span className="text-sm font-bold text-gray-700 group-hover:text-emerald-600 transition-colors duration-300">اعرض مزرعتك</span>
           </button>
 
           {/* زر المساعد الذكي */}
@@ -1282,41 +1274,28 @@ function AppContent() {
             <span className="text-sm font-bold text-emerald-600">المساعد الذكي</span>
           </button>
 
-          {/* زر أشجاري - بدون مربع، مجسم الشجرة فقط */}
+          {/* زر أشجاري - أيقونة مجسمة فقط (الأكبر والأبرز) */}
           <button
             onClick={handleMyFarmClick}
-            className="flex flex-col items-center gap-2.5 px-10 py-5 rounded-3xl transition-all duration-300 group relative"
-            style={{
-              background: appMode === 'agricultural'
-                ? 'linear-gradient(135deg, #3aa17e 0%, #2d7a5f 100%)'
-                : 'linear-gradient(135deg, #d4af37 0%, #b8942f 100%)',
-              boxShadow: appMode === 'agricultural'
-                ? '0 12px 30px rgba(58,161,126,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)'
-                : '0 12px 30px rgba(212,175,55,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)',
-              border: 'none',
-              transform: 'scale(1.08)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px) scale(1.12)';
-              if (appMode === 'agricultural') {
-                e.currentTarget.style.boxShadow = '0 16px 40px rgba(58,161,126,0.5), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
-              } else {
-                e.currentTarget.style.boxShadow = '0 16px 40px rgba(212,175,55,0.5), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0) scale(1.08)';
-              if (appMode === 'agricultural') {
-                e.currentTarget.style.boxShadow = '0 12px 30px rgba(58,161,126,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
-              } else {
-                e.currentTarget.style.boxShadow = '0 12px 30px rgba(212,175,55,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
-              }
-            }}
+            className="flex flex-col items-center gap-3 transition-all duration-300 group transform scale-110"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent rounded-3xl"></div>
-            {/* أيقونة الشجرة مباشرة بدون مربع */}
-            <TreePine className="w-9 h-9 text-white transition-transform duration-300 group-hover:scale-110 relative" strokeWidth={2.5} />
-            <span className="text-sm font-bold text-white relative">أشجاري</span>
+            {/* أيقونة الشجرة مجسمة مع ظلال 3D قوية */}
+            <TreePine
+              className={`w-14 h-14 transition-all duration-300 group-hover:scale-110 ${
+                appMode === 'agricultural' ? 'text-emerald-600 group-hover:text-emerald-500' : 'text-amber-500 group-hover:text-amber-400'
+              }`}
+              strokeWidth={2.5}
+              style={{
+                filter: appMode === 'agricultural'
+                  ? 'drop-shadow(0 6px 12px rgba(58, 161, 126, 0.5)) drop-shadow(0 3px 6px rgba(58, 161, 126, 0.4))'
+                  : 'drop-shadow(0 6px 12px rgba(212, 175, 55, 0.5)) drop-shadow(0 3px 6px rgba(212, 175, 55, 0.4))',
+              }}
+            />
+            <span className={`text-base font-bold transition-colors duration-300 ${
+              appMode === 'agricultural' ? 'text-emerald-700 group-hover:text-emerald-600' : 'text-amber-600 group-hover:text-amber-500'
+            }`}>
+              أشجاري
+            </span>
           </button>
 
           {/* مركز الإشعارات */}
@@ -1326,28 +1305,20 @@ function AppContent() {
             onOpenChange={setShowNotifications}
           />
 
-          {/* زر حسابي - تصميم ثلاثي الأبعاد أصغر بلون زراعي */}
+          {/* زر حسابي - أيقونة مجسمة فقط */}
           <button
             onClick={handleMyAccountClick}
-            className="flex flex-col items-center gap-2 px-6 py-3 rounded-2xl transition-all duration-300 group relative overflow-hidden"
-            style={{
-              background: 'linear-gradient(135deg, #3aa17e 0%, #2d7a5f 100%)',
-              boxShadow: '0 8px 20px rgba(58, 161, 126, 0.35), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)',
-              border: 'none'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px) scale(1.03)';
-              e.currentTarget.style.boxShadow = '0 12px 28px rgba(58, 161, 126, 0.45), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0) scale(1)';
-              e.currentTarget.style.boxShadow = '0 8px 20px rgba(58, 161, 126, 0.35), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
-            }}
+            className="flex flex-col items-center gap-2.5 transition-all duration-300 group"
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent"></div>
-            {/* أيقونة الرجل مباشرة بدون مربع - أصغر */}
-            <User className="w-6 h-6 text-white transition-transform duration-300 group-hover:scale-110 relative" strokeWidth={2.5} />
-            <span className="text-xs font-bold text-white relative">حسابي</span>
+            {/* أيقونة الرجل مجسمة مع ظلال 3D */}
+            <User
+              className="w-10 h-10 text-emerald-600 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-500"
+              strokeWidth={2.5}
+              style={{
+                filter: 'drop-shadow(0 4px 8px rgba(58, 161, 126, 0.4)) drop-shadow(0 2px 4px rgba(58, 161, 126, 0.3))',
+              }}
+            />
+            <span className="text-sm font-bold text-gray-700 group-hover:text-emerald-600 transition-colors duration-300">حسابي</span>
           </button>
         </div>
       </nav>
