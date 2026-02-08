@@ -687,12 +687,7 @@ function AppContent() {
       <ErrorBoundary>
         <NewHomePage
           onStartInvestment={handleStartInvestment}
-          onOpenPartnerProgram={() => {
-            console.log('🎯 Opening Partner Program - Going to Admin Dashboard');
-            setAdminInitialSection('marketing');
-            setAdminInitialMarketingTab('influencers');
-            setShowAdminLogin(true);
-          }}
+          onOpenPartnerProgram={() => setShowSuccessPartnerIntro(true)}
           onOpenAccount={() => setShowQuickAccountAccess(true)}
           onOpenAssistant={() => setShowAdvancedAssistant(true)}
           onOfferFarm={handleOfferFarmClick}
