@@ -688,6 +688,7 @@ function AppContent() {
           onOpenPartnerProgram={() => setShowSuccessPartnerIntro(true)}
           onOpenAccount={() => setShowQuickAccountAccess(true)}
           onOpenAssistant={() => setShowAdvancedAssistant(true)}
+          onOfferFarm={handleOfferFarmClick}
         />
       </ErrorBoundary>
     );

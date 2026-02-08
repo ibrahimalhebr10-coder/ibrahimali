@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Play, Shield, TrendingUp, Star, Handshake, User, Sprout, Sparkles, CheckCircle, ChevronLeft, Users, TreePine, Calendar, Award, Zap, Bell, X } from 'lucide-react';
+import { Play, Shield, TrendingUp, Star, Handshake, User, Sprout, Sparkles, CheckCircle, ChevronLeft, Users, TreePine, Calendar, Award, Zap, Bell, X, Plus } from 'lucide-react';
 import IntroVideoPlayer from './IntroVideoPlayer';
 import NotificationCenter from './NotificationCenter';
 import { supabase } from '../lib/supabase';
@@ -12,6 +12,7 @@ interface NewHomePageProps {
   onOpenPartnerProgram: () => void;
   onOpenAccount: () => void;
   onOpenAssistant: () => void;
+  onOfferFarm: () => void;
 }
 
 interface PlatformStats {
@@ -34,7 +35,8 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   onStartInvestment,
   onOpenPartnerProgram,
   onOpenAccount,
-  onOpenAssistant
+  onOpenAssistant,
+  onOfferFarm
 }) => {
   const [showVideoPlayer, setShowVideoPlayer] = useState(false);
   const [introVideo, setIntroVideo] = useState<IntroVideo | null>(null);
@@ -482,13 +484,39 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
               gap: '8px'
             }}
           >
-            <div style={{ minWidth: '60px', display: 'flex', justifyContent: 'center' }}>
-              <NotificationCenter
-                unreadCount={unreadMessagesCount}
-                onCountChange={handleUnreadCountChange}
-                onOpenChange={() => {}}
-              />
-            </div>
+            <button
+              onClick={onOfferFarm}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '4px',
+                minWidth: '60px',
+                background: 'linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%)',
+                border: '2px solid #b8942f',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                padding: '8px 12px',
+                boxShadow: '0 4px 12px rgba(212, 175, 55, 0.4)',
+                transition: 'all 0.3s ease',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(212, 175, 55, 0.6)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(212, 175, 55, 0.4)';
+              }}
+            >
+              <div style={{ position: 'relative' }}>
+                <Plus style={{ width: '14px', height: '14px', color: '#ffffff', position: 'absolute', top: '-4px', right: '-4px' }} />
+                <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} />
+              </div>
+              <span style={{ fontSize: '10px', color: '#ffffff', fontWeight: 600, textAlign: 'center', lineHeight: '1.2' }}>اعرض مزرعتك</span>
+            </button>
 
             <button
               onClick={onStartInvestment}
