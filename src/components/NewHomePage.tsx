@@ -484,39 +484,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
               gap: '8px'
             }}
           >
-            <button
-              onClick={onOfferFarm}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                minWidth: '60px',
-                background: 'linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%)',
-                border: '2px solid #b8942f',
-                borderRadius: '12px',
-                cursor: 'pointer',
-                padding: '8px 12px',
-                boxShadow: '0 4px 12px rgba(212, 175, 55, 0.4)',
-                transition: 'all 0.3s ease',
-                position: 'relative',
-                overflow: 'hidden'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'scale(1.05)';
-                e.currentTarget.style.boxShadow = '0 6px 20px rgba(212, 175, 55, 0.6)';
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(212, 175, 55, 0.4)';
-              }}
-            >
-              <div style={{ position: 'relative' }}>
-                <Plus style={{ width: '14px', height: '14px', color: '#ffffff', position: 'absolute', top: '-4px', right: '-4px' }} />
-                <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} />
-              </div>
-              <span style={{ fontSize: '10px', color: '#ffffff', fontWeight: 600, textAlign: 'center', lineHeight: '1.2' }}>اعرض مزرعتك</span>
-            </button>
+            <div style={{ minWidth: '60px' }}></div>
 
             <button
               onClick={onStartInvestment}
