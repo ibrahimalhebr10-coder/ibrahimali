@@ -828,7 +828,7 @@ function AppContent() {
 
         {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && (
           <Header
-            isVisible={!showAccountProfile && !showSuccessPartnerAccount}
+            isVisible={!showAccountProfile && !showSuccessPartnerAccount && !showMyTrees}
             onAdminAccess={() => setShowAdminLogin(true)}
           />
         )}
@@ -1235,7 +1235,7 @@ function AppContent() {
         )}
 
 
-      {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerIntroExperience && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && !showAdvancedAssistant && !showAccountProfile && !showSuccessPartnerAccount && ReactDOM.createPortal(
+      {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerIntroExperience && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && !showAdvancedAssistant && !showAccountProfile && !showSuccessPartnerAccount && !showMyTrees && ReactDOM.createPortal(
         <div
           id="unified-footer"
           style={{
