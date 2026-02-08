@@ -1,5 +1,6 @@
 import { User, Handshake, Sprout, Wheat, Apple, Grape, Leaf, HelpCircle, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X, Video } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import NewHomePage from './components/NewHomePage';
 import HowToStart from './components/HowToStart';
 import StreamingVideoPlayer from './components/StreamingVideoPlayer';
 import AdvancedAIAssistant from './components/AdvancedAIAssistant';
@@ -87,6 +88,7 @@ function AppContent() {
   const [accountIndicatorType, setAccountIndicatorType] = useState<'regular' | 'partner'>('regular');
   const [showSuccessPartnerAccount, setShowSuccessPartnerAccount] = useState(false);
   const [showAccountTypeSelector, setShowAccountTypeSelector] = useState(false);
+  const [showNewHomePage, setShowNewHomePage] = useState(true);
 
   const handleAppModeChange = async (mode: AppMode) => {
     await updateIdentity(mode);
@@ -616,6 +618,19 @@ function AppContent() {
     return (
       <ErrorBoundary>
         <FarmOfferMode />
+      </ErrorBoundary>
+    );
+  }
+
+  if (showNewHomePage && !showAdminDashboard && !showAdminLogin) {
+    return (
+      <ErrorBoundary>
+        <NewHomePage
+          onStartInvestment={() => setShowNewHomePage(false)}
+          onOpenPartnerProgram={() => setShowSuccessPartnerIntro(true)}
+          onOpenAccount={() => setShowQuickAccountAccess(true)}
+          onOpenAssistant={() => setShowAdvancedAssistant(true)}
+        />
       </ErrorBoundary>
     );
   }
