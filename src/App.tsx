@@ -1314,49 +1314,7 @@ function AppContent() {
               <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '15px' }}>أشجاري</span>
             </button>
 
-            {/* Notifications Button - Right */}
-            <button
-              onClick={() => setShowNotifications(true)}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '5px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                position: 'relative',
-                minWidth: '60px'
-              }}
-            >
-              <div style={{ position: 'relative' }}>
-                <svg style={{ width: '26px', height: '26px', color: '#9ca3af' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-                </svg>
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '-5px',
-                    right: '-5px',
-                    width: '18px',
-                    height: '18px',
-                    borderRadius: '50%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '11px',
-                    fontWeight: 700,
-                    color: '#ffffff',
-                    background: '#dc2626',
-                    boxShadow: '0 2px 6px rgba(220, 38, 38, 0.4)'
-                  }}
-                >
-                  {unreadMessagesCount > 0 ? (unreadMessagesCount > 9 ? '9+' : unreadMessagesCount) : '3'}
-                </div>
-              </div>
-              <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600 }}>الإشعارات</span>
-            </button>
+            <div style={{ minWidth: '60px' }}></div>
           </div>
         </div>,
         document.body
