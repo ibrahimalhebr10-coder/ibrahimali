@@ -1245,12 +1245,11 @@ function AppContent() {
             }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent"></div>
+            {/* أيقونة الغصن مباشرة مع Plus بدون مربع */}
             <div className="relative">
-              <div className="w-10 h-10 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center">
-                <Sprout className="w-5 h-5 text-white" strokeWidth={2.5} />
-                <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white/40 flex items-center justify-center">
-                  <Plus className="w-3 h-3 text-white group-hover:rotate-90 transition-transform duration-300" strokeWidth={3} />
-                </div>
+              <Sprout className="w-7 h-7 text-white" strokeWidth={2.5} />
+              <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-white/40 flex items-center justify-center" style={{ boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+                <Plus className="w-3 h-3 text-white group-hover:rotate-90 transition-transform duration-300" strokeWidth={3} />
               </div>
             </div>
             <span className="text-sm font-bold text-white relative">اعرض مزرعتك</span>
@@ -1283,10 +1282,10 @@ function AppContent() {
             <span className="text-sm font-bold text-emerald-600">المساعد الذكي</span>
           </button>
 
-          {/* زر أشجاري - تصميم ثلاثي الأبعاد محسّن */}
+          {/* زر أشجاري - تصميم ثلاثي الأبعاد محسّن (أصغر قليلاً) */}
           <button
             onClick={handleMyFarmClick}
-            className="flex flex-col items-center gap-2.5 px-10 py-5 rounded-3xl transition-all duration-300 group relative"
+            className="flex flex-col items-center gap-2.5 px-8 py-4 rounded-3xl transition-all duration-300 group relative"
             style={{
               background: appMode === 'agricultural'
                 ? 'linear-gradient(135deg, #3aa17e 0%, #2d7a5f 100%)'
@@ -1295,10 +1294,10 @@ function AppContent() {
                 ? '0 12px 30px rgba(58,161,126,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)'
                 : '0 12px 30px rgba(212,175,55,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)',
               border: 'none',
-              transform: 'scale(1.08)'
+              transform: 'scale(1.05)'
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-4px) scale(1.12)';
+              e.currentTarget.style.transform = 'translateY(-3px) scale(1.08)';
               if (appMode === 'agricultural') {
                 e.currentTarget.style.boxShadow = '0 16px 40px rgba(58,161,126,0.5), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
               } else {
@@ -1306,7 +1305,7 @@ function AppContent() {
               }
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0) scale(1.08)';
+              e.currentTarget.style.transform = 'translateY(0) scale(1.05)';
               if (appMode === 'agricultural') {
                 e.currentTarget.style.boxShadow = '0 12px 30px rgba(58,161,126,0.4), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -4px 0 rgba(0,0,0,0.15)';
               } else {
@@ -1349,9 +1348,8 @@ function AppContent() {
             }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent"></div>
-            <div className="w-10 h-10 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center relative" style={{ boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-              <User className="w-5 h-5 text-white transition-transform duration-300 group-hover:scale-110" strokeWidth={2.5} />
-            </div>
+            {/* أيقونة الرجل مباشرة بدون مربع */}
+            <User className="w-7 h-7 text-white transition-transform duration-300 group-hover:scale-110 relative" strokeWidth={2.5} />
             <span className="text-sm font-bold text-white relative">حسابي</span>
           </button>
         </div>
@@ -1426,24 +1424,13 @@ function AppContent() {
                 borderRadius: '18px 18px 0 0'
               }}></div>
 
-              <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.25)',
-                backdropFilter: 'blur(10px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3)',
-                position: 'relative'
-              }}>
-                <User style={{ width: '20px', height: '20px', color: '#ffffff' }} strokeWidth={2.5} />
-              </div>
+              {/* أيقونة الرجل مباشرة بدون مربع */}
+              <User style={{ width: '28px', height: '28px', color: '#ffffff', position: 'relative' }} strokeWidth={2.5} />
+
               <span style={{ fontSize: '11px', color: '#ffffff', fontWeight: 700, position: 'relative' }}>حسابي</span>
             </button>
 
-            {/* زر أشجاري - تصميم ثلاثي الأبعاد محسّن */}
+            {/* زر أشجاري - تصميم ثلاثي الأبعاد محسّن (أصغر قليلاً) */}
             <button
               onClick={handleMyFarmClick}
               style={{
@@ -1451,7 +1438,7 @@ function AppContent() {
                 flexDirection: 'column',
                 alignItems: 'center',
                 gap: '6px',
-                padding: '12px 8px',
+                padding: '10px 8px',
                 borderRadius: '18px',
                 background: appMode === 'agricultural'
                   ? 'linear-gradient(135deg, #3aa17e 0%, #2d7a5f 100%)'
@@ -1548,34 +1535,26 @@ function AppContent() {
                 borderRadius: '18px 18px 0 0'
               }}></div>
 
-              <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.25)',
-                backdropFilter: 'blur(10px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3)',
-                position: 'relative'
-              }}>
-                <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} strokeWidth={2.5} />
+              {/* أيقونة الغصن مباشرة مع Plus بدون مربع */}
+              <div style={{ position: 'relative' }}>
+                <Sprout style={{ width: '28px', height: '28px', color: '#ffffff' }} strokeWidth={2.5} />
                 <div style={{
                   position: 'absolute',
-                  top: '-2px',
-                  right: '-2px',
-                  width: '12px',
-                  height: '12px',
+                  top: '-4px',
+                  right: '-4px',
+                  width: '14px',
+                  height: '14px',
                   borderRadius: '50%',
                   background: 'rgba(255, 255, 255, 0.4)',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                 }}>
-                  <Plus style={{ width: '8px', height: '8px', color: '#ffffff' }} strokeWidth={3} />
+                  <Plus style={{ width: '9px', height: '9px', color: '#ffffff' }} strokeWidth={3} />
                 </div>
               </div>
+
               <span style={{ fontSize: '10px', color: '#ffffff', fontWeight: 700, position: 'relative', textAlign: 'center', lineHeight: '1.2' }}>
                 اعرض<br/>مزرعتك
               </span>
