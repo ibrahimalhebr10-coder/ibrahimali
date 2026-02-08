@@ -901,119 +901,135 @@ function AppContent() {
                         setSelectedInvestmentFarm(farm);
                         setSelectedFarmMode(appMode);
                       }}
-                      className="flex-shrink-0 w-[92%] lg:w-[calc(50%-1rem)] xl:w-[calc(33.333%-1rem)] rounded-[24px] overflow-hidden text-right relative cursor-pointer transition-all duration-300 group animate-fadeIn snap-center"
+                      className="flex-shrink-0 w-[92%] lg:w-[calc(50%-1rem)] xl:w-[calc(33.333%-1rem)] rounded-[20px] text-right relative cursor-pointer transition-all duration-300 group animate-fadeIn snap-center pt-5"
                       style={{
-                        background: 'linear-gradient(180deg, #fefefe 0%, #f8f6f3 100%)',
-                        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.1), 0 4px 12px rgba(0,0,0,0.05)',
-                        border: '1px solid rgba(230,225,215,0.5)',
-                        animationDelay: `${idx * 100}ms`
+                        animationDelay: `${idx * 80}ms`
                       }}
                       onTouchStart={(e) => {
-                        e.currentTarget.style.transform = 'scale(0.98)';
+                        const card = e.currentTarget.querySelector('.farm-card-inner') as HTMLElement;
+                        if (card) card.style.transform = 'scale(0.98)';
                       }}
                       onTouchEnd={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)';
+                        const card = e.currentTarget.querySelector('.farm-card-inner') as HTMLElement;
+                        if (card) card.style.transform = 'scale(1)';
                       }}
                     >
-                      {/* Farm Image Section */}
-                      <div className="relative w-full h-40 overflow-hidden rounded-t-[24px]">
-                        <img
-                          src={farm.image}
-                          alt={farm.name}
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
-
-                        {/* Farm Name Badge - Top Center */}
-                        <div
-                          className="absolute top-3 left-1/2 -translate-x-1/2 px-5 py-2 rounded-full"
-                          style={{
-                            background: 'linear-gradient(145deg, #4a9d7c 0%, #2d6a4f 100%)',
-                            boxShadow: '0 6px 20px rgba(45, 106, 79, 0.45)'
-                          }}
-                        >
-                          <span className="text-sm font-bold text-white whitespace-nowrap">
-                            {farm.name}
-                          </span>
-                        </div>
-
-                        {/* Return Rate Badge - Gold Circle */}
-                        <div
-                          className="absolute top-1/2 -translate-y-1/2 left-3 w-[76px] h-[76px] rounded-full flex flex-col items-center justify-center"
-                          style={{
-                            background: 'linear-gradient(145deg, #f5e9c8 0%, #d4b04a 25%, #c9a227 50%, #b8922a 75%, #d4b85a 100%)',
-                            border: '4px solid rgba(255,255,255,0.98)',
-                            boxShadow: '0 8px 28px rgba(169, 124, 0, 0.45), inset 0 2px 6px rgba(255,255,255,0.5)'
-                          }}
-                        >
-                          <span className="text-[10px] font-bold" style={{ color: '#5c4a1f' }}>عائد سنوي</span>
-                          <div className="flex items-center gap-0.5">
-                            <span className="text-[22px] font-black" style={{ color: '#4a3a15' }}>{farm.returnRate}</span>
-                            <TrendingUp className="w-4 h-4 text-green-700" strokeWidth={3} />
-                          </div>
-                        </div>
+                      {/* Farm Name Badge - Floating Above Card */}
+                      <div
+                        className="absolute top-0 left-1/2 -translate-x-1/2 z-20 px-6 py-2 rounded-full"
+                        style={{
+                          background: 'linear-gradient(180deg, #4a9d7c 0%, #357a5c 50%, #2d6a4f 100%)',
+                          boxShadow: '0 4px 12px rgba(45, 106, 79, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
+                          border: '1px solid rgba(255,255,255,0.1)'
+                        }}
+                      >
+                        <span className="text-[14px] font-bold text-white whitespace-nowrap" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>
+                          {farm.name}
+                        </span>
                       </div>
 
-                      {/* Card Content */}
-                      <div className="p-3.5 space-y-2" style={{ background: '#fefefe' }}>
-                        {/* Available Trees */}
-                        <div className="flex items-center justify-center gap-2">
-                          <span className="text-[15px] font-bold" style={{ color: '#3a3a3a' }}>
-                            {totalTrees} شجرة متاحة للاستثمار
-                          </span>
-                          <CheckCircle2 className="w-5 h-5 text-green-600" strokeWidth={2.5} />
-                        </div>
+                      {/* Card Inner Container */}
+                      <div
+                        className="farm-card-inner rounded-[20px] overflow-hidden transition-transform duration-200"
+                        style={{
+                          background: 'linear-gradient(180deg, #fefefe 0%, #f8f7f5 100%)',
+                          boxShadow: '0 6px 24px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0,0,0,0.05)',
+                          border: '1px solid rgba(230, 225, 215, 0.6)',
+                        }}
+                      >
+                        {/* Farm Image Section */}
+                        <div className="relative w-full h-40 overflow-visible">
+                          <img
+                            src={farm.image}
+                            alt={farm.name}
+                            className="w-full h-full object-cover rounded-t-[20px]"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent rounded-t-[20px]" />
 
-                        {/* Progress Bar */}
-                        <div className="space-y-2">
+                          {/* Return Rate Badge - Gold Circle - Right Side */}
                           <div
-                            className="relative h-4 rounded-full overflow-hidden"
+                            className="absolute top-1/2 -translate-y-1/2 -right-2 z-10 w-[88px] h-[88px] rounded-full flex flex-col items-center justify-center"
                             style={{
-                              background: 'linear-gradient(180deg, #e8e5de 0%, #dedad2 100%)',
-                              boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.08)'
+                              background: 'linear-gradient(145deg, #f7ebb8 0%, #e8d590 20%, #d4c070 40%, #c9b560 60%, #dcc878 80%, #e8d890 100%)',
+                              border: '3px solid #b8a050',
+                              boxShadow: '0 4px 16px rgba(169, 140, 50, 0.35), inset 0 2px 4px rgba(255,255,255,0.35), inset 0 -1px 2px rgba(0,0,0,0.08)'
                             }}
                           >
-                            <div
-                              className="absolute right-0 top-0 h-full rounded-r-full"
-                              style={{
-                                width: `${availablePercentage}%`,
-                                background: 'linear-gradient(90deg, #7ee8b8 0%, #4ade80 25%, #22c55e 50%, #16a34a 75%, #15803d 100%)',
-                              }}
-                            />
-                            {reservationPercentage > 0 && (
-                              <div
-                                className="absolute top-0 h-full"
-                                style={{
-                                  right: `${availablePercentage}%`,
-                                  width: `${reservationPercentage}%`,
-                                  background: 'linear-gradient(90deg, #fef08a 0%, #facc15 50%, #eab308 100%)',
-                                }}
-                              />
-                            )}
-                          </div>
-
-                          {/* Status Labels */}
-                          <div className="flex items-center justify-between px-0.5">
-                            <div className="flex items-center gap-1.5">
-                              <div className="w-3 h-3 rounded-full" style={{ background: 'linear-gradient(135deg, #4ade80 0%, #16a34a 100%)' }} />
-                              <span className="font-bold text-xs" style={{ color: '#555555' }}>متاح</span>
+                            <span className="text-[10px] font-bold" style={{ color: '#6b5a28' }}>عائد سنوي</span>
+                            <div className="flex items-center gap-0.5 -mt-0.5">
+                              <span className="text-[24px] font-black leading-none" style={{ color: '#4a4020' }}>{farm.returnRate}</span>
+                              <TrendingUp className="w-4 h-4 text-green-600" strokeWidth={3} />
                             </div>
-                            <div className="flex items-center gap-1.5">
-                              <div className="w-3 h-3 rounded-full" style={{ background: 'linear-gradient(135deg, #fef08a 0%, #eab308 100%)' }} />
-                              <span className="font-bold text-xs" style={{ color: '#555555' }}>محجوز</span>
-                            </div>
-                            <span className="font-black text-sm" style={{ color: '#333333' }}>
-                              {reservationPercentage.toFixed(0)}%
-                            </span>
                           </div>
                         </div>
 
-                        {/* Management Info */}
-                        <div className="flex items-center justify-center gap-1.5">
-                          <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
-                          <span className="font-semibold text-xs" style={{ color: '#666666' }}>
-                            الإدارة والمتابعة من فريق متخصص
-                          </span>
+                        {/* Card Content */}
+                        <div className="p-3.5 space-y-2.5" style={{ background: 'linear-gradient(180deg, #fefefe 0%, #faf9f7 100%)' }}>
+                          {/* Available Trees Row */}
+                          <div className="flex items-center justify-center gap-2">
+                            <span className="text-[14px] font-bold" style={{ color: '#3a3a3a' }}>
+                              {totalTrees} شجرة متاحة للاستثمار
+                            </span>
+                            <CheckCircle2 className="w-5 h-5 text-green-600" strokeWidth={2.5} />
+                          </div>
+
+                          {/* Progress Bar Section */}
+                          <div className="space-y-2">
+                            {/* The Bar */}
+                            <div
+                              className="relative h-[14px] rounded-full overflow-hidden"
+                              style={{
+                                background: 'linear-gradient(180deg, #e5e3dc 0%, #d8d5cd 100%)',
+                                boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
+                              }}
+                            >
+                              {/* Available - Green from right */}
+                              <div
+                                className="absolute right-0 top-0 h-full rounded-r-full"
+                                style={{
+                                  width: `${availablePercentage}%`,
+                                  background: 'linear-gradient(90deg, #6ee7b7 0%, #34d399 30%, #10b981 60%, #059669 100%)',
+                                }}
+                              />
+                              {/* Reserved - Yellow/Orange */}
+                              {reservationPercentage > 0 && (
+                                <div
+                                  className="absolute top-0 h-full"
+                                  style={{
+                                    right: `${availablePercentage}%`,
+                                    width: `${reservationPercentage}%`,
+                                    background: 'linear-gradient(90deg, #fde68a 0%, #fbbf24 50%, #f59e0b 100%)',
+                                  }}
+                                />
+                              )}
+                            </div>
+
+                            {/* Legend Row - Matching the image exactly */}
+                            <div className="flex items-center justify-between px-0.5">
+                              {/* Right side - Available */}
+                              <div className="flex items-center gap-1">
+                                <span className="font-bold text-[11px]" style={{ color: '#555' }}>متاح</span>
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'linear-gradient(135deg, #34d399 0%, #059669 100%)' }} />
+                              </div>
+                              {/* Center - Reserved */}
+                              <div className="flex items-center gap-1">
+                                <span className="font-bold text-[11px]" style={{ color: '#555' }}>محجوز</span>
+                                <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)' }} />
+                              </div>
+                              {/* Left side - Percentage */}
+                              <span className="font-black text-[13px]" style={{ color: '#333' }}>
+                                {reservationPercentage.toFixed(0)}%
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Management Info Row */}
+                          <div className="flex items-center justify-center gap-1.5 pt-0.5">
+                            <span className="font-semibold text-[11px]" style={{ color: '#777' }}>
+                              الإدارة والمتابعة من فريق متخصص
+                            </span>
+                            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                          </div>
                         </div>
                       </div>
                     </div>
