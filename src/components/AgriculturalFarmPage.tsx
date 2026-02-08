@@ -316,34 +316,42 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           )}
         </div>
 
-        {/* Action Icons Row */}
+        {/* Action Icons Row - Enhanced 3D Design */}
         <div className="px-4 py-3">
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => setShowVideoModal(true)}
               disabled={!farm.video}
-              className="flex items-center justify-center gap-2 p-4 bg-gradient-to-br from-green-100/50 to-emerald-100/50 rounded-xl border-2 border-darkgreen/30 hover:border-darkgreen/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+              className="group relative flex items-center justify-center gap-2 p-5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 overflow-hidden"
             >
-              <Video className="w-3 h-3 text-darkgreen" />
-              <span className="text-sm font-bold text-darkgreen">عرض فيديو</span>
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <Video className="w-5 h-5 text-white relative z-10" />
+              <span className="text-sm font-bold text-white relative z-10">عرض فيديو</span>
+              <div className="absolute -top-1 -right-1 w-16 h-16 bg-white/10 rounded-full blur-2xl"></div>
             </button>
 
             <button
               onClick={() => setShowInfoModal(true)}
-              className="flex items-center justify-center gap-2 p-4 bg-gradient-to-br from-green-100/50 to-emerald-100/50 rounded-xl border-2 border-darkgreen/30 hover:border-darkgreen/50 transition-all active:scale-95"
+              className="group relative flex items-center justify-center gap-2 p-5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl shadow-lg hover:shadow-2xl hover:scale-[1.02] transition-all duration-300 active:scale-95 overflow-hidden"
             >
-              <HelpCircle className="w-3 h-3 text-darkgreen" />
-              <span className="text-sm font-bold text-darkgreen">اعرف المزرعة</span>
+              <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <HelpCircle className="w-5 h-5 text-white relative z-10" />
+              <span className="text-sm font-bold text-white relative z-10">اعرف المزرعة</span>
+              <div className="absolute -bottom-1 -left-1 w-16 h-16 bg-white/10 rounded-full blur-2xl"></div>
             </button>
           </div>
         </div>
 
-        {/* Influencer Code Input - Always Visible */}
-        <div className="mt-3 mx-4">
-          <InfluencerCodeInput
-            onCodeEntered={handleInfluencerCodeEntered}
-            featuredColor={featuredColor}
-          />
+        {/* Influencer Code Input - Enhanced Design */}
+        <div className="mt-4 mx-4">
+          <div className="bg-gradient-to-br from-amber-50 via-yellow-50 to-orange-50 rounded-2xl border-2 border-amber-300 shadow-lg p-4 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-400/20 to-transparent rounded-full -mr-16 -mt-16"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tl from-orange-400/20 to-transparent rounded-full -ml-12 -mb-12"></div>
+            <InfluencerCodeInput
+              onCodeEntered={handleInfluencerCodeEntered}
+              featuredColor={featuredColor}
+            />
+          </div>
         </div>
 
         {/* Featured Package Overlay - Temporary Marketing Element */}
@@ -356,10 +364,18 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           </div>
         )}
 
-        {/* Agricultural Packages Slider */}
-        <div className="mt-3 bg-gradient-to-br from-green-50/95 via-emerald-50/90 to-teal-50/95 rounded-2xl border border-green-200/50 shadow-md py-4 mx-4">
-          <div className="px-4 mb-3 flex items-center justify-between">
-            <h3 className="text-base font-bold text-darkgreen">باقات أشجاري الخضراء</h3>
+        {/* Agricultural Packages Slider - Premium 3D Design */}
+        <div className="mt-6 mx-4">
+          <div className="bg-white/90 backdrop-blur-xl rounded-3xl border-2 border-green-200/80 shadow-2xl py-6 relative overflow-hidden">
+            {/* Decorative Background Elements */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-green-400/10 to-transparent rounded-full -ml-32 -mt-32"></div>
+            <div className="absolute bottom-0 right-0 w-48 h-48 bg-gradient-to-tl from-emerald-400/10 to-transparent rounded-full -mr-24 -mb-24"></div>
+
+            <div className="px-4 mb-4 flex items-center justify-between relative z-10">
+              <div>
+                <h3 className="text-lg font-bold text-darkgreen mb-1">باقات أشجاري الخضراء</h3>
+                <p className="text-xs text-gray-600">اختر الباقة المناسبة لك</p>
+              </div>
             {packages.length > 1 && (
               <div className="flex gap-2">
                 <button
@@ -380,11 +396,11 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             )}
           </div>
 
-          {/* Packages Slider */}
+          {/* Packages Slider - Enhanced 3D Cards */}
           <div
             ref={packagesScrollRef}
             onScroll={handlePackageScroll}
-            className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4"
+            className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide px-4 relative z-10"
             style={{ scrollPaddingLeft: '1rem' }}
           >
             {packages.map((pkg, index) => {
@@ -394,85 +410,148 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                 <div
                   key={pkg.id}
                   onClick={() => handleSelectPackage(pkg)}
-                  className={`relative flex-shrink-0 w-[85%] md:w-[48%] lg:w-[45%] xl:w-[30%] snap-center p-4 rounded-xl border-2 transition-all cursor-pointer active:scale-95 ${
+                  className={`group relative flex-shrink-0 w-[85%] md:w-[48%] lg:w-[45%] xl:w-[30%] snap-center rounded-2xl transition-all duration-300 cursor-pointer ${
                     isFeatured
-                      ? 'bg-gradient-to-br from-amber-50 to-yellow-50 border-amber-400 shadow-xl ring-2 ring-amber-400/50'
-                      : isSelected
-                      ? 'bg-gradient-to-br from-green-100/60 to-emerald-100/50 border-darkgreen shadow-lg'
-                      : 'bg-white/80 border-green-200 hover:border-green-400 hover:shadow-md'
+                      ? 'hover:scale-[1.02]'
+                      : 'hover:scale-[1.03]'
                   }`}
                   style={isFeatured ? {
-                    boxShadow: `0 0 30px ${featuredColor}40`
+                    filter: `drop-shadow(0 0 20px ${featuredColor}60)`
                   } : {}}
                 >
-                  {/* Info Button - Top Left Corner with Text */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePackageDetailsClick(pkg);
-                    }}
-                    className="absolute top-2 left-2 bg-gradient-to-l from-white/95 via-white/90 to-white/80 backdrop-blur-sm border border-green-300/60 hover:border-darkgreen/80 hover:from-green-50/95 hover:via-green-50/90 hover:to-green-50/80 transition-all flex items-center gap-1.5 shadow-md hover:shadow-lg active:scale-95 z-10 rounded-full px-3 py-1.5"
-                    aria-label="اقرأ المزيد عن الباقة"
+                  {/* Inner Card with 3D Effect */}
+                  <div className={`relative h-full p-5 rounded-2xl border-3 transition-all duration-300 ${
+                    isFeatured
+                      ? 'bg-gradient-to-br from-amber-400 via-yellow-400 to-orange-400 border-amber-500 shadow-2xl'
+                      : isSelected
+                      ? 'bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 border-green-600 shadow-2xl'
+                      : 'bg-gradient-to-br from-white via-green-50/30 to-emerald-50/30 border-green-300 shadow-lg group-hover:shadow-2xl group-hover:border-green-500'
+                  }`}
                   >
-                    <HelpCircle className="w-3.5 h-3.5 text-darkgreen" />
-                    <span className="text-[10px] font-semibold text-darkgreen/90 tracking-wide">
-                      اقرأ عن الباقة
-                    </span>
-                  </button>
+                    {/* Shimmer Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-out"></div>
 
-                  {/* Featured Badge */}
-                  {isFeatured && (
-                    <div
-                      className="absolute -top-3 right-1/2 transform translate-x-1/2 text-white text-xs font-bold px-4 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg animate-pulse"
-                      style={{ backgroundColor: featuredColor }}
+                    {/* Info Button - Enhanced */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handlePackageDetailsClick(pkg);
+                      }}
+                      className={`absolute top-3 left-3 backdrop-blur-md border-2 transition-all flex items-center gap-1.5 shadow-lg hover:shadow-2xl active:scale-90 z-20 rounded-full px-3 py-2 ${
+                        isFeatured || isSelected
+                          ? 'bg-white/90 border-white/50 hover:bg-white text-darkgreen'
+                          : 'bg-white/80 border-green-200 hover:bg-white hover:border-green-400 text-darkgreen'
+                      }`}
+                      aria-label="اقرأ المزيد عن الباقة"
                     >
-                      <Gift className="w-3.5 h-3.5" />
-                      <span>الباقة المميزة</span>
-                    </div>
-                  )}
+                      <HelpCircle className="w-4 h-4" />
+                      <span className="text-xs font-bold">
+                        التفاصيل
+                      </span>
+                    </button>
 
-                  {/* Selected Badge - Top Left Corner */}
-                  {isSelected && !isFeatured && (
-                    <div className="absolute top-2 right-2 bg-darkgreen text-white text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                      <span>✓</span>
-                      <span>مختارة</span>
-                    </div>
-                  )}
-
-                  <div className="text-center space-y-2.5 pt-6">
-                    <h4 className={`font-bold text-sm ${isFeatured ? 'text-amber-700' : 'text-darkgreen'}`}>
-                      {pkg.package_name}
-                    </h4>
-
-                    <div className={`${isFeatured ? 'bg-gradient-to-r from-amber-500 to-orange-600' : 'bg-green-600'} text-white rounded-lg py-2 px-3`}>
-                      <div className="text-xl font-bold">{pkg.price_per_tree} ر.س</div>
-                      <div className="text-[10px] opacity-90">للشجرة الواحدة</div>
-                    </div>
-
-                    {isFeatured && featuredPackageSettings && (
-                      <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-300 rounded-lg py-2 px-3 animate-bounce">
-                        <div className="flex items-center justify-center gap-2 text-amber-700">
-                          <Clock className="w-4 h-4" />
-                          <span className="font-bold text-sm">{featuredPackageSettings.highlightText}</span>
+                    {/* Featured Badge - Glowing */}
+                    {isFeatured && (
+                      <div className="absolute -top-4 right-1/2 transform translate-x-1/2 z-30">
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-white blur-md animate-pulse"></div>
+                          <div className="relative bg-white text-amber-700 text-xs font-black px-5 py-2 rounded-full flex items-center gap-2 shadow-2xl border-2 border-amber-300">
+                            <Gift className="w-4 h-4 animate-bounce" />
+                            <span>الباقة المميزة</span>
+                          </div>
                         </div>
                       </div>
                     )}
 
-                    {pkg.motivational_text && (
-                      <div className={`text-xs font-semibold rounded-lg py-1.5 px-2 ${
-                        isFeatured
-                          ? 'text-amber-700 bg-amber-50 border border-amber-200'
-                          : 'text-green-700 bg-green-50'
-                      }`}>
-                        {pkg.motivational_text}
+                    {/* Selected Badge - Enhanced */}
+                    {isSelected && !isFeatured && (
+                      <div className="absolute top-3 right-3 bg-white text-green-700 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1.5 shadow-lg border-2 border-white/50 z-20">
+                        <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-[10px]">✓</span>
+                        </div>
+                        <span>محددة</span>
                       </div>
                     )}
 
-                    {/* Selection Indicator */}
-                    <div className={`text-xs font-medium transition-all ${
-                      isSelected ? 'text-darkgreen' : 'text-gray-400'
-                    }`}>
-                      {isSelected ? '← الباقة المختارة' : 'اضغط للاختيار'}
+                    {/* Card Content - Enhanced */}
+                    <div className="text-center space-y-3 pt-8 relative z-10">
+                      {/* Package Name */}
+                      <h4 className={`font-black text-base tracking-tight ${
+                        isFeatured
+                          ? 'text-white drop-shadow-md'
+                          : isSelected
+                          ? 'text-white drop-shadow-md'
+                          : 'text-darkgreen'
+                      }`}>
+                        {pkg.package_name}
+                      </h4>
+
+                      {/* Price Badge - Premium Design */}
+                      <div className="relative inline-block">
+                        <div className={`absolute inset-0 blur-xl ${
+                          isFeatured
+                            ? 'bg-white/50'
+                            : isSelected
+                            ? 'bg-white/40'
+                            : 'bg-green-500/30'
+                        }`}></div>
+                        <div className={`relative ${
+                          isFeatured
+                            ? 'bg-white border-2 border-white/50'
+                            : isSelected
+                            ? 'bg-white border-2 border-white/50'
+                            : 'bg-gradient-to-r from-green-600 to-emerald-600 border-2 border-green-500'
+                        } rounded-2xl py-3 px-5 shadow-2xl`}>
+                          <div className={`text-2xl font-black ${
+                            isFeatured || isSelected ? 'text-green-700' : 'text-white'
+                          }`}>
+                            {pkg.price_per_tree}
+                            <span className="text-base mr-1">ر.س</span>
+                          </div>
+                          <div className={`text-[11px] font-bold ${
+                            isFeatured || isSelected ? 'text-green-600' : 'text-white/90'
+                          }`}>
+                            للشجرة الواحدة
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Featured Highlight */}
+                      {isFeatured && featuredPackageSettings && (
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-white/30 blur-lg animate-pulse"></div>
+                          <div className="relative bg-white rounded-2xl py-3 px-4 border-2 border-white/50 shadow-xl">
+                            <div className="flex items-center justify-center gap-2 text-amber-700">
+                              <Clock className="w-5 h-5 animate-pulse" />
+                              <span className="font-black text-sm">{featuredPackageSettings.highlightText}</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Motivational Text */}
+                      {pkg.motivational_text && (
+                        <div className={`text-xs font-bold rounded-xl py-2 px-3 shadow-md ${
+                          isFeatured
+                            ? 'text-white bg-white/20 border border-white/30'
+                            : isSelected
+                            ? 'text-white bg-white/20 border border-white/30'
+                            : 'text-green-700 bg-white/80 border border-green-200'
+                        }`}>
+                          {pkg.motivational_text}
+                        </div>
+                      )}
+
+                      {/* Selection Indicator - Enhanced */}
+                      <div className={`text-sm font-black transition-all pt-2 ${
+                        isSelected
+                          ? isFeatured
+                            ? 'text-white'
+                            : 'text-white'
+                          : 'text-gray-500 group-hover:text-green-600'
+                      }`}>
+                        {isSelected ? '✓ محددة الآن' : 'اضغط للتحديد'}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -480,104 +559,124 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             })}
           </div>
 
-          {/* Dots Indicator */}
+          {/* Dots Indicator - Enhanced */}
           {packages.length > 1 && (
-            <div className="flex justify-center gap-2 mt-3">
+            <div className="flex justify-center gap-2 mt-5 relative z-10">
               {packages.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => scrollToPackage(index)}
-                  className={`h-2 rounded-full transition-all ${
+                  className={`h-2.5 rounded-full transition-all shadow-md ${
                     index === currentPackageIndex
-                      ? 'w-6 bg-darkgreen'
-                      : 'w-2 bg-green-300 hover:bg-green-400'
+                      ? 'w-8 bg-gradient-to-r from-green-600 to-emerald-600 shadow-lg'
+                      : 'w-2.5 bg-green-300 hover:bg-green-500 hover:w-4'
                   }`}
                   aria-label={`الانتقال للباقة ${index + 1}`}
                 />
               ))}
             </div>
           )}
+          </div>
         </div>
 
-        {/* Tree Slider - احجز أشجارك */}
-        <div className="px-4 py-6 mt-4 bg-white rounded-2xl shadow-lg border border-green-100 mx-4">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-lg font-bold text-darkgreen flex items-center gap-2">
-                <Sprout className="w-5 h-5" />
-                احجز أشجارك
-              </h3>
-              <p className="text-xs text-gray-500 mt-0.5">اختر عدد الأشجار التي تريد حجزها</p>
-            </div>
-            <div className="text-right">
-              <div className="text-xs text-gray-500">متاح الآن</div>
-              <div className="text-lg font-bold text-darkgreen">{maxTrees}</div>
-              <div className="text-xs text-gray-500">شجرة</div>
-            </div>
-          </div>
+        {/* Tree Counter - Premium 3D Design */}
+        <div className="mt-6 mx-4">
+          <div className="bg-gradient-to-br from-white via-green-50/20 to-emerald-50/20 rounded-3xl shadow-2xl border-2 border-green-200/80 p-6 relative overflow-hidden">
+            {/* Decorative Elements */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-green-400/10 to-transparent rounded-full -mr-24 -mt-24"></div>
+            <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tl from-emerald-400/10 to-transparent rounded-full -ml-20 -mb-20"></div>
 
-          {/* Counter Controls */}
-          <div className="flex items-center justify-center gap-6 mb-6 py-4 bg-gradient-to-br from-green-50/50 to-emerald-50/50 rounded-xl">
-            <button
-              onClick={() => handleTreeCountChange(-1)}
-              disabled={treeCount === 0}
-              className="w-14 h-14 rounded-full bg-white border-2 border-darkgreen/40 flex items-center justify-center hover:border-darkgreen hover:bg-green-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 shadow-sm"
-            >
-              <Minus className="w-6 h-6 text-darkgreen" />
-            </button>
-
-            <div className="text-center">
-              <div className="text-5xl font-bold text-darkgreen min-w-[120px]">
-                {treeCount}
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6 relative z-10">
+              <div>
+                <h3 className="text-xl font-black text-darkgreen flex items-center gap-2.5">
+                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <Sprout className="w-5 h-5 text-white" />
+                  </div>
+                  احجز أشجارك
+                </h3>
+                <p className="text-sm text-gray-600 mt-1.5 mr-12">حدد عدد الأشجار المطلوبة</p>
               </div>
-              <div className="text-sm text-gray-600 mt-1">شجرة</div>
+              <div className="text-center bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl px-4 py-3 shadow-xl">
+                <div className="text-xs text-white/90 font-bold mb-0.5">متوفر</div>
+                <div className="text-2xl font-black text-white">{maxTrees}</div>
+                <div className="text-xs text-white/90 font-bold">شجرة</div>
+              </div>
             </div>
 
-            <button
-              onClick={() => handleTreeCountChange(1)}
-              disabled={treeCount >= maxTrees}
-              className="w-14 h-14 rounded-full bg-white border-2 border-darkgreen/40 flex items-center justify-center hover:border-darkgreen hover:bg-green-50 transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 shadow-sm"
-            >
-              <Plus className="w-6 h-6 text-darkgreen" />
-            </button>
-          </div>
+            {/* Counter Controls - Premium 3D */}
+            <div className="flex items-center justify-center gap-8 mb-6 py-6 bg-gradient-to-br from-green-50/60 to-emerald-50/60 rounded-2xl relative z-10 border-2 border-green-100/50">
+              <button
+                onClick={() => handleTreeCountChange(-1)}
+                disabled={treeCount === 0}
+                className="group relative w-16 h-16 rounded-2xl bg-gradient-to-br from-white to-green-50 border-3 border-green-300 flex items-center justify-center hover:from-green-500 hover:to-emerald-600 hover:border-green-600 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed active:scale-90 shadow-xl hover:shadow-2xl disabled:hover:from-white disabled:hover:to-green-50"
+              >
+                <Minus className="w-7 h-7 text-darkgreen group-hover:text-white transition-colors" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity"></div>
+              </button>
 
-          {/* Slider */}
-          <div className="relative mb-6">
-            <input
-              type="range"
-              min="0"
-              max={maxTrees}
-              value={treeCount}
-              onChange={handleSliderChange}
-              className="w-full h-3 bg-green-200 rounded-lg appearance-none cursor-pointer slider-thumb-green"
-              style={{
-                background: `linear-gradient(to right, #3AA17E 0%, #3AA17E ${(treeCount / maxTrees) * 100}%, #86EFAC ${(treeCount / maxTrees) * 100}%, #86EFAC 100%)`
-              }}
-            />
-            <div className="flex justify-between text-xs text-gray-500 mt-2">
-              <span>0</span>
-              <span>{maxTrees}</span>
+              <div className="text-center px-6">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-green-500/20 blur-2xl rounded-full"></div>
+                  <div className="relative text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-green-600 to-emerald-700 min-w-[140px] drop-shadow-lg">
+                    {treeCount}
+                  </div>
+                </div>
+                <div className="text-base font-bold text-gray-700 mt-2">شجرة</div>
+              </div>
+
+              <button
+                onClick={() => handleTreeCountChange(1)}
+                disabled={treeCount >= maxTrees}
+                className="group relative w-16 h-16 rounded-2xl bg-gradient-to-br from-white to-green-50 border-3 border-green-300 flex items-center justify-center hover:from-green-500 hover:to-emerald-600 hover:border-green-600 transition-all duration-300 disabled:opacity-30 disabled:cursor-not-allowed active:scale-90 shadow-xl hover:shadow-2xl disabled:hover:from-white disabled:hover:to-green-50"
+              >
+                <Plus className="w-7 h-7 text-darkgreen group-hover:text-white transition-colors" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/50 to-transparent opacity-0 group-hover:opacity-100 rounded-2xl transition-opacity"></div>
+              </button>
             </div>
-          </div>
 
-          {/* Quick Selectors */}
-          <div className="space-y-2">
-            <p className="text-xs text-gray-600 font-semibold">اختيار سريع:</p>
-            <div className="flex gap-2">
-              {[10, 25, 50, 100].filter(num => num <= maxTrees).map((num) => (
-                <button
-                  key={num}
-                  onClick={() => setTreeCount(num)}
-                  className={`flex-1 py-3 px-3 rounded-xl border-2 text-sm font-bold transition-all active:scale-95 ${
-                    treeCount === num
-                      ? 'bg-darkgreen text-white border-darkgreen shadow-md'
-                      : 'bg-white text-darkgreen border-green-300 hover:bg-green-50 hover:border-darkgreen'
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
+            {/* Slider - Enhanced */}
+            <div className="relative mb-8 px-2 relative z-10">
+              <input
+                type="range"
+                min="0"
+                max={maxTrees}
+                value={treeCount}
+                onChange={handleSliderChange}
+                className="w-full h-4 bg-gradient-to-r from-green-200 to-emerald-200 rounded-full appearance-none cursor-pointer slider-thumb-green shadow-inner"
+                style={{
+                  background: `linear-gradient(to right, #10B981 0%, #059669 ${(treeCount / maxTrees) * 100}%, #D1FAE5 ${(treeCount / maxTrees) * 100}%, #F0FDF4 100%)`
+                }}
+              />
+              <div className="flex justify-between text-sm font-bold text-gray-600 mt-3 px-1">
+                <span className="bg-white px-3 py-1 rounded-lg shadow-sm border border-green-200">0</span>
+                <span className="bg-white px-3 py-1 rounded-lg shadow-sm border border-green-200">{maxTrees}</span>
+              </div>
+            </div>
+
+            {/* Quick Selectors - Premium Cards */}
+            <div className="space-y-3 relative z-10">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent to-green-200"></div>
+                <p className="text-sm text-gray-700 font-bold px-3">اختيار سريع</p>
+                <div className="flex-1 h-0.5 bg-gradient-to-l from-transparent to-green-200"></div>
+              </div>
+              <div className="grid grid-cols-4 gap-3">
+                {[10, 25, 50, 100].filter(num => num <= maxTrees).map((num) => (
+                  <button
+                    key={num}
+                    onClick={() => setTreeCount(num)}
+                    className={`group relative py-4 px-2 rounded-2xl border-2 text-sm font-black transition-all duration-300 active:scale-90 overflow-hidden ${
+                      treeCount === num
+                        ? 'bg-gradient-to-br from-green-500 to-emerald-600 text-white border-green-600 shadow-2xl scale-105'
+                        : 'bg-white text-darkgreen border-green-300 hover:bg-green-50 hover:border-green-500 shadow-md hover:shadow-xl'
+                    }`}
+                  >
+                    <div className={`absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity`}></div>
+                    <span className="relative z-10">{num}</span>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -587,7 +686,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       </>
       )}
 
-      {/* Purchase Summary - Fixed Bottom - Compact Design */}
+      {/* Checkout Bar - Premium 3D Floating Design */}
       {treeCount > 0 && selectedContract && !showBookingFlow && (() => {
         console.log('📊 عرض الشريط السفلي - العقد المختار:', {
           name: selectedContract.contract_name,
@@ -597,53 +696,76 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         return true;
       })() && (
         <div
-          className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-white via-white to-white/95 backdrop-blur-xl border-t-2 border-darkgreen/40 shadow-2xl z-[100000]"
-          style={{ paddingBottom: 'max(4rem, env(safe-area-inset-bottom))' }}
+          className="fixed bottom-0 left-0 right-0 z-[100000] animate-in slide-in-from-bottom duration-500"
+          style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
         >
-          <div className="max-w-lg mx-auto px-4 pt-5 pb-4">
-            {/* Compact Info Row */}
-            <div className="flex items-center justify-between text-xs mb-3 px-2">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-darkgreen"></div>
-                  <span className="text-gray-600">{treeCount} شجرة</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                  <span className="text-gray-600">
-                    {selectedContract.duration_years} {selectedContract.duration_years === 1 ? 'سنة' : 'سنوات'}
-                    {selectedContract.bonus_years > 0 && (
-                      <span className="text-green-600 font-bold"> +{selectedContract.bonus_years}</span>
-                    )}
-                  </span>
-                </div>
+          {/* Backdrop Blur Layer */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/20 to-transparent backdrop-blur-xl"></div>
+
+          <div className="max-w-lg mx-auto px-4 pb-4 relative">
+            {/* Info Badges - Floating Above */}
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <div className="bg-white/95 backdrop-blur-md rounded-full px-4 py-2 shadow-2xl border-2 border-green-200 flex items-center gap-2">
+                <div className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 animate-pulse"></div>
+                <span className="text-sm font-bold text-darkgreen">{treeCount} شجرة</span>
               </div>
-              <div className="text-gray-500 font-semibold">خطوة واحدة ✓</div>
+              <div className="bg-white/95 backdrop-blur-md rounded-full px-4 py-2 shadow-2xl border-2 border-green-200 flex items-center gap-2">
+                <Clock className="w-4 h-4 text-darkgreen" />
+                <span className="text-sm font-bold text-darkgreen">
+                  {selectedContract.duration_years} {selectedContract.duration_years === 1 ? 'سنة' : 'سنوات'}
+                  {selectedContract.bonus_years > 0 && (
+                    <span className="text-green-600"> +{selectedContract.bonus_years}</span>
+                  )}
+                </span>
+              </div>
             </div>
 
-            {/* Total and Action Button - Prominent */}
-            <div className="bg-gradient-to-br from-darkgreen to-emerald-700 rounded-2xl p-4 shadow-xl">
-              <div className="flex items-center justify-between gap-4">
-                {/* Total Section */}
-                <div className="flex-1">
-                  <div className="text-green-100 text-xs mb-1 font-medium">الإجمالي الكلي</div>
-                  <div className="text-white text-3xl font-bold tracking-tight">
-                    {calculateTotal().toLocaleString()}
-                    <span className="text-lg mr-1.5">ر.س</span>
-                  </div>
-                  <div className="text-green-100/80 text-[10px] mt-0.5">
-                    {selectedPackage?.package_name}
-                  </div>
-                </div>
+            {/* Main Checkout Card - 3D Floating */}
+            <div className="relative">
+              {/* Glow Effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500 via-emerald-500 to-teal-500 blur-2xl opacity-60 rounded-3xl"></div>
 
-                {/* Action Button */}
-                <button
-                  onClick={handleBuyNow}
-                  className="px-6 py-4 bg-white text-darkgreen font-bold rounded-xl shadow-lg hover:shadow-2xl hover:scale-105 transition-all active:scale-95 flex items-center gap-2 whitespace-nowrap"
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  <span className="text-sm">احجز الآن</span>
-                </button>
+              {/* Card Content */}
+              <div className="relative bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 rounded-3xl p-5 shadow-2xl border-2 border-white/20 overflow-hidden">
+                {/* Animated Background Pattern */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32"></div>
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full -ml-24 -mb-24"></div>
+
+                <div className="flex items-center justify-between gap-4 relative z-10">
+                  {/* Total Section */}
+                  <div className="flex-1">
+                    <div className="text-white/80 text-xs mb-1.5 font-bold">المبلغ الإجمالي</div>
+                    <div className="flex items-baseline gap-2">
+                      <div className="text-white text-4xl font-black tracking-tight drop-shadow-lg">
+                        {calculateTotal().toLocaleString()}
+                      </div>
+                      <div className="text-white/90 text-xl font-bold">ر.س</div>
+                    </div>
+                    {selectedPackage && (
+                      <div className="text-white/70 text-xs mt-1.5 font-bold bg-white/10 rounded-full px-3 py-1 inline-block">
+                        {selectedPackage.package_name}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action Button - Pulsing */}
+                  <button
+                    onClick={handleBuyNow}
+                    className="group relative px-7 py-5 bg-white rounded-2xl shadow-2xl hover:shadow-[0_0_40px_rgba(255,255,255,0.5)] hover:scale-105 transition-all duration-300 active:scale-95 overflow-hidden"
+                  >
+                    {/* Button Glow on Hover */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-400/0 via-green-400/20 to-green-400/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+
+                    <div className="relative flex items-center gap-2.5">
+                      <ShoppingCart className="w-6 h-6 text-green-600 group-hover:animate-bounce" />
+                      <div className="text-right">
+                        <div className="text-sm font-black text-darkgreen leading-tight">احجز الآن</div>
+                        <div className="text-[10px] font-bold text-green-600">خطوة واحدة ✓</div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
