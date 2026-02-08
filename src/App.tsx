@@ -1282,7 +1282,7 @@ function AppContent() {
             <span className="text-sm font-bold text-emerald-600">المساعد الذكي</span>
           </button>
 
-          {/* زر أشجاري - تصميم ثلاثي الأبعاد محسّن */}
+          {/* زر أشجاري - بدون مربع، مجسم الشجرة فقط */}
           <button
             onClick={handleMyFarmClick}
             className="flex flex-col items-center gap-2.5 px-10 py-5 rounded-3xl transition-all duration-300 group relative"
@@ -1314,12 +1314,9 @@ function AppContent() {
             }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-white/15 via-transparent to-transparent rounded-3xl"></div>
-            <div className="w-12 h-12 rounded-xl bg-white/25 backdrop-blur-sm flex items-center justify-center relative" style={{ boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }}>
-              <TreePine className="w-7 h-7 text-white transition-transform duration-300 group-hover:scale-110" strokeWidth={2.5} />
-            </div>
-            <span className="text-sm font-bold text-white relative">
-              {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
-            </span>
+            {/* أيقونة الشجرة مباشرة بدون مربع */}
+            <TreePine className="w-9 h-9 text-white transition-transform duration-300 group-hover:scale-110 relative" strokeWidth={2.5} />
+            <span className="text-sm font-bold text-white relative">أشجاري</span>
           </button>
 
           {/* مركز الإشعارات */}
