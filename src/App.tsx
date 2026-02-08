@@ -51,6 +51,7 @@ function AppContent() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const farmsSliderRef = useRef<HTMLDivElement>(null);
   const [isScrollingDown, setIsScrollingDown] = useState(false);
+  const [pageInitialized, setPageInitialized] = useState(false);
   const lastScrollYRef = useRef(0);
   const [currentFarmIndex, setCurrentFarmIndex] = useState(0);
   const [hasSwipedOnce, setHasSwipedOnce] = useState(false);
@@ -89,6 +90,20 @@ function AppContent() {
   const [showSuccessPartnerAccount, setShowSuccessPartnerAccount] = useState(false);
   const [showAccountTypeSelector, setShowAccountTypeSelector] = useState(false);
   const [showNewHomePage, setShowNewHomePage] = useState(true);
+
+  useEffect(() => {
+    if (!showNewHomePage) {
+      setIsScrollingDown(false);
+      setPageInitialized(false);
+      lastScrollYRef.current = 0;
+
+      const timer = setTimeout(() => {
+        setPageInitialized(true);
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showNewHomePage]);
 
   const handleAppModeChange = async (mode: AppMode) => {
     await updateIdentity(mode);
@@ -1078,16 +1093,11 @@ function AppContent() {
             backdropFilter: 'blur(24px)',
             WebkitBackdropFilter: 'blur(24px)',
             bottom: 0,
-            transform: !isScrollingDown ? 'translateY(0)' : 'translateY(100%)',
+            transform: (!pageInitialized || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
             transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
             willChange: 'transform',
-            WebkitTransform: !isScrollingDown ? 'translateY(0)' : 'translateY(100%)',
+            WebkitTransform: (!pageInitialized || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
             WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
-          }}
-          ref={(el) => {
-            if (el) {
-              console.log('🟢 Desktop Footer - isScrollingDown:', isScrollingDown, 'Transform:', el.style.transform);
-            }
           }}
         >
         <div className="max-w-7xl mx-auto w-full px-8 py-5 pb-8 flex items-center justify-around">
@@ -1205,7 +1215,7 @@ function AppContent() {
         <nav
           className="fixed left-0 right-0 lg:hidden"
         style={{
-          transform: !isScrollingDown ? 'translateY(0)' : 'translateY(100%)',
+          transform: (!pageInitialized || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
           bottom: 0,
           background: 'linear-gradient(180deg, #f8f6f2 0%, #f0ede7 100%)',
           borderTop: '1px solid rgba(200,195,185,0.5)',
@@ -1216,13 +1226,8 @@ function AppContent() {
           position: 'fixed',
           transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
           willChange: 'transform',
-          WebkitTransform: !isScrollingDown ? 'translateY(0)' : 'translateY(100%)',
+          WebkitTransform: (!pageInitialized || !isScrollingDown) ? 'translateY(0)' : 'translateY(100%)',
           WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)'
-        }}
-        ref={(el) => {
-          if (el) {
-            console.log('Footer - isScrollingDown:', isScrollingDown);
-          }
         }}
       >
         <div className="flex items-center justify-between px-6">
