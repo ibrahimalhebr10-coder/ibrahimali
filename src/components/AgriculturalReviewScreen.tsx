@@ -27,6 +27,7 @@ export default function AgriculturalReviewScreen({
   onBack,
   isLoading = false
 }: AgriculturalReviewScreenProps) {
+  console.log('🟢 تم تحميل صفحة الحجز الجديدة (الأشجار الخضراء) - التحديث 2026-02-08');
   const calculatedPricePerTree = pricePerTree || (treeCount > 0 ? Math.round(totalPrice / treeCount) : 0);
 
   return (

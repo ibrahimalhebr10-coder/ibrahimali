@@ -31,6 +31,7 @@ export default function InvestmentReviewScreen({
   onBack,
   isLoading = false
 }: InvestmentReviewScreenProps) {
+  console.log('🟡 تم تحميل صفحة الاستثمار الجديدة (الأشجار الذهبية) - التحديث 2026-02-08');
   const calculatedPricePerTree = pricePerTree || (treeCount > 0 ? Math.round(totalPrice / treeCount) : 0);
 
   return (
