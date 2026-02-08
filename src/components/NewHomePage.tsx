@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Play, Shield, TrendingUp, Star, Handshake, User, Sprout, Sparkles, CheckCircle, ChevronLeft, Users, TreePine, Calendar, Award, Zap, Bell, X, Plus } from 'lucide-react';
+import { Play, Shield, TrendingUp, Star, Handshake, User, Sprout, Bot, CheckCircle, ChevronLeft, Users, TreePine, Calendar, Award, Zap, Bell, X, Plus } from 'lucide-react';
 import IntroVideoPlayer from './IntroVideoPlayer';
 import NotificationCenter from './NotificationCenter';
 import { supabase } from '../lib/supabase';
@@ -770,8 +770,8 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
                   padding: '4px'
                 }}
               >
-                <Sparkles style={{ width: '24px', height: '24px', color: '#374151' }} />
-                <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>المساعد</span>
+                <Bot style={{ width: '24px', height: '24px', color: '#374151' }} />
+                <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>المساعد الذكي</span>
               </button>
             </div>
           </div>
