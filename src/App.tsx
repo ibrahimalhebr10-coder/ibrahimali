@@ -1247,31 +1247,26 @@ function AppContent() {
             <span className="text-sm font-bold text-gray-700 group-hover:text-emerald-600 transition-colors duration-300">اعرض مزرعتك</span>
           </button>
 
-          {/* زر المساعد الذكي */}
+          {/* زر المساعد الذكي - أيقونة مجسمة فقط */}
           <button
             onClick={() => setShowAdvancedAssistant(true)}
-            className="flex flex-col items-center gap-2.5 px-8 py-4 rounded-2xl transition-all duration-300 hover:scale-105 relative group"
-            style={{
-              background: 'linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.12) 100%)',
-              border: '2px solid rgba(16, 185, 129, 0.2)'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.2) 100%)';
-              e.currentTarget.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.25)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(16, 185, 129, 0.12) 100%)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
+            className="flex flex-col items-center gap-2.5 transition-all duration-300 group"
           >
+            {/* أيقونة النجمة مجسمة مع ظلال 3D */}
             <div className="relative">
-              <Sparkles className="w-7 h-7 text-emerald-600 transition-transform duration-300 group-hover:scale-110" strokeWidth={2} />
-              <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full animate-pulse" style={{
+              <Sparkles
+                className="w-10 h-10 text-emerald-600 transition-all duration-300 group-hover:scale-110 group-hover:text-emerald-500"
+                strokeWidth={2.5}
+                style={{
+                  filter: 'drop-shadow(0 4px 8px rgba(58, 161, 126, 0.4)) drop-shadow(0 2px 4px rgba(58, 161, 126, 0.3))',
+                }}
+              />
+              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full animate-pulse" style={{
                 background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
                 boxShadow: '0 0 12px rgba(212,175,55,0.7)'
               }}></div>
             </div>
-            <span className="text-sm font-bold text-emerald-600">المساعد الذكي</span>
+            <span className="text-sm font-bold text-gray-700 group-hover:text-emerald-600 transition-colors duration-300">المساعد الذكي</span>
           </button>
 
           {/* زر أشجاري - أيقونة مجسمة فقط (الأكبر والأبرز) */}
