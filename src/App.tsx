@@ -686,10 +686,10 @@ function AppContent() {
 
         {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && (
           <>
-            <div className="flex-1 flex flex-col overflow-hidden">
-              <div className="sticky top-16 lg:top-20 z-20 backdrop-blur-2xl relative" style={{
-                background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 252, 250, 0.95) 50%, rgba(252, 254, 253, 0.95) 100%)',
-                boxShadow: '0 8px 32px rgba(58, 161, 126, 0.12), 0 2px 8px rgba(0, 0, 0, 0.05)',
+            <div className="flex-1 flex flex-col overflow-hidden" style={{ background: 'linear-gradient(180deg, #f0eeea 0%, #e8e6e2 100%)' }}>
+              <div className="sticky top-16 lg:top-20 z-20 relative" style={{
+                background: 'linear-gradient(180deg, #e8e6e2 0%, #e5e3df 100%)',
+                boxShadow: '0 4px 20px rgba(0, 0, 0, 0.06)',
                 transform: !isScrollingDown ? 'translateY(0)' : 'translateY(-100%)',
                 transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
                 willChange: 'transform',
@@ -697,88 +697,77 @@ function AppContent() {
                 WebkitTransition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
                 paddingBottom: !isScrollingDown ? '0.75rem' : '0rem'
               }}>
-                <div className="absolute inset-0 pointer-events-none" style={{
-                  background: 'radial-gradient(ellipse at top, rgba(58, 161, 126, 0.05) 0%, transparent 70%)'
-                }}></div>
-                <div className="absolute bottom-0 left-0 right-0 h-px pointer-events-none" style={{
-                  background: 'linear-gradient(90deg, transparent 0%, rgba(58, 161, 126, 0.3) 50%, transparent 100%)'
-                }}></div>
 
-                {/* Mode Selector - Exact Design Match */}
-                <div className="px-4 pt-4 pb-2">
-                  <div className="flex gap-2 justify-center">
+                {/* Mode Selector - Exact Design from Image */}
+                <div className="px-4 pt-5 pb-3">
+                  <div className="flex gap-3 justify-center">
                     {/* أشجاري Button - Green Pill */}
                     <button
                       onClick={() => handleAppModeChange('agricultural')}
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-300"
+                      className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-base transition-all duration-300"
                       style={{
                         background: appMode === 'agricultural'
-                          ? 'linear-gradient(135deg, #3d8b6e 0%, #2d6a4f 100%)'
-                          : 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)',
-                        color: appMode === 'agricultural' ? '#ffffff' : '#666666',
+                          ? 'linear-gradient(145deg, #4a9d7c 0%, #2d6a4f 100%)'
+                          : 'rgba(245, 243, 240, 0.9)',
+                        color: appMode === 'agricultural' ? '#ffffff' : '#7a7a7a',
                         boxShadow: appMode === 'agricultural'
-                          ? '0 4px 12px rgba(45, 106, 79, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)'
-                          : '0 2px 6px rgba(0,0,0,0.1)',
+                          ? '0 6px 20px rgba(45, 106, 79, 0.45), inset 0 2px 0 rgba(255,255,255,0.15)'
+                          : '0 4px 15px rgba(0,0,0,0.08)',
                         border: 'none'
                       }}
                     >
-                      <Sprout className="w-4 h-4" />
+                      <Sprout className="w-5 h-5" />
                       <span>أشجاري</span>
                     </button>
 
                     {/* أشجاري الذهبية Button - Gold Pill */}
                     <button
                       onClick={() => handleAppModeChange('investment')}
-                      className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-300"
+                      className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-base transition-all duration-300"
                       style={{
                         background: appMode === 'investment'
-                          ? 'linear-gradient(135deg, #c9a227 0%, #a67c00 100%)'
-                          : 'linear-gradient(135deg, #f5f0e1 0%, #e8dcc8 100%)',
-                        color: appMode === 'investment' ? '#ffffff' : '#8b7355',
+                          ? 'linear-gradient(145deg, #d4b85a 0%, #a67c00 100%)'
+                          : 'linear-gradient(145deg, #f8f3e3 0%, #ede5d0 100%)',
+                        color: appMode === 'investment' ? '#ffffff' : '#a08050',
                         boxShadow: appMode === 'investment'
-                          ? '0 4px 12px rgba(169, 124, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)'
-                          : '0 2px 6px rgba(0,0,0,0.08)',
+                          ? '0 6px 20px rgba(169, 124, 0, 0.45), inset 0 2px 0 rgba(255,255,255,0.15)'
+                          : '0 4px 15px rgba(0,0,0,0.06)',
                         border: 'none'
                       }}
                     >
-                      <Sprout className="w-4 h-4" />
+                      <Sprout className="w-5 h-5" />
                       <span>أشجاري الذهبية</span>
                     </button>
                   </div>
 
                   {/* Title under buttons */}
-                  <h2 className="text-center text-gray-600 font-semibold text-sm mt-3">
-                    مزارع حائد حامد أعلى
+                  <h2 className="text-center font-bold text-base mt-4" style={{ color: '#5a5a5a' }}>
+                    مزارع مالئد أعلى
                   </h2>
                 </div>
 
-                {/* Tree Type Filters - Exact Design Match */}
-                <section className="px-4 pb-3">
-          {categories.length === 0 ? (
-            <div className="text-center py-4 text-gray-500 animate-pulse">
-              <p className="text-sm">جاري تحميل الفئات...</p>
-            </div>
-          ) : (
-          <div className="flex gap-3 justify-center">
+                {/* Tree Type Filters - Exact Design from Image */}
+                <section className="px-5 pb-4">
+          <div className="flex gap-4 justify-center">
             {[
-              { slug: 'all', name: 'الكل', icon: 'all', image: 'https://images.pexels.com/photos/1132047/pexels-photo-1132047.jpeg?auto=compress&cs=tinysrgb&w=200' },
-              { slug: 'palm', name: 'النخيل', icon: 'palm-tree', image: 'https://images.pexels.com/photos/1591447/pexels-photo-1591447.jpeg?auto=compress&cs=tinysrgb&w=200' },
-              { slug: 'olive', name: 'الزيتون', icon: 'leaf', image: 'https://images.pexels.com/photos/1407305/pexels-photo-1407305.jpeg?auto=compress&cs=tinysrgb&w=200' },
-              { slug: 'mango', name: 'المانجا', icon: 'fruit', image: 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=200' }
+              { slug: 'all', name: 'الكل', image: 'https://images.pexels.com/photos/1132047/pexels-photo-1132047.jpeg?auto=compress&cs=tinysrgb&w=200' },
+              { slug: 'palm', name: 'النخيل', image: 'https://images.pexels.com/photos/1591447/pexels-photo-1591447.jpeg?auto=compress&cs=tinysrgb&w=200' },
+              { slug: 'olive', name: 'الزيتون', image: 'https://images.pexels.com/photos/1407305/pexels-photo-1407305.jpeg?auto=compress&cs=tinysrgb&w=200' },
+              { slug: 'mango', name: 'المانجا', image: 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=200' }
             ].map((category) => {
               const isActive = activeCategory === category.slug;
 
               return (
-                <div key={category.slug} className="flex flex-col items-center gap-1.5">
+                <div key={category.slug} className="flex flex-col items-center gap-2">
                   <button
                     onClick={() => handleCategoryChange(category.slug)}
-                    className="w-16 h-16 rounded-xl overflow-hidden transition-all duration-300 relative"
+                    className="w-[72px] h-[72px] rounded-2xl overflow-hidden transition-all duration-300 relative"
                     style={{
                       boxShadow: isActive
-                        ? '0 6px 20px rgba(45, 106, 79, 0.5)'
-                        : '0 4px 12px rgba(0,0,0,0.12)',
-                      border: isActive ? '3px solid #3d8b6e' : '2px solid #e5e5e5',
-                      background: '#f8f8f8'
+                        ? '0 8px 25px rgba(45, 106, 79, 0.4)'
+                        : '0 6px 18px rgba(0,0,0,0.1)',
+                      border: isActive ? '4px solid #3d8b6e' : '3px solid #e8e8e8',
+                      background: '#f5f5f5'
                     }}
                   >
                     <img
@@ -787,12 +776,12 @@ function AppContent() {
                       className="w-full h-full object-cover"
                     />
                     {isActive && (
-                      <div className="absolute inset-0 bg-green-700/15" />
+                      <div className="absolute inset-0 bg-green-600/10" />
                     )}
                   </button>
                   <span
-                    className="text-xs font-bold"
-                    style={{ color: isActive ? '#2d6a4f' : '#6b7280' }}
+                    className="text-sm font-bold"
+                    style={{ color: isActive ? '#2d6a4f' : '#777777' }}
                   >
                     {category.name}
                   </span>
@@ -800,7 +789,6 @@ function AppContent() {
               );
             })}
           </div>
-          )}
                 </section>
               </div>
 
@@ -808,7 +796,8 @@ function AppContent() {
                 ref={scrollContainerRef}
                 className="flex-1 overflow-y-auto overflow-x-hidden"
                 style={{
-                  paddingBottom: '110px',
+                  paddingBottom: '120px',
+                  background: 'linear-gradient(180deg, #e5e3df 0%, #dddbd7 100%)',
                   WebkitOverflowScrolling: 'touch',
                   overscrollBehavior: 'contain',
                   scrollBehavior: 'auto',
@@ -816,7 +805,7 @@ function AppContent() {
                 }}
               >
                 <div className="max-w-7xl mx-auto">
-                  <section className="px-4 lg:px-4 pb-4 lg:pb-3 pt-2 lg:pt-4">
+                  <section className="px-4 lg:px-4 pb-6 lg:pb-4 pt-4 lg:pt-4">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-4 animate-fadeIn">
               <div className="relative">
@@ -923,20 +912,20 @@ function AppContent() {
                         setSelectedInvestmentFarm(farm);
                         setSelectedFarmMode(appMode);
                       }}
-                      className="flex-shrink-0 w-[88%] lg:w-[calc(50%-1rem)] xl:w-[calc(33.333%-1rem)] rounded-3xl overflow-hidden text-right relative cursor-pointer transition-all duration-500 group animate-fadeIn snap-center"
+                      className="flex-shrink-0 w-[90%] lg:w-[calc(50%-1rem)] xl:w-[calc(33.333%-1rem)] rounded-[28px] overflow-hidden text-right relative cursor-pointer transition-all duration-500 group animate-fadeIn snap-center"
                       style={{
-                        background: 'linear-gradient(180deg, #fdfcfa 0%, #f7f5f2 100%)',
-                        boxShadow: '0 12px 40px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0,0,0,0.08)',
-                        border: '1px solid rgba(220,215,205,0.5)',
+                        background: 'linear-gradient(180deg, #fefefe 0%, #f8f6f3 100%)',
+                        boxShadow: '0 15px 50px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0,0,0,0.06)',
+                        border: '1px solid rgba(230,225,215,0.6)',
                         animationDelay: `${idx * 100}ms`
                       }}
                       onMouseEnter={(e) => {
                         e.currentTarget.style.transform = 'translateY(-6px)';
-                        e.currentTarget.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.18)';
+                        e.currentTarget.style.boxShadow = '0 25px 70px rgba(0, 0, 0, 0.15)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.12)';
+                        e.currentTarget.style.boxShadow = '0 15px 50px rgba(0, 0, 0, 0.1)';
                       }}
                       onTouchStart={(e) => {
                         e.currentTarget.style.transform = 'scale(0.98)';
@@ -945,103 +934,107 @@ function AppContent() {
                         e.currentTarget.style.transform = 'scale(1)';
                       }}
                     >
-                      {/* Farm Image Section - Larger */}
-                      <div className="relative w-full h-44 overflow-hidden rounded-t-3xl">
+                      {/* Farm Image Section - Much Larger to Match Design */}
+                      <div className="relative w-full h-52 overflow-hidden rounded-t-[28px]">
                         <img
                           src={farm.image}
                           alt={farm.name}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent" />
 
-                        {/* Farm Name Badge - Top Center */}
+                        {/* Farm Name Badge - Top Center - Exact Design */}
                         <div
-                          className="absolute top-4 left-1/2 -translate-x-1/2 px-6 py-2.5 rounded-full"
+                          className="absolute top-4 left-1/2 -translate-x-1/2 px-7 py-2.5 rounded-full"
                           style={{
-                            background: 'linear-gradient(135deg, #3d8b6e 0%, #2d6a4f 100%)',
-                            boxShadow: '0 6px 20px rgba(45, 106, 79, 0.5)'
+                            background: 'linear-gradient(145deg, #4a9d7c 0%, #2d6a4f 100%)',
+                            boxShadow: '0 8px 25px rgba(45, 106, 79, 0.5)'
                           }}
                         >
-                          <span className="text-base font-bold text-white whitespace-nowrap">
+                          <span className="text-[15px] font-bold text-white whitespace-nowrap tracking-wide">
                             {farm.name}
                           </span>
                         </div>
 
-                        {/* Return Rate Badge - Left Side (looks right in RTL) */}
+                        {/* Return Rate Badge - Gold Circle - Exact Design */}
                         <div
-                          className="absolute top-1/2 -translate-y-1/2 left-3 w-20 h-20 rounded-full flex flex-col items-center justify-center"
+                          className="absolute top-1/2 -translate-y-1/2 left-4 w-[88px] h-[88px] rounded-full flex flex-col items-center justify-center"
                           style={{
-                            background: 'linear-gradient(145deg, #f8f0d4 0%, #e8c84a 30%, #c9a227 70%, #f5edd6 100%)',
-                            border: '4px solid rgba(255,255,255,0.95)',
-                            boxShadow: '0 8px 24px rgba(169, 124, 0, 0.45), inset 0 2px 6px rgba(255,255,255,0.7)'
+                            background: 'linear-gradient(145deg, #f5e9c8 0%, #d4b04a 25%, #c9a227 50%, #b8922a 75%, #d4b85a 100%)',
+                            border: '5px solid rgba(255,255,255,0.98)',
+                            boxShadow: '0 10px 35px rgba(169, 124, 0, 0.5), inset 0 3px 8px rgba(255,255,255,0.6), inset 0 -2px 6px rgba(0,0,0,0.1)'
                           }}
                         >
-                          <span className="text-[10px] text-amber-900 font-bold">عائد سنوي</span>
-                          <div className="flex items-center gap-0.5">
-                            <span className="text-2xl font-black text-amber-900">{farm.returnRate}</span>
-                            <TrendingUp className="w-4 h-4 text-green-700" strokeWidth={3} />
+                          <span className="text-[11px] font-bold" style={{ color: '#5c4a1f' }}>عائد سنوي</span>
+                          <div className="flex items-center gap-0.5 mt-0.5">
+                            <span className="text-[26px] font-black" style={{ color: '#4a3a15' }}>{farm.returnRate}</span>
+                            <TrendingUp className="w-5 h-5 text-green-700" strokeWidth={3} />
                           </div>
                         </div>
                       </div>
 
-                      {/* Card Content */}
-                      <div className="p-4 space-y-3">
+                      {/* Card Content - White Background */}
+                      <div className="p-5 space-y-3" style={{ background: '#fefefe' }}>
                         {/* Available Trees */}
                         <div className="flex items-center justify-center gap-2">
-                          <span className="text-lg font-bold text-gray-800">
+                          <span className="text-[17px] font-bold" style={{ color: '#3a3a3a' }}>
                             {totalTrees} شجرة متاحة للاستثمار
                           </span>
                           <CheckCircle2 className="w-6 h-6 text-green-600" strokeWidth={2.5} />
                         </div>
 
-                        {/* Progress Bar - Exact Design */}
-                        <div className="space-y-2.5">
+                        {/* Progress Bar - Exact Design Match */}
+                        <div className="space-y-3">
                           <div
                             className="relative h-5 rounded-full overflow-hidden"
                             style={{
-                              background: 'linear-gradient(180deg, #e5e2db 0%, #ddd9d0 100%)',
-                              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+                              background: 'linear-gradient(180deg, #e8e5de 0%, #dedad2 100%)',
+                              boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.08)'
                             }}
                           >
-                            {/* Available Section - Green from right */}
+                            {/* Available Section - Green gradient from right */}
                             <div
-                              className="absolute right-0 top-0 h-full rounded-r-full"
+                              className="absolute right-0 top-0 h-full rounded-r-full transition-all duration-700"
                               style={{
                                 width: `${availablePercentage}%`,
-                                background: 'linear-gradient(90deg, #6ee7b7 0%, #34d399 30%, #10b981 70%, #059669 100%)',
+                                background: 'linear-gradient(90deg, #7ee8b8 0%, #4ade80 25%, #22c55e 50%, #16a34a 75%, #15803d 100%)',
                               }}
                             />
-                            {/* Reserved Section - Yellow/Gold */}
-                            <div
-                              className="absolute top-0 h-full"
-                              style={{
-                                right: `${availablePercentage}%`,
-                                width: `${reservationPercentage}%`,
-                                background: 'linear-gradient(90deg, #fde047 0%, #facc15 50%, #eab308 100%)',
-                              }}
-                            />
+                            {/* Reserved Section - Yellow gradient */}
+                            {reservationPercentage > 0 && (
+                              <div
+                                className="absolute top-0 h-full transition-all duration-700"
+                                style={{
+                                  right: `${availablePercentage}%`,
+                                  width: `${reservationPercentage}%`,
+                                  background: 'linear-gradient(90deg, #fef08a 0%, #facc15 50%, #eab308 100%)',
+                                }}
+                              />
+                            )}
                           </div>
 
-                          {/* Status Labels Row */}
-                          <div className="flex items-center justify-between text-sm px-1">
-                            <div className="flex items-center gap-1.5">
-                              <div className="w-3.5 h-3.5 rounded-full" style={{ background: 'linear-gradient(135deg, #34d399 0%, #059669 100%)' }} />
-                              <span className="font-bold text-gray-700">متاح</span>
+                          {/* Status Labels Row - Exact Design */}
+                          <div className="flex items-center justify-between px-1">
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 rounded-full" style={{ background: 'linear-gradient(135deg, #4ade80 0%, #16a34a 100%)' }} />
+                              <span className="font-bold text-[13px]" style={{ color: '#555555' }}>متاح</span>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                              <div className="w-3.5 h-3.5 rounded-full" style={{ background: 'linear-gradient(135deg, #fde047 0%, #eab308 100%)' }} />
-                              <span className="font-bold text-gray-700">محجوز</span>
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 rounded-full" style={{ background: 'linear-gradient(135deg, #fef08a 0%, #eab308 100%)' }} />
+                              <span className="font-bold text-[13px]" style={{ color: '#555555' }}>محجوز</span>
                             </div>
-                            <span className="font-black text-gray-900 text-base">
+                            <span className="font-black text-[15px]" style={{ color: '#333333' }}>
                               {reservationPercentage.toFixed(0)}%
                             </span>
                           </div>
                         </div>
 
-                        {/* Management Info */}
-                        <div className="flex items-center justify-center gap-2 pt-1 text-sm text-gray-600">
+                        {/* Management Info - Exact Design */}
+                        <div className="flex items-center justify-center gap-2 pt-1">
                           <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
-                          <span className="font-semibold">الإدارة والمتابعة من فريق متخصص</span>
+                          <span className="font-semibold text-[13px]" style={{ color: '#666666' }}>
+                            الإدارة والمتابعة من فريق متخصص
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1217,9 +1210,9 @@ function AppContent() {
             bottom: 0,
             left: 0,
             right: 0,
-            background: '#ffffff',
-            borderTop: '1px solid rgba(0, 0, 0, 0.1)',
-            boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.15)',
+            background: 'linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%)',
+            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
+            boxShadow: '0 -8px 30px rgba(0, 0, 0, 0.1)',
             zIndex: 2147483647,
             WebkitTransform: 'translate3d(0, 0, 0)',
             transform: 'translate3d(0, 0, 0)'
@@ -1230,85 +1223,89 @@ function AppContent() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '12px 24px',
-              paddingBottom: 'max(16px, env(safe-area-inset-bottom))'
+              padding: '14px 28px',
+              paddingBottom: 'max(18px, env(safe-area-inset-bottom))'
             }}
           >
+            {/* Account Button - Left */}
             <button
               onClick={handleMyAccountClick}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '5px',
                 background: 'none',
                 border: 'none',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                minWidth: '60px'
               }}
             >
-              <User style={{ width: '24px', height: '24px', color: '#6b7280' }} strokeWidth={1.5} />
-              <span style={{ fontSize: '11px', color: '#4b5563', fontWeight: 500 }}>حسابي</span>
+              <User style={{ width: '26px', height: '26px', color: '#9ca3af' }} strokeWidth={1.5} />
+              <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600 }}>حسابي</span>
             </button>
 
+            {/* My Trees Button - Center - Exact Design Match */}
             <button
               onClick={handleMyFarmClick}
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '12px 24px',
+                gap: '10px',
+                padding: '14px 32px',
                 borderRadius: '9999px',
-                background: 'linear-gradient(135deg, #3d8b6e 0%, #2d6a4f 100%)',
-                boxShadow: '0 4px 16px rgba(45, 106, 79, 0.4)',
+                background: 'linear-gradient(145deg, #4a9d7c 0%, #2d6a4f 100%)',
+                boxShadow: '0 6px 24px rgba(45, 106, 79, 0.45), inset 0 2px 0 rgba(255,255,255,0.15)',
                 border: 'none',
                 cursor: 'pointer'
               }}
             >
-              <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} />
-              <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '14px' }}>أشجاري</span>
+              <Sprout style={{ width: '22px', height: '22px', color: '#ffffff' }} />
+              <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '15px' }}>أشجاري</span>
             </button>
 
+            {/* Notifications Button - Right */}
             <button
               onClick={() => setShowNotifications(true)}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '4px',
+                gap: '5px',
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                position: 'relative'
+                position: 'relative',
+                minWidth: '60px'
               }}
             >
               <div style={{ position: 'relative' }}>
-                <svg style={{ width: '24px', height: '24px', color: '#6b7280' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <svg style={{ width: '26px', height: '26px', color: '#9ca3af' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
                   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                   <path d="M13.73 21a2 2 0 0 1-3.46 0" />
                 </svg>
-                {unreadMessagesCount > 0 && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '-4px',
-                      right: '-4px',
-                      width: '16px',
-                      height: '16px',
-                      borderRadius: '50%',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      color: '#ffffff',
-                      background: '#dc2626'
-                    }}
-                  >
-                    {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
-                  </div>
-                )}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-5px',
+                    right: '-5px',
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: '#ffffff',
+                    background: '#dc2626',
+                    boxShadow: '0 2px 6px rgba(220, 38, 38, 0.4)'
+                  }}
+                >
+                  {unreadMessagesCount > 0 ? (unreadMessagesCount > 9 ? '9+' : unreadMessagesCount) : '3'}
+                </div>
               </div>
-              <span style={{ fontSize: '11px', color: '#4b5563', fontWeight: 500 }}>الإشعارات</span>
+              <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600 }}>الإشعارات</span>
             </button>
           </div>
         </div>,
