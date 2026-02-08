@@ -692,7 +692,7 @@ function AppContent() {
                 background: 'linear-gradient(180deg, #e8e6e2 0%, #dddbd7 100%)',
                 minHeight: '100vh',
                 paddingTop: '64px',
-                paddingBottom: '90px'
+                paddingBottom: '120px'
               }}
             >
               {/* Top Section - Mode Selector & Filters */}
@@ -901,7 +901,7 @@ function AppContent() {
                         setSelectedInvestmentFarm(farm);
                         setSelectedFarmMode(appMode);
                       }}
-                      className="flex-shrink-0 w-[92%] lg:w-[calc(50%-1rem)] xl:w-[calc(33.333%-1rem)] rounded-[20px] text-right relative cursor-pointer transition-all duration-300 group animate-fadeIn snap-center pt-5"
+                      className="flex-shrink-0 w-[92%] lg:w-[calc(50%-1rem)] xl:w-[calc(33.333%-1rem)] rounded-[20px] text-right relative cursor-pointer transition-all duration-300 group animate-fadeIn snap-center pt-3"
                       style={{
                         animationDelay: `${idx * 80}ms`
                       }}
@@ -914,16 +914,16 @@ function AppContent() {
                         if (card) card.style.transform = 'scale(1)';
                       }}
                     >
-                      {/* Farm Name Badge - Floating Above Card */}
+                      {/* Farm Name Badge - Top Center, 10% outside card */}
                       <div
-                        className="absolute top-0 left-1/2 -translate-x-1/2 z-20 px-6 py-2 rounded-full"
+                        className="absolute top-1 left-1/2 -translate-x-1/2 z-20 px-5 py-1.5 rounded-full"
                         style={{
                           background: 'linear-gradient(180deg, #4a9d7c 0%, #357a5c 50%, #2d6a4f 100%)',
-                          boxShadow: '0 4px 12px rgba(45, 106, 79, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
+                          boxShadow: '0 3px 10px rgba(45, 106, 79, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
                           border: '1px solid rgba(255,255,255,0.1)'
                         }}
                       >
-                        <span className="text-[14px] font-bold text-white whitespace-nowrap" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>
+                        <span className="text-[13px] font-bold text-white whitespace-nowrap" style={{ textShadow: '0 1px 2px rgba(0,0,0,0.15)' }}>
                           {farm.name}
                         </span>
                       </div>
@@ -946,19 +946,28 @@ function AppContent() {
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent rounded-t-[20px]" />
 
-                          {/* Return Rate Badge - Gold Circle - Right Side */}
+                          {/* Return Rate Badge - 3D Gold Circle */}
                           <div
-                            className="absolute top-1/2 -translate-y-1/2 -right-2 z-10 w-[88px] h-[88px] rounded-full flex flex-col items-center justify-center"
+                            className="absolute top-1/2 -translate-y-1/2 -right-2 z-10 w-[82px] h-[82px] rounded-full flex flex-col items-center justify-center p-1"
                             style={{
-                              background: 'linear-gradient(145deg, #f7ebb8 0%, #e8d590 20%, #d4c070 40%, #c9b560 60%, #dcc878 80%, #e8d890 100%)',
-                              border: '3px solid #b8a050',
-                              boxShadow: '0 4px 16px rgba(169, 140, 50, 0.35), inset 0 2px 4px rgba(255,255,255,0.35), inset 0 -1px 2px rgba(0,0,0,0.08)'
+                              background: 'linear-gradient(145deg, #faf0c8 0%, #e8d48a 30%, #d4bc60 60%, #c4a840 100%)',
+                              border: '3px solid #a08030',
+                              boxShadow: '0 6px 20px rgba(140, 110, 30, 0.5), 0 2px 6px rgba(0,0,0,0.2), inset 0 3px 6px rgba(255,255,255,0.5), inset 0 -3px 8px rgba(100,80,20,0.3)',
                             }}
                           >
-                            <span className="text-[10px] font-bold" style={{ color: '#6b5a28' }}>عائد سنوي</span>
-                            <div className="flex items-center gap-0.5 -mt-0.5">
-                              <span className="text-[24px] font-black leading-none" style={{ color: '#4a4020' }}>{farm.returnRate}</span>
-                              <TrendingUp className="w-4 h-4 text-green-600" strokeWidth={3} />
+                            {/* Inner circle for 3D effect */}
+                            <div
+                              className="w-full h-full rounded-full flex flex-col items-center justify-center"
+                              style={{
+                                background: 'linear-gradient(160deg, #f5e8b0 0%, #e0c868 40%, #c8a840 70%, #b89830 100%)',
+                                boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.4), inset 0 -2px 4px rgba(80,60,10,0.2)'
+                              }}
+                            >
+                              <span className="text-[9px] font-bold leading-tight" style={{ color: '#5c4a18' }}>عائد سنوي</span>
+                              <div className="flex items-center gap-0.5">
+                                <span className="text-[20px] font-black leading-none" style={{ color: '#3a3010' }}>{farm.returnRate}</span>
+                                <TrendingUp className="w-3.5 h-3.5 text-green-700" strokeWidth={3} />
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -1048,7 +1057,7 @@ function AppContent() {
 
               {/* Progress Dots */}
               {currentFarms.length > 1 && (
-                <div className="flex justify-center gap-1.5 mt-2">
+                <div className="flex justify-center gap-1.5 mt-2 pb-4">
                   {currentFarms.map((_, index) => (
                     <button
                       key={index}
@@ -1065,6 +1074,8 @@ function AppContent() {
               )}
             </div>
           )}
+                  {/* Footer spacer */}
+                  <div className="h-8" />
                   </section>
                 </div>
               </div>
