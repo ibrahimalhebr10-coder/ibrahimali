@@ -497,6 +497,21 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
         </div>
       </div>
 
+      {/* Smart Assistant Icon - Floating Above Footer - Right Side */}
+      {!hideFooter && ReactDOM.createPortal(
+        <div
+          style={{
+            position: 'fixed',
+            bottom: isMobile ? '90px' : '100px',
+            right: isMobile ? '16px' : '24px',
+            zIndex: 2147483648
+          }}
+        >
+          <SmartAssistantIcon onClick={onOpenAssistant} />
+        </div>,
+        document.body
+      )}
+
       {/* Fixed Bottom Footer - Clean & Simple */}
       {!hideFooter && ReactDOM.createPortal(
         <div
