@@ -690,9 +690,9 @@ function AppContent() {
               className="flex-1 flex flex-col"
               style={{
                 background: 'linear-gradient(180deg, #e8e6e2 0%, #dddbd7 100%)',
-                minHeight: '100vh',
+                minHeight: '100dvh',
                 paddingTop: '64px',
-                paddingBottom: '120px'
+                paddingBottom: 'calc(100px + env(safe-area-inset-bottom, 20px))'
               }}
             >
               {/* Top Section - Mode Selector & Filters */}
@@ -1218,10 +1218,12 @@ function AppContent() {
             right: 0,
             background: 'linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%)',
             borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-            boxShadow: '0 -8px 30px rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 -8px 30px rgba(0, 0, 0, 0.15)',
             zIndex: 2147483647,
             WebkitTransform: 'translate3d(0, 0, 0)',
-            transform: 'translate3d(0, 0, 0)'
+            transform: 'translate3d(0, 0, 0)',
+            paddingBottom: 'env(safe-area-inset-bottom, 0px)',
+            willChange: 'transform'
           }}
         >
           <div
@@ -1229,8 +1231,7 @@ function AppContent() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '14px 28px',
-              paddingBottom: 'max(18px, env(safe-area-inset-bottom))'
+              padding: '12px 24px 14px 24px'
             }}
           >
             {/* Account Button - Left */}
