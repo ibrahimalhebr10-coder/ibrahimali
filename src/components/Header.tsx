@@ -34,13 +34,14 @@ export default function Header({ onBack, showBackButton = false, isVisible = tru
 
   return (
     <header
-      className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between z-50 backdrop-blur-2xl flex-shrink-0 fixed left-0 right-0 top-0"
+      className="h-14 lg:h-16 px-4 lg:px-12 flex items-center justify-between backdrop-blur-2xl flex-shrink-0 fixed left-0 right-0 top-0"
       style={{
-        background: 'linear-gradient(135deg, rgba(248, 250, 249, 0.95) 0%, rgba(242, 247, 244, 0.92) 100%)',
+        background: 'linear-gradient(135deg, rgba(248, 250, 249, 0.98) 0%, rgba(242, 247, 244, 0.96) 100%)',
         borderBottom: '3px solid rgba(58,161,126,0.4)',
         boxShadow: '0 6px 24px rgba(0, 0, 0, 0.1), inset 0 -1px 0 rgba(255,255,255,0.8)',
         backdropFilter: 'blur(24px)',
         WebkitBackdropFilter: 'blur(24px)',
+        zIndex: 9999999,
         transform: isVisible ? 'translateY(0)' : 'translateY(-100%)',
         transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
         willChange: 'transform',
