@@ -490,18 +490,76 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
               onClick={onStartInvestment}
               style={{
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                gap: '8px',
-                padding: '14px 24px',
-                borderRadius: '9999px',
-                background: 'linear-gradient(135deg, #15803d 0%, #166534 100%)',
-                boxShadow: '0 4px 15px rgba(21, 128, 61, 0.4)',
-                border: 'none',
-                cursor: 'pointer'
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '18px 36px',
+                borderRadius: '20px',
+                background: 'linear-gradient(145deg, #16a34a 0%, #15803d 35%, #14532d 100%)',
+                boxShadow: '0 8px 24px rgba(21, 128, 61, 0.5), 0 4px 12px rgba(20, 83, 45, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2), inset 0 -2px 0 rgba(0, 0, 0, 0.2)',
+                border: '2px solid rgba(34, 197, 94, 0.5)',
+                cursor: 'pointer',
+                position: 'relative',
+                transform: 'translateY(0)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)';
+                e.currentTarget.style.boxShadow = '0 12px 32px rgba(21, 128, 61, 0.6), 0 6px 16px rgba(20, 83, 45, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.2), 0 0 20px rgba(34, 197, 94, 0.4)';
+                e.currentTarget.style.borderColor = 'rgba(34, 197, 94, 0.8)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = '0 8px 24px rgba(21, 128, 61, 0.5), 0 4px 12px rgba(20, 83, 45, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2), inset 0 -2px 0 rgba(0, 0, 0, 0.2)';
+                e.currentTarget.style.borderColor = 'rgba(34, 197, 94, 0.5)';
+              }}
+              onMouseDown={(e) => {
+                e.currentTarget.style.transform = 'translateY(1px) scale(0.98)';
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(21, 128, 61, 0.4), 0 2px 6px rgba(20, 83, 45, 0.3), inset 0 2px 4px rgba(0, 0, 0, 0.3)';
+              }}
+              onMouseUp={(e) => {
+                e.currentTarget.style.transform = 'translateY(-3px) scale(1.02)';
+                e.currentTarget.style.boxShadow = '0 12px 32px rgba(21, 128, 61, 0.6), 0 6px 16px rgba(20, 83, 45, 0.5), inset 0 2px 0 rgba(255, 255, 255, 0.25), inset 0 -2px 0 rgba(0, 0, 0, 0.2), 0 0 20px rgba(34, 197, 94, 0.4)';
               }}
             >
-              <Sprout style={{ width: '20px', height: '20px', color: '#ffffff' }} />
-              <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '15px' }}>ابدأ</span>
+              {/* Glow effect overlay */}
+              <div style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%, rgba(0, 0, 0, 0.1) 100%)',
+                borderRadius: '18px',
+                pointerEvents: 'none'
+              }} />
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative', zIndex: 1 }}>
+                <Sprout style={{ width: '24px', height: '24px', color: '#ffffff', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))' }} />
+                <span style={{
+                  fontWeight: 800,
+                  color: '#ffffff',
+                  fontSize: '16px',
+                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.3), 0 0 8px rgba(255, 255, 255, 0.1)',
+                  letterSpacing: '0.3px'
+                }}>
+                  احجز أشجارك المثمرة
+                </span>
+              </div>
+
+              {/* Shine effect */}
+              <div style={{
+                position: 'absolute',
+                top: '-50%',
+                left: '-50%',
+                width: '200%',
+                height: '200%',
+                background: 'linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%)',
+                transform: 'rotate(45deg)',
+                pointerEvents: 'none',
+                opacity: 0.6
+              }} />
             </button>
 
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
