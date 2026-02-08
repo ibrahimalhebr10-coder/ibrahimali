@@ -796,98 +796,100 @@ function AppContent() {
                   }}></div>
                 </div>
 
-                {/* Mode Selector - New Design */}
-                <div className="px-3 lg:px-6 py-3 lg:py-4">
-                  <div className="flex gap-3 max-w-md mx-auto">
-                    {/* Agricultural Trees Button */}
+                {/* Mode Selector - Exact Design Match */}
+                <div className="px-4 pt-4 pb-2">
+                  <div className="flex gap-2 justify-center">
+                    {/* أشجاري Button - Green Pill */}
                     <button
                       onClick={() => handleAppModeChange('agricultural')}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-bold text-sm transition-all duration-300 ${
-                        appMode === 'agricultural'
-                          ? 'bg-gradient-to-r from-emerald-50 to-green-100 text-green-800 shadow-lg scale-105'
-                          : 'bg-white/60 text-gray-600 hover:bg-white/80'
-                      }`}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-300"
                       style={{
-                        border: appMode === 'agricultural' ? '2px solid #10b981' : '1px solid #d1d5db',
+                        background: appMode === 'agricultural'
+                          ? 'linear-gradient(135deg, #3d8b6e 0%, #2d6a4f 100%)'
+                          : 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)',
+                        color: appMode === 'agricultural' ? '#ffffff' : '#666666',
                         boxShadow: appMode === 'agricultural'
-                          ? '0 4px 12px rgba(16, 185, 129, 0.3), inset 0 1px 0 rgba(255,255,255,0.8)'
-                          : '0 2px 4px rgba(0,0,0,0.05)'
+                          ? '0 4px 12px rgba(45, 106, 79, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)'
+                          : '0 2px 6px rgba(0,0,0,0.1)',
+                        border: 'none'
                       }}
                     >
-                      <Leaf className="w-5 h-5" />
+                      <Sprout className="w-4 h-4" />
                       <span>أشجاري</span>
                     </button>
 
-                    {/* Golden Trees Button */}
+                    {/* أشجاري الذهبية Button - Gold Pill */}
                     <button
                       onClick={() => handleAppModeChange('investment')}
-                      className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-2xl font-bold text-sm transition-all duration-300 ${
-                        appMode === 'investment'
-                          ? 'bg-gradient-to-r from-amber-100 to-yellow-100 text-amber-900 shadow-lg scale-105'
-                          : 'bg-white/60 text-gray-600 hover:bg-white/80'
-                      }`}
+                      className="flex items-center gap-2 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-300"
                       style={{
-                        border: appMode === 'investment' ? '2px solid #d97706' : '1px solid #d1d5db',
+                        background: appMode === 'investment'
+                          ? 'linear-gradient(135deg, #c9a227 0%, #a67c00 100%)'
+                          : 'linear-gradient(135deg, #f5f0e1 0%, #e8dcc8 100%)',
+                        color: appMode === 'investment' ? '#ffffff' : '#8b7355',
                         boxShadow: appMode === 'investment'
-                          ? '0 4px 12px rgba(217, 119, 6, 0.3), inset 0 1px 0 rgba(255,255,255,0.8)'
-                          : '0 2px 4px rgba(0,0,0,0.05)'
+                          ? '0 4px 12px rgba(169, 124, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)'
+                          : '0 2px 6px rgba(0,0,0,0.08)',
+                        border: 'none'
                       }}
                     >
-                      <Sparkles className="w-5 h-5" />
+                      <Sprout className="w-4 h-4" />
                       <span>أشجاري الذهبية</span>
                     </button>
                   </div>
 
                   {/* Title under buttons */}
-                  <h2 className="text-center text-gray-700 font-bold text-base mt-3">
-                    {user ? `مزارع ${user.email?.split('@')[0] || 'المستثمر'}` : 'مزارع حائد حامد أعلى'}
+                  <h2 className="text-center text-gray-600 font-semibold text-sm mt-3">
+                    مزارع حائد حامد أعلى
                   </h2>
                 </div>
 
-                {/* Tree Type Filters - New Design */}
-                <section className="px-3 lg:px-6 pb-3 lg:pb-4">
+                {/* Tree Type Filters - Square Cards with Images */}
+                <section className="px-4 pb-4">
           {categories.length === 0 ? (
-            <div className="text-center py-4 text-darkgreen/70 animate-pulse">
+            <div className="text-center py-4 text-gray-500 animate-pulse">
               <p className="text-sm">جاري تحميل الفئات...</p>
             </div>
           ) : (
-          <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
-            {[{ slug: 'all', name: 'الكل', icon: 'all' }, ...categories].map((category, idx) => {
-              const Icon = iconMap[category.icon] || Leaf;
+          <div className="flex gap-3 justify-center">
+            {[{ slug: 'all', name: 'الكل', icon: 'all', image: 'https://images.pexels.com/photos/1132047/pexels-photo-1132047.jpeg?auto=compress&cs=tinysrgb&w=150' },
+              ...categories.map(cat => ({
+                ...cat,
+                image: cat.icon === 'palm-tree' || cat.icon === 'treepine'
+                  ? 'https://images.pexels.com/photos/1420440/pexels-photo-1420440.jpeg?auto=compress&cs=tinysrgb&w=150'
+                  : cat.icon === 'leaf'
+                    ? 'https://images.pexels.com/photos/1407305/pexels-photo-1407305.jpeg?auto=compress&cs=tinysrgb&w=150'
+                    : 'https://images.pexels.com/photos/2294471/pexels-photo-2294471.jpeg?auto=compress&cs=tinysrgb&w=150'
+              }))
+            ].map((category, idx) => {
               const isActive = activeCategory === category.slug;
-              const iconColor = appMode === 'agricultural' ? '#059669' : '#d97706';
 
               return (
-                <button
-                  key={category.slug}
-                  onClick={() => handleCategoryChange(category.slug)}
-                  className={`flex-shrink-0 flex flex-col items-center justify-center gap-2 w-20 h-20 rounded-2xl transition-all duration-300 ${
-                    isActive
-                      ? appMode === 'agricultural'
-                        ? 'bg-gradient-to-br from-emerald-600 to-green-700 text-white shadow-xl scale-105'
-                        : 'bg-gradient-to-br from-amber-600 to-orange-700 text-white shadow-xl scale-105'
-                      : 'bg-white/80 text-gray-700 hover:bg-white'
-                  }`}
-                  style={{
-                    border: isActive ? 'none' : '1px solid #e5e7eb',
-                    boxShadow: isActive
-                      ? appMode === 'agricultural'
-                        ? '0 4px 16px rgba(5, 150, 105, 0.4), inset 0 1px 0 rgba(255,255,255,0.3)'
-                        : '0 4px 16px rgba(217, 119, 6, 0.4), inset 0 1px 0 rgba(255,255,255,0.3)'
-                      : '0 2px 8px rgba(0,0,0,0.08)'
-                  }}
-                >
-                  <Icon
-                    className="w-8 h-8"
+                <div key={category.slug} className="flex flex-col items-center gap-1.5">
+                  <button
+                    onClick={() => handleCategoryChange(category.slug)}
+                    className="w-16 h-16 rounded-xl overflow-hidden transition-all duration-300 relative"
                     style={{
-                      color: isActive ? '#ffffff' : iconColor,
-                      filter: isActive ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' : 'none'
+                      boxShadow: isActive
+                        ? '0 4px 12px rgba(45, 106, 79, 0.5), inset 0 0 0 3px #3d8b6e'
+                        : '0 2px 8px rgba(0,0,0,0.1)',
+                      border: isActive ? '3px solid #3d8b6e' : '1px solid #e0e0e0',
+                      background: '#f5f5f5'
                     }}
-                  />
-                  <span className={`text-xs font-bold ${isActive ? 'text-white' : 'text-gray-700'}`}>
+                  >
+                    <img
+                      src={category.image}
+                      alt={category.name}
+                      className="w-full h-full object-cover"
+                    />
+                    {isActive && (
+                      <div className="absolute inset-0 bg-green-800/20" />
+                    )}
+                  </button>
+                  <span className={`text-xs font-bold ${isActive ? 'text-green-800' : 'text-gray-600'}`}>
                     {category.name}
                   </span>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -1005,7 +1007,7 @@ function AppContent() {
                 {currentFarms.map((farm, idx) => {
                   const totalTrees = farm.availableTrees + farm.reservedTrees;
                   const reservationPercentage = (farm.reservedTrees / totalTrees) * 100;
-                  const availablePercentage = (farm.availableTrees / totalTrees) * 100;
+                  const availablePercentage = 100 - reservationPercentage;
 
                   return (
                     <div
@@ -1014,19 +1016,20 @@ function AppContent() {
                         setSelectedInvestmentFarm(farm);
                         setSelectedFarmMode(appMode);
                       }}
-                      className="flex-shrink-0 w-full lg:w-[calc(50%-1rem)] xl:w-[calc(33.333%-1rem)] rounded-3xl overflow-hidden text-right relative cursor-pointer transition-all duration-500 group animate-fadeIn snap-center bg-gradient-to-br from-gray-50 to-white"
+                      className="flex-shrink-0 w-[92%] lg:w-[calc(50%-1rem)] xl:w-[calc(33.333%-1rem)] rounded-3xl overflow-hidden text-right relative cursor-pointer transition-all duration-500 group animate-fadeIn snap-center"
                       style={{
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.8)',
-                        border: '1px solid rgba(0,0,0,0.08)',
+                        background: 'linear-gradient(180deg, #faf8f5 0%, #f5f3ef 100%)',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0,0,0,0.08)',
+                        border: '1px solid rgba(200,195,185,0.4)',
                         animationDelay: `${idx * 100}ms`
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.transform = 'translateY(-6px)';
-                        e.currentTarget.style.boxShadow = '0 16px 48px rgba(0, 0, 0, 0.18)';
+                        e.currentTarget.style.transform = 'translateY(-4px)';
+                        e.currentTarget.style.boxShadow = '0 16px 48px rgba(0, 0, 0, 0.2)';
                       }}
                       onMouseLeave={(e) => {
                         e.currentTarget.style.transform = 'translateY(0)';
-                        e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.12)';
+                        e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.15)';
                       }}
                       onTouchStart={(e) => {
                         e.currentTarget.style.transform = 'scale(0.98)';
@@ -1035,40 +1038,40 @@ function AppContent() {
                         e.currentTarget.style.transform = 'scale(1)';
                       }}
                     >
-                      {/* Farm Image */}
-                      <div className="relative w-full h-48 overflow-hidden">
+                      {/* Farm Image Section */}
+                      <div className="relative w-full h-44 overflow-hidden rounded-t-3xl">
                         <img
                           src={farm.image}
                           alt={farm.name}
-                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                        />
-                        <div
-                          className="absolute inset-0"
-                          style={{
-                            background: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, transparent 50%, rgba(0,0,0,0.1) 100%)'
-                          }}
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
 
-                        {/* Farm Name Badge - Top Right */}
-                        <div className="absolute top-3 right-3 bg-gradient-to-r from-emerald-600 to-green-700 rounded-full px-4 py-2 shadow-xl">
-                          <span className="text-sm font-bold text-white drop-shadow-lg">
+                        {/* Farm Name Badge - Top Center */}
+                        <div
+                          className="absolute top-3 left-1/2 -translate-x-1/2 px-5 py-2 rounded-full"
+                          style={{
+                            background: 'linear-gradient(135deg, #3d8b6e 0%, #2d6a4f 100%)',
+                            boxShadow: '0 4px 12px rgba(45, 106, 79, 0.5)'
+                          }}
+                        >
+                          <span className="text-sm font-bold text-white whitespace-nowrap">
                             {farm.name}
                           </span>
                         </div>
 
-                        {/* Return Rate Badge - Top Left */}
+                        {/* Return Rate Badge - Right Side */}
                         <div
-                          className="absolute top-3 left-3 w-16 h-16 rounded-full flex flex-col items-center justify-center shadow-2xl animate-pulse"
+                          className="absolute top-1/2 -translate-y-1/2 -left-2 w-20 h-20 rounded-full flex flex-col items-center justify-center"
                           style={{
-                            background: 'linear-gradient(135deg, #f4e4c1 0%, #d4af37 50%, #f4e4c1 100%)',
-                            border: '3px solid rgba(255,255,255,0.9)',
-                            boxShadow: '0 4px 16px rgba(212, 175, 55, 0.5), inset 0 2px 4px rgba(255,255,255,0.5)'
+                            background: 'linear-gradient(135deg, #f5edd6 0%, #d4b85a 40%, #c9a227 60%, #f5edd6 100%)',
+                            border: '4px solid rgba(255,255,255,0.95)',
+                            boxShadow: '0 6px 20px rgba(169, 124, 0, 0.4), inset 0 2px 6px rgba(255,255,255,0.6)'
                           }}
                         >
-                          <span className="text-xs text-amber-900 font-medium">عائد سنوي</span>
-                          <div className="flex items-center gap-0.5">
-                            <span className="text-xl font-black text-amber-900">{farm.returnRate}</span>
-                            <TrendingUp className="w-3 h-3 text-amber-900" strokeWidth={3} />
+                          <span className="text-[10px] text-amber-900 font-semibold">عائد سنوي</span>
+                          <div className="flex items-center">
+                            <span className="text-2xl font-black text-amber-900">{farm.returnRate}</span>
+                            <TrendingUp className="w-4 h-4 text-amber-700 mr-0.5" strokeWidth={3} />
                           </div>
                         </div>
                       </div>
@@ -1076,58 +1079,61 @@ function AppContent() {
                       {/* Card Content */}
                       <div className="p-4 space-y-3">
                         {/* Available Trees */}
-                        <div className="flex items-center justify-center gap-2 py-2 px-4 rounded-xl bg-gradient-to-r from-emerald-50 to-green-50">
-                          <CheckCircle2 className="w-5 h-5 text-green-700" strokeWidth={2.5} />
+                        <div className="flex items-center justify-center gap-2">
                           <span className="text-base font-bold text-gray-800">
                             {totalTrees} شجرة متاحة للاستثمار
                           </span>
+                          <CheckCircle2 className="w-5 h-5 text-green-600" strokeWidth={2.5} />
                         </div>
 
-                        {/* Progress Bar with Labels */}
+                        {/* Progress Bar - Exact Design */}
                         <div className="space-y-2">
-                          {/* Progress Bar */}
-                          <div className="relative h-8 rounded-full overflow-hidden shadow-inner" style={{ background: '#e5e7eb' }}>
-                            {/* Available - Green */}
+                          <div
+                            className="relative h-4 rounded-full overflow-hidden"
+                            style={{
+                              background: '#e8e4dc',
+                              boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)'
+                            }}
+                          >
+                            {/* Available Section - Green from right */}
                             <div
-                              className="absolute left-0 top-0 h-full"
+                              className="absolute right-0 top-0 h-full rounded-r-full"
                               style={{
                                 width: `${availablePercentage}%`,
-                                background: 'linear-gradient(90deg, #059669 0%, #10b981 100%)',
-                                boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.3)'
+                                background: 'linear-gradient(90deg, #4ade80 0%, #22c55e 50%, #16a34a 100%)',
                               }}
                             />
-                            {/* Reserved - Yellow/Amber */}
+                            {/* Reserved Section - Yellow/Gold */}
                             <div
                               className="absolute top-0 h-full"
                               style={{
                                 right: `${availablePercentage}%`,
                                 width: `${reservationPercentage}%`,
-                                background: 'linear-gradient(90deg, #f59e0b 0%, #fbbf24 100%)',
-                                boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.3)'
+                                background: 'linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%)',
                               }}
                             />
                           </div>
 
-                          {/* Status Labels */}
-                          <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center gap-1.5">
-                              <Leaf className="w-4 h-4 text-green-700" />
-                              <span className="font-bold text-green-800">متاح</span>
+                          {/* Status Labels Row */}
+                          <div className="flex items-center justify-between text-xs px-1">
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 rounded-full bg-green-500" />
+                              <span className="font-semibold text-gray-700">متاح</span>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                              <Layers className="w-4 h-4 text-amber-700" />
-                              <span className="font-bold text-amber-800">محجوز</span>
+                            <div className="flex items-center gap-1">
+                              <div className="w-3 h-3 rounded-full bg-amber-400" />
+                              <span className="font-semibold text-gray-700">محجوز</span>
                             </div>
-                            <div className="font-black text-gray-800">
+                            <span className="font-bold text-gray-800">
                               {reservationPercentage.toFixed(0)}%
-                            </div>
+                            </span>
                           </div>
                         </div>
 
                         {/* Management Info */}
-                        <div className="flex items-center justify-center gap-2 py-2 text-sm text-gray-600">
-                          <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                          <span className="font-medium">الإدارة والمتابعة تن فريق متخصص</span>
+                        <div className="flex items-center justify-center gap-1.5 pt-1 text-sm text-gray-600">
+                          <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                          <span className="font-medium">الإدارة والمتابعة من فريق متخصص</span>
                         </div>
                       </div>
                     </div>
@@ -1305,17 +1311,15 @@ function AppContent() {
 
       {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && !showAdvancedAssistant && (
         <nav
-          className="fixed left-0 right-0 lg:hidden backdrop-blur-2xl"
+          className="fixed left-0 right-0 lg:hidden"
         style={{
           transform: !isScrollingDown ? 'translateY(0)' : 'translateY(100%)',
           bottom: 0,
-          background: 'linear-gradient(180deg, rgba(248, 250, 249, 0.98) 0%, rgba(242, 247, 244, 0.95) 100%)',
-          borderTop: '3px solid rgba(58,161,126,0.4)',
-          boxShadow: '0 -12px 40px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255,255,255,0.8)',
-          backdropFilter: 'blur(24px)',
-          WebkitBackdropFilter: 'blur(24px)',
-          paddingTop: '1.25rem',
-          paddingBottom: '5.5rem',
+          background: 'linear-gradient(180deg, #f8f6f2 0%, #f0ede7 100%)',
+          borderTop: '1px solid rgba(200,195,185,0.5)',
+          boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.08)',
+          paddingTop: '0.75rem',
+          paddingBottom: '2rem',
           zIndex: 50000,
           position: 'fixed',
           transition: 'transform 0.25s cubic-bezier(0.4, 0, 0.6, 1)',
@@ -1325,100 +1329,53 @@ function AppContent() {
         }}
         ref={(el) => {
           if (el) {
-            console.log('🔵 Mobile Footer - isScrollingDown:', isScrollingDown, 'Transform:', el.style.transform);
+            console.log('Footer - isScrollingDown:', isScrollingDown);
           }
         }}
       >
-        <div className="flex items-center justify-around px-2 relative" style={{ height: '5rem' }}>
-          <button
-            onClick={handleOfferFarmClick}
-            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
-          >
-            <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90 overflow-hidden relative"
-              style={{
-                background: 'linear-gradient(135deg, #d4af37 0%, #f4e4c1 50%, #d4af37 100%)',
-                boxShadow: '0 4px 12px rgba(212,175,55,0.4), inset 0 2px 4px rgba(255,255,255,0.9)',
-                border: '2px solid #b8942f'
-              }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
-              <div className="relative">
-                <Plus className="w-3 h-3 absolute -top-0.5 -right-0.5 text-white group-hover:rotate-90 transition-transform duration-300" />
-                <Sprout className="w-5 h-5 text-white transition-all duration-300 group-active:scale-110" />
-              </div>
-            </div>
-            <span className="text-[9px] font-bold" style={{ color: '#b8942f' }}>اعرض مزرعتك</span>
-          </button>
-
-          <button
-            onClick={() => setShowAdvancedAssistant(true)}
-            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
-          >
-            <div
-              className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 relative group-active:scale-90 overflow-hidden"
-              style={{
-                background: 'linear-gradient(145deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.10) 100%)',
-                boxShadow: '0 4px 8px rgba(16, 185, 129, 0.2), inset 0 2px 4px rgba(255,255,255,0.9)',
-                border: '2px solid rgba(16, 185, 129, 0.35)'
-              }}
-            >
-              <Sparkles className="w-5 h-5 text-emerald-600 transition-all duration-300 group-active:scale-110" />
-              <div
-                className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full animate-pulse"
-                style={{
-                  background: 'linear-gradient(135deg, #FFD700 0%, #D4AF37 100%)',
-                  boxShadow: '0 0 8px rgba(212,175,55,0.6)'
-                }}
-              />
-            </div>
-            <span className="text-[9px] font-bold text-emerald-600">المساعد</span>
-          </button>
-
-          <button
-            onClick={handleMyFarmClick}
-            className="flex flex-col items-center justify-center gap-1.5 relative group active:scale-95 transition-transform -mt-6"
-          >
-            <div
-              className="w-16 h-16 rounded-3xl flex items-center justify-center transition-all duration-300 relative group-active:scale-90 overflow-hidden"
-              style={{
-                background: appMode === 'agricultural'
-                  ? 'linear-gradient(145deg, rgba(58,161,126,0.28) 0%, rgba(58,161,126,0.18) 50%, rgba(58,161,126,0.28) 100%)'
-                  : 'linear-gradient(145deg, rgba(212,175,55,0.28) 0%, rgba(212,175,55,0.18) 50%, rgba(212,175,55,0.28) 100%)',
-                boxShadow: appMode === 'agricultural'
-                  ? '0 8px 20px rgba(58,161,126,0.4), 0 4px 12px rgba(58,161,126,0.3), inset 0 2px 4px rgba(255,255,255,0.8)'
-                  : '0 8px 20px rgba(212,175,55,0.4), 0 4px 12px rgba(212,175,55,0.3), inset 0 2px 4px rgba(255,255,255,0.8)',
-                border: appMode === 'agricultural' ? '3px solid rgba(58,161,126,0.5)' : '3px solid rgba(212,175,55,0.5)'
-              }}
-            >
-              <TreePine className="w-7 h-7 transition-all duration-300 group-active:scale-110" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37' }} />
-            </div>
-            <span className="text-[10px] font-black" style={{ color: appMode === 'agricultural' ? '#3aa17e' : '#b8942f' }}>
-              {appMode === 'agricultural' ? 'أشجاري الخضراء' : 'أشجاري الذهبية'}
-            </span>
-          </button>
-
-          <NotificationCenter
-            unreadCount={unreadMessagesCount}
-            onCountChange={handleUnreadCountChange}
-            onOpenChange={setShowNotifications}
-          />
-
+        <div className="flex items-center justify-between px-6">
+          {/* حسابي - Right */}
           <button
             onClick={handleMyAccountClick}
-            className="flex flex-col items-center justify-center gap-1 relative group active:scale-95 transition-transform"
+            className="flex flex-col items-center gap-1 active:scale-95 transition-transform"
           >
-            <div
-              className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 group-active:scale-90"
-              style={{
-                background: 'linear-gradient(145deg, rgba(240,248,244,0.95) 0%, rgba(232,242,237,0.9) 100%)',
-                boxShadow: '0 4px 8px rgba(58,161,126,0.2), inset 0 2px 4px rgba(255,255,255,0.9)',
-                border: '2px solid rgba(58,161,126,0.35)'
-              }}
-            >
-              <User className="w-5 h-5 text-darkgreen transition-all duration-300 group-active:scale-110" />
+            <User className="w-6 h-6 text-gray-500" strokeWidth={1.5} />
+            <span className="text-xs text-gray-600 font-medium">حسابي</span>
+          </button>
+
+          {/* أشجاري - Center (Main Button) */}
+          <button
+            onClick={handleMyFarmClick}
+            className="flex items-center gap-2 px-6 py-3 rounded-full active:scale-95 transition-transform"
+            style={{
+              background: 'linear-gradient(135deg, #3d8b6e 0%, #2d6a4f 100%)',
+              boxShadow: '0 4px 16px rgba(45, 106, 79, 0.4), inset 0 1px 0 rgba(255,255,255,0.2)'
+            }}
+          >
+            <Sprout className="w-5 h-5 text-white" />
+            <span className="text-sm font-bold text-white">أشجاري</span>
+          </button>
+
+          {/* الإشعارات - Left */}
+          <button
+            onClick={() => setShowNotifications(true)}
+            className="flex flex-col items-center gap-1 active:scale-95 transition-transform relative"
+          >
+            <div className="relative">
+              <svg className="w-6 h-6 text-gray-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+              </svg>
+              {unreadMessagesCount > 0 && (
+                <div
+                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold text-white"
+                  style={{ background: '#dc2626' }}
+                >
+                  {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                </div>
+              )}
             </div>
-            <span className="text-[9px] font-black text-darkgreen/80">حسابي</span>
+            <span className="text-xs text-gray-600 font-medium">الإشعارات</span>
           </button>
         </div>
       </nav>
