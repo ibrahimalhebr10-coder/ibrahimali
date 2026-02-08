@@ -536,23 +536,33 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
               <span style={{ fontWeight: 700, color: '#ffffff', fontSize: '15px' }}>ابدأ</span>
             </button>
 
-            <button
-              onClick={onOpenAssistant}
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: '4px',
-                minWidth: '60px',
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: '4px'
-              }}
-            >
-              <Sparkles style={{ width: '24px', height: '24px', color: '#374151' }} />
-              <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>المساعد</span>
-            </button>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <div style={{ minWidth: '60px', display: 'flex', justifyContent: 'center' }}>
+                <NotificationCenter
+                  unreadCount={unreadMessagesCount}
+                  onCountChange={handleUnreadCountChange}
+                  onOpenChange={() => {}}
+                />
+              </div>
+
+              <button
+                onClick={onOpenAssistant}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '4px',
+                  minWidth: '60px',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  padding: '4px'
+                }}
+              >
+                <Sparkles style={{ width: '24px', height: '24px', color: '#374151' }} />
+                <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>المساعد</span>
+              </button>
+            </div>
           </div>
         </div>,
         document.body
