@@ -92,6 +92,42 @@ function AppContent() {
   const [showAccountTypeSelector, setShowAccountTypeSelector] = useState(false);
   const [showNewHomePage, setShowNewHomePage] = useState(true);
 
+  // Handler لزر "ابدأ" - يغلق جميع الـ modals ويفتح الصفحة الثانية فقط
+  const handleStartInvestment = useCallback(() => {
+    console.log('🚀 [App] زر ابدأ - إغلاق جميع الـ modals وفتح الصفحة الثانية');
+
+    // إغلاق الواجهة الرئيسية
+    setShowNewHomePage(false);
+
+    // إغلاق جميع الـ modals الأخرى
+    setShowSuccessPartnerIntro(false);
+    setShowAdvancedAssistant(false);
+    setShowQuickAccountAccess(false);
+    setShowAccountProfile(false);
+    setShowSuccessPartnerAccount(false);
+    setShowSuccessPartnerOnboarding(false);
+    setShowSuccessPartnerRegistration(false);
+    setShowSuccessPartnerWelcome(false);
+    setShowHowItWorksPartner(false);
+    setShowSuccessPartnerWelcomeBanner(false);
+    setShowNotifications(false);
+    setShowMyReservations(false);
+    setShowMyTrees(false);
+    setShowStandaloneRegistration(false);
+    setShowWelcomeToAccount(false);
+    setShowAccountTypeSelector(false);
+    setShowHowToStart(false);
+    setShowStreamingVideo(false);
+    setSelectedInvestmentFarm(null);
+
+    // إعادة تعيين الـ scroll
+    setIsScrollingDown(false);
+    setAllowHideFooter(false);
+    lastScrollYRef.current = 0;
+
+    console.log('✅ [App] تم فتح الصفحة الثانية (المزارع) بنجاح');
+  }, []);
+
   useEffect(() => {
     if (!showNewHomePage) {
       setIsScrollingDown(false);
@@ -648,7 +684,7 @@ function AppContent() {
     return (
       <ErrorBoundary>
         <NewHomePage
-          onStartInvestment={() => setShowNewHomePage(false)}
+          onStartInvestment={handleStartInvestment}
           onOpenPartnerProgram={() => setShowSuccessPartnerIntro(true)}
           onOpenAccount={() => setShowQuickAccountAccess(true)}
           onOpenAssistant={() => setShowAdvancedAssistant(true)}
