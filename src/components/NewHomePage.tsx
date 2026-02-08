@@ -325,7 +325,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
       </div>
 
       {/* Content */}
-      <div className="scrollbar-hide" style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', minHeight: '100dvh', paddingTop: partnerBannerEnabled && showPartnerBanner ? (isMobile ? '140px' : '120px') : '56px', overflowX: 'hidden', width: '100%' }}>
+      <div className="scrollbar-hide" style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', minHeight: '100dvh', paddingTop: partnerBannerEnabled && showPartnerBanner ? (isMobile ? '110px' : '120px') : '56px', overflowX: 'hidden', width: '100%' }}>
         {/* Hero Section */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px', paddingBottom: isMobile ? '180px' : '200px' }}>
           <div className="w-full max-w-lg space-y-3">
