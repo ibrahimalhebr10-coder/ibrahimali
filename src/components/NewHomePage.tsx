@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { Play, Shield, TrendingUp, Star, Handshake, User, Sprout, Bot, CheckCircle, ChevronLeft, Users, TreePine, Calendar, Award, Zap, Bell, X, Plus } from 'lucide-react';
+import { Play, Shield, TrendingUp, Star, Handshake, User, Sprout, CheckCircle, ChevronLeft, Users, TreePine, Calendar, Award, Zap, Bell, X, Plus } from 'lucide-react';
 import IntroVideoPlayer from './IntroVideoPlayer';
 import NotificationCenter from './NotificationCenter';
+import SmartAssistantIcon from './SmartAssistantIcon';
 import { supabase } from '../lib/supabase';
 import { partnerShareMessageService } from '../services/partnerShareMessageService';
 import { getUnreadCount } from '../services/messagesService';
@@ -756,23 +757,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
                 />
               </div>
 
-              <button
-                onClick={onOpenAssistant}
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  gap: '4px',
-                  minWidth: '60px',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  padding: '4px'
-                }}
-              >
-                <Bot style={{ width: '24px', height: '24px', color: '#374151' }} />
-                <span style={{ fontSize: '11px', color: '#374151', fontWeight: 500 }}>المساعد الذكي</span>
-              </button>
+              <SmartAssistantIcon onClick={onOpenAssistant} size={70} />
             </div>
           </div>
         </div>,
