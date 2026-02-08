@@ -29,7 +29,7 @@ import OperationsSection from './OperationsSection';
 import FinanceSection from './FinanceSection';
 import CustomersSection from './CustomersSection';
 import HotLeadsDashboard from './HotLeadsDashboard';
-import SmartAssistantManager from './SmartAssistantManager';
+import AdvancedAssistantManager from './AdvancedAssistantManager';
 import IntroVideoManager from './IntroVideoManager';
 
 type AdminSection =
@@ -114,7 +114,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       case 'videos':
         return <IntroVideoManager />;
       case 'assistant':
-        return <SmartAssistantManager />;
+        return <AdvancedAssistantManager />;
       case 'settings':
         return <GeneralSettings />;
       default:

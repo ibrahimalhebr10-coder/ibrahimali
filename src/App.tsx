@@ -1359,11 +1359,44 @@ function AppContent() {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
-              padding: '12px 24px 14px 24px',
+              padding: '12px 20px 14px 20px',
               maxWidth: '1200px',
-              margin: '0 auto'
+              margin: '0 auto',
+              gap: '12px'
             }}
           >
+            {/* Smart Assistant Button - Far Left */}
+            <button
+              onClick={() => setShowAdvancedAssistant(true)}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '5px',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                minWidth: '60px',
+                position: 'relative'
+              }}
+            >
+              <div style={{ position: 'relative' }}>
+                <Sparkles style={{ width: '26px', height: '26px', color: '#d4af37' }} strokeWidth={1.5} />
+                <div style={{
+                  position: 'absolute',
+                  top: '-2px',
+                  right: '-2px',
+                  width: '8px',
+                  height: '8px',
+                  borderRadius: '50%',
+                  background: '#10b981',
+                  boxShadow: '0 0 8px rgba(16, 185, 129, 0.6)',
+                  animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                }}></div>
+              </div>
+              <span style={{ fontSize: '11px', color: '#d4af37', fontWeight: 600 }}>المساعد</span>
+            </button>
+
             {/* Account Button - Left */}
             <button
               onClick={handleMyAccountClick}
@@ -1379,22 +1412,23 @@ function AppContent() {
               }}
             >
               <User style={{ width: '26px', height: '26px', color: '#9ca3af' }} strokeWidth={1.5} />
-              <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600 }}>حسابي</span>
+              <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: 600 }}>حسابي</span>
             </button>
 
-            {/* My Trees Button - Center - Exact Design Match */}
+            {/* My Trees Button - Center */}
             <button
               onClick={handleMyFarmClick}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
-                padding: '14px 32px',
+                padding: '14px 28px',
                 borderRadius: '9999px',
                 background: 'linear-gradient(145deg, #4a9d7c 0%, #2d6a4f 100%)',
                 boxShadow: '0 6px 24px rgba(45, 106, 79, 0.45), inset 0 2px 0 rgba(255,255,255,0.15)',
                 border: 'none',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                flexShrink: 0
               }}
             >
               <Sprout style={{ width: '22px', height: '22px', color: '#ffffff' }} />
