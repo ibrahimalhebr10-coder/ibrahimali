@@ -206,7 +206,7 @@ function AppContent() {
 
     refreshInterval = setInterval(() => {
       console.log('[App] 🔄 Background refresh');
-      farmLoadingService.loadAllFarms().then(result => {
+      farmLoadingService.loadFresh().then(result => {
         if (mounted) {
           farmLoadingService.saveToCache(result.categories, result.farms);
           console.log('[App] ✅ Cache updated in background');
