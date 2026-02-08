@@ -1341,184 +1341,134 @@ function AppContent() {
         >
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr 1fr 1fr',
-              gap: '10px',
-              padding: '12px 16px 16px 16px',
+              display: 'flex',
+              justifyContent: 'space-around',
+              alignItems: 'center',
+              padding: '16px 20px',
               maxWidth: '500px',
               margin: '0 auto'
             }}
           >
-            {/* زر حسابي - تصميم ثلاثي الأبعاد أصغر بلون زراعي */}
+            {/* زر حسابي - أيقونة مجسمة فقط */}
             <button
               onClick={handleMyAccountClick}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '4px',
-                padding: '8px 6px',
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, #3aa17e 0%, #2d7a5f 100%)',
-                boxShadow: '0 6px 16px rgba(58, 161, 126, 0.35), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)',
+                gap: '6px',
+                background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                position: 'relative',
-                overflow: 'hidden'
+                transition: 'all 0.3s ease'
               }}
               onTouchStart={(e) => {
                 e.currentTarget.style.transform = 'scale(0.95)';
-                e.currentTarget.style.boxShadow = '0 3px 10px rgba(58, 161, 126, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)';
               }}
               onTouchEnd={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(58, 161, 126, 0.35), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)';
               }}
             >
-              {/* تأثير الإضاءة */}
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '50%',
-                background: 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%)',
-                borderRadius: '16px 16px 0 0'
-              }}></div>
-
-              {/* أيقونة الرجل مباشرة بدون مربع - أصغر */}
-              <User style={{ width: '22px', height: '22px', color: '#ffffff', position: 'relative' }} strokeWidth={2.5} />
-
-              <span style={{ fontSize: '10px', color: '#ffffff', fontWeight: 700, position: 'relative' }}>حسابي</span>
+              <User
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  color: '#3aa17e',
+                  filter: 'drop-shadow(0 3px 6px rgba(58, 161, 126, 0.3))'
+                }}
+                strokeWidth={2.5}
+              />
+              <span style={{ fontSize: '11px', color: '#374151', fontWeight: 700 }}>حسابي</span>
             </button>
 
-            {/* زر أشجاري - تصميم ثلاثي الأبعاد محسّن */}
+            {/* زر أشجاري - أيقونة مجسمة فقط (الأكبر) */}
             <button
               onClick={handleMyFarmClick}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '6px',
-                padding: '12px 8px',
-                borderRadius: '18px',
-                background: appMode === 'agricultural'
-                  ? 'linear-gradient(135deg, #3aa17e 0%, #2d7a5f 100%)'
-                  : 'linear-gradient(135deg, #d4af37 0%, #b8942f 100%)',
-                boxShadow: appMode === 'agricultural'
-                  ? '0 8px 20px rgba(58, 161, 126, 0.4), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)'
-                  : '0 8px 20px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)',
+                gap: '8px',
+                background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                position: 'relative',
-                overflow: 'hidden'
+                transition: 'all 0.3s ease',
+                transform: 'scale(1.15)'
               }}
               onTouchStart={(e) => {
-                e.currentTarget.style.transform = 'scale(0.95)';
-                if (appMode === 'agricultural') {
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(58, 161, 126, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)';
-                } else {
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(212, 175, 55, 0.35), inset 0 1px 0 rgba(255,255,255,0.2)';
-                }
+                e.currentTarget.style.transform = 'scale(1.05)';
               }}
               onTouchEnd={(e) => {
-                e.currentTarget.style.transform = 'scale(1)';
-                if (appMode === 'agricultural') {
-                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(58, 161, 126, 0.4), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)';
-                } else {
-                  e.currentTarget.style.boxShadow = '0 8px 20px rgba(212, 175, 55, 0.4), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)';
-                }
+                e.currentTarget.style.transform = 'scale(1.15)';
               }}
             >
-              {/* تأثير البريق */}
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '50%',
-                background: 'linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 100%)',
-                borderRadius: '18px 18px 0 0'
-              }}></div>
-
-              <div style={{
-                width: '36px',
-                height: '36px',
-                borderRadius: '12px',
-                background: 'rgba(255, 255, 255, 0.25)',
-                backdropFilter: 'blur(10px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxShadow: '0 4px 10px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3)',
-                position: 'relative'
+              <TreePine
+                style={{
+                  width: '36px',
+                  height: '36px',
+                  color: appMode === 'agricultural' ? '#3aa17e' : '#d4af37',
+                  filter: appMode === 'agricultural'
+                    ? 'drop-shadow(0 4px 8px rgba(58, 161, 126, 0.4))'
+                    : 'drop-shadow(0 4px 8px rgba(212, 175, 55, 0.4))'
+                }}
+                strokeWidth={2.5}
+              />
+              <span style={{
+                fontSize: '12px',
+                color: appMode === 'agricultural' ? '#047857' : '#d4af37',
+                fontWeight: 700
               }}>
-                <TreePine style={{ width: '20px', height: '20px', color: '#ffffff' }} strokeWidth={2.5} />
-              </div>
-              <span style={{ fontSize: '11px', color: '#ffffff', fontWeight: 700, position: 'relative' }}>أشجاري</span>
+                أشجاري
+              </span>
             </button>
 
-            {/* زر اعرض مزرعتك - تصميم ثلاثي الأبعاد أصغر بلون زراعي */}
+            {/* زر اعرض مزرعتك - أيقونة مجسمة فقط */}
             <button
               onClick={handleOfferFarmClick}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '4px',
-                padding: '8px 6px',
-                borderRadius: '16px',
-                background: 'linear-gradient(135deg, #3aa17e 0%, #2d7a5f 100%)',
-                boxShadow: '0 6px 16px rgba(58, 161, 126, 0.35), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)',
+                gap: '6px',
+                background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                position: 'relative',
-                overflow: 'hidden'
+                transition: 'all 0.3s ease'
               }}
               onTouchStart={(e) => {
                 e.currentTarget.style.transform = 'scale(0.95)';
-                e.currentTarget.style.boxShadow = '0 3px 10px rgba(58, 161, 126, 0.3), inset 0 1px 0 rgba(255,255,255,0.2)';
               }}
               onTouchEnd={(e) => {
                 e.currentTarget.style.transform = 'scale(1)';
-                e.currentTarget.style.boxShadow = '0 6px 16px rgba(58, 161, 126, 0.35), inset 0 1px 0 rgba(255,255,255,0.25), inset 0 -3px 0 rgba(0,0,0,0.15)';
               }}
             >
-              {/* تأثير التموج */}
-              <div style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '50%',
-                background: 'linear-gradient(180deg, rgba(255,255,255,0.15) 0%, transparent 100%)',
-                borderRadius: '16px 16px 0 0'
-              }}></div>
-
-              {/* أيقونة الغصن مباشرة مع Plus بدون مربع - أصغر */}
               <div style={{ position: 'relative' }}>
-                <Sprout style={{ width: '22px', height: '22px', color: '#ffffff' }} strokeWidth={2.5} />
+                <Sprout
+                  style={{
+                    width: '28px',
+                    height: '28px',
+                    color: '#3aa17e',
+                    filter: 'drop-shadow(0 3px 6px rgba(58, 161, 126, 0.3))'
+                  }}
+                  strokeWidth={2.5}
+                />
                 <div style={{
                   position: 'absolute',
                   top: '-3px',
                   right: '-3px',
-                  width: '12px',
-                  height: '12px',
+                  width: '16px',
+                  height: '16px',
                   borderRadius: '50%',
-                  background: 'rgba(255, 255, 255, 0.4)',
+                  background: '#10b981',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                  boxShadow: '0 2px 6px rgba(16, 185, 129, 0.4)'
                 }}>
-                  <Plus style={{ width: '8px', height: '8px', color: '#ffffff' }} strokeWidth={3} />
+                  <Plus style={{ width: '10px', height: '10px', color: '#ffffff' }} strokeWidth={3} />
                 </div>
               </div>
-
-              <span style={{ fontSize: '9px', color: '#ffffff', fontWeight: 700, position: 'relative', textAlign: 'center', whiteSpace: 'nowrap' }}>
+              <span style={{ fontSize: '9px', color: '#374151', fontWeight: 700, textAlign: 'center', whiteSpace: 'nowrap' }}>
                 اعرض مزرعتك
               </span>
             </button>
