@@ -708,8 +708,9 @@ function AppContent() {
         <SuccessPartnerIntroExperience
           isOpen={showSuccessPartnerIntroExperience}
           onContinue={() => {
+            console.log('✅ [App] Moving DIRECTLY to Registration - NO OLD SCREENS!');
             setShowSuccessPartnerIntroExperience(false);
-            setShowSuccessPartnerOnboarding(true);
+            setShowSuccessPartnerRegistration(true);
           }}
         />
 
