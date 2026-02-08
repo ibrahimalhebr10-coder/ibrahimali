@@ -1,4 +1,4 @@
-import { User, Handshake, Sprout, Wheat, Apple, Grape, Leaf, HelpCircle, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X, Video } from 'lucide-react';
+import { User, Handshake, Sprout, Wheat, Apple, Grape, Leaf, HelpCircle, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X, Video, Star } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import NewHomePage from './components/NewHomePage';
 import HowToStart from './components/HowToStart';
