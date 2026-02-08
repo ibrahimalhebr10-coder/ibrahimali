@@ -44,6 +44,7 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   const [showPartnerBanner, setShowPartnerBanner] = useState(true);
   const [partnerBannerEnabled, setPartnerBannerEnabled] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
   const [stats, setStats] = useState<PlatformStats>({
     totalReservations: 0,
     totalUsers: 0,
@@ -139,6 +140,16 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
     };
 
     fetchIntroVideo();
+  }, []);
+
+  // Detect screen size changes
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const handleVideoPlay = async () => {
@@ -491,9 +502,9 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '12px',
-                padding: '18px 24px',
-                borderRadius: '20px',
+                gap: isMobile ? '8px' : '12px',
+                padding: isMobile ? '14px 16px' : '18px 24px',
+                borderRadius: isMobile ? '16px' : '20px',
                 background: 'linear-gradient(135deg, #059669 0%, #047857 25%, #065f46 50%, #064e3b 75%, #14532d 100%)',
                 boxShadow: `
                   0 0 40px rgba(16, 185, 129, 0.6),
@@ -508,8 +519,8 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
                 position: 'relative',
                 transform: 'translateY(0) perspective(1000px) rotateX(0deg)',
                 transition: 'all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                overflow: 'hidden',
-                minHeight: '64px',
+                overflow: 'visible',
+                minHeight: isMobile ? '56px' : '64px',
                 transformStyle: 'preserve-3d'
               }}
               onMouseOver={(e) => {
@@ -625,8 +636,8 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
                 flexShrink: 0
               }}>
                 <Sprout style={{
-                  width: '28px',
-                  height: '28px',
+                  width: isMobile ? '22px' : '28px',
+                  height: isMobile ? '22px' : '28px',
                   color: '#ffffff',
                   filter: 'drop-shadow(0 0 8px rgba(52, 211, 153, 0.8)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5))'
                 }} />
@@ -636,17 +647,19 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
               <span style={{
                 fontWeight: 900,
                 color: '#ffffff',
-                fontSize: '18px',
+                fontSize: isMobile ? '15px' : '18px',
                 textShadow: `
                   0 0 20px rgba(52, 211, 153, 0.8),
                   0 0 10px rgba(16, 185, 129, 0.6),
                   0 2px 8px rgba(0, 0, 0, 0.6),
                   0 1px 3px rgba(0, 0, 0, 0.8)
                 `,
-                letterSpacing: '0.5px',
+                letterSpacing: isMobile ? '0.2px' : '0.5px',
                 position: 'relative',
                 zIndex: 5,
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                textAlign: 'center',
+                lineHeight: '1.2'
               }}>
                 احجز أشجارك المثمرة
               </span>
