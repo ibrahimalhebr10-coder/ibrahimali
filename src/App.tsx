@@ -809,7 +809,7 @@ function AppContent() {
                 ref={scrollContainerRef}
                 className="flex-1 overflow-y-auto overflow-x-hidden"
                 style={{
-                  paddingBottom: '5rem',
+                  paddingBottom: '80px',
                   WebkitOverflowScrolling: 'touch',
                   overscrollBehavior: 'contain',
                   scrollBehavior: 'auto',
@@ -817,7 +817,7 @@ function AppContent() {
                 }}
               >
                 <div className="max-w-7xl mx-auto">
-                  <section className="px-3 lg:px-4 pb-2 lg:pb-4 pt-8 lg:pt-4">
+                  <section className="px-3 lg:px-4 pb-1 lg:pb-2 pt-2 lg:pt-2">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-4 animate-fadeIn">
               <div className="relative">
@@ -1051,16 +1051,16 @@ function AppContent() {
 
               {/* Swipe Hint Text - Mobile Only */}
               {!hasSwipedOnce && currentFarms.length > 1 && (
-                <div className="lg:hidden flex items-center justify-center gap-2 mt-3 animate-bounce">
-                  <ChevronLeft className="w-4 h-4 text-darkgreen/60" />
-                  <span className="text-xs text-darkgreen/70 font-semibold">اسحب لرؤية المزيد</span>
-                  <ChevronRight className="w-4 h-4 text-darkgreen/60" />
+                <div className="lg:hidden flex items-center justify-center gap-2 mt-1 animate-bounce">
+                  <ChevronLeft className="w-3 h-3 text-darkgreen/60" />
+                  <span className="text-[10px] text-darkgreen/70 font-semibold">اسحب لرؤية المزيد</span>
+                  <ChevronRight className="w-3 h-3 text-darkgreen/60" />
                 </div>
               )}
 
               {/* Progress Dots */}
               {currentFarms.length > 1 && (
-                <div className="flex justify-center gap-2 mt-4">
+                <div className="flex justify-center gap-1.5 mt-2">
                   {currentFarms.map((_, index) => (
                     <button
                       key={index}
