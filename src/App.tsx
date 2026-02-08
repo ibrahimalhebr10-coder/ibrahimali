@@ -1,5 +1,6 @@
 import { User, Handshake, Sprout, Wheat, Apple, Grape, Leaf, HelpCircle, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X, Video, Star } from 'lucide-react';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import NewHomePage from './components/NewHomePage';
 import HowToStart from './components/HowToStart';
 import StreamingVideoPlayer from './components/StreamingVideoPlayer';
@@ -752,13 +753,13 @@ function AppContent() {
                 </div>
 
                 {/* Tree Type Filters - Square Cards with Images */}
-                <section className="px-4 pb-4">
+                <section className="px-3 pb-2">
           {categories.length === 0 ? (
             <div className="text-center py-4 text-gray-500 animate-pulse">
               <p className="text-sm">جاري تحميل الفئات...</p>
             </div>
           ) : (
-          <div className="flex gap-3 justify-center">
+          <div className="flex gap-2 justify-center">
             {[{ slug: 'all', name: 'الكل', icon: 'all', image: 'https://images.pexels.com/photos/1132047/pexels-photo-1132047.jpeg?auto=compress&cs=tinysrgb&w=150' },
               ...categories.map(cat => ({
                 ...cat,
@@ -772,10 +773,10 @@ function AppContent() {
               const isActive = activeCategory === category.slug;
 
               return (
-                <div key={category.slug} className="flex flex-col items-center gap-1.5">
+                <div key={category.slug} className="flex flex-col items-center gap-1">
                   <button
                     onClick={() => handleCategoryChange(category.slug)}
-                    className="w-16 h-16 rounded-xl overflow-hidden transition-all duration-300 relative"
+                    className="w-12 h-12 rounded-lg overflow-hidden transition-all duration-300 relative"
                     style={{
                       boxShadow: isActive
                         ? '0 4px 12px rgba(45, 106, 79, 0.5), inset 0 0 0 3px #3d8b6e'
@@ -808,7 +809,7 @@ function AppContent() {
                 ref={scrollContainerRef}
                 className="flex-1 overflow-y-auto overflow-x-hidden"
                 style={{
-                  paddingBottom: '6.5rem',
+                  paddingBottom: '5rem',
                   WebkitOverflowScrolling: 'touch',
                   overscrollBehavior: 'contain',
                   scrollBehavior: 'auto',
@@ -816,7 +817,7 @@ function AppContent() {
                 }}
               >
                 <div className="max-w-7xl mx-auto">
-                  <section className="px-3 lg:px-4 pb-4 lg:pb-6 pt-14 lg:pt-6">
+                  <section className="px-3 lg:px-4 pb-2 lg:pb-4 pt-8 lg:pt-4">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12 gap-4 animate-fadeIn">
               <div className="relative">
@@ -905,7 +906,7 @@ function AppContent() {
               <div
                 ref={farmsSliderRef}
                 onScroll={handleFarmScroll}
-                className="flex gap-4 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-2"
+                className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-1"
                 style={{
                   scrollPaddingLeft: '1rem',
                   scrollPaddingRight: '1rem'
@@ -946,7 +947,7 @@ function AppContent() {
                       }}
                     >
                       {/* Farm Image Section */}
-                      <div className="relative w-full h-44 overflow-hidden rounded-t-3xl">
+                      <div className="relative w-full h-28 overflow-hidden rounded-t-3xl">
                         <img
                           src={farm.image}
                           alt={farm.name}
@@ -968,23 +969,23 @@ function AppContent() {
 
                         {/* Return Rate Badge - Right Side */}
                         <div
-                          className="absolute top-1/2 -translate-y-1/2 -left-2 w-20 h-20 rounded-full flex flex-col items-center justify-center"
+                          className="absolute top-1/2 -translate-y-1/2 -left-1 w-16 h-16 rounded-full flex flex-col items-center justify-center"
                           style={{
                             background: 'linear-gradient(135deg, #f5edd6 0%, #d4b85a 40%, #c9a227 60%, #f5edd6 100%)',
-                            border: '4px solid rgba(255,255,255,0.95)',
-                            boxShadow: '0 6px 20px rgba(169, 124, 0, 0.4), inset 0 2px 6px rgba(255,255,255,0.6)'
+                            border: '3px solid rgba(255,255,255,0.95)',
+                            boxShadow: '0 4px 16px rgba(169, 124, 0, 0.4), inset 0 2px 4px rgba(255,255,255,0.6)'
                           }}
                         >
-                          <span className="text-[10px] text-amber-900 font-semibold">عائد سنوي</span>
+                          <span className="text-[9px] text-amber-900 font-semibold">عائد سنوي</span>
                           <div className="flex items-center">
-                            <span className="text-2xl font-black text-amber-900">{farm.returnRate}</span>
-                            <TrendingUp className="w-4 h-4 text-amber-700 mr-0.5" strokeWidth={3} />
+                            <span className="text-xl font-black text-amber-900">{farm.returnRate}</span>
+                            <TrendingUp className="w-3 h-3 text-amber-700 mr-0.5" strokeWidth={3} />
                           </div>
                         </div>
                       </div>
 
                       {/* Card Content */}
-                      <div className="p-4 space-y-3">
+                      <div className="p-3 space-y-2">
                         {/* Available Trees */}
                         <div className="flex items-center justify-center gap-2">
                           <span className="text-base font-bold text-gray-800">
@@ -1207,7 +1208,7 @@ function AppContent() {
       </nav>
       )}
 
-      {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && !showAdvancedAssistant && (
+      {!selectedInvestmentFarm && !showAdminDashboard && !showAdminLogin && !showSuccessPartnerIntro && !showSuccessPartnerOnboarding && !showSuccessPartnerRegistration && !showSuccessPartnerWelcome && !showHowItWorksPartner && !showAdvancedAssistant && ReactDOM.createPortal(
         <div
           id="mobile-footer"
           className="lg:hidden"
@@ -1216,10 +1217,10 @@ function AppContent() {
             bottom: 0,
             left: 0,
             right: 0,
-            background: 'linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.98) 100%)',
-            borderTop: '1px solid rgba(0, 0, 0, 0.08)',
-            boxShadow: '0 -8px 30px rgba(0, 0, 0, 0.12)',
-            zIndex: 99999,
+            background: '#ffffff',
+            borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+            boxShadow: '0 -4px 20px rgba(0, 0, 0, 0.15)',
+            zIndex: 2147483647,
             WebkitTransform: 'translate3d(0, 0, 0)',
             transform: 'translate3d(0, 0, 0)'
           }}
@@ -1310,7 +1311,8 @@ function AppContent() {
               <span style={{ fontSize: '11px', color: '#4b5563', fontWeight: 500 }}>الإشعارات</span>
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       <StreamingVideoPlayer
