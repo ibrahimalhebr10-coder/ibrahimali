@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { Play, Shield, TrendingUp, Star, Handshake, User, Sprout, Sparkles, CheckCircle, ChevronLeft, Users, TreePine, Calendar, Award, Zap } from 'lucide-react';
-import StreamingVideoPlayer from './StreamingVideoPlayer';
+import IntroVideoPlayer from './IntroVideoPlayer';
 import { supabase } from '../lib/supabase';
 
 interface NewHomePageProps {
@@ -120,17 +120,27 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
   }, []);
 
   const handleVideoPlay = async () => {
-    if (!introVideo) return;
+    if (!introVideo) {
+      console.warn('⚠️ No intro video available');
+      return;
+    }
+
+    console.log('🎬 Playing intro video:', {
+      id: introVideo.id,
+      title: introVideo.title,
+      url: introVideo.file_url
+    });
 
     // Increment view count
     try {
       await supabase.rpc('increment_video_views', { video_id: introVideo.id });
       console.log('📊 Video view count incremented');
     } catch (error) {
-      console.error('Error incrementing view count:', error);
+      console.error('❌ Error incrementing view count:', error);
     }
 
     setShowVideoPlayer(true);
+    console.log('✅ Video player opened');
   };
 
   return (
@@ -427,14 +437,11 @@ const NewHomePage: React.FC<NewHomePageProps> = ({
 
       {/* Video Player Modal */}
       {showVideoPlayer && introVideo && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4" style={{ zIndex: 999999 }}>
-          <div className="w-full max-w-4xl">
-            <StreamingVideoPlayer
-              videoUrl={introVideo.file_url}
-              onClose={() => setShowVideoPlayer(false)}
-            />
-          </div>
-        </div>
+        <IntroVideoPlayer
+          videoUrl={introVideo.file_url}
+          videoTitle={introVideo.title}
+          onClose={() => setShowVideoPlayer(false)}
+        />
       )}
     </div>
   );
