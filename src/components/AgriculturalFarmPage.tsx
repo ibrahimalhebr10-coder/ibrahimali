@@ -515,13 +515,33 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                     <span className="text-[14px] font-bold text-[#1a3d2a]">{(selectedPackage?.price_per_tree || 0).toLocaleString()} ر.س</span>
                   </div>
                   <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <span className="text-[13px] text-gray-500">مدة العقد</span>
+                    <span className="text-[13px] text-gray-500">مدة العقد الأساسية</span>
                     <span className="text-[14px] font-bold text-[#1a3d2a]">{selectedPackage?.contract_years || 1} سنة</span>
                   </div>
-                  {((bonusYears || 0) + (selectedPackage?.bonus_years || 0) > 0) && (
+                  {(selectedPackage?.bonus_years || 0) > 0 && (
                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                      <span className="text-[13px] text-gray-500">مدة إضافية مجانية</span>
-                      <span className="text-[14px] font-bold text-[#16a34a]">+{(bonusYears || 0) + (selectedPackage?.bonus_years || 0)} سنة</span>
+                      <span className="text-[13px] text-gray-500 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                        مدة مجانية من الباقة
+                      </span>
+                      <span className="text-[14px] font-bold text-[#16a34a]">+{selectedPackage?.bonus_years} سنة</span>
+                    </div>
+                  )}
+                  {(bonusYears || 0) > 0 && (
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <span className="text-[13px] text-gray-500 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        مدة مجانية من كود الشريك
+                      </span>
+                      <span className="text-[14px] font-bold text-amber-600">+{bonusYears} سنة</span>
+                    </div>
+                  )}
+                  {((bonusYears || 0) + (selectedPackage?.bonus_years || 0) > 0) && (
+                    <div className="flex items-center justify-between py-2.5 mt-2 pt-2.5 border-t-2 border-dashed border-[#16a34a]/20">
+                      <span className="text-[13px] font-bold text-[#1a3d2a]">المجموع الكلي للسنوات</span>
+                      <span className="text-[15px] font-extrabold text-[#16a34a] bg-[#f0fdf4] px-3 py-1 rounded-lg">
+                        {(selectedPackage?.contract_years || 1) + (bonusYears || 0) + (selectedPackage?.bonus_years || 0)} سنة
+                      </span>
                     </div>
                   )}
                 </>
@@ -540,13 +560,33 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                     <span className="text-[14px] font-bold text-[#1a3d2a]">{(selectedContract?.farmer_price || selectedContract?.investor_price || 0).toLocaleString()} ر.س</span>
                   </div>
                   <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                    <span className="text-[13px] text-gray-500">مدة العقد</span>
+                    <span className="text-[13px] text-gray-500">مدة العقد الأساسية</span>
                     <span className="text-[14px] font-bold text-[#1a3d2a]">{selectedContract?.duration_years || 1} سنة</span>
                   </div>
-                  {((bonusYears || 0) + (selectedContract?.bonus_years || 0) > 0) && (
+                  {(selectedContract?.bonus_years || 0) > 0 && (
                     <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                      <span className="text-[13px] text-gray-500">مدة إضافية مجانية</span>
-                      <span className="text-[14px] font-bold text-[#16a34a]">+{(bonusYears || 0) + (selectedContract?.bonus_years || 0)} سنة</span>
+                      <span className="text-[13px] text-gray-500 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a]"></span>
+                        مدة مجانية من العقد
+                      </span>
+                      <span className="text-[14px] font-bold text-[#16a34a]">+{selectedContract?.bonus_years} سنة</span>
+                    </div>
+                  )}
+                  {(bonusYears || 0) > 0 && (
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <span className="text-[13px] text-gray-500 flex items-center gap-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        مدة مجانية من كود الشريك
+                      </span>
+                      <span className="text-[14px] font-bold text-amber-600">+{bonusYears} سنة</span>
+                    </div>
+                  )}
+                  {((bonusYears || 0) + (selectedContract?.bonus_years || 0) > 0) && (
+                    <div className="flex items-center justify-between py-2.5 mt-2 pt-2.5 border-t-2 border-dashed border-[#16a34a]/20">
+                      <span className="text-[13px] font-bold text-[#1a3d2a]">المجموع الكلي للسنوات</span>
+                      <span className="text-[15px] font-extrabold text-[#16a34a] bg-[#f0fdf4] px-3 py-1 rounded-lg">
+                        {(selectedContract?.duration_years || 1) + (bonusYears || 0) + (selectedContract?.bonus_years || 0)} سنة
+                      </span>
                     </div>
                   )}
                 </>
