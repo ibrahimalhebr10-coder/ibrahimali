@@ -49,7 +49,12 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
 
   const loadSettings = async () => {
     try {
+      console.log('🔧 [SETTINGS] تحميل إعدادات الدفع المرن...');
+      console.log('👤 [SETTINGS] المستخدم:', user ? 'مسجل' : 'زائر');
+
       const settings = await systemSettingsService.getAllSettings();
+
+      console.log('📦 [SETTINGS] عدد الإعدادات المحملة:', settings.length);
 
       // Convert array to object for easier access
       const settingsObj: Record<string, string> = {};
@@ -58,15 +63,27 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
       });
 
       const flexibleEnabled = settingsObj['flexible_payment_enabled'] === 'true';
-      const gracePeriod = parseInt(settingsObj['payment_grace_period_days'] || '7');
+      const gracePeriod = parseInt(settingsObj['payment_grace_period_days'] || '30');
 
-      console.log('🔧 [SETTINGS] Flexible Payment Enabled:', flexibleEnabled);
-      console.log('🔧 [SETTINGS] Grace Period Days:', gracePeriod);
+      console.log('✅ [SETTINGS] Flexible Payment Enabled:', flexibleEnabled);
+      console.log('✅ [SETTINGS] Grace Period Days:', gracePeriod);
+      console.log('✅ [SETTINGS] القيمة الخام:', settingsObj['flexible_payment_enabled']);
 
       setFlexiblePaymentEnabled(flexibleEnabled);
       setPaymentGracePeriodDays(gracePeriod);
+
+      // إذا فشل التحميل، نستخدم القيم الافتراضية
+      if (settings.length === 0) {
+        console.warn('⚠️ [SETTINGS] لم يتم تحميل إعدادات - استخدام القيم الافتراضية');
+        setFlexiblePaymentEnabled(true); // افتراضياً مفعّل
+        setPaymentGracePeriodDays(30);
+      }
     } catch (error) {
-      console.error('Error loading settings:', error);
+      console.error('❌ [SETTINGS] خطأ في تحميل الإعدادات:', error);
+      // في حالة الخطأ، نفعّل النظام افتراضياً
+      console.log('🔄 [SETTINGS] تفعيل النظام المرن افتراضياً بعد الخطأ');
+      setFlexiblePaymentEnabled(true);
+      setPaymentGracePeriodDays(30);
     }
   };
 

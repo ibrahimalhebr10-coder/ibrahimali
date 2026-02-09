@@ -38,15 +38,23 @@ export const systemSettingsService = {
 
   async getAllSettings(): Promise<SystemSetting[]> {
     try {
+      console.log('📥 [SYSTEM_SETTINGS] جلب جميع الإعدادات...');
+
       const { data, error } = await supabase
         .from('system_settings')
         .select('*')
         .order('category', { ascending: true });
 
-      if (error) throw error;
+      if (error) {
+        console.error('❌ [SYSTEM_SETTINGS] خطأ في جلب الإعدادات:', error);
+        throw error;
+      }
+
+      console.log(`✅ [SYSTEM_SETTINGS] تم جلب ${data?.length || 0} إعداد`);
+
       return data || [];
     } catch (error) {
-      console.error('Error fetching system settings:', error);
+      console.error('❌ [SYSTEM_SETTINGS] خطأ عام في جلب الإعدادات:', error);
       return [];
     }
   },
