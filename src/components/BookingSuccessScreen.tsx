@@ -57,8 +57,8 @@ export default function BookingSuccessScreen({
 
   if (showRegistration) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 z-50 overflow-y-auto">
-        <div className="min-h-screen p-4 flex items-center justify-center">
+      <div className="fixed inset-0 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 z-50 overflow-y-auto scroll-smooth">
+        <div className="min-h-screen p-4 py-8 flex items-start justify-center">
           <div className="max-w-md w-full">
             {onClose && (
               <button
@@ -82,8 +82,8 @@ export default function BookingSuccessScreen({
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 z-50 overflow-y-auto">
-      <div className="min-h-screen p-4 flex items-center justify-center">
+    <div className="fixed inset-0 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 z-50 overflow-y-auto scroll-smooth">
+      <div className="min-h-screen p-4 py-8 flex items-start justify-center">
         <div className="max-w-lg w-full space-y-6">
           {onClose && (
             <button
@@ -169,7 +169,7 @@ export default function BookingSuccessScreen({
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200 space-y-4 text-center">
+            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200 space-y-4 text-center mb-8">
               <h3 className="text-lg font-bold text-green-800">
                 الخطوة التالية
               </h3>
