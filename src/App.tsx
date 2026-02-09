@@ -25,7 +25,8 @@ import AccountTypeIndicator from './components/AccountTypeIndicator';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
-import UnifiedFarmPage from './components/UnifiedFarmPage';
+import InvestmentFarmPage from './components/InvestmentFarmPage';
+import AgriculturalFarmPage from './components/AgriculturalFarmPage';
 import IdentitySwitcher from './components/IdentitySwitcher';
 import AdminDashboard from './components/admin/AdminDashboard';
 import AdminLogin from './components/admin/AdminLogin';
@@ -1539,17 +1540,33 @@ function AppContent() {
       )}
 
       {selectedInvestmentFarm && (
-        <UnifiedFarmPage
-          farm={selectedInvestmentFarm}
-          onClose={() => {
-            setSelectedInvestmentFarm(null);
-            setSelectedFarmMode(null);
-          }}
-          onGoToAccount={() => {
-            setShowSuccessPartnerAccount(false);
-            setShowAccountProfile(true);
-          }}
-        />
+        <>
+          {selectedFarmMode === 'investment' ? (
+            <InvestmentFarmPage
+              farm={selectedInvestmentFarm}
+              onClose={() => {
+                setSelectedInvestmentFarm(null);
+                setSelectedFarmMode(null);
+              }}
+              onGoToAccount={() => {
+                setShowSuccessPartnerAccount(false);
+                setShowAccountProfile(true);
+              }}
+            />
+          ) : (
+            <AgriculturalFarmPage
+              farm={selectedInvestmentFarm}
+              onClose={() => {
+                setSelectedInvestmentFarm(null);
+                setSelectedFarmMode(null);
+              }}
+              onGoToAccount={() => {
+                setShowSuccessPartnerAccount(false);
+                setShowAccountProfile(true);
+              }}
+            />
+          )}
+        </>
       )}
 
       {(showAdminDashboard || showAdminLogin) && (
