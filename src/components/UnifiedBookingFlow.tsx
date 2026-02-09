@@ -35,6 +35,7 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
   const [reservationData, setReservationData] = useState<any>(null);
   const [flexiblePaymentEnabled, setFlexiblePaymentEnabled] = useState(false);
   const [paymentGracePeriodDays, setPaymentGracePeriodDays] = useState(7);
+  const [isFlexiblePaymentChosen, setIsFlexiblePaymentChosen] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -120,12 +121,19 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
 
       setReservationId(reservation.id);
       setReservationData(reservationPayload);
+      setIsFlexiblePaymentChosen(useFlexiblePayment);
 
-      if (useFlexiblePayment) {
-        setCurrentStep('flexible-success');
-      } else if (!user) {
+      // إذا لم يكن المستخدم مسجلاً، يجب أن يسجل أولاً (سواء دفع فوري أو مرن)
+      if (!user) {
+        console.log('👤 [UNIFIED] زائر غير مسجل - التوجيه للتسجيل');
         setCurrentStep('registration');
+      } else if (useFlexiblePayment) {
+        // المستخدم مسجل واختار الدفع المرن - شاشة النجاح المرنة
+        console.log('✅ [UNIFIED] مستخدم مسجل + دفع مرن - شاشة النجاح المرنة');
+        setCurrentStep('flexible-success');
       } else {
+        // المستخدم مسجل واختار الدفع الفوري - صفحة الدفع
+        console.log('💳 [UNIFIED] مستخدم مسجل + دفع فوري - صفحة الدفع');
         setCurrentStep('payment');
       }
     } catch (error) {
@@ -137,18 +145,28 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
   const handleRegistrationSuccess = async () => {
     if (reservationId && user) {
       try {
+        console.log('🔗 [UNIFIED] ربط الحجز بالمستخدم الجديد');
         await supabase
           .from('reservations')
           .update({ user_id: user.id })
           .eq('id', reservationId);
 
-        setCurrentStep('payment');
+        // إذا كان المستخدم اختار الدفع المرن، نذهب لشاشة النجاح المرنة
+        if (isFlexiblePaymentChosen) {
+          console.log('✅ [UNIFIED] بعد التسجيل - التوجيه لشاشة النجاح المرنة');
+          setCurrentStep('flexible-success');
+        } else {
+          console.log('💳 [UNIFIED] بعد التسجيل - التوجيه لصفحة الدفع');
+          setCurrentStep('payment');
+        }
       } catch (error) {
         console.error('Error updating reservation:', error);
-        setCurrentStep('payment');
+        // في حالة الخطأ، نستمر حسب نوع الدفع المختار
+        setCurrentStep(isFlexiblePaymentChosen ? 'flexible-success' : 'payment');
       }
     } else {
-      setCurrentStep('payment');
+      // احتياطي: إذا لم يكن هناك reservationId أو user
+      setCurrentStep(isFlexiblePaymentChosen ? 'flexible-success' : 'payment');
     }
   };
 
