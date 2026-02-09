@@ -21,6 +21,7 @@ interface UnifiedBookingFlowProps {
   pricePerTree?: number;
   treeVarieties?: any[];
   influencerCode?: string | null;
+  usageType?: 'personal' | 'investment' | null;
   onBack: () => void;
   onComplete: () => void;
 }
@@ -61,6 +62,7 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         total_trees: props.treeCount,
         total_price: props.totalPrice,
         path_type: props.pathType,
+        usage_type: props.usageType || null,
         status: 'pending',
         influencer_code: props.influencerCode || null
       };
