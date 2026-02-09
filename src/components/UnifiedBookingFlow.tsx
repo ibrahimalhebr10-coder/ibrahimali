@@ -257,61 +257,128 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
 
   if (currentStep === 'flexible-success') {
     return (
-      <div className="max-w-2xl mx-auto p-6">
-        <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
+      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 flex items-center justify-center p-4">
+        <div className="max-w-3xl w-full">
+          {/* بطاقة رئيسية فخمة */}
+          <div className="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl overflow-hidden border border-green-100">
 
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            تم حجز أشجارك بنجاح!
-          </h2>
+            {/* رأس البطاقة - تصميم فخم */}
+            <div className="bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 p-8 text-center relative overflow-hidden">
+              <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
 
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-6">
-            <div className="text-lg font-bold text-green-900 mb-2">
-              لديك {paymentGracePeriodDays} {paymentGracePeriodDays === 1 ? 'يوم' : 'أيام'} لإتمام الدفع
-            </div>
-            <p className="text-sm text-green-700">
-              تم حجز {props.treeCount} شجرة في {props.farmName}
-            </p>
-            <p className="text-2xl font-bold text-green-900 mt-3">
-              {props.totalPrice.toLocaleString('ar-SA')} ر.س
-            </p>
-          </div>
+              {/* أيقونة النجاح المتطورة */}
+              <div className="relative z-10 mb-4">
+                <div className="w-24 h-24 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-white/30 shadow-xl animate-pulse">
+                  <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
 
-          <div className="text-right space-y-3 mb-6 bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-blue-600 font-bold">1</span>
+                <h1 className="text-4xl font-bold text-white mb-3 drop-shadow-lg">
+                  مبارك! تم حجز أشجارك بنجاح
+                </h1>
+
+                <p className="text-xl text-white/90 font-medium leading-relaxed">
+                  نشكرك على ثقتك الغالية ونهنئك باختيارك الرائع
+                  <br />
+                  أنت الآن جزء من رحلة استثمارية مميزة ومثمرة
+                </p>
               </div>
-              <p className="text-sm text-gray-700">سنرسل لك رابط الدفع عبر الواتساب والبريد الإلكتروني</p>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-blue-600 font-bold">2</span>
+
+            {/* محتوى البطاقة */}
+            <div className="p-8 space-y-6">
+
+              {/* ملخص الحجز - تصميم أنيق */}
+              <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl p-6 border-2 border-emerald-200 shadow-md">
+                <div className="text-center space-y-3">
+                  <div className="flex items-center justify-center gap-3 text-emerald-800 mb-4">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z" />
+                    </svg>
+                    <h3 className="text-2xl font-bold">تفاصيل حجزك</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-right">
+                    <div className="bg-white/80 rounded-xl p-4 shadow-sm">
+                      <p className="text-sm text-gray-600 mb-1">المزرعة</p>
+                      <p className="text-lg font-bold text-emerald-900">{props.farmName}</p>
+                    </div>
+                    <div className="bg-white/80 rounded-xl p-4 shadow-sm">
+                      <p className="text-sm text-gray-600 mb-1">عدد الأشجار</p>
+                      <p className="text-lg font-bold text-emerald-900">{props.treeCount} شجرة</p>
+                    </div>
+                    <div className="bg-white/80 rounded-xl p-4 shadow-sm">
+                      <p className="text-sm text-gray-600 mb-1">المبلغ الإجمالي</p>
+                      <p className="text-lg font-bold text-emerald-900">{props.totalPrice.toLocaleString('ar-SA')} ر.س</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p className="text-sm text-gray-700">يمكنك الدفع في أي وقت خلال المدة المحددة</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-blue-600 font-bold">3</span>
+
+              {/* رسالة التواصل - أنيقة وواضحة */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-6 border-2 border-blue-200 shadow-md">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                      <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                    </div>
+                  </div>
+                  <div className="flex-1 text-right">
+                    <h4 className="text-xl font-bold text-blue-900 mb-3">الخطوات القادمة</h4>
+                    <p className="text-base text-blue-800 leading-relaxed mb-4">
+                      عند اكتمال حجز جميع أشجار المزرعة وإغلاق الطلبات، سيكون لنا الشرف بالتواصل معكم لإتمام ضم أشجاركم إليكم وتفعيل استثمارك المبارك.
+                    </p>
+                    <p className="text-sm text-blue-700 leading-relaxed">
+                      سنرسل لكم جميع التفاصيل والتحديثات عبر الواتساب والبريد الإلكتروني، ونحن دائماً في خدمتكم لأي استفسار أو مساعدة.
+                    </p>
+                  </div>
+                </div>
               </div>
-              <p className="text-sm text-gray-700">سنتواصل معك للمتابعة والمساعدة</p>
+
+              {/* رقم الحجز - تصميم أنيق */}
+              <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 text-center">
+                <p className="text-sm text-gray-600 mb-1">رقم الحجز المرجعي</p>
+                <p className="text-lg font-mono font-bold text-gray-900 tracking-wider">{reservationId}</p>
+                <p className="text-xs text-gray-500 mt-1">احتفظ بهذا الرقم للمراجعة</p>
+              </div>
+
+              {/* الأزرار - تصميم متطور */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                <button
+                  onClick={() => {
+                    // الانتقال إلى صفحة الحساب
+                    window.location.href = '/account';
+                  }}
+                  className="py-4 px-6 bg-gradient-to-r from-emerald-600 to-green-600 text-white rounded-xl font-bold hover:from-emerald-700 hover:to-green-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 duration-200 flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  الدخول إلى حسابي
+                </button>
+
+                <button
+                  onClick={props.onComplete}
+                  className="py-4 px-6 bg-white text-emerald-700 border-2 border-emerald-600 rounded-xl font-bold hover:bg-emerald-50 transition-all shadow-md hover:shadow-lg transform hover:scale-105 duration-200 flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  العودة للواجهة الرئيسية
+                </button>
+              </div>
+
+              {/* رسالة ختامية عاطفية */}
+              <div className="text-center pt-4 border-t-2 border-gray-100">
+                <p className="text-base text-gray-700 leading-relaxed">
+                  🌱 نشكر لكم حسن اختياركم ونتمنى لكم رحلة استثمارية موفقة ومثمرة 🌱
+                </p>
+              </div>
             </div>
           </div>
-
-          <button
-            onClick={props.onComplete}
-            className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg"
-          >
-            العودة إلى الصفحة الرئيسية
-          </button>
-
-          <p className="text-xs text-gray-500 mt-4">
-            رقم الحجز: {reservationId}
-          </p>
         </div>
       </div>
     );

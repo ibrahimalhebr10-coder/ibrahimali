@@ -169,7 +169,7 @@ export default function FlexiblePaymentSettings() {
           <div className="flex-1">
             <h3 className="text-lg font-bold text-gray-900">نظام الدفع المرن</h3>
             <p className="text-sm text-gray-600 mt-1">
-              السماح للعملاء بالحجز أولاً والدفع لاحقاً خلال مدة محددة
+              السماح للعملاء بالحجز أولاً، وعند اكتمال حجز المزرعة سنتواصل معهم لإتمام الدفع
             </p>
           </div>
         </div>
@@ -180,11 +180,12 @@ export default function FlexiblePaymentSettings() {
         <h4 className="font-bold text-gray-900">الإعدادات الأساسية</h4>
 
         {/* تفعيل/تعطيل النظام */}
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border-2 border-green-200">
           <div>
-            <div className="font-medium text-gray-900">تفعيل نظام الدفع المرن</div>
-            <div className="text-sm text-gray-600 mt-1">
-              السماح بالحجز قبل الدفع
+            <div className="font-bold text-gray-900 text-lg">تفعيل نظام الدفع المرن</div>
+            <div className="text-sm text-gray-700 mt-2 leading-relaxed">
+              السماح بالحجز قبل الدفع، وعند اكتمال حجوزات المزرعة وإغلاق الطلبات<br />
+              سيتم التواصل مع العملاء لإتمام ضم أشجارهم وتفعيل استثماراتهم
             </div>
           </div>
           <label className="relative inline-flex items-center cursor-pointer">
@@ -199,210 +200,56 @@ export default function FlexiblePaymentSettings() {
               }
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+            <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-green-600 shadow-lg"></div>
           </label>
         </div>
 
-        {/* المدة الزمنية */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            المدة المسموحة للدفع (بالأيام)
-          </label>
-          <select
-            value={settings.payment_grace_period_days}
-            onChange={(e) =>
-              setSettings({ ...settings, payment_grace_period_days: e.target.value })
-            }
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-          >
-            <option value="3">3 أيام</option>
-            <option value="5">5 أيام</option>
-            <option value="7">7 أيام (الافتراضي)</option>
-            <option value="10">10 أيام</option>
-            <option value="14">14 يوم (أسبوعين)</option>
-            <option value="21">21 يوم (3 أسابيع)</option>
-            <option value="30">30 يوم (شهر)</option>
-          </select>
-          <p className="text-xs text-gray-500 mt-1">
-            المدة التي سيكون فيها الحجز معلقاً قبل الدفع
-          </p>
-        </div>
-
-        {/* الإلغاء التلقائي */}
-        <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-          <div>
-            <div className="font-medium text-gray-900">إلغاء تلقائي بعد انتهاء المهلة</div>
-            <div className="text-sm text-gray-600 mt-1">
-              إلغاء الحجز تلقائياً إذا لم يتم الدفع في الموعد المحدد
+        {/* توضيح النظام الجديد */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border-2 border-blue-200">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0">
+              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center shadow-lg">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+            <div className="flex-1">
+              <h5 className="font-bold text-blue-900 text-lg mb-3">كيف يعمل النظام؟</h5>
+              <div className="space-y-3 text-sm text-blue-800">
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-0.5">1.</span>
+                  <p>العميل يحجز الأشجار ويختار "الدفع عند اكتمال المزرعة"</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-0.5">2.</span>
+                  <p>يتم إنشاء حجز معلق في قاعدة البيانات</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-0.5">3.</span>
+                  <p>عند اكتمال جميع حجوزات المزرعة، يتم التواصل مع العميل</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-blue-600 font-bold mt-0.5">4.</span>
+                  <p>بعد الدفع، يتم تفعيل الحجز وضم الأشجار للعميل</p>
+                </div>
+              </div>
             </div>
           </div>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input
-              type="checkbox"
-              checked={settings.auto_cancel_after_deadline === 'true'}
-              onChange={(e) =>
-                setSettings({
-                  ...settings,
-                  auto_cancel_after_deadline: e.target.checked ? 'true' : 'false'
-                })
-              }
-              className="sr-only peer"
-            />
-            <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-          </label>
-        </div>
-      </div>
-
-      {/* إعدادات التذكيرات */}
-      <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
-        <div className="flex items-center gap-2">
-          <Bell className="w-5 h-5 text-green-600" />
-          <h4 className="font-bold text-gray-900">التذكيرات التلقائية</h4>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+        {/* ملاحظة هامة */}
+        <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-5">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
-              <div className="font-medium text-gray-900">تذكير فور الحجز</div>
-              <div className="text-sm text-gray-600 mt-1">إرسال رسالة تأكيد مع رابط الدفع</div>
+              <h5 className="font-bold text-amber-900 mb-2">ملاحظة هامة</h5>
+              <p className="text-sm text-amber-800 leading-relaxed">
+                لا يوجد تحديد زمني لإتمام الدفع. الحجوزات تبقى معلقة حتى اكتمال المزرعة،
+                ثم يتم التواصل مع العملاء بشكل شخصي لإتمام استثماراتهم.
+              </p>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.reminder_on_booking === 'true'}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    reminder_on_booking: e.target.checked ? 'true' : 'false'
-                  })
-                }
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-            </label>
           </div>
-
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <div className="font-medium text-gray-900">تذكير في منتصف المدة</div>
-              <div className="text-sm text-gray-600 mt-1">إرسال تذكير بعد مرور نصف المدة</div>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.reminder_midway === 'true'}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    reminder_midway: e.target.checked ? 'true' : 'false'
-                  })
-                }
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-            </label>
-          </div>
-
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <div className="font-medium text-gray-900">تذكير قبل يوم من الموعد</div>
-              <div className="text-sm text-gray-600 mt-1">إرسال تذكير عاجل قبل 24 ساعة</div>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.reminder_one_day_before === 'true'}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    reminder_one_day_before: e.target.checked ? 'true' : 'false'
-                  })
-                }
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-            </label>
-          </div>
-
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-            <div>
-              <div className="font-medium text-gray-900">تذكير في يوم الموعد</div>
-              <div className="text-sm text-gray-600 mt-1">إرسال تذكير نهائي في آخر يوم</div>
-            </div>
-            <label className="relative inline-flex items-center cursor-pointer">
-              <input
-                type="checkbox"
-                checked={settings.reminder_deadline_day === 'true'}
-                onChange={(e) =>
-                  setSettings({
-                    ...settings,
-                    reminder_deadline_day: e.target.checked ? 'true' : 'false'
-                  })
-                }
-                className="sr-only peer"
-              />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* قوالب الرسائل */}
-      <div className="bg-white rounded-lg shadow-sm p-6 space-y-6">
-        <h4 className="font-bold text-gray-900">قوالب رسائل التذكير</h4>
-        <p className="text-sm text-gray-600">
-          استخدم المتغيرات: <code className="bg-gray-100 px-2 py-1 rounded">{'{days}'}</code> للأيام و <code className="bg-gray-100 px-2 py-1 rounded">{'{hours}'}</code> للساعات و <code className="bg-gray-100 px-2 py-1 rounded">{'{payment_link}'}</code> لرابط الدفع
-        </p>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            رسالة التأكيد الأولى
-          </label>
-          <textarea
-            value={messageTemplates.payment_reminder_initial}
-            onChange={(e) =>
-              setMessageTemplates({
-                ...messageTemplates,
-                payment_reminder_initial: e.target.value
-              })
-            }
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            رسالة التذكير في منتصف المدة
-          </label>
-          <textarea
-            value={messageTemplates.payment_reminder_midway}
-            onChange={(e) =>
-              setMessageTemplates({
-                ...messageTemplates,
-                payment_reminder_midway: e.target.value
-              })
-            }
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            رسالة التذكير العاجل
-          </label>
-          <textarea
-            value={messageTemplates.payment_reminder_urgent}
-            onChange={(e) =>
-              setMessageTemplates({
-                ...messageTemplates,
-                payment_reminder_urgent: e.target.value
-              })
-            }
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-          />
         </div>
       </div>
 
@@ -412,100 +259,19 @@ export default function FlexiblePaymentSettings() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="w-5 h-5" />
             {saving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
           </button>
 
           {success && (
-            <div className="flex items-center gap-2 text-green-600">
-              <CheckCircle className="w-5 h-5" />
-              <span className="font-medium">تم الحفظ بنجاح</span>
+            <div className="flex items-center gap-2 text-green-600 animate-pulse">
+              <CheckCircle className="w-6 h-6" />
+              <span className="font-bold text-lg">تم الحفظ بنجاح</span>
             </div>
           )}
         </div>
-      </div>
-
-      {/* تشغيل التذكيرات يدوياً */}
-      <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-lg shadow-sm p-6">
-        <div className="flex items-start gap-3 mb-4">
-          <div className="p-3 bg-blue-100 rounded-lg">
-            <Play className="w-6 h-6 text-blue-600" />
-          </div>
-          <div className="flex-1">
-            <h4 className="font-bold text-gray-900">تشغيل التذكيرات التلقائية يدوياً</h4>
-            <p className="text-sm text-gray-600 mt-1">
-              اختبر نظام التذكيرات أو شغله يدوياً الآن
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg p-4 mb-4">
-          <div className="text-sm text-gray-700 space-y-2">
-            <p className="font-medium">سيقوم النظام بـ:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-600">
-              <li>فحص جميع الحجوزات المعلقة</li>
-              <li>إرسال التذكيرات المناسبة حسب الوقت المتبقي</li>
-              <li>تسجيل جميع التذكيرات في قاعدة البيانات</li>
-              <li>إلغاء الحجوزات المنتهية (إذا كان مفعل)</li>
-            </ul>
-          </div>
-        </div>
-
-        <button
-          onClick={handleRunReminders}
-          disabled={runningReminders}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-        >
-          {runningReminders ? (
-            <>
-              <RefreshCw className="w-5 h-5 animate-spin" />
-              جاري التشغيل...
-            </>
-          ) : (
-            <>
-              <Play className="w-5 h-5" />
-              تشغيل التذكيرات الآن
-            </>
-          )}
-        </button>
-
-        {reminderResult && (
-          <div className="mt-4 p-4 bg-white rounded-lg border-2 border-green-200">
-            <div className="flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <h5 className="font-bold text-gray-900 mb-2">نتيجة التشغيل</h5>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <div className="text-gray-600">التذكيرات المرسلة</div>
-                    <div className="text-2xl font-bold text-green-600">
-                      {reminderResult.summary?.reminders_sent || 0}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-gray-600">التذكيرات المتخطاة</div>
-                    <div className="text-2xl font-bold text-gray-600">
-                      {reminderResult.summary?.reminders_skipped || 0}
-                    </div>
-                  </div>
-                  {reminderResult.summary?.reservations_cancelled > 0 && (
-                    <div>
-                      <div className="text-gray-600">الحجوزات الملغاة</div>
-                      <div className="text-2xl font-bold text-red-600">
-                        {reminderResult.summary.reservations_cancelled}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <div className="mt-2 text-xs text-gray-500">
-                  {new Date(reminderResult.timestamp).toLocaleString('ar-SA')}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
