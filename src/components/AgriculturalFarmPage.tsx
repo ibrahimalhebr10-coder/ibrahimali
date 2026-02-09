@@ -175,7 +175,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       <div className="min-h-screen pb-32">
 
         {/* === HERO IMAGE SECTION === */}
-        <div className="relative h-[200px] overflow-hidden">
+        <div className="relative h-[130px] overflow-hidden">
           <img
             src={farmImage}
             alt={farm.name}
@@ -186,54 +186,54 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           {/* Back Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center hover:bg-white/30 transition-all duration-300"
+            className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center hover:bg-white/30 transition-all duration-300"
           >
-            <ArrowRight className="w-5 h-5 text-white" style={{ transform: 'scaleX(-1)' }} />
+            <ArrowRight className="w-4 h-4 text-white" style={{ transform: 'scaleX(-1)' }} />
           </button>
 
           {/* Farm Info Overlay */}
-          <div className="absolute bottom-0 left-0 right-0 p-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="px-2.5 py-1 rounded-full bg-[#22c55e]/90 backdrop-blur-sm flex items-center gap-1">
-                <TreePine className="w-3.5 h-3.5 text-white" />
-                <span className="text-[11px] font-semibold text-white">{farm.availableTrees?.toLocaleString() || '1,000'} شجرة متاحة</span>
+          <div className="absolute bottom-0 left-0 right-0 p-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <div className="px-2 py-0.5 rounded-full bg-[#22c55e]/90 backdrop-blur-sm flex items-center gap-1">
+                <TreePine className="w-3 h-3 text-white" />
+                <span className="text-[10px] font-semibold text-white">{farm.availableTrees?.toLocaleString() || '1,000'} شجرة</span>
               </div>
-              <div className="px-2.5 py-1 rounded-full bg-white/20 backdrop-blur-sm flex items-center gap-1">
-                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                <span className="text-[11px] font-medium text-white">4.9</span>
+              <div className="px-2 py-0.5 rounded-full bg-white/20 backdrop-blur-sm flex items-center gap-1">
+                <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
+                <span className="text-[10px] font-medium text-white">4.9</span>
               </div>
             </div>
-            <h1 className="text-[22px] font-bold text-white leading-tight drop-shadow-lg">{farm.name}</h1>
-            <div className="flex items-center gap-1 mt-1">
-              <MapPin className="w-3.5 h-3.5 text-white/80" />
-              <span className="text-[12px] text-white/90">{farm.location}</span>
+            <h1 className="text-[18px] font-bold text-white leading-tight drop-shadow-lg">{farm.name}</h1>
+            <div className="flex items-center gap-1">
+              <MapPin className="w-3 h-3 text-white/80" />
+              <span className="text-[10px] text-white/90">{farm.location}</span>
             </div>
           </div>
         </div>
 
         {/* === BOOKING HEADER === */}
-        <div className="px-4 pt-4 pb-2">
+        <div className="px-4 pt-3 pb-1">
           <div className="flex items-center justify-between">
-            <h2 className="text-[18px] font-bold text-[#1a3d2a]">احجز أشجارك الآن</h2>
-            <div className="flex items-center gap-1 text-[11px] text-[#16a34a] bg-[#dcfce7] px-2.5 py-1 rounded-full">
+            <h2 className="text-[15px] font-bold text-[#1a3d2a]">احجز أشجارك الآن</h2>
+            <div className="flex items-center gap-1 text-[10px] text-[#16a34a] bg-[#dcfce7] px-2 py-0.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-[#16a34a] animate-pulse"></span>
               <span>متاح للحجز</span>
             </div>
           </div>
         </div>
 
-        <div className="px-4 mt-2">
+        <div className="px-4 mt-1">
 
           {/* === 1. PACKAGE CARDS (أولاً) === */}
-          <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 p-5 mb-4">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <Star className="w-4 h-4 text-white fill-white" />
+          <div className="bg-white rounded-[16px] shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-gray-100 p-3 mb-3">
+            <div className="flex items-center justify-center gap-1.5 mb-2">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-md shadow-amber-500/20">
+                <Star className="w-3 h-3 text-white fill-white" />
               </div>
-              <h2 className="text-[17px] font-bold text-[#1a3d2a]">اختر الباقة المناسبة</h2>
+              <h2 className="text-[14px] font-bold text-[#1a3d2a]">اختر الباقة</h2>
             </div>
 
-            <div className="grid grid-cols-3 gap-2.5 pt-2">
+            <div className="grid grid-cols-3 gap-2 pt-1">
               {packages.slice(0, 3).map((pkg, index) => {
                 const isMiddle = index === 1;
                 const isSelected = selectedPackage?.id === pkg.id;
@@ -243,29 +243,29 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                   <button
                     key={pkg.id}
                     onClick={() => handleSelectPackage(pkg)}
-                    className={`relative py-3.5 px-2 rounded-2xl transition-all duration-300 ${
+                    className={`relative py-2.5 px-1.5 rounded-xl transition-all duration-300 ${
                       isMiddle
-                        ? 'bg-gradient-to-b from-[#22c55e] to-[#16a34a] border-2 border-[#22c55e] shadow-xl shadow-green-500/25 scale-[1.05] -mt-1'
+                        ? 'bg-gradient-to-b from-[#22c55e] to-[#16a34a] border-2 border-[#22c55e] shadow-lg shadow-green-500/25 scale-[1.03] -mt-0.5'
                         : isSelected
                           ? 'bg-white border-2 border-[#22c55e] shadow-md'
-                          : 'bg-white border border-gray-200 hover:border-[#22c55e]/50 hover:shadow-lg'
+                          : 'bg-white border border-gray-200 hover:border-[#22c55e]/50 hover:shadow-md'
                     }`}
                   >
                     {isMiddle && (
-                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-400 text-amber-900 text-[10px] px-3 py-1 rounded-full flex items-center gap-1 whitespace-nowrap shadow-lg font-bold">
-                        <Star className="w-3 h-3 fill-current" />
+                      <div className="absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-amber-400 text-amber-900 text-[8px] px-2 py-0.5 rounded-full flex items-center gap-0.5 whitespace-nowrap shadow-md font-bold">
+                        <Star className="w-2 h-2 fill-current" />
                         <span>الأكثر طلباً</span>
                       </div>
                     )}
                     <div className="text-center">
-                      <div className={`text-[14px] font-bold ${isMiddle ? 'text-white' : 'text-[#1a3d2a]'}`}>{pkg.min_trees} شجرة</div>
-                      <div className={`text-[16px] font-black mt-1.5 ${isMiddle ? 'text-white' : 'text-[#16a34a]'}`}>
+                      <div className={`text-[12px] font-bold ${isMiddle ? 'text-white' : 'text-[#1a3d2a]'}`}>{pkg.min_trees} شجرة</div>
+                      <div className={`text-[14px] font-black mt-1 ${isMiddle ? 'text-white' : 'text-[#16a34a]'}`}>
                         {totalPrice.toLocaleString()}
                       </div>
-                      <div className={`text-[10px] mt-0.5 ${isMiddle ? 'text-white/80' : 'text-gray-500'}`}>ر.س / سنة</div>
+                      <div className={`text-[9px] ${isMiddle ? 'text-white/80' : 'text-gray-500'}`}>ر.س / سنة</div>
                       {isMiddle && (
-                        <div className="mt-2 py-1 px-2 rounded-lg bg-white/20 backdrop-blur-sm">
-                          <span className="text-[10px] text-white font-semibold">+ سنتين مجاناً</span>
+                        <div className="mt-1 py-0.5 px-1.5 rounded-md bg-white/20 backdrop-blur-sm">
+                          <span className="text-[8px] text-white font-semibold">+ سنتين مجاناً</span>
                         </div>
                       )}
                     </div>
@@ -275,11 +275,11 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             </div>
 
             {/* Dots indicator */}
-            <div className="flex justify-center gap-2 mt-5">
+            <div className="flex justify-center gap-1.5 mt-3">
               {[0, 1, 2, 3, 4].map((dot) => (
                 <div
                   key={dot}
-                  className={`rounded-full transition-all duration-300 ${dot === 1 ? 'w-6 h-2 bg-[#22c55e]' : 'w-2 h-2 bg-gray-300'}`}
+                  className={`rounded-full transition-all duration-300 ${dot === 1 ? 'w-5 h-1.5 bg-[#22c55e]' : 'w-1.5 h-1.5 bg-gray-300'}`}
                 />
               ))}
             </div>
