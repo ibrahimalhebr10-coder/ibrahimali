@@ -189,7 +189,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
         contractId={selectedContract.id}
         contractName={selectedContract.contract_name}
         durationYears={selectedPackage.base_duration_years || selectedContract.duration_years}
-        bonusYears={bonusYears || selectedPackage.bonus_free_years || selectedContract.bonus_years}
+        bonusYears={(bonusYears || 0) + (selectedPackage.bonus_free_years || selectedContract.bonus_years || 0)}
         totalPrice={calculateTotal()}
         pricePerTree={selectedPackage.price_per_tree}
         influencerCode={isCodeVerified ? sessionStorage.getItem('influencer_code') : null}
@@ -480,10 +480,10 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
                 <span className="text-[13px] text-gray-500">مدة العقد</span>
                 <span className="text-[14px] font-bold text-[#78350f]">{selectedPackage?.base_duration_years || 1} سنة</span>
               </div>
-              {(bonusYears > 0 || (selectedPackage?.bonus_free_years || 0) > 0) && (
+              {((bonusYears || 0) + (selectedPackage?.bonus_free_years || 0) > 0) && (
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
                   <span className="text-[13px] text-gray-500">مدة إضافية مجانية</span>
-                  <span className="text-[14px] font-bold text-amber-600">+{bonusYears || selectedPackage?.bonus_free_years || 0} سنة</span>
+                  <span className="text-[14px] font-bold text-amber-600">+{(bonusYears || 0) + (selectedPackage?.bonus_free_years || 0)} سنة</span>
                 </div>
               )}
               <div className="flex items-center justify-between pt-3 mt-1 border-t-2 border-amber-200">
