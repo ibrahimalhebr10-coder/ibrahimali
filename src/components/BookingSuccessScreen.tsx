@@ -57,44 +57,41 @@ export default function BookingSuccessScreen({
 
   if (showRegistration) {
     return (
-      <div className="fixed inset-0 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 z-50 overflow-y-auto scroll-smooth">
-        <div className="min-h-screen p-4 py-8 flex items-start justify-center">
-          <div className="max-w-md w-full">
-            {onClose && (
-              <button
-                onClick={onClose}
-                className="mb-4 p-3 bg-white/80 rounded-xl shadow-lg hover:bg-white transition-colors flex items-center gap-2 font-bold text-gray-700"
-              >
-                <X className="w-5 h-5" />
-                <span>إلغاء</span>
-              </button>
-            )}
+      <div className="fixed inset-0 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 z-50 overflow-y-auto">
+        <div className="w-full max-w-md mx-auto py-8 px-4">
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="mb-4 p-3 bg-white/80 rounded-xl shadow-lg hover:bg-white transition-colors flex items-center gap-2 font-bold text-gray-700"
+            >
+              <X className="w-5 h-5" />
+              <span>إلغاء</span>
+            </button>
+          )}
 
-            <InvestorRegistrationForm
-              guestId={guestId}
-              onSuccess={handleRegistrationSuccess}
-              onCancel={() => setShowRegistration(false)}
-            />
-          </div>
+          <InvestorRegistrationForm
+            guestId={guestId}
+            onSuccess={handleRegistrationSuccess}
+            onCancel={() => setShowRegistration(false)}
+          />
         </div>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 z-50 overflow-y-auto scroll-smooth">
-      <div className="min-h-screen p-4 py-8 flex items-start justify-center">
-        <div className="max-w-lg w-full space-y-6">
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="p-3 bg-white/80 rounded-xl shadow-lg hover:bg-white transition-colors"
-            >
-              <X className="w-5 h-5 text-gray-700" />
-            </button>
-          )}
+    <div className="fixed inset-0 bg-gradient-to-br from-amber-50/98 via-yellow-50/95 to-orange-50/98 z-50 overflow-y-auto">
+      <div className="w-full max-w-lg mx-auto py-8 px-4 space-y-6">
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="p-3 bg-white/80 rounded-xl shadow-lg hover:bg-white transition-colors"
+          >
+            <X className="w-5 h-5 text-gray-700" />
+          </button>
+        )}
 
-          <div className="bg-white rounded-2xl p-8 shadow-2xl border-2 border-[#D4AF37]/30 space-y-6">
+        <div className="bg-white rounded-2xl p-8 shadow-2xl border-2 border-[#D4AF37]/30 space-y-6">
             <div className="text-center space-y-4">
               <div className="flex justify-center">
                 <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center shadow-lg animate-bounce">
@@ -169,25 +166,24 @@ export default function BookingSuccessScreen({
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200 space-y-4 text-center mb-8">
-              <h3 className="text-lg font-bold text-green-800">
-                الخطوة التالية
-              </h3>
-              <p className="text-base font-bold text-[#B8942F]">
-                أنشئ حساب المستثمر وأكمل الدفع
-              </p>
-              <p className="text-sm text-gray-700">
-                بعد الدفع، سيصبح عقدك الرسمي جاهزاً للعرض والتحميل
-              </p>
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border-2 border-green-200 space-y-4 text-center">
+            <h3 className="text-lg font-bold text-green-800">
+              الخطوة التالية
+            </h3>
+            <p className="text-base font-bold text-[#B8942F]">
+              أنشئ حساب المستثمر وأكمل الدفع
+            </p>
+            <p className="text-sm text-gray-700">
+              بعد الدفع، سيصبح عقدك الرسمي جاهزاً للعرض والتحميل
+            </p>
 
-              <button
-                onClick={() => setShowRegistration(true)}
-                className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
-              >
-                <ArrowRight className="w-5 h-5" />
-                <span>إنشاء حساب المستثمر</span>
-              </button>
-            </div>
+            <button
+              onClick={() => setShowRegistration(true)}
+              className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all active:scale-95 flex items-center justify-center gap-2"
+            >
+              <ArrowRight className="w-5 h-5" />
+              <span>إنشاء حساب المستثمر</span>
+            </button>
           </div>
         </div>
       </div>
