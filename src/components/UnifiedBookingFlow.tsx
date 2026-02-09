@@ -5,6 +5,7 @@ import StandaloneAccountRegistration from './StandaloneAccountRegistration';
 import PaymentPage from './PaymentPage';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { systemSettingsService } from '../services/systemSettingsService';
 
 interface UnifiedBookingFlowProps {
   farmId: string;
@@ -25,13 +26,19 @@ interface UnifiedBookingFlowProps {
   onComplete: () => void;
 }
 
-type FlowStep = 'review' | 'registration' | 'payment' | 'success';
+type FlowStep = 'review' | 'registration' | 'payment' | 'success' | 'flexible-success';
 
 export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState<FlowStep>('review');
   const [reservationId, setReservationId] = useState<string>('');
   const [reservationData, setReservationData] = useState<any>(null);
+  const [flexiblePaymentEnabled, setFlexiblePaymentEnabled] = useState(false);
+  const [paymentGracePeriodDays, setPaymentGracePeriodDays] = useState(7);
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
 
   useEffect(() => {
     if (user && currentStep === 'registration' && reservationId) {
@@ -39,7 +46,17 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
     }
   }, [user, currentStep, reservationId]);
 
-  const handleReviewConfirm = async () => {
+  const loadSettings = async () => {
+    try {
+      const settings = await systemSettingsService.getAllSettings();
+      setFlexiblePaymentEnabled(settings.flexible_payment_enabled === 'true');
+      setPaymentGracePeriodDays(parseInt(settings.payment_grace_period_days || '7'));
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    }
+  };
+
+  const handleReviewConfirm = async (useFlexiblePayment: boolean = false) => {
     try {
       const guestId = !user?.id
         ? `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -48,6 +65,10 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
       if (guestId) {
         console.log('👤 [UNIFIED] إنشاء Guest ID للزائر:', guestId);
       }
+
+      const paymentDeadline = useFlexiblePayment
+        ? new Date(Date.now() + paymentGracePeriodDays * 24 * 60 * 60 * 1000).toISOString()
+        : null;
 
       const reservationPayload = {
         user_id: user?.id || null,
@@ -61,7 +82,9 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         total_trees: props.treeCount,
         total_price: props.totalPrice,
         path_type: props.pathType,
-        status: 'pending',
+        status: useFlexiblePayment ? 'pending_payment' : 'pending',
+        flexible_payment_enabled: useFlexiblePayment,
+        payment_deadline: paymentDeadline,
         influencer_code: props.influencerCode || null
       };
 
@@ -85,7 +108,9 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
       setReservationId(reservation.id);
       setReservationData(reservationPayload);
 
-      if (!user) {
+      if (useFlexiblePayment) {
+        setCurrentStep('flexible-success');
+      } else if (!user) {
         setCurrentStep('registration');
       } else {
         setCurrentStep('payment');
@@ -136,6 +161,8 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         pricePerTree={props.pricePerTree}
         onConfirm={handleReviewConfirm}
         onBack={props.onBack}
+        flexiblePaymentEnabled={flexiblePaymentEnabled}
+        paymentGracePeriodDays={paymentGracePeriodDays}
       />
     ) : (
       <InvestmentReviewScreen
@@ -149,6 +176,8 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         treeVarieties={props.treeVarieties || []}
         onConfirm={handleReviewConfirm}
         onBack={props.onBack}
+        flexiblePaymentEnabled={flexiblePaymentEnabled}
+        paymentGracePeriodDays={paymentGracePeriodDays}
       />
     );
   }
@@ -176,6 +205,68 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
 
   if (currentStep === 'success') {
     return null;
+  }
+
+  if (currentStep === 'flexible-success') {
+    return (
+      <div className="max-w-2xl mx-auto p-6">
+        <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            تم حجز أشجارك بنجاح!
+          </h2>
+
+          <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 mb-6">
+            <div className="text-lg font-bold text-green-900 mb-2">
+              لديك {paymentGracePeriodDays} {paymentGracePeriodDays === 1 ? 'يوم' : 'أيام'} لإتمام الدفع
+            </div>
+            <p className="text-sm text-green-700">
+              تم حجز {props.treeCount} شجرة في {props.farmName}
+            </p>
+            <p className="text-2xl font-bold text-green-900 mt-3">
+              {props.totalPrice.toLocaleString('ar-SA')} ر.س
+            </p>
+          </div>
+
+          <div className="text-right space-y-3 mb-6 bg-gray-50 rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-blue-600 font-bold">1</span>
+              </div>
+              <p className="text-sm text-gray-700">سنرسل لك رابط الدفع عبر الواتساب والبريد الإلكتروني</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-blue-600 font-bold">2</span>
+              </div>
+              <p className="text-sm text-gray-700">يمكنك الدفع في أي وقت خلال المدة المحددة</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-blue-600 font-bold">3</span>
+              </div>
+              <p className="text-sm text-gray-700">سنتواصل معك للمتابعة والمساعدة</p>
+            </div>
+          </div>
+
+          <button
+            onClick={props.onComplete}
+            className="w-full py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-bold hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg"
+          >
+            العودة إلى الصفحة الرئيسية
+          </button>
+
+          <p className="text-xs text-gray-500 mt-4">
+            رقم الحجز: {reservationId}
+          </p>
+        </div>
+      </div>
+    );
   }
 
   return null;

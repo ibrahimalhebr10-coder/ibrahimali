@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { Settings, Palette, Key, Database, CreditCard } from 'lucide-react';
+import { Settings, Palette, Key, Database, CreditCard, Clock } from 'lucide-react';
 import PaymentProvidersManager from './PaymentProvidersManager';
+import FlexiblePaymentSettings from './FlexiblePaymentSettings';
 
-type SettingsTab = 'system' | 'branding' | 'api-keys' | 'database' | 'payments';
+type SettingsTab = 'system' | 'branding' | 'api-keys' | 'database' | 'payments' | 'flexible-payment';
 
 const GeneralSettings: React.FC = () => {
   const [activeTab, setActiveTab] = useState<SettingsTab>('system');
 
   const tabs = [
     { id: 'system' as SettingsTab, label: 'إعدادات النظام', icon: Settings },
+    { id: 'flexible-payment' as SettingsTab, label: 'الدفع المرن', icon: Clock },
     { id: 'payments' as SettingsTab, label: 'بوابات الدفع', icon: CreditCard },
     { id: 'branding' as SettingsTab, label: 'الهوية العامة', icon: Palette },
     { id: 'api-keys' as SettingsTab, label: 'مفاتيح التشغيل', icon: Key },
@@ -47,7 +49,17 @@ const GeneralSettings: React.FC = () => {
       </div>
 
       {/* Content */}
-      {activeTab === 'payments' ? (
+      {activeTab === 'flexible-payment' ? (
+        <div>
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">إعدادات الدفع المرن</h2>
+            <p className="text-gray-600">
+              إدارة نظام الحجز المرن والتذكيرات التلقائية
+            </p>
+          </div>
+          <FlexiblePaymentSettings />
+        </div>
+      ) : activeTab === 'payments' ? (
         <div>
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">إدارة بوابات الدفع</h2>

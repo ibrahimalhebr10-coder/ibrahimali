@@ -15,7 +15,8 @@ import {
   Users,
   Flame,
   Sparkles,
-  Video
+  Video,
+  ClipboardCheck
 } from 'lucide-react';
 import { useAdminAuth } from '../../contexts/AdminAuthContext';
 import DashboardOverview from './DashboardOverview';
@@ -31,11 +32,13 @@ import CustomersSection from './CustomersSection';
 import HotLeadsDashboard from './HotLeadsDashboard';
 import AdvancedAssistantManager from './AdvancedAssistantManager';
 import IntroVideoManager from './IntroVideoManager';
+import FollowUpRoom from './FollowUpRoom';
 
 type AdminSection =
   | 'overview'
   | 'farms'
   | 'farm-offers'
+  | 'follow-up'
   | 'hot-leads'
   | 'customers'
   | 'operations'
@@ -62,6 +65,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
   const menuItems = [
     { id: 'overview' as AdminSection, label: 'الرئيسية', icon: LayoutDashboard, color: 'blue' },
+    { id: 'follow-up' as AdminSection, label: 'غرفة المتابعة', icon: ClipboardCheck, color: 'emerald' },
     { id: 'hot-leads' as AdminSection, label: 'العملاء الساخنون', icon: Flame, color: 'red' },
     { id: 'farms' as AdminSection, label: 'المزارع', icon: Layers, color: 'green' },
     { id: 'farm-offers' as AdminSection, label: 'عروض المزارع', icon: ClipboardList, color: 'emerald' },
@@ -93,6 +97,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     switch (activeSection) {
       case 'overview':
         return <DashboardOverview />;
+      case 'follow-up':
+        return <FollowUpRoom />;
       case 'hot-leads':
         return <HotLeadsDashboard />;
       case 'farms':
