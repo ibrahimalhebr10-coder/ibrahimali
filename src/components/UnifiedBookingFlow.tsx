@@ -49,8 +49,21 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
   const loadSettings = async () => {
     try {
       const settings = await systemSettingsService.getAllSettings();
-      setFlexiblePaymentEnabled(settings.flexible_payment_enabled === 'true');
-      setPaymentGracePeriodDays(parseInt(settings.payment_grace_period_days || '7'));
+
+      // Convert array to object for easier access
+      const settingsObj: Record<string, string> = {};
+      settings.forEach(setting => {
+        settingsObj[setting.key] = setting.value;
+      });
+
+      const flexibleEnabled = settingsObj['flexible_payment_enabled'] === 'true';
+      const gracePeriod = parseInt(settingsObj['payment_grace_period_days'] || '7');
+
+      console.log('🔧 [SETTINGS] Flexible Payment Enabled:', flexibleEnabled);
+      console.log('🔧 [SETTINGS] Grace Period Days:', gracePeriod);
+
+      setFlexiblePaymentEnabled(flexibleEnabled);
+      setPaymentGracePeriodDays(gracePeriod);
     } catch (error) {
       console.error('Error loading settings:', error);
     }
