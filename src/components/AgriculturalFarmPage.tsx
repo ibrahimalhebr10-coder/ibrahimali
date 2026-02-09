@@ -6,7 +6,8 @@ import type { FarmProject, FarmContract } from '../services/farmService';
 import { agriculturalPackagesService, type AgriculturalPackage } from '../services/agriculturalPackagesService';
 import UnifiedBookingFlow from './UnifiedBookingFlow';
 import { usePageTracking } from '../hooks/useLeadTracking';
-import { influencerMarketingService } from '../services/influencerMarketingService';
+import { influencerMarketingService, type FeaturedPackageSettings } from '../services/influencerMarketingService';
+import FeaturedPackageOverlay from './FeaturedPackageOverlay';
 
 interface AgriculturalFarmPageProps {
   farm: FarmProject;
@@ -33,6 +34,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [isCodeVerified, setIsCodeVerified] = useState(false);
   const [bonusYears, setBonusYears] = useState(0);
   const [verifiedPartnerName, setVerifiedPartnerName] = useState('');
+  const [featuredPackageSettings, setFeaturedPackageSettings] = useState<FeaturedPackageSettings | null>(null);
 
   // New state: user can choose between "with package" or "without package"
   const [usePackage, setUsePackage] = useState(true);
@@ -124,6 +126,13 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         setBonusYears(3);
         setVerifiedPartnerName(result.partner.display_name || result.partner.name);
         sessionStorage.setItem('influencer_code', result.partner.partner_code);
+
+        // تحميل إعدادات الباقة المميزة
+        const settings = await influencerMarketingService.getFeaturedPackageSettings();
+        if (settings) {
+          setFeaturedPackageSettings(settings);
+          sessionStorage.setItem('featured_package_active', 'true');
+        }
       }
     } catch (error) {
       console.error('Error verifying code:', error);
@@ -401,6 +410,18 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               })}
             </div>
           </div>
+          )}
+
+          {/* === 3.5. FEATURED PACKAGE (الباقة المميزة لشركاء النجاح) === */}
+          {usePackage && isCodeVerified && featuredPackageSettings && (
+            <div className="mb-3 px-1">
+              <FeaturedPackageOverlay
+                settings={featuredPackageSettings}
+                onDismiss={() => {
+                  // لا نفعل شيء - الباقة ستبقى ظاهرة طالما الكود مفعّل
+                }}
+              />
+            </div>
           )}
 
           {/* === 4. TREE COUNTER CARD (رابعاً - بعد الباقات أو بدونها) === */}

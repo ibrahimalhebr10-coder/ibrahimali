@@ -5,7 +5,8 @@ import type { FarmProject, FarmContract } from '../services/farmService';
 import { investmentPackagesService, type InvestmentPackage } from '../services/investmentPackagesService';
 import UnifiedBookingFlow from './UnifiedBookingFlow';
 import { usePageTracking } from '../hooks/useLeadTracking';
-import { influencerMarketingService } from '../services/influencerMarketingService';
+import { influencerMarketingService, type FeaturedPackageSettings } from '../services/influencerMarketingService';
+import FeaturedPackageOverlay from './FeaturedPackageOverlay';
 
 interface InvestmentFarmPageProps {
   farm: FarmProject;
@@ -30,6 +31,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   const [isCodeVerified, setIsCodeVerified] = useState(false);
   const [bonusYears, setBonusYears] = useState(0);
   const [verifiedPartnerName, setVerifiedPartnerName] = useState('');
+  const [featuredPackageSettings, setFeaturedPackageSettings] = useState<FeaturedPackageSettings | null>(null);
 
   useEffect(() => {
     if (farm.contracts && farm.contracts.length > 0) {
@@ -143,6 +145,13 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
         setBonusYears(3);
         setVerifiedPartnerName(result.partner.display_name || result.partner.name);
         sessionStorage.setItem('influencer_code', result.partner.partner_code);
+
+        // تحميل إعدادات الباقة المميزة
+        const settings = await influencerMarketingService.getFeaturedPackageSettings();
+        if (settings) {
+          setFeaturedPackageSettings(settings);
+          sessionStorage.setItem('featured_package_active', 'true');
+        }
       }
     } catch (error) {
       console.error('Error verifying code:', error);
@@ -363,6 +372,18 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
               })}
             </div>
           </div>
+
+          {/* === 2.5. FEATURED PACKAGE (الباقة المميزة لشركاء النجاح) === */}
+          {isCodeVerified && featuredPackageSettings && (
+            <div className="mb-3 px-1">
+              <FeaturedPackageOverlay
+                settings={featuredPackageSettings}
+                onDismiss={() => {
+                  // لا نفعل شيء - الباقة ستبقى ظاهرة طالما الكود مفعّل
+                }}
+              />
+            </div>
+          )}
 
           {/* === 3. TREE COUNTER CARD (ثالثاً - بعد الباقات) === */}
           <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-amber-100 p-5 mb-4">

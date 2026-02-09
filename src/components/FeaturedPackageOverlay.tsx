@@ -53,37 +53,13 @@ export default function FeaturedPackageOverlay({ settings, onDismiss }: Featured
   };
 
   const getBenefitIcon = () => {
-    switch (settings.benefitType) {
-      case 'free_shipping':
-        return '🚚';
-      case 'discount':
-        return '💰';
-      case 'bonus_trees':
-        return '🌳';
-      case 'priority_support':
-        return '⭐';
-      case 'custom':
-        return '🎁';
-      default:
-        return '🎁';
-    }
+    // استخدام أيقونة ثابتة للباقة المميزة
+    return '🎁';
   };
 
   const getBenefitLabel = () => {
-    switch (settings.benefitType) {
-      case 'free_shipping':
-        return 'شحن مجاني';
-      case 'discount':
-        return 'خصم خاص';
-      case 'bonus_trees':
-        return 'أشجار إضافية';
-      case 'priority_support':
-        return 'دعم مميز';
-      case 'custom':
-        return 'مزية خاصة';
-      default:
-        return 'مزية خاصة';
-    }
+    // استخدام نص ثابت للباقة المميزة
+    return 'مزايا خاصة';
   };
 
   return (
@@ -139,7 +115,7 @@ export default function FeaturedPackageOverlay({ settings, onDismiss }: Featured
               </span>
             </div>
             <p className="text-sm text-slate-700 font-medium">
-              {settings.benefitDescription}
+              {settings.description}
             </p>
           </div>
 
