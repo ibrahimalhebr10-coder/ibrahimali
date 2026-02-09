@@ -39,7 +39,13 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
     }
   }, [user, currentStep, reservationId]);
 
-  const handleReviewConfirm = async () => {
+  const handleReviewConfirm = async (updatedData?: {
+    treeCount: number;
+    totalPrice: number;
+    selectedPackage: any;
+    influencerCode: string | null;
+    bonusYears: number;
+  }) => {
     try {
       const guestId = !user?.id
         ? `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -49,6 +55,12 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         console.log('👤 [UNIFIED] إنشاء Guest ID للزائر:', guestId);
       }
 
+      // Use updated data if provided, otherwise use props
+      const treeCount = updatedData?.treeCount || props.treeCount;
+      const totalPrice = updatedData?.totalPrice || props.totalPrice;
+      const bonusYears = updatedData?.bonusYears ?? props.bonusYears;
+      const influencerCode = updatedData?.influencerCode ?? props.influencerCode;
+
       const reservationPayload = {
         user_id: user?.id || null,
         guest_id: guestId,
@@ -57,12 +69,12 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         contract_id: props.contractId,
         contract_name: props.contractName,
         duration_years: props.durationYears,
-        bonus_years: props.bonusYears,
-        total_trees: props.treeCount,
-        total_price: props.totalPrice,
+        bonus_years: bonusYears,
+        total_trees: treeCount,
+        total_price: totalPrice,
         path_type: props.pathType,
         status: 'pending',
-        influencer_code: props.influencerCode || null
+        influencer_code: influencerCode || null
       };
 
       console.log('🚀 [UNIFIED] إنشاء حجز جديد - البيانات:', reservationPayload);
