@@ -169,104 +169,118 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   }
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-gray-50 to-white z-50 overflow-y-auto">
+    <div className="fixed inset-0 bg-[#f5f5f5] z-50 overflow-y-auto" dir="rtl">
       <div className="min-h-screen pb-32">
 
-        {/* HEADER */}
-        <div className="bg-white shadow-sm sticky top-0 z-10">
-          <div className="p-4">
+        {/* === HEADER === */}
+        <div className="bg-[#f5f5f5] pt-4 px-4 pb-2">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h1 className="text-[22px] font-bold text-gray-800 leading-tight">احجز أشجارك الآن</h1>
+              <p className="text-[13px] text-gray-500 mt-1 flex items-center gap-1">
+                <span className="text-gray-300">|</span>
+                <span>خطوة واحدة • إدارة احترافية • عوائد سنوية</span>
+              </p>
+            </div>
             <button
               onClick={onClose}
-              className="mb-4 w-10 h-10 rounded-full border-2 border-gray-300 flex items-center justify-center hover:bg-gray-50 transition-colors"
+              className="w-9 h-9 rounded-full border border-gray-300 bg-white flex items-center justify-center hover:bg-gray-50 transition-colors shadow-sm"
             >
-              <ArrowRight className="w-5 h-5 text-gray-700" />
+              <ArrowRight className="w-4 h-4 text-gray-600" style={{ transform: 'scaleX(-1)' }} />
             </button>
-            <h1 className="text-2xl font-bold text-center text-gray-900">احجز أشجارك الآن</h1>
-            <p className="text-center text-sm text-gray-600 mt-1">
-              خطوة واحدة • إدارة احترافية • عوائد سنوية
-            </p>
           </div>
         </div>
 
-        <div className="px-4 mt-6">
+        <div className="px-4 mt-4">
 
-          {/* 1. TREE COUNTER SECTION */}
-          <div className="bg-white rounded-3xl shadow-lg p-6 mb-5 border border-gray-100">
-            <h2 className="text-xl font-bold text-center mb-2 text-gray-900">اختر عدد الأشجار</h2>
-            <p className="text-sm text-gray-500 text-center mb-6">اختر عدد عدد الأشجار التي نريد حجزها</p>
+          {/* === 1. TREE COUNTER CARD === */}
+          <div className="bg-white rounded-[20px] shadow-sm p-5 mb-4">
+            <h2 className="text-[17px] font-bold text-center text-gray-800 mb-1">اختر عدد الأشجار</h2>
+            <p className="text-[12px] text-gray-400 text-center mb-5">اختر عدد عدد الأشجار التي تريد حجزها</p>
 
-            {/* Counter Display */}
-            <div className="flex items-center justify-center gap-4 mb-6">
+            {/* Counter with +/- buttons */}
+            <div className="flex items-center justify-center gap-3 mb-5">
               <button
                 onClick={() => handleTreeCountChange(-1)}
                 disabled={treeCount <= 1}
-                className="w-12 h-12 rounded-full border-2 border-gray-300 flex items-center justify-center disabled:opacity-30 hover:bg-gray-50 transition-all active:scale-95"
+                className="w-10 h-10 rounded-full border border-gray-300 bg-white flex items-center justify-center disabled:opacity-30 hover:bg-gray-50 transition-all active:scale-95"
               >
-                <Minus className="w-5 h-5 text-gray-700" />
+                <Minus className="w-4 h-4 text-gray-600" />
               </button>
 
-              <div className="text-center min-w-[100px]">
-                <div className="text-5xl font-bold text-gray-900">{treeCount}</div>
-                <div className="text-sm text-gray-500 mt-1">شجرة</div>
+              <div className="text-center min-w-[80px]">
+                <div className="text-[48px] font-bold text-gray-800 leading-none">{treeCount}</div>
+                <div className="text-[13px] text-gray-500 mt-1">شجرة</div>
               </div>
 
               <button
                 onClick={() => handleTreeCountChange(1)}
                 disabled={treeCount >= maxTrees}
-                className="w-12 h-12 rounded-full border-2 border-gray-300 flex items-center justify-center disabled:opacity-30 hover:bg-gray-50 transition-all active:scale-95"
+                className="w-10 h-10 rounded-full border border-gray-300 bg-white flex items-center justify-center disabled:opacity-30 hover:bg-gray-50 transition-all active:scale-95"
               >
-                <Plus className="w-5 h-5 text-gray-700" />
+                <Plus className="w-4 h-4 text-gray-600" />
               </button>
             </div>
 
             {/* Slider */}
-            <div className="relative mb-2">
+            <div className="relative mb-1 px-1">
+              <div className="relative h-[6px] bg-gray-200 rounded-full overflow-visible">
+                <div
+                  className="absolute top-0 right-0 h-full bg-[#4a7c59] rounded-full"
+                  style={{ width: `${(treeCount / maxTrees) * 100}%` }}
+                />
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 w-5 h-5 bg-white rounded-full border-[3px] border-gray-300 shadow-md cursor-pointer"
+                  style={{ left: `${(treeCount / maxTrees) * 100}%`, transform: 'translate(-50%, -50%)' }}
+                />
+              </div>
               <input
                 type="range"
                 min="1"
                 max={maxTrees}
                 value={treeCount}
                 onChange={handleSliderChange}
-                className="w-full h-2 bg-gray-200 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-green-600 [&::-webkit-slider-thumb]:shadow-lg"
-                style={{
-                  background: `linear-gradient(to right, #16a34a 0%, #16a34a ${(treeCount / maxTrees) * 100}%, #e5e7eb ${(treeCount / maxTrees) * 100}%, #e5e7eb 100%)`
-                }}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
               />
             </div>
-            <div className="flex justify-between text-xs text-gray-500 px-1">
+            <div className="flex justify-between text-[11px] text-gray-400 px-1 mt-2">
               <span>1-50</span>
-              <span>متاحة شجرة {maxTrees.toLocaleString()}-</span>
+              <span>مجلجلة شجرة {maxTrees.toLocaleString()}-</span>
             </div>
 
-            {/* Quick Package Selection Cards */}
-            <div className="grid grid-cols-3 gap-3 mt-6">
+            {/* === PACKAGE CARDS === */}
+            <div className="grid grid-cols-3 gap-2 mt-5">
               {packages.slice(0, 3).map((pkg, index) => {
                 const isMiddle = index === 1;
                 const isSelected = selectedPackage?.id === pkg.id;
+                const totalPrice = pkg.price_per_tree * pkg.min_trees;
+
                 return (
                   <button
                     key={pkg.id}
                     onClick={() => handleSelectPackage(pkg)}
-                    className={`relative p-4 rounded-2xl border-2 transition-all ${
-                      isSelected
-                        ? 'border-green-600 bg-green-50 shadow-md'
-                        : 'border-gray-200 bg-white hover:border-gray-300'
-                    } ${isMiddle ? 'ring-2 ring-amber-400 ring-offset-2' : ''}`}
+                    className={`relative py-3 px-2 rounded-xl transition-all ${
+                      isMiddle
+                        ? 'bg-white border-2 border-gray-300 shadow-md'
+                        : isSelected
+                          ? 'bg-gray-50 border border-gray-300'
+                          : 'bg-white border border-gray-200 hover:border-gray-300'
+                    }`}
                   >
                     {isMiddle && (
-                      <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-amber-400 text-white text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-md">
-                        <span>★</span>
-                        <span>عقد بستة</span>
+                      <div className="absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-gray-500 text-white text-[10px] px-2 py-0.5 rounded-md flex items-center gap-0.5 whitespace-nowrap">
+                        <span className="text-[9px]">★</span>
+                        <span>عقد سنة</span>
                       </div>
                     )}
-                    <div className="text-center mt-1">
-                      <div className="text-base font-bold text-gray-900">{pkg.min_trees} شجرة</div>
-                      <div className="text-sm font-semibold text-green-700 mt-1">
-                        {pkg.price_per_tree.toLocaleString()} ر.س
+                    <div className="text-center">
+                      <div className="text-[13px] font-semibold text-gray-700">شجرة {pkg.min_trees}</div>
+                      <div className="text-[14px] font-bold text-gray-800 mt-1">
+                        {totalPrice.toLocaleString()} ر.س
                       </div>
-                      <div className="text-[10px] text-gray-500 mt-0.5">عقد سنة</div>
+                      <div className="text-[10px] text-gray-400 mt-0.5">عقد سنة</div>
                       {isMiddle && (
-                        <div className="text-[10px] text-amber-600 font-semibold mt-1">+ ستتين مجاناً</div>
+                        <div className="text-[10px] text-gray-500 mt-1">• + سنتين مجاناً •</div>
                       )}
                     </div>
                   </button>
@@ -274,87 +288,93 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               })}
             </div>
 
-            {/* Package dots indicator */}
-            <div className="flex justify-center gap-1.5 mt-4">
+            {/* Dots indicator */}
+            <div className="flex justify-center gap-1 mt-4">
               {[0, 1, 2, 3, 4].map((dot) => (
                 <div
                   key={dot}
-                  className={`w-1.5 h-1.5 rounded-full ${dot === 1 ? 'bg-gray-400' : 'bg-gray-200'}`}
+                  className={`w-[5px] h-[5px] rounded-full ${dot === 1 ? 'bg-gray-400' : 'bg-gray-200'}`}
                 />
               ))}
             </div>
           </div>
 
-          {/* 2. PARTNER CODE SECTION */}
-          <div className="bg-white rounded-3xl shadow-lg p-5 mb-5 border border-gray-100">
-            <h3 className="text-base font-bold text-center text-gray-900 mb-1">
+          {/* === 2. PARTNER CODE SECTION === */}
+          <div className="mb-4">
+            <h3 className="text-[15px] font-bold text-center text-gray-800 mb-1">
               هل لديك كود شريك نجاح (اختياري)
             </h3>
-            <div className="flex items-center justify-center gap-1 text-xs text-gray-500 mb-4">
-              <span className="inline-block w-4 h-4 rounded-full bg-gray-100 flex items-center justify-center text-[10px]">ℹ</span>
-              <span>الخبر الحضحت مدة إضافية فقط</span>
+            <div className="flex items-center justify-center gap-1 text-[11px] text-gray-400 mb-3">
+              <span className="w-3.5 h-3.5 rounded-full border border-gray-300 flex items-center justify-center text-[9px] text-gray-400">i</span>
+              <span>الكود الخحصك مدة إضافية فقط</span>
             </div>
 
-            <div className="flex items-center gap-3 bg-gray-50 rounded-2xl p-3 border border-gray-200">
+            <div className="flex items-center gap-2 bg-gray-100 rounded-full py-2.5 px-4 border border-gray-200">
+              <button
+                onClick={handleVerifyPartnerCode}
+                disabled={!partnerCode.trim() || isCodeVerified}
+                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all flex-shrink-0 ${
+                  isCodeVerified
+                    ? 'bg-[#4a7c59] text-white'
+                    : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                }`}
+              >
+                <span className="text-sm">{isCodeVerified ? '✓' : '✓'}</span>
+              </button>
               <input
                 type="text"
                 value={partnerCode}
                 onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
                 placeholder="أدخل الكود هنا"
                 disabled={isCodeVerified}
-                className="flex-1 bg-transparent text-center text-sm focus:outline-none text-gray-700 placeholder-gray-400 disabled:text-green-700"
+                className="flex-1 bg-transparent text-left text-[13px] focus:outline-none text-gray-600 placeholder-gray-400 disabled:text-[#4a7c59]"
+                dir="ltr"
               />
-              <button
-                onClick={handleVerifyPartnerCode}
-                disabled={!partnerCode.trim() || isCodeVerified}
-                className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all ${
-                  isCodeVerified
-                    ? 'bg-green-500 text-white'
-                    : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
-                } disabled:opacity-50`}
-              >
-                {isCodeVerified ? '✓' : '→'}
-              </button>
             </div>
 
             {isCodeVerified && (
-              <div className="mt-3 text-xs text-green-600 text-center font-semibold bg-green-50 py-2 rounded-xl">
-                تم التحقق بنجاح - حصلت على +{bonusYears} سنوات مجاناً
+              <div className="mt-2 text-[11px] text-[#4a7c59] text-center font-medium">
+                تم التحقق - حصلت على +{bonusYears} سنوات مجاناً
               </div>
             )}
           </div>
 
-          {/* 3. BOOKING SUMMARY */}
-          <div className="mb-5">
-            <h3 className="text-lg font-bold text-center text-gray-900 mb-3">ملخص الحجز</h3>
-            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-4 text-center border border-gray-200">
-              <p className="text-sm text-gray-600">
-                ـ {treeCount} • عقد سنة • {selectedPackage?.contract_years || selectedContract?.duration_years || 0} سنة
-                {bonusYears > 0 && ` + ${bonusYears} ستتين مجاناً`}
+          {/* === 3. BOOKING SUMMARY === */}
+          <div className="mb-4">
+            <h3 className="text-[15px] font-bold text-center text-gray-800 mb-2">ملخص الحجز</h3>
+            <div className="bg-gray-100 rounded-xl py-3 px-4 text-center border border-gray-200">
+              <p className="text-[13px] text-gray-600">
+                ـ {treeCount} • عقد سنة • عقد سنة
+                {(bonusYears > 0 || (selectedPackage?.bonus_years || 0) > 0) &&
+                  ` + ${bonusYears || selectedPackage?.bonus_years || 0} سنتين مجاناً`
+                }
               </p>
             </div>
           </div>
 
-          {/* 4. BOOK NOW BUTTON */}
-          <div className="mb-6">
+          {/* === 4. BOOK NOW BUTTON === */}
+          <div className="mb-4">
             <button
               onClick={handleBuyNow}
               disabled={!selectedContract || treeCount === 0}
-              className="w-full py-4 bg-gradient-to-l from-green-600 to-green-700 text-white rounded-3xl font-bold text-lg shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 border-2 border-green-800/20"
+              className="w-full py-3.5 bg-white border-2 border-gray-700 rounded-full font-bold text-[18px] text-gray-800 shadow-sm hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              <span className="text-2xl">🔒</span>
-              <span>احجز الآن {calculateTotal().toLocaleString()}</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" strokeWidth="2"/>
+                <path d="M7 11V7a5 5 0 0110 0v4" strokeWidth="2"/>
+              </svg>
+              <span>{calculateTotal().toLocaleString()} احجز الآن</span>
             </button>
-            <div className="flex items-center justify-center gap-1 mt-3">
-              <span className="text-lg">✓</span>
-              <span className="text-xs text-gray-500">أمن يمكنك الإلغاء حسب الشروط.</span>
+            <div className="flex items-center justify-center gap-1.5 mt-3">
+              <span className="text-[#4a7c59] text-sm">✓</span>
+              <span className="text-[11px] text-gray-400">آمن يمكنك الإلغاء حسب الشروط.</span>
             </div>
           </div>
 
         </div>
 
         {/* SPACER FOR FOOTER */}
-        <div className="h-20"></div>
+        <div className="h-24"></div>
 
       </div>
     </div>
