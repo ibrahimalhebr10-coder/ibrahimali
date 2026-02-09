@@ -250,7 +250,54 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
 
         <div className="px-4 mt-1">
 
-          {/* === 1. PACKAGE CARDS === */}
+          {/* === 1. PARTNER CODE SECTION (أولاً - تحت الهيدر مباشرة) === */}
+          <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-amber-100 p-5 mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-1">
+                <span className="w-4 h-4 rounded-full bg-amber-100 flex items-center justify-center text-[9px] text-amber-600">!</span>
+                <span className="text-[10px] text-amber-600 font-medium">يمنحك مدة إضافية</span>
+              </div>
+              <span className="text-[13px] font-bold text-[#78350f]">كود شريك نجاح (اختياري)</span>
+            </div>
+
+            <div className={`flex items-center gap-2 rounded-xl py-2.5 px-3 border-2 transition-all duration-300 ${
+              isCodeVerified
+                ? 'bg-amber-50 border-amber-500'
+                : 'bg-gray-50 border-gray-200 focus-within:border-amber-500 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(245,158,11,0.1)]'
+            }`}>
+              <input
+                type="text"
+                value={partnerCode}
+                onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
+                placeholder="أدخل الكود هنا..."
+                disabled={isCodeVerified}
+                className="flex-1 bg-transparent text-center text-[13px] focus:outline-none text-[#78350f] placeholder-gray-400 disabled:text-amber-600 font-semibold"
+                dir="ltr"
+              />
+              <button
+                onClick={handleVerifyPartnerCode}
+                disabled={!partnerCode.trim() || isCodeVerified}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
+                  isCodeVerified
+                    ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30'
+                    : partnerCode.trim()
+                      ? 'bg-gradient-to-b from-amber-500 to-amber-600 text-white hover:shadow-lg hover:shadow-amber-500/30'
+                      : 'bg-gray-200 text-gray-400'
+                }`}
+              >
+                <span className="text-[14px] font-bold">✓</span>
+              </button>
+            </div>
+
+            {isCodeVerified && (
+              <div className="mt-3 py-2 px-3 rounded-lg bg-gradient-to-l from-amber-50 to-amber-100 border border-amber-200 flex items-center justify-center gap-2">
+                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                <span className="text-[12px] text-amber-700 font-bold">مبروك! حصلت على +{bonusYears} سنوات مجاناً</span>
+              </div>
+            )}
+          </div>
+
+          {/* === 2. PACKAGE CARDS (ثانياً - بعد كود الشريك) === */}
           <div className="bg-white rounded-[16px] shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-amber-100 p-3 mb-3">
             <div className="flex items-center justify-center gap-1.5 mb-2">
               <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-md shadow-amber-500/20">
@@ -313,54 +360,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
             </div>
           </div>
 
-          {/* === 2. PARTNER CODE SECTION === */}
-          <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-amber-100 p-5 mb-4">
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-1">
-                <span className="w-4 h-4 rounded-full bg-amber-100 flex items-center justify-center text-[9px] text-amber-600">!</span>
-                <span className="text-[10px] text-amber-600 font-medium">يمنحك مدة إضافية</span>
-              </div>
-              <span className="text-[13px] font-bold text-[#78350f]">كود شريك نجاح (اختياري)</span>
-            </div>
-
-            <div className={`flex items-center gap-2 rounded-xl py-2.5 px-3 border-2 transition-all duration-300 ${
-              isCodeVerified
-                ? 'bg-amber-50 border-amber-500'
-                : 'bg-gray-50 border-gray-200 focus-within:border-amber-500 focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(245,158,11,0.1)]'
-            }`}>
-              <input
-                type="text"
-                value={partnerCode}
-                onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
-                placeholder="أدخل الكود هنا..."
-                disabled={isCodeVerified}
-                className="flex-1 bg-transparent text-center text-[13px] focus:outline-none text-[#78350f] placeholder-gray-400 disabled:text-amber-600 font-semibold"
-                dir="ltr"
-              />
-              <button
-                onClick={handleVerifyPartnerCode}
-                disabled={!partnerCode.trim() || isCodeVerified}
-                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
-                  isCodeVerified
-                    ? 'bg-amber-500 text-white shadow-md shadow-amber-500/30'
-                    : partnerCode.trim()
-                      ? 'bg-gradient-to-b from-amber-500 to-amber-600 text-white hover:shadow-lg hover:shadow-amber-500/30'
-                      : 'bg-gray-200 text-gray-400'
-                }`}
-              >
-                <span className="text-[14px] font-bold">✓</span>
-              </button>
-            </div>
-
-            {isCodeVerified && (
-              <div className="mt-3 py-2 px-3 rounded-lg bg-gradient-to-l from-amber-50 to-amber-100 border border-amber-200 flex items-center justify-center gap-2">
-                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                <span className="text-[12px] text-amber-700 font-bold">مبروك! حصلت على +{bonusYears} سنوات مجاناً</span>
-              </div>
-            )}
-          </div>
-
-          {/* === 3. TREE COUNTER CARD === */}
+          {/* === 3. TREE COUNTER CARD (ثالثاً - بعد الباقات) === */}
           <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-amber-100 p-5 mb-4">
             <div className="flex items-center justify-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
