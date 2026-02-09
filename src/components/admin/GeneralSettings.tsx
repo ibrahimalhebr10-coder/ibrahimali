@@ -18,15 +18,15 @@ const GeneralSettings: React.FC = () => {
   ];
 
   return (
-    <div>
-      {/* Header */}
-      <div className="mb-8">
+    <div className="h-full flex flex-col">
+      {/* Header - ثابت */}
+      <div className="mb-6 flex-shrink-0">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">الإعدادات العامة</h1>
         <p className="text-gray-600">إدارة إعدادات النظام والتكامل</p>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6 overflow-x-auto">
+      {/* Tabs - ثابت */}
+      <div className="flex gap-2 mb-6 overflow-x-auto flex-shrink-0">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -48,53 +48,43 @@ const GeneralSettings: React.FC = () => {
         })}
       </div>
 
-      {/* Content */}
-      {activeTab === 'flexible-payment' ? (
-        <div>
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">إعدادات الدفع المرن</h2>
-            <p className="text-gray-600">
-              إدارة نظام الحجز المرن والتذكيرات التلقائية
-            </p>
+      {/* Content - قابل للتمرير */}
+      <div className="flex-1 overflow-y-auto">
+        {activeTab === 'flexible-payment' ? (
+          <div className="h-full">
+            <FlexiblePaymentSettings />
           </div>
-          <FlexiblePaymentSettings />
-        </div>
-      ) : activeTab === 'payments' ? (
-        <div>
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">إدارة بوابات الدفع</h2>
-            <p className="text-gray-600">
-              قم بتكوين وإدارة بوابات الدفع المختلفة للمنصة
-            </p>
+        ) : activeTab === 'payments' ? (
+          <div className="h-full">
+            <PaymentProvidersManager />
           </div>
-          <PaymentProvidersManager />
-        </div>
-      ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-          <div className="text-center max-w-md mx-auto py-8">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                {tabs.find(t => t.id === activeTab) && React.createElement(
-                  tabs.find(t => t.id === activeTab)!.icon,
-                  { className: 'w-10 h-10 text-gray-600' }
-                )}
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {tabs.find(t => t.id === activeTab)?.label}
-              </h3>
-              <p className="text-gray-600 mb-6">
-                هذا التبويب جاهز للتطوير. سيتم إضافة المحتوى والوظائف في المراحل القادمة.
-              </p>
-
-              {/* Warning for sensitive settings */}
-              <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 text-right">
-                <p className="text-sm font-medium text-red-900 mb-2">تنبيه أمني</p>
-                <p className="text-sm text-red-700">
-                  الإعدادات الحساسة مثل مفاتيح API وإعدادات قاعدة البيانات ستتطلب صلاحيات خاصة
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+            <div className="text-center max-w-md mx-auto py-8">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  {tabs.find(t => t.id === activeTab) && React.createElement(
+                    tabs.find(t => t.id === activeTab)!.icon,
+                    { className: 'w-10 h-10 text-gray-600' }
+                  )}
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  {tabs.find(t => t.id === activeTab)?.label}
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  هذا التبويب جاهز للتطوير. سيتم إضافة المحتوى والوظائف في المراحل القادمة.
                 </p>
-              </div>
+
+                {/* Warning for sensitive settings */}
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-4 text-right">
+                  <p className="text-sm font-medium text-red-900 mb-2">تنبيه أمني</p>
+                  <p className="text-sm text-red-700">
+                    الإعدادات الحساسة مثل مفاتيح API وإعدادات قاعدة البيانات ستتطلب صلاحيات خاصة
+                  </p>
+                </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
