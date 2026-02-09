@@ -224,13 +224,74 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
         <div className="px-4 mt-2">
 
-          {/* === 1. TREE COUNTER CARD === */}
+          {/* === 1. PACKAGE CARDS (أولاً) === */}
+          <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 p-5 mb-4">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <Star className="w-4 h-4 text-white fill-white" />
+              </div>
+              <h2 className="text-[17px] font-bold text-[#1a3d2a]">اختر الباقة المناسبة</h2>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2.5 pt-2">
+              {packages.slice(0, 3).map((pkg, index) => {
+                const isMiddle = index === 1;
+                const isSelected = selectedPackage?.id === pkg.id;
+                const totalPrice = pkg.price_per_tree * pkg.min_trees;
+
+                return (
+                  <button
+                    key={pkg.id}
+                    onClick={() => handleSelectPackage(pkg)}
+                    className={`relative py-3.5 px-2 rounded-2xl transition-all duration-300 ${
+                      isMiddle
+                        ? 'bg-gradient-to-b from-[#22c55e] to-[#16a34a] border-2 border-[#22c55e] shadow-xl shadow-green-500/25 scale-[1.05] -mt-1'
+                        : isSelected
+                          ? 'bg-white border-2 border-[#22c55e] shadow-md'
+                          : 'bg-white border border-gray-200 hover:border-[#22c55e]/50 hover:shadow-lg'
+                    }`}
+                  >
+                    {isMiddle && (
+                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-400 text-amber-900 text-[10px] px-3 py-1 rounded-full flex items-center gap-1 whitespace-nowrap shadow-lg font-bold">
+                        <Star className="w-3 h-3 fill-current" />
+                        <span>الأكثر طلباً</span>
+                      </div>
+                    )}
+                    <div className="text-center">
+                      <div className={`text-[14px] font-bold ${isMiddle ? 'text-white' : 'text-[#1a3d2a]'}`}>{pkg.min_trees} شجرة</div>
+                      <div className={`text-[16px] font-black mt-1.5 ${isMiddle ? 'text-white' : 'text-[#16a34a]'}`}>
+                        {totalPrice.toLocaleString()}
+                      </div>
+                      <div className={`text-[10px] mt-0.5 ${isMiddle ? 'text-white/80' : 'text-gray-500'}`}>ر.س / سنة</div>
+                      {isMiddle && (
+                        <div className="mt-2 py-1 px-2 rounded-lg bg-white/20 backdrop-blur-sm">
+                          <span className="text-[10px] text-white font-semibold">+ سنتين مجاناً</span>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Dots indicator */}
+            <div className="flex justify-center gap-2 mt-5">
+              {[0, 1, 2, 3, 4].map((dot) => (
+                <div
+                  key={dot}
+                  className={`rounded-full transition-all duration-300 ${dot === 1 ? 'w-6 h-2 bg-[#22c55e]' : 'w-2 h-2 bg-gray-300'}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* === 2. TREE COUNTER CARD (ثانياً - تحت الباقات) === */}
           <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 p-5 mb-4">
             <div className="flex items-center justify-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#22c55e] to-[#16a34a] flex items-center justify-center shadow-lg shadow-green-500/20">
                 <TreePine className="w-4 h-4 text-white" />
               </div>
-              <h2 className="text-[17px] font-bold text-[#1a3d2a]">اختر عدد الأشجار</h2>
+              <h2 className="text-[17px] font-bold text-[#1a3d2a]">حدد عدد الأشجار</h2>
             </div>
 
             {/* Counter with +/- buttons */}
@@ -282,105 +343,53 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               <span>الحد الأدنى: 1</span>
               <span>الحد الأقصى: {maxTrees.toLocaleString()}</span>
             </div>
+          </div>
 
-            {/* === 2. PARTNER CODE SECTION === */}
-            <div className="mt-5 mb-4 pt-4 border-t border-gray-100">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-1">
-                  <span className="w-4 h-4 rounded-full bg-amber-100 flex items-center justify-center text-[9px] text-amber-600">!</span>
-                  <span className="text-[10px] text-amber-600 font-medium">يمنحك مدة إضافية</span>
-                </div>
-                <span className="text-[12px] font-bold text-[#1a3d2a]">كود شريك نجاح</span>
+          {/* === 3. PARTNER CODE SECTION === */}
+          <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 p-5 mb-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-1">
+                <span className="w-4 h-4 rounded-full bg-amber-100 flex items-center justify-center text-[9px] text-amber-600">!</span>
+                <span className="text-[10px] text-amber-600 font-medium">يمنحك مدة إضافية</span>
               </div>
+              <span className="text-[13px] font-bold text-[#1a3d2a]">كود شريك نجاح (اختياري)</span>
+            </div>
 
-              <div className={`flex items-center gap-2 rounded-xl py-2 px-3 border-2 transition-all duration-300 ${
-                isCodeVerified
-                  ? 'bg-[#f0fdf4] border-[#22c55e]'
-                  : 'bg-gray-50 border-gray-200 focus-within:border-[#22c55e] focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(34,197,94,0.1)]'
-              }`}>
-                <input
-                  type="text"
-                  value={partnerCode}
-                  onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
-                  placeholder="أدخل الكود هنا..."
-                  disabled={isCodeVerified}
-                  className="flex-1 bg-transparent text-center text-[13px] focus:outline-none text-[#1a3d2a] placeholder-gray-400 disabled:text-[#16a34a] font-semibold"
-                  dir="ltr"
-                />
-                <button
-                  onClick={handleVerifyPartnerCode}
-                  disabled={!partnerCode.trim() || isCodeVerified}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
-                    isCodeVerified
-                      ? 'bg-[#22c55e] text-white shadow-md shadow-green-500/30'
-                      : partnerCode.trim()
-                        ? 'bg-gradient-to-b from-[#22c55e] to-[#16a34a] text-white hover:shadow-lg hover:shadow-green-500/30'
-                        : 'bg-gray-200 text-gray-400'
-                  }`}
-                >
-                  <span className="text-[14px] font-bold">✓</span>
-                </button>
+            <div className={`flex items-center gap-2 rounded-xl py-2.5 px-3 border-2 transition-all duration-300 ${
+              isCodeVerified
+                ? 'bg-[#f0fdf4] border-[#22c55e]'
+                : 'bg-gray-50 border-gray-200 focus-within:border-[#22c55e] focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(34,197,94,0.1)]'
+            }`}>
+              <input
+                type="text"
+                value={partnerCode}
+                onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
+                placeholder="أدخل الكود هنا..."
+                disabled={isCodeVerified}
+                className="flex-1 bg-transparent text-center text-[13px] focus:outline-none text-[#1a3d2a] placeholder-gray-400 disabled:text-[#16a34a] font-semibold"
+                dir="ltr"
+              />
+              <button
+                onClick={handleVerifyPartnerCode}
+                disabled={!partnerCode.trim() || isCodeVerified}
+                className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-300 flex-shrink-0 ${
+                  isCodeVerified
+                    ? 'bg-[#22c55e] text-white shadow-md shadow-green-500/30'
+                    : partnerCode.trim()
+                      ? 'bg-gradient-to-b from-[#22c55e] to-[#16a34a] text-white hover:shadow-lg hover:shadow-green-500/30'
+                      : 'bg-gray-200 text-gray-400'
+                }`}
+              >
+                <span className="text-[14px] font-bold">✓</span>
+              </button>
+            </div>
+
+            {isCodeVerified && (
+              <div className="mt-3 py-2 px-3 rounded-lg bg-gradient-to-l from-[#f0fdf4] to-[#dcfce7] border border-[#bbf7d0] flex items-center justify-center gap-2">
+                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                <span className="text-[12px] text-[#15803d] font-bold">مبروك! حصلت على +{bonusYears} سنوات مجاناً</span>
               </div>
-
-              {isCodeVerified && (
-                <div className="mt-2 py-2 px-3 rounded-lg bg-gradient-to-l from-[#f0fdf4] to-[#dcfce7] border border-[#bbf7d0] flex items-center justify-center gap-2">
-                  <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                  <span className="text-[12px] text-[#15803d] font-bold">مبروك! حصلت على +{bonusYears} سنوات مجاناً</span>
-                </div>
-              )}
-            </div>
-
-            {/* === 3. PACKAGE CARDS === */}
-            <div className="grid grid-cols-3 gap-2.5">
-              {packages.slice(0, 3).map((pkg, index) => {
-                const isMiddle = index === 1;
-                const isSelected = selectedPackage?.id === pkg.id;
-                const totalPrice = pkg.price_per_tree * pkg.min_trees;
-
-                return (
-                  <button
-                    key={pkg.id}
-                    onClick={() => handleSelectPackage(pkg)}
-                    className={`relative py-3.5 px-2 rounded-2xl transition-all duration-300 ${
-                      isMiddle
-                        ? 'bg-gradient-to-b from-[#22c55e] to-[#16a34a] border-2 border-[#22c55e] shadow-xl shadow-green-500/25 scale-[1.05] -mt-1'
-                        : isSelected
-                          ? 'bg-white border-2 border-[#22c55e] shadow-md'
-                          : 'bg-white border border-gray-200 hover:border-[#22c55e]/50 hover:shadow-lg'
-                    }`}
-                  >
-                    {isMiddle && (
-                      <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-400 text-amber-900 text-[10px] px-3 py-1 rounded-full flex items-center gap-1 whitespace-nowrap shadow-lg font-bold">
-                        <Star className="w-3 h-3 fill-current" />
-                        <span>الأكثر طلباً</span>
-                      </div>
-                    )}
-                    <div className="text-center">
-                      <div className={`text-[14px] font-bold ${isMiddle ? 'text-white' : 'text-[#1a3d2a]'}`}>{pkg.min_trees} شجرة</div>
-                      <div className={`text-[16px] font-black mt-1.5 ${isMiddle ? 'text-white' : 'text-[#16a34a]'}`}>
-                        {totalPrice.toLocaleString()}
-                      </div>
-                      <div className={`text-[10px] mt-0.5 ${isMiddle ? 'text-white/80' : 'text-gray-500'}`}>ر.س / سنة</div>
-                      {isMiddle && (
-                        <div className="mt-2 py-1 px-2 rounded-lg bg-white/20 backdrop-blur-sm">
-                          <span className="text-[10px] text-white font-semibold">+ سنتين مجاناً</span>
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Dots indicator */}
-            <div className="flex justify-center gap-2 mt-5">
-              {[0, 1, 2, 3, 4].map((dot) => (
-                <div
-                  key={dot}
-                  className={`rounded-full transition-all duration-300 ${dot === 1 ? 'w-6 h-2 bg-[#22c55e]' : 'w-2 h-2 bg-gray-300'}`}
-                />
-              ))}
-            </div>
+            )}
           </div>
 
           {/* === 3. BOOKING SUMMARY === */}
