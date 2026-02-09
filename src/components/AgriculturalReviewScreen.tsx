@@ -9,9 +9,11 @@ interface AgriculturalReviewScreenProps {
   treeCount: number;
   totalPrice: number;
   pricePerTree?: number;
-  onConfirm: () => void;
+  onConfirm: (useFlexiblePayment?: boolean) => void;
   onBack: () => void;
   isLoading?: boolean;
+  flexiblePaymentEnabled?: boolean;
+  paymentGracePeriodDays?: number;
 }
 
 export default function AgriculturalReviewScreen({
@@ -25,7 +27,9 @@ export default function AgriculturalReviewScreen({
   pricePerTree,
   onConfirm,
   onBack,
-  isLoading = false
+  isLoading = false,
+  flexiblePaymentEnabled = false,
+  paymentGracePeriodDays = 7
 }: AgriculturalReviewScreenProps) {
   console.log('🟢 تم تحميل صفحة الحجز الجديدة (الأشجار الخضراء) - التحديث 2026-02-08');
   const calculatedPricePerTree = pricePerTree || (treeCount > 0 ? Math.round(totalPrice / treeCount) : 0);
@@ -215,28 +219,57 @@ export default function AgriculturalReviewScreen({
                 </p>
               </div>
 
-              {/* Confirm Button */}
-              <button
-                onClick={onConfirm}
-                disabled={isLoading}
-                className="relative w-full py-5 bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group"
-                style={{ backgroundSize: '200% 100%' }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
-                <div className="relative flex items-center justify-center gap-3">
-                  {isLoading ? (
-                    <>
-                      <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                      <span className="text-lg">جاري التأكيد...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sprout className="w-6 h-6 group-hover:rotate-12 transition-transform" />
-                      <span className="text-lg">تأكيد ضم أشجارك إلى مزرعتك الآن</span>
-                    </>
-                  )}
+              {/* Payment Options - Immediate or Flexible */}
+              {flexiblePaymentEnabled ? (
+                <div className="space-y-4">
+                  {/* Immediate Payment Button */}
+                  <button
+                    onClick={() => onConfirm(false)}
+                    disabled={isLoading}
+                    className="relative w-full py-5 bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group"
+                  >
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
+                    <div className="relative flex items-center justify-center gap-3">
+                      <Sprout className="w-6 h-6" />
+                      <span className="text-lg">تأكيد الحجز والدفع الآن</span>
+                    </div>
+                  </button>
+
+                  {/* Flexible Payment Button */}
+                  <button
+                    onClick={() => onConfirm(true)}
+                    disabled={isLoading}
+                    className="relative w-full py-4 bg-white border-2 border-emerald-600 text-emerald-700 font-bold rounded-2xl shadow hover:shadow-lg transition-all duration-300 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed group"
+                  >
+                    <div className="flex items-center justify-center gap-2">
+                      <Clock className="w-5 h-5" />
+                      <span>تأكيد والدفع خلال {paymentGracePeriodDays} أيام</span>
+                    </div>
+                  </button>
                 </div>
-              </button>
+              ) : (
+                <button
+                  onClick={() => onConfirm(false)}
+                  disabled={isLoading}
+                  className="relative w-full py-5 bg-gradient-to-r from-emerald-600 via-green-600 to-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 active:scale-98 disabled:opacity-50 disabled:cursor-not-allowed overflow-hidden group"
+                  style={{ backgroundSize: '200% 100%' }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
+                  <div className="relative flex items-center justify-center gap-3">
+                    {isLoading ? (
+                      <>
+                        <div className="w-6 h-6 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span className="text-lg">جاري التأكيد...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sprout className="w-6 h-6 group-hover:rotate-12 transition-transform" />
+                        <span className="text-lg">تأكيد ضم أشجارك إلى مزرعتك الآن</span>
+                      </>
+                    )}
+                  </div>
+                </button>
+              )}
 
               {/* Terms */}
               <p className="text-xs text-center text-gray-500 leading-relaxed">
