@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight, Minus, Plus, Gift, Check } from 'lucide-react';
+import { ArrowRight, Minus, Plus, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import type { FarmProject, FarmContract } from '../services/farmService';
@@ -29,7 +29,6 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [showBookingFlow, setShowBookingFlow] = useState(false);
   const [isLoadingContract, setIsLoadingContract] = useState(false);
 
-  // Partner code state
   const [showPartnerInput, setShowPartnerInput] = useState(false);
   const [partnerCode, setPartnerCode] = useState('');
   const [isCodeVerified, setIsCodeVerified] = useState(false);
@@ -48,13 +47,11 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         const pkgs = await agriculturalPackagesService.getActivePackages();
         setPackages(pkgs);
 
-        // Auto select middle package if available
         if (pkgs.length >= 2) {
           const middlePackage = pkgs[1];
           setSelectedPackage(middlePackage);
           setTreeCount(middlePackage.min_trees);
 
-          // Load contract for this package
           const { data: contract } = await supabase
             .from('farm_contracts')
             .select('*')
@@ -125,7 +122,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
       if (isValid) {
         setIsCodeVerified(true);
-        setBonusYears(3); // Add 3 bonus years
+        setBonusYears(3);
         sessionStorage.setItem('influencer_code', partnerCode);
       } else {
         alert('الكود غير صحيح');
@@ -178,7 +175,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
-      {/* Background Image with Overlay */}
+      {/* Background Image */}
       <div className="absolute inset-0">
         {farm.heroImage || farm.image ? (
           <img
@@ -189,247 +186,268 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
         ) : (
           <div className="w-full h-full bg-gradient-to-br from-green-100 via-emerald-100 to-teal-100"></div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/40"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/30"></div>
       </div>
 
-      {/* Content Container - Scrollable */}
+      {/* Content */}
       <div className="relative h-full overflow-y-auto">
-        <div className="min-h-full flex flex-col">
-          {/* Header */}
-          <div className="flex-shrink-0 pt-8 pb-6 px-6">
-            <button
-              onClick={onClose}
-              className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center shadow-lg hover:bg-white transition-all mb-6"
-            >
-              <ArrowRight className="w-5 h-5 text-gray-800" />
-            </button>
+        <div className="min-h-full flex flex-col px-4 pt-6 pb-8">
+          {/* Back Button */}
+          <button
+            onClick={onClose}
+            className="w-11 h-11 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-all mb-8"
+          >
+            <ArrowRight className="w-5 h-5 text-gray-700" />
+          </button>
 
-            <div className="text-center">
-              <h1 className="text-3xl font-black text-white drop-shadow-2xl mb-2">
-                احجز أشجارك الآن
-              </h1>
-              <p className="text-white/90 text-base font-semibold drop-shadow-lg">
-                خطوة واحدة - عائد سنوي 15%
-              </p>
-            </div>
+          {/* Title */}
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-black text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] mb-1.5">
+              احجز أشجارك الآن
+            </h1>
+            <p className="text-white/95 text-sm font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.3)]">
+              خطوة واحدة - عائد سنوي 15%
+            </p>
           </div>
 
-          {/* Main Card - Glass Morphism */}
-          <div className="flex-1 px-4 pb-8">
-            <div
-              className="bg-gradient-to-br from-[#f5f0e8]/95 via-[#ebe5db]/95 to-[#e8e0d5]/95 backdrop-blur-xl rounded-[32px] shadow-[0_8px_32px_rgba(0,0,0,0.3)] border border-white/40 p-6 space-y-6"
-              style={{
-                boxShadow: '0 8px 32px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.5)'
-              }}
-            >
-              {/* Tree Counter Section */}
-              <div className="space-y-4">
-                <h2 className="text-center text-[#2d4a3e] font-bold text-lg">
-                  اختر عدد الأشجار للاستثمار
-                </h2>
+          {/* Main Card */}
+          <div
+            className="bg-[#f0ebe3]/95 backdrop-blur-xl rounded-[28px] shadow-[0_8px_32px_rgba(0,0,0,0.25)] border border-white/30 p-5 space-y-5"
+            style={{
+              boxShadow: '0 8px 32px rgba(0,0,0,0.25), inset 0 1px 3px rgba(255,255,255,0.4)'
+            }}
+          >
+            {/* Tree Counter Title */}
+            <h2 className="text-center text-[#3a4f45] font-bold text-base mb-1">
+              اختر عدد الأشجار للاستثمار
+            </h2>
 
-                {/* Counter Controls */}
-                <div className="flex items-center justify-center gap-6">
-                  <button
-                    onClick={() => handleTreeCountChange(-1)}
-                    disabled={treeCount <= 1}
-                    className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/80 to-[#e8e0d5]/60 border-2 border-[#d4c4b0]/50 flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
-                  >
-                    <Minus className="w-6 h-6 text-[#2d4a3e]" />
-                  </button>
-
-                  <div className="text-center min-w-[120px]">
-                    <div className="text-7xl font-black text-[#2d4a3e] leading-none">
-                      {treeCount}
-                    </div>
-                    <div className="text-base font-bold text-[#5a6d63] mt-1">شجرة</div>
-                  </div>
-
-                  <button
-                    onClick={() => handleTreeCountChange(1)}
-                    disabled={treeCount >= maxTrees}
-                    className="w-16 h-16 rounded-2xl bg-gradient-to-br from-white/80 to-[#e8e0d5]/60 border-2 border-[#d4c4b0]/50 flex items-center justify-center shadow-lg hover:shadow-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
-                  >
-                    <Plus className="w-6 h-6 text-[#2d4a3e]" />
-                  </button>
-                </div>
-
-                {/* Slider */}
-                <div className="px-2 space-y-2">
-                  <input
-                    type="range"
-                    min="1"
-                    max={maxTrees}
-                    value={treeCount}
-                    onChange={handleSliderChange}
-                    className="w-full h-3 rounded-full appearance-none cursor-pointer"
-                    style={{
-                      background: `linear-gradient(to right, #7c9885 0%, #7c9885 ${(treeCount / maxTrees) * 100}%, #d4c4b0 ${(treeCount / maxTrees) * 100}%, #d4c4b0 100%)`,
-                      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
-                    }}
-                  />
-                  <div className="flex items-center justify-between text-sm text-[#5a6d63] font-semibold px-1">
-                    <span className="flex items-center gap-1">
-                      <span className="text-xs">📊</span>
-                      ملكتك شجرة {maxTrees.toLocaleString()}-
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Packages Section */}
-              <div className="grid grid-cols-3 gap-3">
-                {packages.slice(0, 3).map((pkg, index) => {
-                  const isSelected = selectedPackage?.id === pkg.id;
-                  const isFeatured = index === 1; // Middle package
-
-                  return (
-                    <button
-                      key={pkg.id}
-                      onClick={() => handleSelectPackage(pkg)}
-                      className={`relative p-4 rounded-2xl border-2 transition-all ${
-                        isFeatured
-                          ? 'bg-gradient-to-br from-[#daa520] to-[#c89000] border-[#b8860b] shadow-xl'
-                          : 'bg-gradient-to-br from-white/70 to-[#e8e0d5]/50 border-[#d4c4b0]/50 shadow-lg'
-                      } ${isSelected && !isFeatured ? 'ring-2 ring-[#7c9885]' : ''}`}
-                    >
-                      {isFeatured && (
-                        <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-white text-[#daa520] text-[10px] font-black px-3 py-1 rounded-full shadow-lg flex items-center gap-1 whitespace-nowrap">
-                          <span>⭐</span>
-                          <span>أكثر طلباً</span>
-                        </div>
-                      )}
-
-                      <div className={`text-center space-y-2 ${isFeatured ? 'pt-2' : ''}`}>
-                        <div className={`text-base font-bold ${isFeatured ? 'text-white' : 'text-[#2d4a3e]'}`}>
-                          {pkg.min_trees} شجرة
-                        </div>
-                        <div className={`text-2xl font-black ${isFeatured ? 'text-white' : 'text-[#2d4a3e]'}`}>
-                          {(pkg.min_trees * pkg.price_per_tree).toLocaleString()}
-                          <span className="text-sm mr-1">ريس</span>
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Partner Code Section */}
-              <div className="space-y-3 pt-2">
-                {/* Toggle Question */}
-                <div className="flex items-center justify-between">
-                  <span className="text-[#2d4a3e] font-bold text-base">لديك كود شريك نجاح؟</span>
-                  <button
-                    onClick={() => setShowPartnerInput(!showPartnerInput)}
-                    className={`w-14 h-7 rounded-full transition-all ${
-                      showPartnerInput
-                        ? 'bg-gradient-to-r from-[#7c9885] to-[#6a8573]'
-                        : 'bg-gray-300'
-                    } relative`}
-                  >
-                    <div
-                      className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform ${
-                        showPartnerInput ? 'right-0.5' : 'right-7'
-                      }`}
-                    ></div>
-                  </button>
-                </div>
-
-                {/* Partner Code Input (when enabled) */}
-                {showPartnerInput && (
-                  <div className="space-y-3 animate-in slide-in-from-top duration-300">
-                    <p className="text-sm text-[#5a6d63] font-semibold flex items-center gap-2">
-                      <span>🌱</span>
-                      <span>أدخل الكود للحصول الان 3 + 3 سنوات</span>
-                    </p>
-
-                    <div className="flex gap-2">
-                      <div className="flex-1 relative">
-                        <input
-                          type="text"
-                          value={partnerCode}
-                          onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
-                          placeholder="PARTNER50"
-                          disabled={isCodeVerified}
-                          className={`w-full px-4 py-3 rounded-2xl border-2 font-bold text-[#2d4a3e] placeholder:text-[#a89f8f] text-center ${
-                            isCodeVerified
-                              ? 'bg-white/80 border-[#7c9885] text-[#2d4a3e]'
-                              : 'bg-white/60 border-[#d4c4b0]/50 focus:border-[#7c9885] focus:outline-none'
-                          }`}
-                        />
-                        {isCodeVerified && (
-                          <div className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#7c9885] flex items-center justify-center">
-                            <Check className="w-4 h-4 text-white" />
-                          </div>
-                        )}
-                      </div>
-
-                      {!isCodeVerified ? (
-                        <button
-                          onClick={handleVerifyPartnerCode}
-                          disabled={!partnerCode.trim()}
-                          className="px-6 py-3 rounded-2xl bg-gradient-to-br from-[#9d8456] to-[#8b7240] text-white font-black shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                        >
-                          {calculateTotal().toLocaleString()} ريس
-                        </button>
-                      ) : (
-                        <div className="px-6 py-3 rounded-2xl bg-gradient-to-br from-[#9d8456] to-[#8b7240] text-white font-black shadow-lg flex items-center whitespace-nowrap">
-                          {calculateTotal().toLocaleString()} ريس
-                        </div>
-                      )}
-                    </div>
-
-                    {isCodeVerified && (
-                      <p className="text-sm text-[#5a6d63] font-semibold text-center animate-in fade-in duration-500">
-                        تم تحصيل الكود بنجاح الان + 3 سنوات
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* Book Now Button */}
+            {/* Counter Controls */}
+            <div className="flex items-center justify-center gap-5 py-2">
               <button
-                onClick={handleBuyNow}
-                disabled={!selectedContract || treeCount === 0}
-                className="w-full py-5 rounded-2xl bg-gradient-to-r from-[#4a6b56] via-[#3d5c49] to-[#2d4a3e] text-white font-black text-xl shadow-2xl hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center justify-center gap-3"
+                onClick={() => handleTreeCountChange(-1)}
+                disabled={treeCount <= 1}
+                className="w-[52px] h-[52px] rounded-[18px] bg-gradient-to-b from-[#e8e3db] to-[#ddd7ce] border-2 border-[#c5bfb5]/40 flex items-center justify-center shadow-[0_3px_8px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                style={{
+                  boxShadow: '0 3px 8px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.6)'
+                }}
               >
-                <span>🔒</span>
-                <span>احجز الآن</span>
-                <span>{calculateTotal().toLocaleString()}</span>
+                <Minus className="w-5 h-5 text-[#3a4f45]" />
               </button>
 
-              {/* Safety Message */}
-              <p className="text-center text-sm text-[#5a6d63] font-semibold flex items-center justify-center gap-2">
-                <span>✅</span>
-                <span>آمن يمكنك الإلغاء حسب الشروط</span>
-              </p>
+              <div className="text-center min-w-[100px]">
+                <div className="text-[72px] font-black text-[#2d3e35] leading-none tracking-tight">
+                  {treeCount}
+                </div>
+                <div className="text-sm font-bold text-[#5a6b62] mt-0.5">شجرة</div>
+              </div>
+
+              <button
+                onClick={() => handleTreeCountChange(1)}
+                disabled={treeCount >= maxTrees}
+                className="w-[52px] h-[52px] rounded-[18px] bg-gradient-to-b from-[#e8e3db] to-[#ddd7ce] border-2 border-[#c5bfb5]/40 flex items-center justify-center shadow-[0_3px_8px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                style={{
+                  boxShadow: '0 3px 8px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.6)'
+                }}
+              >
+                <Plus className="w-5 h-5 text-[#3a4f45]" />
+              </button>
             </div>
+
+            {/* Slider */}
+            <div className="px-1 space-y-2 py-2">
+              <input
+                type="range"
+                min="1"
+                max={maxTrees}
+                value={treeCount}
+                onChange={handleSliderChange}
+                className="w-full h-[11px] rounded-full appearance-none cursor-pointer custom-slider"
+                style={{
+                  background: `linear-gradient(to right, #7a9587 0%, #7a9587 ${(treeCount / maxTrees) * 100}%, #c9bfb1 ${(treeCount / maxTrees) * 100}%, #c9bfb1 100%)`,
+                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.15)'
+                }}
+              />
+              <div className="flex items-center text-[13px] text-[#5a6b62] font-semibold px-0.5">
+                <span className="mr-1">📊</span>
+                <span>ملكتك شجرة {maxTrees.toLocaleString()}-</span>
+              </div>
+            </div>
+
+            {/* Quick Selection Cards */}
+            <div className="grid grid-cols-3 gap-2.5 pt-1">
+              {packages.slice(0, 3).map((pkg, index) => {
+                const isSelected = selectedPackage?.id === pkg.id;
+                const isFeatured = index === 1;
+
+                return (
+                  <button
+                    key={pkg.id}
+                    onClick={() => handleSelectPackage(pkg)}
+                    className={`relative rounded-[18px] transition-all ${
+                      isFeatured
+                        ? 'bg-gradient-to-b from-[#d4a574] to-[#b8894f] border-2 border-[#a37a45] shadow-[0_4px_12px_rgba(180,140,70,0.4)]'
+                        : 'bg-gradient-to-b from-white/90 to-[#f5f0e8]/80 border-2 border-[#d5cfc5]/50 shadow-[0_2px_8px_rgba(0,0,0,0.12)]'
+                    }`}
+                    style={{
+                      padding: isFeatured ? '20px 12px 16px' : '16px 12px',
+                      boxShadow: isFeatured
+                        ? '0 4px 12px rgba(180,140,70,0.4), inset 0 1px 2px rgba(255,255,255,0.3)'
+                        : '0 2px 8px rgba(0,0,0,0.12), inset 0 1px 2px rgba(255,255,255,0.5)'
+                    }}
+                  >
+                    {isFeatured && (
+                      <div className="absolute -top-2.5 left-1/2 transform -translate-x-1/2">
+                        <div className="bg-white rounded-full px-3 py-1 shadow-lg border border-[#e0d5c5]">
+                          <div className="flex items-center gap-1">
+                            <span className="text-[10px]">⭐</span>
+                            <span className="text-[10px] font-black text-[#b8894f] whitespace-nowrap">أكثر طلباً</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="text-center space-y-1.5">
+                      <div className={`text-sm font-bold ${isFeatured ? 'text-white' : 'text-[#3a4f45]'}`}>
+                        {pkg.min_trees} شجرة
+                      </div>
+                      <div className={`text-[22px] font-black leading-none ${isFeatured ? 'text-white' : 'text-[#2d3e35]'}`}>
+                        {(pkg.min_trees * pkg.price_per_tree).toLocaleString()}
+                        <span className="text-xs font-bold mr-0.5">ريس</span>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Partner Code Section */}
+            <div className="space-y-3 pt-2">
+              {/* Toggle Question */}
+              <div className="flex items-center justify-between">
+                <span className="text-[#3a4f45] font-bold text-[15px]">لديك كود شريك نجاح؟</span>
+                <button
+                  onClick={() => setShowPartnerInput(!showPartnerInput)}
+                  className={`w-[54px] h-7 rounded-full transition-all relative ${
+                    showPartnerInput ? 'bg-gradient-to-r from-[#6d8a76] to-[#5a7563]' : 'bg-[#c9c0b5]'
+                  }`}
+                  style={{
+                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+                  }}
+                >
+                  <div
+                    className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform ${
+                      showPartnerInput ? 'right-0.5' : 'right-[26px]'
+                    }`}
+                  ></div>
+                </button>
+              </div>
+
+              {/* Partner Code Input */}
+              {showPartnerInput && (
+                <div className="space-y-2.5 animate-in slide-in-from-top duration-300">
+                  <p className="text-[13px] text-[#5a6b62] font-semibold flex items-center gap-1.5">
+                    <span>🌱</span>
+                    <span>أدخل الكود للحصول الان 3 + 3 سنوات</span>
+                  </p>
+
+                  <div className="flex gap-2">
+                    <div className="flex-1 relative">
+                      <input
+                        type="text"
+                        value={partnerCode}
+                        onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
+                        placeholder="PARTNER50"
+                        disabled={isCodeVerified}
+                        className={`w-full px-4 py-3 rounded-[16px] border-2 font-bold text-[15px] text-center ${
+                          isCodeVerified
+                            ? 'bg-white/90 border-[#6d8a76] text-[#3a4f45]'
+                            : 'bg-white/80 border-[#d5cfc5] text-[#3a4f45] placeholder:text-[#a39a8f] focus:border-[#6d8a76] focus:outline-none'
+                        }`}
+                        style={{
+                          boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)'
+                        }}
+                      />
+                      {isCodeVerified && (
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#6d8a76] flex items-center justify-center shadow-md">
+                          <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={handleVerifyPartnerCode}
+                      disabled={!partnerCode.trim() || isCodeVerified}
+                      className="px-5 py-3 rounded-[16px] bg-gradient-to-b from-[#9d8760] to-[#8a7550] text-white font-black text-[15px] shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                      style={{
+                        boxShadow: '0 3px 8px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.2)'
+                      }}
+                    >
+                      {calculateTotal().toLocaleString()} ريس
+                    </button>
+                  </div>
+
+                  {isCodeVerified && (
+                    <p className="text-[13px] text-[#5a6b62] font-semibold text-center animate-in fade-in duration-500">
+                      تم تحصيل الكود بنجاح الان + 3 سنوات
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Book Now Button */}
+            <button
+              onClick={handleBuyNow}
+              disabled={!selectedContract || treeCount === 0}
+              className="w-full py-[18px] rounded-[18px] bg-gradient-to-b from-[#4a5f52] via-[#3e5246] to-[#344539] text-white font-black text-lg shadow-[0_6px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center justify-center gap-2.5"
+              style={{
+                boxShadow: '0 6px 20px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.15)'
+              }}
+            >
+              <span className="text-xl">🔒</span>
+              <span>احجز الآن</span>
+              <span>{calculateTotal().toLocaleString()}</span>
+            </button>
+
+            {/* Safety Message */}
+            <p className="text-center text-[13px] text-[#5a6b62] font-semibold flex items-center justify-center gap-2">
+              <span>✅</span>
+              <span>آمن يمكنك الإلغاء حسب الشروط</span>
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Custom Styles */}
+      {/* Custom Slider Styles */}
       <style>{`
-        input[type="range"]::-webkit-slider-thumb {
+        .custom-slider::-webkit-slider-thumb {
           appearance: none;
-          width: 28px;
-          height: 28px;
+          width: 26px;
+          height: 26px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #e8e0d5 0%, #f5f0e8 100%);
+          background: linear-gradient(145deg, #f0ebe3, #e3ddd5);
           cursor: pointer;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.8);
-          border: 3px solid #7c9885;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.6);
+          border: 3px solid #7a9587;
         }
 
-        input[type="range"]::-moz-range-thumb {
-          width: 28px;
-          height: 28px;
+        .custom-slider::-moz-range-thumb {
+          width: 26px;
+          height: 26px;
           border-radius: 50%;
-          background: linear-gradient(135deg, #e8e0d5 0%, #f5f0e8 100%);
+          background: linear-gradient(145deg, #f0ebe3, #e3ddd5);
           cursor: pointer;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.8);
-          border: 3px solid #7c9885;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.6);
+          border: 3px solid #7a9587;
+        }
+
+        .custom-slider::-webkit-slider-thumb:hover {
+          box-shadow: 0 3px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.6);
+        }
+
+        .custom-slider::-moz-range-thumb:hover {
+          box-shadow: 0 3px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.6);
         }
       `}</style>
     </div>
