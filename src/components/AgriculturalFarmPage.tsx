@@ -27,7 +27,6 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [selectedContract, setSelectedContract] = useState<FarmContract | null>(null);
   const [treeCount, setTreeCount] = useState(50);
   const [showBookingFlow, setShowBookingFlow] = useState(false);
-  const [isLoadingContract, setIsLoadingContract] = useState(false);
 
   const [showPartnerInput, setShowPartnerInput] = useState(false);
   const [partnerCode, setPartnerCode] = useState('');
@@ -36,8 +35,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
   useEffect(() => {
     if (farm.contracts && farm.contracts.length > 0) {
-      const firstContract = farm.contracts[0];
-      setSelectedContract(firstContract);
+      setSelectedContract(farm.contracts[0]);
     }
   }, [farm.contracts]);
 
@@ -93,7 +91,6 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   };
 
   const handleSelectPackage = async (pkg: AgriculturalPackage) => {
-    setIsLoadingContract(true);
     setSelectedPackage(pkg);
     setTreeCount(pkg.min_trees);
 
@@ -109,8 +106,6 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
       }
     } catch (error) {
       console.error('Error loading contract:', error);
-    } finally {
-      setIsLoadingContract(false);
     }
   };
 
@@ -174,8 +169,8 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-hidden">
-      {/* Background Image */}
+    <div className="fixed inset-0 z-50">
+      {/* Background */}
       <div className="absolute inset-0">
         {farm.heroImage || farm.image ? (
           <img
@@ -184,269 +179,305 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             className="w-full h-full object-cover"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-green-100 via-emerald-100 to-teal-100"></div>
+          <div className="w-full h-full bg-gradient-to-br from-green-200 via-emerald-200 to-teal-200"></div>
         )}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/10 to-black/30"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30"></div>
       </div>
 
       {/* Content */}
       <div className="relative h-full overflow-y-auto">
-        <div className="min-h-full flex flex-col px-4 pt-6 pb-8">
-          {/* Back Button */}
-          <button
-            onClick={onClose}
-            className="w-11 h-11 rounded-full bg-white/95 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-all mb-8"
-          >
-            <ArrowRight className="w-5 h-5 text-gray-700" />
-          </button>
+        <div className="min-h-full flex flex-col">
+          {/* Header */}
+          <div className="px-5 pt-6 pb-4">
+            <button
+              onClick={onClose}
+              className="w-11 h-11 rounded-full bg-white/95 backdrop-blur flex items-center justify-center shadow-lg mb-6"
+            >
+              <ArrowRight className="w-5 h-5 text-gray-700" />
+            </button>
 
-          {/* Title */}
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-black text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] mb-1.5">
-              احجز أشجارك الآن
-            </h1>
-            <p className="text-white/95 text-sm font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.3)]">
-              خطوة واحدة - عائد سنوي 15%
-            </p>
+            <div className="text-center mb-6">
+              <h1 className="text-[28px] font-black text-white leading-tight mb-1.5"
+                style={{ textShadow: '0 2px 12px rgba(0,0,0,0.4)' }}>
+                احجز أشجارك الآن
+              </h1>
+              <p className="text-white/95 text-sm font-semibold"
+                style={{ textShadow: '0 1px 6px rgba(0,0,0,0.3)' }}>
+                خطوة واحدة - عائد سنوي 15%
+              </p>
+            </div>
           </div>
 
           {/* Main Card */}
-          <div
-            className="bg-[#f0ebe3]/95 backdrop-blur-xl rounded-[28px] shadow-[0_8px_32px_rgba(0,0,0,0.25)] border border-white/30 p-5 space-y-5"
-            style={{
-              boxShadow: '0 8px 32px rgba(0,0,0,0.25), inset 0 1px 3px rgba(255,255,255,0.4)'
-            }}
-          >
-            {/* Tree Counter Title */}
-            <h2 className="text-center text-[#3a4f45] font-bold text-base mb-1">
-              اختر عدد الأشجار للاستثمار
-            </h2>
+          <div className="flex-1 px-4 pb-8">
+            <div
+              className="rounded-[32px] p-6 space-y-5"
+              style={{
+                background: 'linear-gradient(to bottom, rgba(240,235,227,0.97), rgba(235,229,219,0.97))',
+                backdropFilter: 'blur(20px)',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.5), inset 0 -1px 0 rgba(0,0,0,0.05)',
+                border: '1px solid rgba(255,255,255,0.3)'
+              }}
+            >
+              {/* Title */}
+              <h2 className="text-center font-bold text-[17px] leading-tight mb-1"
+                style={{ color: '#3a4f45' }}>
+                اختر عدد الأشجار للاستثمار
+              </h2>
 
-            {/* Counter Controls */}
-            <div className="flex items-center justify-center gap-5 py-2">
-              <button
-                onClick={() => handleTreeCountChange(-1)}
-                disabled={treeCount <= 1}
-                className="w-[52px] h-[52px] rounded-[18px] bg-gradient-to-b from-[#e8e3db] to-[#ddd7ce] border-2 border-[#c5bfb5]/40 flex items-center justify-center shadow-[0_3px_8px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
-                style={{
-                  boxShadow: '0 3px 8px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.6)'
-                }}
-              >
-                <Minus className="w-5 h-5 text-[#3a4f45]" />
-              </button>
-
-              <div className="text-center min-w-[100px]">
-                <div className="text-[72px] font-black text-[#2d3e35] leading-none tracking-tight">
-                  {treeCount}
-                </div>
-                <div className="text-sm font-bold text-[#5a6b62] mt-0.5">شجرة</div>
-              </div>
-
-              <button
-                onClick={() => handleTreeCountChange(1)}
-                disabled={treeCount >= maxTrees}
-                className="w-[52px] h-[52px] rounded-[18px] bg-gradient-to-b from-[#e8e3db] to-[#ddd7ce] border-2 border-[#c5bfb5]/40 flex items-center justify-center shadow-[0_3px_8px_rgba(0,0,0,0.15)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.2)] transition-all disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
-                style={{
-                  boxShadow: '0 3px 8px rgba(0,0,0,0.15), inset 0 1px 2px rgba(255,255,255,0.6)'
-                }}
-              >
-                <Plus className="w-5 h-5 text-[#3a4f45]" />
-              </button>
-            </div>
-
-            {/* Slider */}
-            <div className="px-1 space-y-2 py-2">
-              <input
-                type="range"
-                min="1"
-                max={maxTrees}
-                value={treeCount}
-                onChange={handleSliderChange}
-                className="w-full h-[11px] rounded-full appearance-none cursor-pointer custom-slider"
-                style={{
-                  background: `linear-gradient(to right, #7a9587 0%, #7a9587 ${(treeCount / maxTrees) * 100}%, #c9bfb1 ${(treeCount / maxTrees) * 100}%, #c9bfb1 100%)`,
-                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.15)'
-                }}
-              />
-              <div className="flex items-center text-[13px] text-[#5a6b62] font-semibold px-0.5">
-                <span className="mr-1">📊</span>
-                <span>ملكتك شجرة {maxTrees.toLocaleString()}-</span>
-              </div>
-            </div>
-
-            {/* Quick Selection Cards */}
-            <div className="grid grid-cols-3 gap-2.5 pt-1">
-              {packages.slice(0, 3).map((pkg, index) => {
-                const isSelected = selectedPackage?.id === pkg.id;
-                const isFeatured = index === 1;
-
-                return (
-                  <button
-                    key={pkg.id}
-                    onClick={() => handleSelectPackage(pkg)}
-                    className={`relative rounded-[18px] transition-all ${
-                      isFeatured
-                        ? 'bg-gradient-to-b from-[#d4a574] to-[#b8894f] border-2 border-[#a37a45] shadow-[0_4px_12px_rgba(180,140,70,0.4)]'
-                        : 'bg-gradient-to-b from-white/90 to-[#f5f0e8]/80 border-2 border-[#d5cfc5]/50 shadow-[0_2px_8px_rgba(0,0,0,0.12)]'
-                    }`}
-                    style={{
-                      padding: isFeatured ? '20px 12px 16px' : '16px 12px',
-                      boxShadow: isFeatured
-                        ? '0 4px 12px rgba(180,140,70,0.4), inset 0 1px 2px rgba(255,255,255,0.3)'
-                        : '0 2px 8px rgba(0,0,0,0.12), inset 0 1px 2px rgba(255,255,255,0.5)'
-                    }}
-                  >
-                    {isFeatured && (
-                      <div className="absolute -top-2.5 left-1/2 transform -translate-x-1/2">
-                        <div className="bg-white rounded-full px-3 py-1 shadow-lg border border-[#e0d5c5]">
-                          <div className="flex items-center gap-1">
-                            <span className="text-[10px]">⭐</span>
-                            <span className="text-[10px] font-black text-[#b8894f] whitespace-nowrap">أكثر طلباً</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <div className="text-center space-y-1.5">
-                      <div className={`text-sm font-bold ${isFeatured ? 'text-white' : 'text-[#3a4f45]'}`}>
-                        {pkg.min_trees} شجرة
-                      </div>
-                      <div className={`text-[22px] font-black leading-none ${isFeatured ? 'text-white' : 'text-[#2d3e35]'}`}>
-                        {(pkg.min_trees * pkg.price_per_tree).toLocaleString()}
-                        <span className="text-xs font-bold mr-0.5">ريس</span>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Partner Code Section */}
-            <div className="space-y-3 pt-2">
-              {/* Toggle Question */}
-              <div className="flex items-center justify-between">
-                <span className="text-[#3a4f45] font-bold text-[15px]">لديك كود شريك نجاح؟</span>
+              {/* Counter */}
+              <div className="flex items-center justify-center gap-5 py-3">
                 <button
-                  onClick={() => setShowPartnerInput(!showPartnerInput)}
-                  className={`w-[54px] h-7 rounded-full transition-all relative ${
-                    showPartnerInput ? 'bg-gradient-to-r from-[#6d8a76] to-[#5a7563]' : 'bg-[#c9c0b5]'
-                  }`}
+                  onClick={() => handleTreeCountChange(-1)}
+                  disabled={treeCount <= 1}
+                  className="w-14 h-14 rounded-[20px] flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 transition-transform"
                   style={{
-                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+                    background: 'linear-gradient(145deg, #e8e3db, #ddd7ce)',
+                    boxShadow: '0 3px 10px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.08)',
+                    border: '2px solid rgba(197,191,181,0.4)'
                   }}
                 >
-                  <div
-                    className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform ${
-                      showPartnerInput ? 'right-0.5' : 'right-[26px]'
-                    }`}
-                  ></div>
+                  <Minus className="w-5 h-5" style={{ color: '#3a4f45' }} />
+                </button>
+
+                <div className="text-center min-w-[110px]">
+                  <div className="font-black leading-none tracking-tight"
+                    style={{ fontSize: '76px', color: '#2d3e35' }}>
+                    {treeCount}
+                  </div>
+                  <div className="text-sm font-bold mt-1" style={{ color: '#5a6b62' }}>
+                    شجرة
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleTreeCountChange(1)}
+                  disabled={treeCount >= maxTrees}
+                  className="w-14 h-14 rounded-[20px] flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed active:scale-95 transition-transform"
+                  style={{
+                    background: 'linear-gradient(145deg, #e8e3db, #ddd7ce)',
+                    boxShadow: '0 3px 10px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.7), inset 0 -1px 0 rgba(0,0,0,0.08)',
+                    border: '2px solid rgba(197,191,181,0.4)'
+                  }}
+                >
+                  <Plus className="w-5 h-5" style={{ color: '#3a4f45' }} />
                 </button>
               </div>
 
-              {/* Partner Code Input */}
-              {showPartnerInput && (
-                <div className="space-y-2.5 animate-in slide-in-from-top duration-300">
-                  <p className="text-[13px] text-[#5a6b62] font-semibold flex items-center gap-1.5">
-                    <span>🌱</span>
-                    <span>أدخل الكود للحصول الان 3 + 3 سنوات</span>
-                  </p>
+              {/* Slider */}
+              <div className="px-2 space-y-2.5 py-1">
+                <input
+                  type="range"
+                  min="1"
+                  max={maxTrees}
+                  value={treeCount}
+                  onChange={handleSliderChange}
+                  className="w-full appearance-none cursor-pointer booking-slider"
+                  style={{
+                    height: '12px',
+                    borderRadius: '999px',
+                    background: `linear-gradient(to right, #7a9587 0%, #7a9587 ${(treeCount / maxTrees) * 100}%, #c9bfb1 ${(treeCount / maxTrees) * 100}%, #c9bfb1 100%)`,
+                    boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.15)'
+                  }}
+                />
+                <div className="flex items-center text-[13px] font-semibold" style={{ color: '#5a6b62' }}>
+                  <span className="mr-1.5">📊</span>
+                  <span>ملكتك شجرة {maxTrees.toLocaleString()}-</span>
+                </div>
+              </div>
 
-                  <div className="flex gap-2">
-                    <div className="flex-1 relative">
-                      <input
-                        type="text"
-                        value={partnerCode}
-                        onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
-                        placeholder="PARTNER50"
-                        disabled={isCodeVerified}
-                        className={`w-full px-4 py-3 rounded-[16px] border-2 font-bold text-[15px] text-center ${
-                          isCodeVerified
-                            ? 'bg-white/90 border-[#6d8a76] text-[#3a4f45]'
-                            : 'bg-white/80 border-[#d5cfc5] text-[#3a4f45] placeholder:text-[#a39a8f] focus:border-[#6d8a76] focus:outline-none'
-                        }`}
-                        style={{
-                          boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)'
-                        }}
-                      />
-                      {isCodeVerified && (
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-[#6d8a76] flex items-center justify-center shadow-md">
-                          <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
-                        </div>
-                      )}
-                    </div>
+              {/* Package Cards */}
+              <div className="grid grid-cols-3 gap-2.5 pt-1">
+                {packages.slice(0, 3).map((pkg, index) => {
+                  const isSelected = selectedPackage?.id === pkg.id;
+                  const isFeatured = index === 1;
 
+                  return (
                     <button
-                      onClick={handleVerifyPartnerCode}
-                      disabled={!partnerCode.trim() || isCodeVerified}
-                      className="px-5 py-3 rounded-[16px] bg-gradient-to-b from-[#9d8760] to-[#8a7550] text-white font-black text-[15px] shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                      key={pkg.id}
+                      onClick={() => handleSelectPackage(pkg)}
+                      className="relative rounded-[20px] transition-all active:scale-95"
                       style={{
-                        boxShadow: '0 3px 8px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.2)'
+                        padding: isFeatured ? '22px 10px 18px' : '18px 10px',
+                        ...(isFeatured ? {
+                          background: 'linear-gradient(to bottom, #d4a574, #b8894f)',
+                          boxShadow: '0 4px 12px rgba(180,140,70,0.45), inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -1px 0 rgba(0,0,0,0.1)',
+                          border: '2px solid #a37a45'
+                        } : {
+                          background: 'linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(245,240,232,0.85))',
+                          boxShadow: '0 2px 8px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 0 rgba(0,0,0,0.05)',
+                          border: '2px solid rgba(213,207,197,0.5)'
+                        })
                       }}
                     >
-                      {calculateTotal().toLocaleString()} ريس
+                      {isFeatured && (
+                        <div className="absolute -top-2.5 left-1/2 transform -translate-x-1/2">
+                          <div className="bg-white rounded-full px-3 py-1 shadow-lg flex items-center gap-1"
+                            style={{ border: '1px solid #e0d5c5' }}>
+                            <span className="text-[10px]">⭐</span>
+                            <span className="text-[10px] font-black whitespace-nowrap"
+                              style={{ color: '#b8894f' }}>
+                              أكثر طلباً
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="text-center space-y-1.5">
+                        <div className="text-sm font-bold"
+                          style={{ color: isFeatured ? '#ffffff' : '#3a4f45' }}>
+                          {pkg.min_trees} شجرة
+                        </div>
+                        <div className="font-black leading-none"
+                          style={{ fontSize: '23px', color: isFeatured ? '#ffffff' : '#2d3e35' }}>
+                          {(pkg.min_trees * pkg.price_per_tree).toLocaleString()}
+                          <span className="text-xs font-bold mr-1">ريس</span>
+                        </div>
+                      </div>
                     </button>
-                  </div>
+                  );
+                })}
+              </div>
 
-                  {isCodeVerified && (
-                    <p className="text-[13px] text-[#5a6b62] font-semibold text-center animate-in fade-in duration-500">
-                      تم تحصيل الكود بنجاح الان + 3 سنوات
-                    </p>
-                  )}
+              {/* Partner Code Section */}
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[15px]" style={{ color: '#3a4f45' }}>
+                    لديك كود شريك نجاح؟
+                  </span>
+                  <button
+                    onClick={() => setShowPartnerInput(!showPartnerInput)}
+                    className="relative transition-all"
+                    style={{
+                      width: '56px',
+                      height: '30px',
+                      borderRadius: '999px',
+                      background: showPartnerInput
+                        ? 'linear-gradient(to right, #6d8a76, #5a7563)'
+                        : '#c9c0b5',
+                      boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.2)'
+                    }}
+                  >
+                    <div
+                      className="absolute top-1 bg-white rounded-full shadow-md transition-all duration-300"
+                      style={{
+                        width: '22px',
+                        height: '22px',
+                        right: showPartnerInput ? '4px' : '30px'
+                      }}
+                    ></div>
+                  </button>
                 </div>
-              )}
+
+                {showPartnerInput && (
+                  <div className="space-y-3 animate-in slide-in-from-top duration-300">
+                    <p className="text-[13px] font-semibold flex items-center gap-1.5"
+                      style={{ color: '#5a6b62' }}>
+                      <span>🌱</span>
+                      <span>أدخل الكود للحصول الان 3 + 3 سنوات</span>
+                    </p>
+
+                    <div className="flex gap-2">
+                      <div className="flex-1 relative">
+                        <input
+                          type="text"
+                          value={partnerCode}
+                          onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
+                          placeholder="PARTNER50"
+                          disabled={isCodeVerified}
+                          className="w-full px-4 py-3 rounded-[18px] font-bold text-[15px] text-center transition-all"
+                          style={{
+                            background: isCodeVerified ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.8)',
+                            border: isCodeVerified ? '2px solid #6d8a76' : '2px solid #d5cfc5',
+                            color: '#3a4f45',
+                            boxShadow: 'inset 0 1px 3px rgba(0,0,0,0.1)',
+                            outline: 'none'
+                          }}
+                        />
+                        {isCodeVerified && (
+                          <div className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full flex items-center justify-center shadow-md"
+                            style={{ background: '#6d8a76' }}>
+                            <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                          </div>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={handleVerifyPartnerCode}
+                        disabled={!partnerCode.trim() || isCodeVerified}
+                        className="px-5 py-3 rounded-[18px] font-black text-[15px] text-white whitespace-nowrap transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{
+                          background: 'linear-gradient(to bottom, #9d8760, #8a7550)',
+                          boxShadow: '0 3px 10px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2)'
+                        }}
+                      >
+                        {calculateTotal().toLocaleString()} ريس
+                      </button>
+                    </div>
+
+                    {isCodeVerified && (
+                      <p className="text-[13px] font-semibold text-center animate-in fade-in duration-500"
+                        style={{ color: '#5a6b62' }}>
+                        تم تحصيل الكود بنجاح الان + 3 سنوات
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Book Button */}
+              <button
+                onClick={handleBuyNow}
+                disabled={!selectedContract || treeCount === 0}
+                className="w-full py-5 rounded-[20px] font-black text-lg text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center justify-center gap-2.5"
+                style={{
+                  background: 'linear-gradient(to bottom, #4a5f52, #3e5246, #344539)',
+                  boxShadow: '0 6px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)'
+                }}
+              >
+                <span className="text-xl">🔒</span>
+                <span>احجز الآن</span>
+                <span>{calculateTotal().toLocaleString()}</span>
+              </button>
+
+              {/* Safety Message */}
+              <p className="text-center text-[13px] font-semibold flex items-center justify-center gap-2"
+                style={{ color: '#5a6b62' }}>
+                <span>✅</span>
+                <span>آمن يمكنك الإلغاء حسب الشروط</span>
+              </p>
             </div>
-
-            {/* Book Now Button */}
-            <button
-              onClick={handleBuyNow}
-              disabled={!selectedContract || treeCount === 0}
-              className="w-full py-[18px] rounded-[18px] bg-gradient-to-b from-[#4a5f52] via-[#3e5246] to-[#344539] text-white font-black text-lg shadow-[0_6px_20px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.4)] transition-all disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] flex items-center justify-center gap-2.5"
-              style={{
-                boxShadow: '0 6px 20px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.15)'
-              }}
-            >
-              <span className="text-xl">🔒</span>
-              <span>احجز الآن</span>
-              <span>{calculateTotal().toLocaleString()}</span>
-            </button>
-
-            {/* Safety Message */}
-            <p className="text-center text-[13px] text-[#5a6b62] font-semibold flex items-center justify-center gap-2">
-              <span>✅</span>
-              <span>آمن يمكنك الإلغاء حسب الشروط</span>
-            </p>
           </div>
         </div>
       </div>
 
-      {/* Custom Slider Styles */}
       <style>{`
-        .custom-slider::-webkit-slider-thumb {
+        .booking-slider::-webkit-slider-thumb {
           appearance: none;
-          width: 26px;
-          height: 26px;
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           background: linear-gradient(145deg, #f0ebe3, #e3ddd5);
           cursor: pointer;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.6);
           border: 3px solid #7a9587;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.6);
         }
 
-        .custom-slider::-moz-range-thumb {
-          width: 26px;
-          height: 26px;
+        .booking-slider::-moz-range-thumb {
+          width: 28px;
+          height: 28px;
           border-radius: 50%;
           background: linear-gradient(145deg, #f0ebe3, #e3ddd5);
           cursor: pointer;
-          box-shadow: 0 2px 6px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.6);
           border: 3px solid #7a9587;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.6);
         }
 
-        .custom-slider::-webkit-slider-thumb:hover {
+        .booking-slider::-webkit-slider-thumb:hover {
           box-shadow: 0 3px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.6);
         }
 
-        .custom-slider::-moz-range-thumb:hover {
+        .booking-slider::-moz-range-thumb:hover {
           box-shadow: 0 3px 8px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.6);
         }
       `}</style>
