@@ -29,6 +29,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
   const [partnerCode, setPartnerCode] = useState('');
   const [isCodeVerified, setIsCodeVerified] = useState(false);
   const [bonusYears, setBonusYears] = useState(0);
+  const [verifiedPartnerName, setVerifiedPartnerName] = useState('');
 
   useEffect(() => {
     if (farm.contracts && farm.contracts.length > 0) {
@@ -140,14 +141,11 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
       if (result.isValid && result.partner) {
         setIsCodeVerified(true);
         setBonusYears(3);
+        setVerifiedPartnerName(result.partner.display_name || result.partner.name);
         sessionStorage.setItem('influencer_code', result.partner.partner_code);
-        alert(`تم تفعيل الكود: ${result.partner.display_name || result.partner.name}`);
-      } else {
-        alert(result.message || 'الكود غير صحيح');
       }
     } catch (error) {
       console.error('Error verifying code:', error);
-      alert('حدث خطأ في التحقق من الكود');
     }
   };
 
@@ -185,7 +183,7 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
         bonusYears={bonusYears || selectedPackage.bonus_free_years || selectedContract.bonus_years}
         totalPrice={calculateTotal()}
         pricePerTree={selectedPackage.price_per_tree}
-        influencerCode={isCodeVerified ? partnerCode : null}
+        influencerCode={isCodeVerified ? sessionStorage.getItem('influencer_code') : null}
         onBack={() => setShowBookingFlow(false)}
         onComplete={() => {
           setShowBookingFlow(false);
@@ -291,9 +289,14 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
             </div>
 
             {isCodeVerified && (
-              <div className="mt-3 py-2 px-3 rounded-lg bg-gradient-to-l from-amber-50 to-amber-100 border border-amber-200 flex items-center justify-center gap-2">
-                <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
-                <span className="text-[12px] text-amber-700 font-bold">مبروك! حصلت على +{bonusYears} سنوات مجاناً</span>
+              <div className="mt-3 py-2 px-3 rounded-lg bg-gradient-to-l from-amber-50 to-amber-100 border border-amber-200">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                  <span className="text-[13px] text-amber-700 font-bold">تم تفعيل كود: {verifiedPartnerName}</span>
+                </div>
+                <div className="text-center">
+                  <span className="text-[12px] text-amber-600 font-semibold">مبروك! حصلت على +{bonusYears} سنوات مجاناً</span>
+                </div>
               </div>
             )}
           </div>
