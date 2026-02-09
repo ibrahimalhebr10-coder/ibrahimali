@@ -131,13 +131,9 @@ export default function FlexiblePaymentSuccessScreen({
                   </div>
                   <div className="flex-1 text-right">
                     <h3 className="text-2xl font-black text-blue-900 mb-4">خطة الدفع المرنة</h3>
-                    <p className="text-lg text-blue-800 leading-relaxed mb-4">
-                      لديك <span className="font-black text-2xl text-blue-600">{paymentDeadlineDays} يوم</span> لإتمام الدفع بكل راحة ومرونة.
-                    </p>
-                    <div className="bg-white/80 rounded-xl p-4 border border-blue-200">
+                    <div className="bg-white/80 rounded-xl p-5 border border-blue-200">
                       <p className="text-base text-blue-700 leading-relaxed">
-                        سنتواصل معك عبر الواتساب والبريد الإلكتروني بجميع التفاصيل والتحديثات.
-                        يمكنك إتمام الدفع في أي وقت خلال هذه الفترة، ونحن دائماً في خدمتك.
+                        سوف يكون الدفع متاحاً بعد اكتمال تأجير جميع أشجار المزرعة، بعدها سيتم التواصل معك لضم أشجارك إلى حسابك إن شاء الله.
                       </p>
                     </div>
                   </div>

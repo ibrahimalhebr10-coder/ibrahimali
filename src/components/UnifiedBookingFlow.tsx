@@ -264,7 +264,9 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         treeCount={props.treeCount}
         totalPrice={props.totalPrice}
         paymentDeadlineDays={paymentGracePeriodDays}
-        onGoToHome={props.onComplete}
+        onGoToHome={() => {
+          window.location.href = '/';
+        }}
         onGoToAccount={() => {
           window.location.href = '/account';
         }}
