@@ -3,6 +3,7 @@ import AgriculturalReviewScreen from './AgriculturalReviewScreen';
 import InvestmentReviewScreen from './InvestmentReviewScreen';
 import StandaloneAccountRegistration from './StandaloneAccountRegistration';
 import PaymentPage from './PaymentPage';
+import FlexiblePaymentSuccessScreen from './FlexiblePaymentSuccessScreen';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { systemSettingsService } from '../services/systemSettingsService';
@@ -26,7 +27,7 @@ interface UnifiedBookingFlowProps {
   onComplete: () => void;
 }
 
-type FlowStep = 'review' | 'registration' | 'payment' | 'success';
+type FlowStep = 'review' | 'registration' | 'payment' | 'success' | 'flexible-success';
 
 export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
   const { user } = useAuth();
@@ -145,9 +146,9 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         console.log('👤 [UNIFIED] زائر غير مسجل - التوجيه للتسجيل');
         setCurrentStep('registration');
       } else if (useFlexiblePayment) {
-        // المستخدم مسجل واختار الدفع المرن - إغلاق الحجز مباشرة
-        console.log('✅ [UNIFIED] مستخدم مسجل + دفع مرن - إغلاق الحجز');
-        props.onComplete();
+        // المستخدم مسجل واختار الدفع المرن - صفحة النجاح المرنة
+        console.log('✅ [UNIFIED] مستخدم مسجل + دفع مرن - صفحة النجاح المرنة');
+        setCurrentStep('flexible-success');
       } else {
         // المستخدم مسجل واختار الدفع الفوري - صفحة الدفع
         console.log('💳 [UNIFIED] مستخدم مسجل + دفع فوري - صفحة الدفع');
@@ -168,10 +169,10 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
           .update({ user_id: user.id })
           .eq('id', reservationId);
 
-        // إذا كان المستخدم اختار الدفع المرن، نغلق الحجز مباشرة
+        // إذا كان المستخدم اختار الدفع المرن، نذهب لصفحة النجاح المرنة
         if (isFlexiblePaymentChosen) {
-          console.log('✅ [UNIFIED] بعد التسجيل - إغلاق الحجز (دفع مرن)');
-          props.onComplete();
+          console.log('✅ [UNIFIED] بعد التسجيل - التوجيه لصفحة النجاح المرنة');
+          setCurrentStep('flexible-success');
         } else {
           console.log('💳 [UNIFIED] بعد التسجيل - التوجيه لصفحة الدفع');
           setCurrentStep('payment');
@@ -179,19 +180,11 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
       } catch (error) {
         console.error('Error updating reservation:', error);
         // في حالة الخطأ، نستمر حسب نوع الدفع المختار
-        if (isFlexiblePaymentChosen) {
-          props.onComplete();
-        } else {
-          setCurrentStep('payment');
-        }
+        setCurrentStep(isFlexiblePaymentChosen ? 'flexible-success' : 'payment');
       }
     } else {
       // احتياطي: إذا لم يكن هناك reservationId أو user
-      if (isFlexiblePaymentChosen) {
-        props.onComplete();
-      } else {
-        setCurrentStep('payment');
-      }
+      setCurrentStep(isFlexiblePaymentChosen ? 'flexible-success' : 'payment');
     }
   };
 
@@ -261,6 +254,22 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
 
   if (currentStep === 'success') {
     return null;
+  }
+
+  if (currentStep === 'flexible-success') {
+    return (
+      <FlexiblePaymentSuccessScreen
+        reservationId={reservationId}
+        farmName={props.farmName}
+        treeCount={props.treeCount}
+        totalPrice={props.totalPrice}
+        paymentDeadlineDays={paymentGracePeriodDays}
+        onGoToHome={props.onComplete}
+        onGoToAccount={() => {
+          window.location.href = '/account';
+        }}
+      />
+    );
   }
 
   return null;
