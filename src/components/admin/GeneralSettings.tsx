@@ -18,15 +18,15 @@ const GeneralSettings: React.FC = () => {
   ];
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Header - ثابت */}
-      <div className="mb-6 flex-shrink-0">
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">الإعدادات العامة</h1>
         <p className="text-gray-600">إدارة إعدادات النظام والتكامل</p>
       </div>
 
-      {/* Tabs - ثابت */}
-      <div className="flex gap-2 mb-6 overflow-x-auto flex-shrink-0">
+      {/* Tabs */}
+      <div className="flex gap-2 overflow-x-auto">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
@@ -48,16 +48,12 @@ const GeneralSettings: React.FC = () => {
         })}
       </div>
 
-      {/* Content - قابل للتمرير */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Content */}
+      <div>
         {activeTab === 'flexible-payment' ? (
-          <div className="h-full">
-            <FlexiblePaymentSettings />
-          </div>
+          <FlexiblePaymentSettings />
         ) : activeTab === 'payments' ? (
-          <div className="h-full">
-            <PaymentProvidersManager />
-          </div>
+          <PaymentProvidersManager />
         ) : (
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
             <div className="text-center max-w-md mx-auto py-8">

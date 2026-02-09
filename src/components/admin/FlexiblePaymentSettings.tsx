@@ -159,8 +159,7 @@ export default function FlexiblePaymentSettings() {
   }
 
   return (
-    <div className="h-full overflow-y-auto px-2">
-      <div className="max-w-4xl mx-auto space-y-5 pb-8 pt-2">
+    <div className="max-w-4xl mx-auto space-y-5">
         {/* العنوان */}
         <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-start gap-3">
@@ -274,6 +273,5 @@ export default function FlexiblePaymentSettings() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
