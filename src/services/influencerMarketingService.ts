@@ -330,7 +330,7 @@ export const influencerMarketingService = {
 
     const { data, error } = await supabase
       .from('influencer_rewards_details')
-      .select('referral_code, partner_name, total_bookings, total_trees_booked, total_rewards_earned, trees_in_current_batch, trees_until_next_reward, progress_percentage, trees_required_for_reward')
+      .select('referral_code, partner_code, partner_name, total_bookings, total_trees_booked, total_rewards_earned, trees_in_current_batch, trees_until_next_reward, progress_percentage, trees_required_for_reward')
       .eq('user_id', userId)
       .eq('is_active', true)
       .maybeSingle();
@@ -350,6 +350,7 @@ export const influencerMarketingService = {
     return {
       name: data.referral_code,
       display_name: data.partner_name,
+      partner_code: data.partner_code,
       total_bookings: data.total_bookings,
       total_trees_booked: data.total_trees_booked,
       total_rewards_earned: data.total_rewards_earned,
