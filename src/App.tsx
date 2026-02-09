@@ -1069,8 +1069,12 @@ function AppContent() {
                       <div
                         className="absolute top-1 left-1/2 -translate-x-1/2 z-20 px-5 py-1.5 rounded-full"
                         style={{
-                          background: 'linear-gradient(180deg, #4a9d7c 0%, #357a5c 50%, #2d6a4f 100%)',
-                          boxShadow: '0 3px 10px rgba(45, 106, 79, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
+                          background: appMode === 'agricultural'
+                            ? 'linear-gradient(180deg, #4a9d7c 0%, #357a5c 50%, #2d6a4f 100%)'
+                            : 'linear-gradient(180deg, #d4af37 0%, #c4a030 50%, #b89020 100%)',
+                          boxShadow: appMode === 'agricultural'
+                            ? '0 3px 10px rgba(45, 106, 79, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)'
+                            : '0 3px 10px rgba(184, 144, 32, 0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
                           border: '1px solid rgba(255,255,255,0.1)'
                         }}
                       >
@@ -1130,7 +1134,11 @@ function AppContent() {
                             <span className="text-[14px] font-bold" style={{ color: '#3a3a3a' }}>
                               {totalTrees} شجرة متاحة للاستثمار
                             </span>
-                            <CheckCircle2 className="w-5 h-5 text-green-600" strokeWidth={2.5} />
+                            <CheckCircle2
+                              className="w-5 h-5"
+                              style={{ color: appMode === 'agricultural' ? '#16a34a' : '#f59e0b' }}
+                              strokeWidth={2.5}
+                            />
                           </div>
 
                           {/* Progress Bar Section */}
@@ -1143,12 +1151,14 @@ function AppContent() {
                                 boxShadow: 'inset 0 1px 2px rgba(0,0,0,0.06)'
                               }}
                             >
-                              {/* Available - Green from right */}
+                              {/* Available - Green or Gold based on mode */}
                               <div
                                 className="absolute right-0 top-0 h-full rounded-r-full"
                                 style={{
                                   width: `${availablePercentage}%`,
-                                  background: 'linear-gradient(90deg, #6ee7b7 0%, #34d399 30%, #10b981 60%, #059669 100%)',
+                                  background: appMode === 'agricultural'
+                                    ? 'linear-gradient(90deg, #6ee7b7 0%, #34d399 30%, #10b981 60%, #059669 100%)'
+                                    : 'linear-gradient(90deg, #fde68a 0%, #fcd34d 30%, #fbbf24 60%, #f59e0b 100%)',
                                 }}
                               />
                               {/* Reserved - Yellow/Orange */}
@@ -1169,7 +1179,11 @@ function AppContent() {
                               {/* Right side - Available */}
                               <div className="flex items-center gap-1">
                                 <span className="font-bold text-[11px]" style={{ color: '#555' }}>متاح</span>
-                                <div className="w-2.5 h-2.5 rounded-full" style={{ background: 'linear-gradient(135deg, #34d399 0%, #059669 100%)' }} />
+                                <div className="w-2.5 h-2.5 rounded-full" style={{
+                                  background: appMode === 'agricultural'
+                                    ? 'linear-gradient(135deg, #34d399 0%, #059669 100%)'
+                                    : 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)'
+                                }} />
                               </div>
                               {/* Center - Reserved */}
                               <div className="flex items-center gap-1">
@@ -1188,7 +1202,13 @@ function AppContent() {
                             <span className="font-semibold text-[11px]" style={{ color: '#777' }}>
                               الإدارة والمتابعة من فريق متخصص
                             </span>
-                            <Star className="w-4 h-4 text-amber-400 fill-amber-400" />
+                            <Star
+                              className="w-4 h-4"
+                              style={{
+                                color: appMode === 'agricultural' ? '#fbbf24' : '#f59e0b',
+                                fill: appMode === 'agricultural' ? '#fbbf24' : '#f59e0b'
+                              }}
+                            />
                           </div>
                         </div>
                       </div>
