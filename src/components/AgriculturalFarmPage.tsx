@@ -129,8 +129,12 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   };
 
   const handleBuyNow = () => {
-    if ((!selectedContract && !selectedPackage) || treeCount === 0) {
+    if (!selectedPackage || treeCount === 0) {
       alert('يرجى اختيار باقة وعدد الأشجار');
+      return;
+    }
+    if (!selectedContract) {
+      alert('جاري تحميل بيانات العقد، يرجى الانتظار...');
       return;
     }
     setShowBookingFlow(true);
@@ -143,21 +147,21 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     }
   };
 
-  if (showBookingFlow && selectedContract) {
+  if (showBookingFlow && selectedPackage && selectedContract) {
     return (
       <UnifiedBookingFlow
         farmId={farm.id}
         farmName={farm.name}
         farmLocation={farm.location}
         pathType="agricultural"
-        packageName={selectedPackage?.package_name || selectedContract.contract_name}
+        packageName={selectedPackage.package_name}
         treeCount={treeCount}
         contractId={selectedContract.id}
         contractName={selectedContract.contract_name}
-        durationYears={selectedPackage?.contract_years || selectedContract.duration_years}
-        bonusYears={bonusYears || selectedPackage?.bonus_years || selectedContract.bonus_years}
+        durationYears={selectedPackage.contract_years || selectedContract.duration_years}
+        bonusYears={bonusYears || selectedPackage.bonus_years || selectedContract.bonus_years}
         totalPrice={calculateTotal()}
-        pricePerTree={selectedPackage?.price_per_tree || selectedContract.farmer_price || selectedContract.investor_price || 0}
+        pricePerTree={selectedPackage.price_per_tree}
         influencerCode={isCodeVerified ? partnerCode : null}
         onBack={() => setShowBookingFlow(false)}
         onComplete={() => {
@@ -235,7 +239,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
 
             <div className="grid grid-cols-3 gap-2 pt-1">
               {packages.slice(0, 3).map((pkg, index) => {
-                const isMiddle = index === 1;
+                const isPopular = index === 1;
                 const isSelected = selectedPackage?.id === pkg.id;
                 const totalPrice = pkg.price_per_tree * pkg.min_trees;
 
@@ -244,28 +248,26 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                     key={pkg.id}
                     onClick={() => handleSelectPackage(pkg)}
                     className={`relative py-2.5 px-1.5 rounded-xl transition-all duration-300 ${
-                      isMiddle
+                      isSelected
                         ? 'bg-gradient-to-b from-[#22c55e] to-[#16a34a] border-2 border-[#22c55e] shadow-lg shadow-green-500/25 scale-[1.03] -mt-0.5'
-                        : isSelected
-                          ? 'bg-white border-2 border-[#22c55e] shadow-md'
-                          : 'bg-white border border-gray-200 hover:border-[#22c55e]/50 hover:shadow-md'
+                        : 'bg-white border border-gray-200 hover:border-[#22c55e]/50 hover:shadow-md active:scale-95'
                     }`}
                   >
-                    {isMiddle && (
+                    {isPopular && (
                       <div className="absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-amber-400 text-amber-900 text-[8px] px-2 py-0.5 rounded-full flex items-center gap-0.5 whitespace-nowrap shadow-md font-bold">
                         <Star className="w-2 h-2 fill-current" />
                         <span>الأكثر طلباً</span>
                       </div>
                     )}
                     <div className="text-center">
-                      <div className={`text-[12px] font-bold ${isMiddle ? 'text-white' : 'text-[#1a3d2a]'}`}>{pkg.min_trees} شجرة</div>
-                      <div className={`text-[14px] font-black mt-1 ${isMiddle ? 'text-white' : 'text-[#16a34a]'}`}>
+                      <div className={`text-[12px] font-bold ${isSelected ? 'text-white' : 'text-[#1a3d2a]'}`}>{pkg.min_trees} شجرة</div>
+                      <div className={`text-[14px] font-black mt-1 ${isSelected ? 'text-white' : 'text-[#16a34a]'}`}>
                         {totalPrice.toLocaleString()}
                       </div>
-                      <div className={`text-[9px] ${isMiddle ? 'text-white/80' : 'text-gray-500'}`}>ر.س / سنة</div>
-                      {isMiddle && (
-                        <div className="mt-1 py-0.5 px-1.5 rounded-md bg-white/20 backdrop-blur-sm">
-                          <span className="text-[8px] text-white font-semibold">+ سنتين مجاناً</span>
+                      <div className={`text-[9px] ${isSelected ? 'text-white/80' : 'text-gray-500'}`}>ر.س / سنة</div>
+                      {pkg.bonus_years > 0 && (
+                        <div className={`mt-1 py-0.5 px-1.5 rounded-md ${isSelected ? 'bg-white/20 backdrop-blur-sm' : 'bg-[#dcfce7]'}`}>
+                          <span className={`text-[8px] font-semibold ${isSelected ? 'text-white' : 'text-[#16a34a]'}`}>+ {pkg.bonus_years} سنة مجاناً</span>
                         </div>
                       )}
                     </div>
@@ -274,14 +276,18 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               })}
             </div>
 
-            {/* Dots indicator */}
+            {/* Dots indicator - shows selected package index */}
             <div className="flex justify-center gap-1.5 mt-3">
-              {[0, 1, 2, 3, 4].map((dot) => (
-                <div
-                  key={dot}
-                  className={`rounded-full transition-all duration-300 ${dot === 1 ? 'w-5 h-1.5 bg-[#22c55e]' : 'w-1.5 h-1.5 bg-gray-300'}`}
-                />
-              ))}
+              {packages.slice(0, 3).map((pkg, index) => {
+                const isActive = selectedPackage?.id === pkg.id;
+                return (
+                  <div
+                    key={pkg.id}
+                    onClick={() => handleSelectPackage(pkg)}
+                    className={`rounded-full transition-all duration-300 cursor-pointer ${isActive ? 'w-5 h-1.5 bg-[#22c55e]' : 'w-1.5 h-1.5 bg-gray-300 hover:bg-gray-400'}`}
+                  />
+                );
+              })}
             </div>
           </div>
 
@@ -341,6 +347,15 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               <h2 className="text-[17px] font-bold text-[#1a3d2a]">حدد عدد الأشجار</h2>
             </div>
 
+            {/* Live Price Display */}
+            {selectedPackage && (
+              <div className="text-center mb-4 py-2 px-4 rounded-xl bg-gradient-to-l from-[#fef3c7] to-[#fef9c3] border border-amber-200">
+                <span className="text-[12px] text-amber-700">السعر الحالي: </span>
+                <span className="text-[16px] font-black text-amber-600">{calculateTotal().toLocaleString()}</span>
+                <span className="text-[11px] text-amber-600 mr-1">ر.س</span>
+              </div>
+            )}
+
             {/* Counter with +/- buttons */}
             <div className="flex items-center justify-center gap-4 mb-5">
               <button
@@ -399,24 +414,34 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               ملخص الحجز
             </h3>
             <div className="space-y-2">
+              {selectedPackage && (
+                <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                  <span className="text-[13px] text-gray-500">الباقة المختارة</span>
+                  <span className="text-[14px] font-bold text-[#16a34a]">{selectedPackage.package_name}</span>
+                </div>
+              )}
               <div className="flex items-center justify-between py-2 border-b border-gray-100">
                 <span className="text-[13px] text-gray-500">عدد الأشجار</span>
                 <span className="text-[14px] font-bold text-[#1a3d2a]">{treeCount} شجرة</span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                <span className="text-[13px] text-gray-500">سعر الشجرة</span>
+                <span className="text-[14px] font-bold text-[#1a3d2a]">{(selectedPackage?.price_per_tree || 0).toLocaleString()} ر.س</span>
+              </div>
+              <div className="flex items-center justify-between py-2 border-b border-gray-100">
                 <span className="text-[13px] text-gray-500">مدة العقد</span>
-                <span className="text-[14px] font-bold text-[#1a3d2a]">سنة واحدة</span>
+                <span className="text-[14px] font-bold text-[#1a3d2a]">{selectedPackage?.contract_years || 1} سنة</span>
               </div>
               {(bonusYears > 0 || (selectedPackage?.bonus_years || 0) > 0) && (
                 <div className="flex items-center justify-between py-2 border-b border-gray-100">
                   <span className="text-[13px] text-gray-500">مدة إضافية مجانية</span>
-                  <span className="text-[14px] font-bold text-[#16a34a]">+{bonusYears || selectedPackage?.bonus_years || 0} سنوات</span>
+                  <span className="text-[14px] font-bold text-[#16a34a]">+{bonusYears || selectedPackage?.bonus_years || 0} سنة</span>
                 </div>
               )}
-              <div className="flex items-center justify-between pt-2">
-                <span className="text-[14px] font-bold text-[#1a3d2a]">الإجمالي</span>
+              <div className="flex items-center justify-between pt-3 mt-1 border-t-2 border-[#22c55e]/20">
+                <span className="text-[15px] font-bold text-[#1a3d2a]">الإجمالي</span>
                 <div className="text-left">
-                  <span className="text-[20px] font-black text-[#16a34a]">{calculateTotal().toLocaleString()}</span>
+                  <span className="text-[22px] font-black text-[#16a34a]">{calculateTotal().toLocaleString()}</span>
                   <span className="text-[12px] text-gray-500 mr-1">ر.س</span>
                 </div>
               </div>
@@ -427,7 +452,7 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
           <div className="mb-4">
             <button
               onClick={handleBuyNow}
-              disabled={!selectedContract || treeCount === 0}
+              disabled={!selectedPackage || treeCount === 0}
               className="w-full py-4 bg-gradient-to-l from-[#16a34a] via-[#22c55e] to-[#16a34a] rounded-2xl font-bold text-[18px] text-white shadow-xl shadow-green-500/30 hover:shadow-2xl hover:shadow-green-500/40 hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3 relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/10 to-transparent animate-shimmer"></div>
