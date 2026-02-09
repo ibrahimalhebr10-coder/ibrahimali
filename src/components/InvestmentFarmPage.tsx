@@ -142,9 +142,10 @@ export default function InvestmentFarmPage({ farm, onClose, onGoToAccount }: Inv
 
       if (result.isValid && result.partner) {
         setIsCodeVerified(true);
-        setBonusYears(3);
+        setBonusYears(result.partner.bonus_years || 3);
         setVerifiedPartnerName(result.partner.display_name || result.partner.name);
         sessionStorage.setItem('influencer_code', result.partner.partner_code);
+        sessionStorage.setItem('influencer_bonus_years', String(result.partner.bonus_years || 3));
 
         // تحميل إعدادات الباقة المميزة
         const settings = await influencerMarketingService.getFeaturedPackageSettings();

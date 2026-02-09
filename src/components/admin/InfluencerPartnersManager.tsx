@@ -14,7 +14,8 @@ import {
   LogIn,
   Phone,
   Copy,
-  Gift
+  Gift,
+  Calendar
 } from 'lucide-react';
 import {
   influencerMarketingService,
@@ -25,6 +26,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { impersonationService } from '../../services/impersonationService';
 import { useAuth } from '../../contexts/AuthContext';
+import PartnerCodeSettings from './PartnerCodeSettings';
 
 export default function InfluencerPartnersManager() {
   const { user } = useAuth();
@@ -33,6 +35,7 @@ export default function InfluencerPartnersManager() {
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showBonusSettings, setShowBonusSettings] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -269,6 +272,13 @@ export default function InfluencerPartnersManager() {
 
           <div className="flex gap-2">
             <button
+              onClick={() => setShowBonusSettings(true)}
+              className="px-4 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors flex items-center gap-2"
+            >
+              <Calendar className="w-4 h-4" />
+              السنوات المجانية
+            </button>
+            <button
               onClick={() => setShowSettings(true)}
               className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors flex items-center gap-2"
             >
@@ -319,6 +329,7 @@ export default function InfluencerPartnersManager() {
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">اسم العرض</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">رقم الجوال</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الكود المميز</th>
+                <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">السنوات المجانية</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الحالة</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الحجوزات</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الأشجار</th>
@@ -378,6 +389,13 @@ export default function InfluencerPartnersManager() {
                       ) : (
                         <span className="text-slate-400">-</span>
                       )}
+                    </td>
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 font-bold">
+                          +{partner.bonus_years || 3} سنوات
+                        </span>
+                      </div>
                     </td>
                     <td className="py-3 px-4">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
@@ -679,6 +697,35 @@ export default function InfluencerPartnersManager() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Bonus Years Settings Modal */}
+      {showBonusSettings && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between rounded-t-2xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">إعدادات السنوات المجانية</h3>
+                  <p className="text-sm text-gray-500">إدارة السنوات المجانية لأكواد الشركاء</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowBonusSettings(false)}
+                className="w-8 h-8 rounded-lg hover:bg-gray-100 flex items-center justify-center transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-600" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <PartnerCodeSettings />
+            </div>
           </div>
         </div>
       )}

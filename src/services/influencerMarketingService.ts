@@ -10,6 +10,7 @@ export interface InfluencerPartner {
   user_id: string | null;
   is_active: boolean;
   status: string | null;
+  bonus_years: number;
   total_bookings: number;
   total_trees_booked: number;
   total_rewards_earned: number;
