@@ -117,6 +117,68 @@ export const paymentService = {
     }
 
     console.log('🎉 [paymentService] completePayment success:', data);
+
+    // تحديث حالة الحجز إلى confirmed
+    if (data.reservation_id) {
+      console.log('📝 [paymentService] Updating reservation status to confirmed...');
+
+      const { data: reservationData, error: reservationError } = await supabase
+        .from('reservations')
+        .update({ status: 'confirmed' })
+        .eq('id', data.reservation_id)
+        .select('id, tree_count, influencer_code')
+        .single();
+
+      if (reservationError) {
+        console.error('❌ [paymentService] Error updating reservation:', reservationError);
+      } else {
+        console.log('✅ [paymentService] Reservation updated successfully');
+
+        // تحديث إحصائيات المؤثر إذا كان هناك كود مؤثر
+        if (reservationData.influencer_code) {
+          console.log('🎯 [paymentService] Influencer code found:', reservationData.influencer_code);
+          console.log('🎯 [paymentService] Updating influencer stats...');
+
+          try {
+            const { data: influencerResult, error: influencerError } = await supabase
+              .rpc('update_influencer_stats_after_payment', {
+                p_influencer_code: reservationData.influencer_code,
+                p_trees_count: reservationData.tree_count,
+                p_reservation_id: reservationData.id
+              });
+
+            if (influencerError) {
+              console.error('❌ [paymentService] Error updating influencer stats:', influencerError);
+            } else {
+              console.log('🎉 [paymentService] Influencer stats updated successfully:', influencerResult);
+
+              // إرسال إشعار للمؤثر
+              if (influencerResult && influencerResult.success) {
+                console.log('🔔 [paymentService] New rewards earned:', influencerResult.new_rewards_earned);
+
+                // إذا كسب مكافآت جديدة، أرسل إشعاراً
+                if (influencerResult.new_rewards_earned > 0) {
+                  console.log('🎊 [paymentService] Partner earned new rewards! Sending notification...');
+
+                  // يمكن إرسال notification هنا إذا كان هناك نظام إشعارات
+                  if ('Notification' in window && Notification.permission === 'granted') {
+                    new Notification('🎉 مكافأة جديدة!', {
+                      body: `تهانينا! لقد كسبت ${influencerResult.new_rewards_earned} شجرة مكافأة جديدة`,
+                      icon: '/logo.png'
+                    });
+                  }
+                }
+              }
+            }
+          } catch (influencerError) {
+            console.error('❌ [paymentService] Exception updating influencer stats:', influencerError);
+          }
+        } else {
+          console.log('ℹ️ [paymentService] No influencer code in reservation');
+        }
+      }
+    }
+
     return data;
   },
 
