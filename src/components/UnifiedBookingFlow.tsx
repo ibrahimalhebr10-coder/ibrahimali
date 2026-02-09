@@ -257,6 +257,20 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
   }
 
   if (currentStep === 'flexible-success') {
+    const handleGoToAccount = () => {
+      console.log('🔵 الذهاب للحساب - /account');
+      setTimeout(() => {
+        window.location.replace('/account');
+      }, 100);
+    };
+
+    const handleGoToHome = () => {
+      console.log('🟢 الذهاب للرئيسية - /');
+      setTimeout(() => {
+        window.location.replace('/');
+      }, 100);
+    };
+
     return (
       <FlexiblePaymentSuccessScreen
         reservationId={reservationId}
@@ -264,12 +278,8 @@ export default function UnifiedBookingFlow(props: UnifiedBookingFlowProps) {
         treeCount={props.treeCount}
         totalPrice={props.totalPrice}
         paymentDeadlineDays={paymentGracePeriodDays}
-        onGoToHome={() => {
-          window.location.href = '/';
-        }}
-        onGoToAccount={() => {
-          window.location.href = '/account';
-        }}
+        onGoToHome={handleGoToHome}
+        onGoToAccount={handleGoToAccount}
       />
     );
   }

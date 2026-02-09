@@ -156,7 +156,10 @@ export default function FlexiblePaymentSuccessScreen({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* زر الذهاب للحساب - الخيار الأساسي */}
                   <button
-                    onClick={onGoToAccount}
+                    onClick={() => {
+                      console.log('🔵 Button clicked: الدخول إلى حسابي');
+                      onGoToAccount();
+                    }}
                     className="group relative py-6 px-8 bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 text-white rounded-2xl font-black text-lg shadow-2xl hover:shadow-emerald-500/50 transform hover:scale-105 transition-all duration-300 overflow-hidden"
                   >
                     {/* تأثير الخلفية */}
@@ -175,7 +178,10 @@ export default function FlexiblePaymentSuccessScreen({
 
                   {/* زر العودة للرئيسية */}
                   <button
-                    onClick={onGoToHome}
+                    onClick={() => {
+                      console.log('🟢 Button clicked: العودة للواجهة الرئيسية');
+                      onGoToHome();
+                    }}
                     className="group py-6 px-8 bg-white text-emerald-700 border-3 border-emerald-600 rounded-2xl font-black text-lg shadow-xl hover:bg-emerald-50 hover:shadow-2xl transform hover:scale-105 transition-all duration-300"
                   >
                     <div className="flex items-center justify-center gap-3">
