@@ -39,8 +39,8 @@ export default function PartnerCodeSettings() {
 
       const { data, error } = await supabase
         .from('system_settings')
-        .select('setting_key, setting_value')
-        .in('setting_key', [
+        .select('key, value')
+        .in('key', [
           'default_partner_bonus_years',
           'max_partner_bonus_years',
           'min_partner_bonus_years',
@@ -52,10 +52,10 @@ export default function PartnerCodeSettings() {
       if (data) {
         const settingsMap: any = {};
         data.forEach(item => {
-          if (item.setting_key.includes('_years')) {
-            settingsMap[item.setting_key] = parseInt(item.setting_value);
+          if (item.key.includes('_years')) {
+            settingsMap[item.key] = parseInt(item.value);
           } else {
-            settingsMap[item.setting_key] = item.setting_value;
+            settingsMap[item.key] = item.value;
           }
         });
 
@@ -98,20 +98,20 @@ export default function PartnerCodeSettings() {
       // تحديث كل إعداد على حدة
       const updates = [
         {
-          setting_key: 'default_partner_bonus_years',
-          setting_value: String(settings.default_partner_bonus_years)
+          key: 'default_partner_bonus_years',
+          value: String(settings.default_partner_bonus_years)
         },
         {
-          setting_key: 'max_partner_bonus_years',
-          setting_value: String(settings.max_partner_bonus_years)
+          key: 'max_partner_bonus_years',
+          value: String(settings.max_partner_bonus_years)
         },
         {
-          setting_key: 'min_partner_bonus_years',
-          setting_value: String(settings.min_partner_bonus_years)
+          key: 'min_partner_bonus_years',
+          value: String(settings.min_partner_bonus_years)
         },
         {
-          setting_key: 'partner_code_bonus_description',
-          setting_value: settings.partner_code_bonus_description
+          key: 'partner_code_bonus_description',
+          value: settings.partner_code_bonus_description
         }
       ];
 
@@ -119,10 +119,10 @@ export default function PartnerCodeSettings() {
         const { error } = await supabase
           .from('system_settings')
           .update({
-            setting_value: update.setting_value,
+            value: update.value,
             updated_at: new Date().toISOString()
           })
-          .eq('setting_key', update.setting_key);
+          .eq('key', update.key);
 
         if (error) throw error;
       }

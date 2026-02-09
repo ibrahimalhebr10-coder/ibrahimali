@@ -38,43 +38,35 @@ SET bonus_years = 3
 WHERE bonus_years IS NULL OR bonus_years = 0;
 
 -- 3. إضافة إعدادات عامة لنظام أكواد الشركاء
-INSERT INTO system_settings (setting_key, setting_value, setting_type, setting_category, description, is_public)
-VALUES 
+INSERT INTO system_settings (key, value, description, category)
+VALUES
   (
     'default_partner_bonus_years',
     '3',
-    'number',
-    'partner_codes',
     'عدد السنوات المجانية الافتراضية لأكواد الشركاء الجدد',
-    false
+    'partner_codes'
   ),
   (
     'max_partner_bonus_years',
     '10',
-    'number',
-    'partner_codes',
     'الحد الأقصى لعدد السنوات المجانية التي يمكن منحها لكود شريك',
-    false
+    'partner_codes'
   ),
   (
     'min_partner_bonus_years',
     '1',
-    'number',
-    'partner_codes',
     'الحد الأدنى لعدد السنوات المجانية لكود شريك',
-    false
+    'partner_codes'
   ),
   (
     'partner_code_bonus_description',
     'سنوات مجانية إضافية عند استخدام كود الشريك',
-    'text',
-    'partner_codes',
     'وصف المميزات التي يحصل عليها العميل عند استخدام كود الشريك',
-    true
+    'partner_codes'
   )
-ON CONFLICT (setting_key) DO UPDATE
-SET 
-  setting_value = EXCLUDED.setting_value,
+ON CONFLICT (key) DO UPDATE
+SET
+  value = EXCLUDED.value,
   description = EXCLUDED.description,
   updated_at = now();
 
