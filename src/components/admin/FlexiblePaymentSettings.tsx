@@ -159,17 +159,17 @@ export default function FlexiblePaymentSettings() {
   }
 
   return (
-    <div className="h-full overflow-y-auto">
-      <div className="max-w-4xl mx-auto space-y-6 pb-8">
+    <div className="h-full overflow-y-auto px-2">
+      <div className="max-w-4xl mx-auto space-y-5 pb-8 pt-2">
         {/* العنوان */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-white rounded-lg shadow-sm p-4">
           <div className="flex items-start gap-3">
-            <div className="p-3 bg-green-50 rounded-lg">
-              <Clock className="w-6 h-6 text-green-600" />
+            <div className="p-2 bg-green-50 rounded-lg">
+              <Clock className="w-5 h-5 text-green-600" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-gray-900">نظام الدفع المرن</h3>
-              <p className="text-sm text-gray-600 mt-1">
+              <h3 className="text-base font-bold text-gray-900">نظام الدفع المرن</h3>
+              <p className="text-sm text-gray-600 mt-0.5">
                 السماح للعملاء بالحجز أولاً، وعند اكتمال حجز المزرعة سنتواصل معهم لإتمام الدفع
               </p>
             </div>
@@ -177,11 +177,11 @@ export default function FlexiblePaymentSettings() {
         </div>
 
         {/* الإعدادات الأساسية */}
-        <div className="bg-white rounded-lg shadow-sm p-6 space-y-5">
-          <h4 className="font-bold text-gray-900 text-base">الإعدادات الأساسية</h4>
+        <div className="bg-white rounded-lg shadow-sm p-4 space-y-4">
+          <h4 className="font-bold text-gray-900 text-sm">الإعدادات الأساسية</h4>
 
           {/* تفعيل/تعطيل النظام */}
-          <div className="flex items-center justify-between p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border-2 border-green-200">
+          <div className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
             <div className="flex-1 ml-4">
               <div className="font-bold text-gray-900">تفعيل نظام الدفع المرن</div>
               <div className="text-sm text-gray-700 mt-1 leading-relaxed">
@@ -205,18 +205,18 @@ export default function FlexiblePaymentSettings() {
           </div>
 
           {/* توضيح النظام الجديد */}
-          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-5 border border-blue-200">
-            <div className="flex items-start gap-3">
+          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-3 border border-blue-200">
+            <div className="flex items-start gap-2">
               <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
               </div>
               <div className="flex-1">
-                <h5 className="font-bold text-blue-900 mb-2">كيف يعمل النظام؟</h5>
-                <div className="space-y-2 text-sm text-blue-800">
+                <h5 className="font-bold text-blue-900 mb-1.5 text-sm">كيف يعمل النظام؟</h5>
+                <div className="space-y-1.5 text-sm text-blue-800">
                   <div className="flex items-start gap-2">
                     <span className="text-blue-600 font-bold">1.</span>
                     <p>العميل يحجز الأشجار ويختار "الدفع عند اكتمال المزرعة"</p>
@@ -239,12 +239,12 @@ export default function FlexiblePaymentSettings() {
           </div>
 
           {/* ملاحظة هامة */}
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
-                <h5 className="font-bold text-amber-900 mb-1">ملاحظة هامة</h5>
-                <p className="text-sm text-amber-800 leading-relaxed">
+                <h5 className="font-bold text-amber-900 mb-0.5 text-sm">ملاحظة هامة</h5>
+                <p className="text-xs text-amber-800 leading-relaxed">
                   لا يوجد تحديد زمني لإتمام الدفع. الحجوزات تبقى معلقة حتى اكتمال المزرعة،
                   ثم يتم التواصل مع العملاء بشكل شخصي.
                 </p>
@@ -254,21 +254,21 @@ export default function FlexiblePaymentSettings() {
         </div>
 
         {/* زر الحفظ */}
-        <div className="bg-white rounded-lg shadow-sm p-5 sticky bottom-0 z-10 border-t-2 border-green-100">
-          <div className="flex items-center gap-4">
+        <div className="bg-white rounded-lg shadow-sm p-4 sticky bottom-0 z-10 border-t border-green-100">
+          <div className="flex items-center gap-3">
             <button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-bold hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg text-sm font-bold hover:from-green-700 hover:to-emerald-700 transition-all shadow-md hover:shadow-lg transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Save className="w-5 h-5" />
+              <Save className="w-4 h-4" />
               {saving ? 'جاري الحفظ...' : 'حفظ الإعدادات'}
             </button>
 
             {success && (
               <div className="flex items-center gap-2 text-green-600 animate-pulse">
-                <CheckCircle className="w-5 h-5" />
-                <span className="font-bold">تم الحفظ بنجاح</span>
+                <CheckCircle className="w-4 h-4" />
+                <span className="font-bold text-sm">تم الحفظ بنجاح</span>
               </div>
             )}
           </div>
