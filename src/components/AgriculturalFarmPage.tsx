@@ -249,41 +249,43 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             </div>
 
             {/* === 2. PARTNER CODE SECTION (قبل الباقات) === */}
-            <div className="mt-5 mb-5">
-              <h3 className="text-[15px] font-bold text-center text-gray-800 mb-1">
-                هل لديك كود شريك نجاح (اختياري)
-              </h3>
-              <div className="flex items-center justify-center gap-1 text-[11px] text-gray-400 mb-3">
-                <span className="w-3.5 h-3.5 rounded-full border border-gray-300 flex items-center justify-center text-[9px] text-gray-400">i</span>
-                <span>الكود يمنحك مدة إضافية فقط</span>
+            <div className="mt-5 mb-4 pt-4 border-t border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-1">
+                  <span className="w-3 h-3 rounded-full border border-gray-300 flex items-center justify-center text-[8px] text-gray-400">i</span>
+                  <span className="text-[10px] text-gray-400">يمنحك مدة إضافية</span>
+                </div>
+                <span className="text-[12px] font-semibold text-gray-600">كود شريك نجاح (اختياري)</span>
               </div>
 
-              <div className="flex items-center gap-2 bg-gray-100 rounded-full py-2.5 px-4 border border-gray-200">
-                <button
-                  onClick={handleVerifyPartnerCode}
-                  disabled={!partnerCode.trim() || isCodeVerified}
-                  className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all flex-shrink-0 ${
-                    isCodeVerified
-                      ? 'bg-[#4a7c59] text-white'
-                      : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
-                  }`}
-                >
-                  <span className="text-sm">✓</span>
-                </button>
+              <div className="flex items-center gap-1.5 bg-gray-50 rounded-lg py-1.5 px-2 border border-gray-200">
                 <input
                   type="text"
                   value={partnerCode}
                   onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
                   placeholder="أدخل الكود هنا"
                   disabled={isCodeVerified}
-                  className="flex-1 bg-transparent text-left text-[13px] focus:outline-none text-gray-600 placeholder-gray-400 disabled:text-[#4a7c59]"
+                  className="flex-1 bg-transparent text-center text-[12px] focus:outline-none text-gray-600 placeholder-gray-400 disabled:text-[#4a7c59] font-medium"
                   dir="ltr"
                 />
+                <button
+                  onClick={handleVerifyPartnerCode}
+                  disabled={!partnerCode.trim() || isCodeVerified}
+                  className={`w-6 h-6 rounded-md flex items-center justify-center transition-all flex-shrink-0 ${
+                    isCodeVerified
+                      ? 'bg-[#4a7c59] text-white'
+                      : partnerCode.trim()
+                        ? 'bg-gray-700 text-white hover:bg-gray-800'
+                        : 'bg-gray-200 text-gray-400'
+                  }`}
+                >
+                  <span className="text-[11px]">✓</span>
+                </button>
               </div>
 
               {isCodeVerified && (
-                <div className="mt-2 text-[11px] text-[#4a7c59] text-center font-medium">
-                  تم التحقق - حصلت على +{bonusYears} سنوات مجاناً
+                <div className="mt-1.5 text-[10px] text-[#4a7c59] text-center font-medium">
+                  تم التحقق +{bonusYears} سنوات مجاناً
                 </div>
               )}
             </div>
