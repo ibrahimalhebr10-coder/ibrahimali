@@ -33,6 +33,9 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
   const [isCodeVerified, setIsCodeVerified] = useState(false);
   const [bonusYears, setBonusYears] = useState(0);
 
+  // New state: user can choose between "with package" or "without package"
+  const [usePackage, setUsePackage] = useState(true);
+
   useEffect(() => {
     if (farm.contracts && farm.contracts.length > 0) {
       setSelectedContract(farm.contracts[0]);
@@ -128,9 +131,32 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     }
   };
 
+  const handleTogglePackageMode = (withPackage: boolean) => {
+    setUsePackage(withPackage);
+    if (!withPackage) {
+      // Without package: set default tree count and use first contract
+      setSelectedPackage(null);
+      setTreeCount(50);
+      if (farm.contracts && farm.contracts.length > 0) {
+        setSelectedContract(farm.contracts[0]);
+      }
+    } else {
+      // With package: select middle package if available
+      if (packages.length >= 2) {
+        handleSelectPackage(packages[1]);
+      } else if (packages.length > 0) {
+        handleSelectPackage(packages[0]);
+      }
+    }
+  };
+
   const handleBuyNow = () => {
-    if (!selectedPackage || treeCount === 0) {
-      alert('يرجى اختيار باقة وعدد الأشجار');
+    if (usePackage && !selectedPackage) {
+      alert('يرجى اختيار باقة');
+      return;
+    }
+    if (treeCount === 0) {
+      alert('يرجى تحديد عدد الأشجار');
       return;
     }
     if (!selectedContract) {
@@ -147,21 +173,21 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     }
   };
 
-  if (showBookingFlow && selectedPackage && selectedContract) {
+  if (showBookingFlow && selectedContract) {
     return (
       <UnifiedBookingFlow
         farmId={farm.id}
         farmName={farm.name}
         farmLocation={farm.location}
         pathType="agricultural"
-        packageName={selectedPackage.package_name}
+        packageName={usePackage && selectedPackage ? selectedPackage.package_name : 'حجز مرن'}
         treeCount={treeCount}
         contractId={selectedContract.id}
         contractName={selectedContract.contract_name}
-        durationYears={selectedPackage.contract_years || selectedContract.duration_years}
-        bonusYears={bonusYears || selectedPackage.bonus_years || selectedContract.bonus_years}
+        durationYears={selectedPackage?.contract_years || selectedContract.duration_years}
+        bonusYears={bonusYears || selectedPackage?.bonus_years || selectedContract.bonus_years}
         totalPrice={calculateTotal()}
-        pricePerTree={selectedPackage.price_per_tree}
+        pricePerTree={selectedPackage?.price_per_tree || selectedContract.farmer_price || selectedContract.investor_price || 0}
         influencerCode={isCodeVerified ? partnerCode : null}
         onBack={() => setShowBookingFlow(false)}
         onComplete={() => {
@@ -275,7 +301,41 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             )}
           </div>
 
-          {/* === 2. PACKAGE CARDS (ثانياً - بعد كود الشريك) === */}
+          {/* === 2. PACKAGE MODE TOGGLE (ثانياً - اختيار مع أو بدون باقة) === */}
+          <div className="bg-white rounded-[16px] shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-gray-100 p-4 mb-3">
+            <h3 className="text-[13px] font-bold text-[#1a3d2a] text-center mb-3">كيف تريد الحجز؟</h3>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => handleTogglePackageMode(true)}
+                className={`py-3 px-4 rounded-xl transition-all duration-300 ${
+                  usePackage
+                    ? 'bg-gradient-to-b from-[#22c55e] to-[#16a34a] text-white shadow-lg shadow-green-500/25'
+                    : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                <div className="text-center">
+                  <div className="text-[13px] font-bold mb-1">مع باقة</div>
+                  <div className="text-[9px] opacity-80">عرض مميز بسعر أفضل</div>
+                </div>
+              </button>
+              <button
+                onClick={() => handleTogglePackageMode(false)}
+                className={`py-3 px-4 rounded-xl transition-all duration-300 ${
+                  !usePackage
+                    ? 'bg-gradient-to-b from-[#22c55e] to-[#16a34a] text-white shadow-lg shadow-green-500/25'
+                    : 'bg-gray-50 text-gray-600 border border-gray-200 hover:bg-gray-100'
+                }`}
+              >
+                <div className="text-center">
+                  <div className="text-[13px] font-bold mb-1">بدون باقة</div>
+                  <div className="text-[9px] opacity-80">حرية اختيار العدد</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          {/* === 3. PACKAGE CARDS (ثالثاً - إذا كان usePackage = true) === */}
+          {usePackage && (
           <div className="bg-white rounded-[16px] shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-gray-100 p-3 mb-3">
             <div className="flex items-center justify-center gap-1.5 mb-2">
               <div className="w-6 h-6 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center shadow-md shadow-amber-500/20">
@@ -337,8 +397,9 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               })}
             </div>
           </div>
+          )}
 
-          {/* === 3. TREE COUNTER CARD (ثالثاً - بعد الباقات) === */}
+          {/* === 4. TREE COUNTER CARD (رابعاً - بعد الباقات أو بدونها) === */}
           <div className="bg-white rounded-[20px] shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 p-5 mb-4">
             <div className="flex items-center justify-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#22c55e] to-[#16a34a] flex items-center justify-center shadow-lg shadow-green-500/20">
@@ -348,13 +409,11 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             </div>
 
             {/* Live Price Display */}
-            {selectedPackage && (
-              <div className="text-center mb-4 py-2 px-4 rounded-xl bg-gradient-to-l from-[#fef3c7] to-[#fef9c3] border border-amber-200">
-                <span className="text-[12px] text-amber-700">السعر الحالي: </span>
-                <span className="text-[16px] font-black text-amber-600">{calculateTotal().toLocaleString()}</span>
-                <span className="text-[11px] text-amber-600 mr-1">ر.س</span>
-              </div>
-            )}
+            <div className="text-center mb-4 py-2 px-4 rounded-xl bg-gradient-to-l from-[#fef3c7] to-[#fef9c3] border border-amber-200">
+              <span className="text-[12px] text-amber-700">السعر الحالي: </span>
+              <span className="text-[16px] font-black text-amber-600">{calculateTotal().toLocaleString()}</span>
+              <span className="text-[11px] text-amber-600 mr-1">ر.س</span>
+            </div>
 
             {/* Counter with +/- buttons */}
             <div className="flex items-center justify-center gap-4 mb-5">
@@ -407,36 +466,65 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             </div>
           </div>
 
-          {/* === 4. BOOKING SUMMARY === */}
+          {/* === 5. BOOKING SUMMARY === */}
           <div className="mb-4 bg-white rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-gray-100 p-4">
             <h3 className="text-[14px] font-bold text-[#1a3d2a] mb-3 flex items-center gap-2">
               <span className="w-5 h-5 rounded-lg bg-[#f0fdf4] flex items-center justify-center text-[10px] text-[#16a34a]">✓</span>
               ملخص الحجز
             </h3>
             <div className="space-y-2">
-              {selectedPackage && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-[13px] text-gray-500">الباقة المختارة</span>
-                  <span className="text-[14px] font-bold text-[#16a34a]">{selectedPackage.package_name}</span>
-                </div>
-              )}
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <span className="text-[13px] text-gray-500">عدد الأشجار</span>
-                <span className="text-[14px] font-bold text-[#1a3d2a]">{treeCount} شجرة</span>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <span className="text-[13px] text-gray-500">سعر الشجرة</span>
-                <span className="text-[14px] font-bold text-[#1a3d2a]">{(selectedPackage?.price_per_tree || 0).toLocaleString()} ر.س</span>
-              </div>
-              <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                <span className="text-[13px] text-gray-500">مدة العقد</span>
-                <span className="text-[14px] font-bold text-[#1a3d2a]">{selectedPackage?.contract_years || 1} سنة</span>
-              </div>
-              {(bonusYears > 0 || (selectedPackage?.bonus_years || 0) > 0) && (
-                <div className="flex items-center justify-between py-2 border-b border-gray-100">
-                  <span className="text-[13px] text-gray-500">مدة إضافية مجانية</span>
-                  <span className="text-[14px] font-bold text-[#16a34a]">+{bonusYears || selectedPackage?.bonus_years || 0} سنة</span>
-                </div>
+              {usePackage ? (
+                <>
+                  {selectedPackage && (
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <span className="text-[13px] text-gray-500">الباقة المختارة</span>
+                      <span className="text-[14px] font-bold text-[#16a34a]">{selectedPackage.package_name}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span className="text-[13px] text-gray-500">عدد الأشجار</span>
+                    <span className="text-[14px] font-bold text-[#1a3d2a]">{treeCount} شجرة</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span className="text-[13px] text-gray-500">سعر الشجرة</span>
+                    <span className="text-[14px] font-bold text-[#1a3d2a]">{(selectedPackage?.price_per_tree || 0).toLocaleString()} ر.س</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span className="text-[13px] text-gray-500">مدة العقد</span>
+                    <span className="text-[14px] font-bold text-[#1a3d2a]">{selectedPackage?.contract_years || 1} سنة</span>
+                  </div>
+                  {(bonusYears > 0 || (selectedPackage?.bonus_years || 0) > 0) && (
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <span className="text-[13px] text-gray-500">مدة إضافية مجانية</span>
+                      <span className="text-[14px] font-bold text-[#16a34a]">+{bonusYears || selectedPackage?.bonus_years || 0} سنة</span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span className="text-[13px] text-gray-500">نوع الحجز</span>
+                    <span className="text-[14px] font-bold text-[#16a34a]">حجز مرن</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span className="text-[13px] text-gray-500">عدد الأشجار</span>
+                    <span className="text-[14px] font-bold text-[#1a3d2a]">{treeCount} شجرة</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span className="text-[13px] text-gray-500">سعر الشجرة</span>
+                    <span className="text-[14px] font-bold text-[#1a3d2a]">{(selectedContract?.farmer_price || selectedContract?.investor_price || 0).toLocaleString()} ر.س</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <span className="text-[13px] text-gray-500">مدة العقد</span>
+                    <span className="text-[14px] font-bold text-[#1a3d2a]">{selectedContract?.duration_years || 1} سنة</span>
+                  </div>
+                  {bonusYears > 0 && (
+                    <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                      <span className="text-[13px] text-gray-500">مدة إضافية مجانية</span>
+                      <span className="text-[14px] font-bold text-[#16a34a]">+{bonusYears} سنة</span>
+                    </div>
+                  )}
+                </>
               )}
               <div className="flex items-center justify-between pt-3 mt-1 border-t-2 border-[#22c55e]/20">
                 <span className="text-[15px] font-bold text-[#1a3d2a]">الإجمالي</span>
@@ -448,11 +536,11 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
             </div>
           </div>
 
-          {/* === 4. BOOK NOW BUTTON === */}
+          {/* === 6. BOOK NOW BUTTON === */}
           <div className="mb-4">
             <button
               onClick={handleBuyNow}
-              disabled={!selectedPackage || treeCount === 0}
+              disabled={(usePackage && !selectedPackage) || treeCount === 0}
               className="w-full py-4 bg-gradient-to-l from-[#16a34a] via-[#22c55e] to-[#16a34a] rounded-2xl font-bold text-[18px] text-white shadow-xl shadow-green-500/30 hover:shadow-2xl hover:shadow-green-500/40 hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-3 relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-l from-transparent via-white/10 to-transparent animate-shimmer"></div>
