@@ -6,6 +6,7 @@ export interface InfluencerPartner {
   name: string;
   display_name: string | null;
   phone: string | null;
+  partner_code: string;
   user_id: string | null;
   is_active: boolean;
   status: string | null;
@@ -69,6 +70,7 @@ export interface UpdateInfluencerPartnerData {
 export interface InfluencerStats {
   name: string;
   display_name: string | null;
+  partner_code: string;
   total_bookings: number;
   total_trees_booked: number;
   total_rewards_earned: number;
@@ -101,10 +103,13 @@ export const influencerMarketingService = {
       };
     }
 
+    // تنظيف الكود وتحويله لحروف كبيرة
+    const cleanCode = code.trim().toUpperCase();
+
     const { data, error } = await supabase
       .from('influencer_partners')
       .select('*')
-      .eq('name', code.trim())
+      .eq('partner_code', cleanCode)
       .maybeSingle();
 
     if (error) {

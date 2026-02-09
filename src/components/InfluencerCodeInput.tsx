@@ -99,7 +99,7 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
             <p className="text-sm text-slate-600">
               {hasEnteredCode
                 ? `تم تفعيل الكود: ${enteredName}`
-                : 'أدخل الكود للحصول على باقة مميزة بمزايا إضافية'
+                : 'أدخل الكود المميز للحصول على باقة مميزة بمزايا إضافية'
               }
             </p>
           </div>
@@ -121,16 +121,22 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
                 type="text"
                 value={inputValue}
                 onChange={(e) => {
-                  setInputValue(e.target.value);
+                  setInputValue(e.target.value.toUpperCase());
                   setErrorMessage(null);
                 }}
-                placeholder="مثال: احمد_المزارع"
-                className={`flex-1 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 bg-white text-slate-800 placeholder-slate-400 font-medium ${
+                placeholder="مثال: NOWAL2024"
+                maxLength={12}
+                className={`flex-1 px-4 py-3 border-2 rounded-xl focus:ring-2 focus:ring-amber-500 bg-white text-slate-800 placeholder-slate-400 font-bold text-lg tracking-wider ${
                   errorMessage
                     ? 'border-red-300 focus:border-red-500'
                     : 'border-amber-200 focus:border-amber-500'
                 }`}
-                dir="rtl"
+                style={{
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  fontFamily: 'monospace'
+                }}
+                dir="ltr"
                 disabled={isVerifying}
               />
               <button

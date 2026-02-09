@@ -75,10 +75,12 @@ export default function InfluencerDashboard() {
 
       const partnerName = stats.name || '';
       const displayName = stats.display_name || partnerName;
+      const partnerCode = stats.partner_code || '';
 
       const textToShare = partnerShareMessageService.renderTemplate(templateData.template, {
         partner_name: partnerName,
         display_name: displayName,
+        partner_code: partnerCode,
         website_url: templateData.websiteUrl
       });
 
@@ -92,10 +94,10 @@ export default function InfluencerDashboard() {
   };
 
   const handleCopyCode = async () => {
-    if (!stats?.name) return;
+    if (!stats?.partner_code) return;
 
     try {
-      await navigator.clipboard.writeText(stats.name);
+      await navigator.clipboard.writeText(stats.partner_code);
       setCopiedCode(true);
       setTimeout(() => setCopiedCode(false), 2000);
     } catch (err) {
@@ -336,16 +338,21 @@ export default function InfluencerDashboard() {
 
       {/* قسم المشاركة */}
       <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-2xl p-6 border border-emerald-200">
-        <h3 className="text-lg font-bold text-emerald-900 mb-4 text-center">شارك اسمك واكسب المزيد!</h3>
+        <h3 className="text-lg font-bold text-emerald-900 mb-4 text-center">شارك كودك المميز واكسب المزيد!</h3>
 
         <div className="bg-white/80 rounded-xl p-4 mb-4">
-          <p className="text-sm text-emerald-800 font-semibold mb-2 text-center">اسمك الخاص:</p>
-          <div className="flex items-center justify-center gap-2 p-3 rounded-lg bg-emerald-50 border-2 border-emerald-300">
-            <p className="text-xl font-black text-emerald-900">{stats?.name || ''}</p>
+          <p className="text-sm text-emerald-800 font-semibold mb-2 text-center flex items-center justify-center gap-2">
+            <Gift className="w-5 h-5 text-amber-600" />
+            كودك المميز:
+          </p>
+          <div className="flex items-center justify-center gap-2 p-4 rounded-lg bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300">
+            <p className="text-2xl font-black text-amber-900 tracking-wider" style={{ letterSpacing: '0.15em', fontFamily: 'monospace' }}>
+              {stats?.partner_code || ''}
+            </p>
             <button
               onClick={handleCopyCode}
-              className="p-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-all duration-300 active:scale-95"
-              title="نسخ الاسم"
+              className="p-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-all duration-300 active:scale-95"
+              title="نسخ الكود"
             >
               {copiedCode ? (
                 <CheckCircle2 className="w-5 h-5" />
@@ -354,6 +361,9 @@ export default function InfluencerDashboard() {
               )}
             </button>
           </div>
+          <p className="text-xs text-center text-amber-700 mt-2 font-semibold">
+            اسمك: {stats?.display_name || stats?.name || ''}
+          </p>
         </div>
 
         <button
@@ -380,15 +390,24 @@ export default function InfluencerDashboard() {
 
         <div className="mt-4 bg-white/80 rounded-xl p-4">
           <p className="text-xs text-emerald-800 text-center leading-relaxed">
-            💡 <span className="font-bold">نصيحة:</span> اضغط على الزر لنسخ رسالة جاهزة تحتوي على اسمك، ثم الصقها في واتساب أو أي مكان تريد المشاركة فيه
+            💡 <span className="font-bold">نصيحة:</span> اضغط على الزر لنسخ رسالة جاهزة تحتوي على كودك المميز، ثم الصقها في واتساب أو أي مكان تريد المشاركة فيه
           </p>
         </div>
 
-        <div className="mt-4 bg-gradient-to-r from-amber-50 to-emerald-50 rounded-xl p-4 border border-emerald-200">
-          <p className="text-sm text-emerald-900 text-center font-semibold mb-2">كيف يستخدم العميل اسمك؟</p>
-          <div className="bg-white/80 rounded-lg p-3 text-center">
-            <p className="text-xs text-emerald-800">
-              عند الحجز، يكتب العميل اسمك <span className="font-bold text-emerald-900">{stats?.name || ''}</span> في حقل "كود شريك النجاح"
+        <div className="mt-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-4 border-2 border-amber-200">
+          <p className="text-sm text-amber-900 text-center font-bold mb-2 flex items-center justify-center gap-2">
+            <Sparkles className="w-4 h-4" />
+            كيف يستخدم العميل كودك؟
+          </p>
+          <div className="bg-white/80 rounded-lg p-3 text-center border border-amber-300">
+            <p className="text-xs text-amber-900 leading-relaxed">
+              عند الحجز، يدخل العميل كودك المميز
+              <br />
+              <span className="inline-block mt-1 px-3 py-1 bg-amber-100 rounded-lg font-black text-amber-900 tracking-wider" style={{ letterSpacing: '0.1em', fontFamily: 'monospace' }}>
+                {stats?.partner_code || ''}
+              </span>
+              <br />
+              <span className="text-[10px] text-amber-700 mt-1 inline-block">في حقل "كود شريك المسيرة"</span>
             </p>
           </div>
         </div>

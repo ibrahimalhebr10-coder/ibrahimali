@@ -12,7 +12,9 @@ import {
   CheckCircle,
   AlertCircle,
   LogIn,
-  Phone
+  Phone,
+  Copy,
+  Gift
 } from 'lucide-react';
 import {
   influencerMarketingService,
@@ -316,6 +318,7 @@ export default function InfluencerPartnersManager() {
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">اسم المؤثر</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">اسم العرض</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">رقم الجوال</th>
+                <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الكود المميز</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الحالة</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الحجوزات</th>
                 <th className="text-right py-3 px-4 text-sm font-semibold text-slate-700">الأشجار</th>
@@ -327,7 +330,7 @@ export default function InfluencerPartnersManager() {
             <tbody>
               {partners.length === 0 ? (
                 <tr>
-                  <td colSpan={9} className="text-center py-12 text-slate-500">
+                  <td colSpan={10} className="text-center py-12 text-slate-500">
                     لا يوجد مؤثرين حالياً. اضغط "إضافة مؤثر" للبدء
                   </td>
                 </tr>
@@ -347,6 +350,30 @@ export default function InfluencerPartnersManager() {
                           <a href={`tel:${partner.phone}`} className="text-emerald-600 hover:text-emerald-700 font-medium">
                             {partner.phone}
                           </a>
+                        </div>
+                      ) : (
+                        <span className="text-slate-400">-</span>
+                      )}
+                    </td>
+                    <td className="py-3 px-4">
+                      {(partner as any).partner_code ? (
+                        <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-200 rounded-lg">
+                            <Gift className="w-4 h-4 text-amber-600" />
+                            <span className="font-bold text-amber-900 tracking-wider" style={{ letterSpacing: '0.1em' }}>
+                              {(partner as any).partner_code}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText((partner as any).partner_code);
+                              showMessage('success', 'تم نسخ الكود!');
+                            }}
+                            className="p-1.5 bg-amber-100 text-amber-600 rounded-lg hover:bg-amber-200 transition-colors"
+                            title="نسخ الكود"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
                         </div>
                       ) : (
                         <span className="text-slate-400">-</span>

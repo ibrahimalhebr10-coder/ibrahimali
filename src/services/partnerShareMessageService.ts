@@ -9,6 +9,7 @@ export interface ShareMessageTemplate {
 export interface ShareMessageVariables {
   partner_name: string;
   display_name: string;
+  partner_code: string;
   website_url: string;
 }
 
@@ -41,7 +42,7 @@ export const partnerShareMessageService = {
       return {
         template: `مرحباً! أنا {display_name} - شريك نجاح في منصة حصص زراعية 🌿
 
-عند حجزك، اكتب اسمي: {partner_name}
+🎁 عند حجزك، أدخل كودك المميز: {partner_code}
 
 استثمر في مزارع حقيقية واربح من منتجاتها! 🌱
 
@@ -112,6 +113,6 @@ export const partnerShareMessageService = {
   },
 
   getAvailableVariables(): string[] {
-    return ['{partner_name}', '{display_name}', '{website_url}'];
+    return ['{partner_name}', '{display_name}', '{partner_code}', '{website_url}'];
   }
 };
