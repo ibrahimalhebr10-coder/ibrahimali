@@ -248,8 +248,48 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
               <span>مجلجلة شجرة {maxTrees.toLocaleString()}-</span>
             </div>
 
-            {/* === PACKAGE CARDS === */}
-            <div className="grid grid-cols-3 gap-2 mt-5">
+            {/* === 2. PARTNER CODE SECTION (قبل الباقات) === */}
+            <div className="mt-5 mb-5">
+              <h3 className="text-[15px] font-bold text-center text-gray-800 mb-1">
+                هل لديك كود شريك نجاح (اختياري)
+              </h3>
+              <div className="flex items-center justify-center gap-1 text-[11px] text-gray-400 mb-3">
+                <span className="w-3.5 h-3.5 rounded-full border border-gray-300 flex items-center justify-center text-[9px] text-gray-400">i</span>
+                <span>الكود يمنحك مدة إضافية فقط</span>
+              </div>
+
+              <div className="flex items-center gap-2 bg-gray-100 rounded-full py-2.5 px-4 border border-gray-200">
+                <button
+                  onClick={handleVerifyPartnerCode}
+                  disabled={!partnerCode.trim() || isCodeVerified}
+                  className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all flex-shrink-0 ${
+                    isCodeVerified
+                      ? 'bg-[#4a7c59] text-white'
+                      : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
+                  }`}
+                >
+                  <span className="text-sm">✓</span>
+                </button>
+                <input
+                  type="text"
+                  value={partnerCode}
+                  onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
+                  placeholder="أدخل الكود هنا"
+                  disabled={isCodeVerified}
+                  className="flex-1 bg-transparent text-left text-[13px] focus:outline-none text-gray-600 placeholder-gray-400 disabled:text-[#4a7c59]"
+                  dir="ltr"
+                />
+              </div>
+
+              {isCodeVerified && (
+                <div className="mt-2 text-[11px] text-[#4a7c59] text-center font-medium">
+                  تم التحقق - حصلت على +{bonusYears} سنوات مجاناً
+                </div>
+              )}
+            </div>
+
+            {/* === 3. PACKAGE CARDS === */}
+            <div className="grid grid-cols-3 gap-2">
               {packages.slice(0, 3).map((pkg, index) => {
                 const isMiddle = index === 1;
                 const isSelected = selectedPackage?.id === pkg.id;
@@ -297,46 +337,6 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
                 />
               ))}
             </div>
-          </div>
-
-          {/* === 2. PARTNER CODE SECTION === */}
-          <div className="mb-4">
-            <h3 className="text-[15px] font-bold text-center text-gray-800 mb-1">
-              هل لديك كود شريك نجاح (اختياري)
-            </h3>
-            <div className="flex items-center justify-center gap-1 text-[11px] text-gray-400 mb-3">
-              <span className="w-3.5 h-3.5 rounded-full border border-gray-300 flex items-center justify-center text-[9px] text-gray-400">i</span>
-              <span>الكود الخحصك مدة إضافية فقط</span>
-            </div>
-
-            <div className="flex items-center gap-2 bg-gray-100 rounded-full py-2.5 px-4 border border-gray-200">
-              <button
-                onClick={handleVerifyPartnerCode}
-                disabled={!partnerCode.trim() || isCodeVerified}
-                className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all flex-shrink-0 ${
-                  isCodeVerified
-                    ? 'bg-[#4a7c59] text-white'
-                    : 'bg-gray-200 text-gray-500 hover:bg-gray-300'
-                }`}
-              >
-                <span className="text-sm">{isCodeVerified ? '✓' : '✓'}</span>
-              </button>
-              <input
-                type="text"
-                value={partnerCode}
-                onChange={(e) => setPartnerCode(e.target.value.toUpperCase())}
-                placeholder="أدخل الكود هنا"
-                disabled={isCodeVerified}
-                className="flex-1 bg-transparent text-left text-[13px] focus:outline-none text-gray-600 placeholder-gray-400 disabled:text-[#4a7c59]"
-                dir="ltr"
-              />
-            </div>
-
-            {isCodeVerified && (
-              <div className="mt-2 text-[11px] text-[#4a7c59] text-center font-medium">
-                تم التحقق - حصلت على +{bonusYears} سنوات مجاناً
-              </div>
-            )}
           </div>
 
           {/* === 3. BOOKING SUMMARY === */}
