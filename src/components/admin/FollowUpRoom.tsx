@@ -11,7 +11,10 @@ import {
   Filter,
   ExternalLink,
   Plus,
-  TrendingUp
+  TrendingUp,
+  Repeat,
+  Zap,
+  Timer
 } from 'lucide-react';
 import { followUpService, PendingReservation, FollowUpStats } from '../../services/followUpService';
 
@@ -25,6 +28,7 @@ export default function FollowUpRoom() {
   const [pathFilter, setPathFilter] = useState<'all' | 'agricultural' | 'investment'>('all');
   const [selectedReservation, setSelectedReservation] = useState<PendingReservation | null>(null);
   const [showActivityModal, setShowActivityModal] = useState(false);
+  const [showPaymentModeModal, setShowPaymentModeModal] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -113,6 +117,11 @@ export default function FollowUpRoom() {
   const handleOpenPaymentPage = (reservation: PendingReservation) => {
     const link = followUpService.generatePaymentLink(reservation.id);
     window.open(link, '_blank');
+  };
+
+  const handleTogglePaymentMode = (reservation: PendingReservation) => {
+    setSelectedReservation(reservation);
+    setShowPaymentModeModal(true);
   };
 
   if (loading) {
@@ -255,6 +264,9 @@ export default function FollowUpRoom() {
                   المسار
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                  وضع الدفع
+                </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                   الأشجار
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
@@ -295,6 +307,25 @@ export default function FollowUpRoom() {
                       {reservation.path_type === 'agricultural' ? 'زراعي' : 'استثماري'}
                     </span>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      reservation.flexible_payment_enabled
+                        ? 'bg-orange-100 text-orange-800'
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {reservation.flexible_payment_enabled ? (
+                        <>
+                          <Timer className="w-3 h-3" />
+                          <span>الدفع لاحقاً</span>
+                        </>
+                      ) : (
+                        <>
+                          <Zap className="w-3 h-3" />
+                          <span>الدفع الآن</span>
+                        </>
+                      )}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {reservation.tree_count}
                   </td>
@@ -322,6 +353,17 @@ export default function FollowUpRoom() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex items-center gap-2">
                       <button
+                        onClick={() => handleTogglePaymentMode(reservation)}
+                        className={`${
+                          reservation.flexible_payment_enabled
+                            ? 'text-orange-600 hover:text-orange-900'
+                            : 'text-green-600 hover:text-green-900'
+                        }`}
+                        title={reservation.flexible_payment_enabled ? 'تحويل للدفع الفوري' : 'تحويل للدفع المرن'}
+                      >
+                        {reservation.flexible_payment_enabled ? <Zap className="w-5 h-5" /> : <Timer className="w-5 h-5" />}
+                      </button>
+                      <button
                         onClick={() => handleSendReminder(reservation)}
                         className="text-blue-600 hover:text-blue-900"
                         title="إرسال تذكير"
@@ -330,7 +372,7 @@ export default function FollowUpRoom() {
                       </button>
                       <button
                         onClick={() => handleLogActivity(reservation)}
-                        className="text-green-600 hover:text-green-900"
+                        className="text-gray-600 hover:text-gray-900"
                         title="تسجيل متابعة"
                       >
                         <Plus className="w-5 h-5" />
@@ -379,6 +421,18 @@ export default function FollowUpRoom() {
           }}
         />
       )}
+
+      {/* مودال تبديل وضع الدفع */}
+      {showPaymentModeModal && selectedReservation && (
+        <PaymentModeModal
+          reservation={selectedReservation}
+          onClose={() => {
+            setShowPaymentModeModal(false);
+            setSelectedReservation(null);
+            loadData();
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -401,6 +455,145 @@ function StatCard({ icon, label, value, color }: any) {
       <div className="mt-3">
         <div className="text-2xl font-bold text-gray-900">{value}</div>
         <div className="text-sm text-gray-600 mt-1">{label}</div>
+      </div>
+    </div>
+  );
+}
+
+// مودال تبديل وضع الدفع
+function PaymentModeModal({ reservation, onClose }: { reservation: PendingReservation; onClose: () => void }) {
+  const [reason, setReason] = useState('');
+  const [paymentDays, setPaymentDays] = useState(7);
+  const [submitting, setSubmitting] = useState(false);
+
+  const isCurrentlyFlexible = reservation.flexible_payment_enabled;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+
+    try {
+      if (isCurrentlyFlexible) {
+        // تحويل للدفع الفوري
+        await followUpService.convertToImmediatePayment(reservation.id, reason);
+        alert('تم التحويل للدفع الفوري بنجاح');
+      } else {
+        // تحويل للدفع المرن
+        await followUpService.convertToFlexiblePayment(reservation.id, paymentDays, reason);
+        alert('تم التحويل للدفع المرن بنجاح');
+      }
+      onClose();
+    } catch (error) {
+      alert('حدث خطأ أثناء تبديل وضع الدفع');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-lg max-w-lg w-full p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className={`p-3 rounded-lg ${isCurrentlyFlexible ? 'bg-orange-100' : 'bg-green-100'}`}>
+            {isCurrentlyFlexible ? <Zap className="w-6 h-6 text-orange-600" /> : <Timer className="w-6 h-6 text-green-600" />}
+          </div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-900">
+              {isCurrentlyFlexible ? 'تحويل للدفع الفوري' : 'تحويل للدفع المرن'}
+            </h3>
+            <p className="text-sm text-gray-500">
+              {isCurrentlyFlexible
+                ? 'سيتم إلغاء موعد الدفع ويطلب من العميل الدفع فوراً'
+                : 'سيتم منح العميل مهلة للدفع'}
+            </p>
+          </div>
+        </div>
+
+        <div className="mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+          <div className="flex justify-between">
+            <span className="text-sm text-gray-600">العميل:</span>
+            <span className="font-medium text-gray-900">{reservation.customer_name}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-sm text-gray-600">المبلغ:</span>
+            <span className="font-medium text-gray-900">{reservation.total_price.toLocaleString('ar-SA')} ر.س</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-sm text-gray-600">الوضع الحالي:</span>
+            <span className={`px-2 py-1 rounded text-xs font-medium ${
+              isCurrentlyFlexible
+                ? 'bg-orange-100 text-orange-800'
+                : 'bg-blue-100 text-blue-800'
+            }`}>
+              {isCurrentlyFlexible ? 'الدفع لاحقاً' : 'الدفع الآن'}
+            </span>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {!isCurrentlyFlexible && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                عدد أيام المهلة
+              </label>
+              <select
+                value={paymentDays}
+                onChange={(e) => setPaymentDays(parseInt(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                required
+              >
+                <option value="3">3 أيام</option>
+                <option value="5">5 أيام</option>
+                <option value="7">7 أيام (افتراضي)</option>
+                <option value="10">10 أيام</option>
+                <option value="14">14 يوم</option>
+              </select>
+            </div>
+          )}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              سبب التحويل
+            </label>
+            <textarea
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              placeholder="اكتب سبب تبديل وضع الدفع..."
+              required
+            />
+          </div>
+
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+            <div className="flex gap-2">
+              <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-yellow-800">
+                {isCurrentlyFlexible
+                  ? 'سيتم إلغاء موعد الدفع المحدد وسيطلب من العميل الدفع فوراً'
+                  : `سيتم منح العميل ${paymentDays} يوم كمهلة للدفع`
+                }
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              disabled={submitting}
+              className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+            >
+              {submitting ? 'جاري التحويل...' : 'تأكيد التحويل'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              إلغاء
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

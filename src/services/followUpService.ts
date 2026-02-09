@@ -16,6 +16,7 @@ export interface PendingReservation {
   days_remaining: number;
   hours_remaining: number;
   urgency_level: 'critical' | 'urgent' | 'medium' | 'normal';
+  flexible_payment_enabled: boolean;
   last_activity: {
     type: string;
     result: string;
@@ -116,6 +117,7 @@ export const followUpService = {
         days_remaining: daysRemaining,
         hours_remaining: hoursRemaining,
         urgency_level,
+        flexible_payment_enabled: item.flexible_payment_enabled !== false,
         last_activity: null
       };
     });
@@ -195,6 +197,72 @@ export const followUpService = {
 
     if (error) {
       console.error('Error extending deadline:', error);
+      throw error;
+    }
+
+    return data;
+  },
+
+  /**
+   * تبديل وضع الدفع (الدفع الآن / الدفع لاحقاً)
+   */
+  async togglePaymentMode(
+    reservationId: string,
+    enableFlexible: boolean,
+    paymentDays: number = 7,
+    reason: string = ''
+  ): Promise<any> {
+    const { data, error } = await supabase.rpc('toggle_payment_mode', {
+      p_reservation_id: reservationId,
+      p_enable_flexible: enableFlexible,
+      p_payment_days: paymentDays,
+      p_reason: reason
+    });
+
+    if (error) {
+      console.error('Error toggling payment mode:', error);
+      throw error;
+    }
+
+    return data;
+  },
+
+  /**
+   * تحويل للدفع الفوري (الدفع الآن)
+   */
+  async convertToImmediatePayment(
+    reservationId: string,
+    reason: string = 'تحويل للدفع الفوري'
+  ): Promise<any> {
+    const { data, error } = await supabase.rpc('convert_to_immediate_payment', {
+      p_reservation_id: reservationId,
+      p_reason: reason
+    });
+
+    if (error) {
+      console.error('Error converting to immediate payment:', error);
+      throw error;
+    }
+
+    return data;
+  },
+
+  /**
+   * تحويل للدفع المرن (الدفع لاحقاً)
+   */
+  async convertToFlexiblePayment(
+    reservationId: string,
+    paymentDays: number = 7,
+    reason: string = 'تحويل للدفع المرن'
+  ): Promise<any> {
+    const { data, error } = await supabase.rpc('convert_to_flexible_payment', {
+      p_reservation_id: reservationId,
+      p_payment_days: paymentDays,
+      p_reason: reason
+    });
+
+    if (error) {
+      console.error('Error converting to flexible payment:', error);
       throw error;
     }
 
