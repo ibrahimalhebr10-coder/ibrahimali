@@ -7,6 +7,7 @@ export interface AgriculturalPackage {
   price_per_tree: number;
   base_duration_years: number;
   bonus_free_years: number;
+  min_trees: number;
   motivational_text: string | null;
   description: string;
   what_is_included: string[];
@@ -17,6 +18,8 @@ export interface AgriculturalPackage {
   management_info: string | null;
   is_active: boolean;
   sort_order: number;
+  contract_years?: number;
+  bonus_years?: number;
 }
 
 export interface CreateAgriculturalPackageInput {
@@ -50,7 +53,12 @@ export const agriculturalPackagesService = {
       throw error;
     }
 
-    return data || [];
+    return (data || []).map(pkg => ({
+      ...pkg,
+      min_trees: pkg.min_trees || 50,
+      contract_years: pkg.base_duration_years,
+      bonus_years: pkg.bonus_free_years
+    }));
   },
 
   async getAllPackages(): Promise<AgriculturalPackage[]> {
