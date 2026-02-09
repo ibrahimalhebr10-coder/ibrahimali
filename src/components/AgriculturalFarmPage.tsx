@@ -116,14 +116,15 @@ export default function AgriculturalFarmPage({ farm, onClose, onGoToAccount }: A
     if (!partnerCode.trim()) return;
 
     try {
-      const isValid = await influencerMarketingService.verifyInfluencerCode(partnerCode);
+      const result = await influencerMarketingService.verifyInfluencerCode(partnerCode);
 
-      if (isValid) {
+      if (result.isValid && result.partner) {
         setIsCodeVerified(true);
         setBonusYears(3);
-        sessionStorage.setItem('influencer_code', partnerCode);
+        sessionStorage.setItem('influencer_code', result.partner.partner_code);
+        alert(`تم تفعيل الكود: ${result.partner.display_name || result.partner.name}`);
       } else {
-        alert('الكود غير صحيح');
+        alert(result.message || 'الكود غير صحيح');
       }
     } catch (error) {
       console.error('Error verifying code:', error);

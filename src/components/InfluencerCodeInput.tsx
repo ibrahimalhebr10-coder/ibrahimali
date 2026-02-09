@@ -43,17 +43,20 @@ export default function InfluencerCodeInput({ onCodeEntered, featuredColor = '#F
     try {
       const result = await influencerMarketingService.verifyInfluencerCode(inputValue.trim());
 
-      if (!result.isValid) {
+      if (!result.isValid || !result.partner) {
         setErrorMessage(result.message);
         setIsVerifying(false);
         return;
       }
 
-      const code = inputValue.trim();
+      const code = result.partner.partner_code;
+      const displayName = result.partner.display_name || result.partner.name;
+
       setEnteredName(code);
       setHasEnteredCode(true);
 
       sessionStorage.setItem('influencer_code', code);
+      sessionStorage.setItem('influencer_partner_name', displayName);
       sessionStorage.setItem('influencer_activated_at', new Date().toISOString());
 
       setIsAnimating(true);
