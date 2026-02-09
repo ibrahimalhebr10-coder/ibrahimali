@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Save, AlertCircle, CheckCircle, Clock, Bell } from 'lucide-react';
+import { Save, AlertCircle, CheckCircle, Clock, Bell, Play, RefreshCw } from 'lucide-react';
 import { systemSettingsService } from '../../services/systemSettingsService';
+import { supabase } from '../../lib/supabase';
 
 export default function FlexiblePaymentSettings() {
   const [settings, setSettings] = useState({
@@ -22,6 +23,8 @@ export default function FlexiblePaymentSettings() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [runningReminders, setRunningReminders] = useState(false);
+  const [reminderResult, setReminderResult] = useState<any>(null);
 
   useEffect(() => {
     loadSettings();
@@ -78,6 +81,37 @@ export default function FlexiblePaymentSettings() {
       alert('حدث خطأ أثناء حفظ الإعدادات');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleRunReminders = async () => {
+    setRunningReminders(true);
+    setReminderResult(null);
+
+    try {
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/payment-reminders`;
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('فشل تشغيل التذكيرات');
+      }
+
+      const result = await response.json();
+      setReminderResult(result);
+
+      setTimeout(() => setReminderResult(null), 10000);
+    } catch (error) {
+      console.error('Error running reminders:', error);
+      alert('حدث خطأ أثناء تشغيل التذكيرات');
+    } finally {
+      setRunningReminders(false);
     }
   };
 
@@ -356,6 +390,87 @@ export default function FlexiblePaymentSettings() {
             </div>
           )}
         </div>
+      </div>
+
+      {/* تشغيل التذكيرات يدوياً */}
+      <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-lg shadow-sm p-6">
+        <div className="flex items-start gap-3 mb-4">
+          <div className="p-3 bg-blue-100 rounded-lg">
+            <Play className="w-6 h-6 text-blue-600" />
+          </div>
+          <div className="flex-1">
+            <h4 className="font-bold text-gray-900">تشغيل التذكيرات التلقائية يدوياً</h4>
+            <p className="text-sm text-gray-600 mt-1">
+              اختبر نظام التذكيرات أو شغله يدوياً الآن
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-lg p-4 mb-4">
+          <div className="text-sm text-gray-700 space-y-2">
+            <p className="font-medium">سيقوم النظام بـ:</p>
+            <ul className="list-disc list-inside space-y-1 text-gray-600">
+              <li>فحص جميع الحجوزات المعلقة</li>
+              <li>إرسال التذكيرات المناسبة حسب الوقت المتبقي</li>
+              <li>تسجيل جميع التذكيرات في قاعدة البيانات</li>
+              <li>إلغاء الحجوزات المنتهية (إذا كان مفعل)</li>
+            </ul>
+          </div>
+        </div>
+
+        <button
+          onClick={handleRunReminders}
+          disabled={runningReminders}
+          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+        >
+          {runningReminders ? (
+            <>
+              <RefreshCw className="w-5 h-5 animate-spin" />
+              جاري التشغيل...
+            </>
+          ) : (
+            <>
+              <Play className="w-5 h-5" />
+              تشغيل التذكيرات الآن
+            </>
+          )}
+        </button>
+
+        {reminderResult && (
+          <div className="mt-4 p-4 bg-white rounded-lg border-2 border-green-200">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h5 className="font-bold text-gray-900 mb-2">نتيجة التشغيل</h5>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <div className="text-gray-600">التذكيرات المرسلة</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {reminderResult.summary?.reminders_sent || 0}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-gray-600">التذكيرات المتخطاة</div>
+                    <div className="text-2xl font-bold text-gray-600">
+                      {reminderResult.summary?.reminders_skipped || 0}
+                    </div>
+                  </div>
+                  {reminderResult.summary?.reservations_cancelled > 0 && (
+                    <div>
+                      <div className="text-gray-600">الحجوزات الملغاة</div>
+                      <div className="text-2xl font-bold text-red-600">
+                        {reminderResult.summary.reservations_cancelled}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-2 text-xs text-gray-500">
+                  {new Date(reminderResult.timestamp).toLocaleString('ar-SA')}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
