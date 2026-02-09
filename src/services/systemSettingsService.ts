@@ -53,18 +53,62 @@ export const systemSettingsService = {
 
   async updateSetting(key: string, value: string): Promise<boolean> {
     try {
-      const { error } = await supabase
-        .from('system_settings')
-        .update({
-          value,
-          updated_at: new Date().toISOString()
-        })
-        .eq('key', key);
+      console.log(`📝 [SYSTEM_SETTINGS] تحديث ${key} = ${value}`);
 
-      if (error) throw error;
+      // التحقق من وجود الإعداد أولاً
+      const { data: existing, error: checkError } = await supabase
+        .from('system_settings')
+        .select('id')
+        .eq('key', key)
+        .maybeSingle();
+
+      if (checkError) {
+        console.error('❌ [SYSTEM_SETTINGS] خطأ في التحقق من الإعداد:', checkError);
+        throw checkError;
+      }
+
+      if (existing) {
+        // الإعداد موجود - تحديثه
+        console.log(`🔄 [SYSTEM_SETTINGS] تحديث إعداد موجود: ${key}`);
+
+        const { error } = await supabase
+          .from('system_settings')
+          .update({
+            value,
+            updated_at: new Date().toISOString()
+          })
+          .eq('key', key);
+
+        if (error) {
+          console.error('❌ [SYSTEM_SETTINGS] خطأ في التحديث:', error);
+          throw error;
+        }
+
+        console.log(`✅ [SYSTEM_SETTINGS] تم تحديث ${key}`);
+      } else {
+        // الإعداد غير موجود - إنشاؤه
+        console.log(`➕ [SYSTEM_SETTINGS] إنشاء إعداد جديد: ${key}`);
+
+        const { error } = await supabase
+          .from('system_settings')
+          .insert({
+            key,
+            value,
+            category: 'payment',
+            description: `إعداد ${key}`
+          });
+
+        if (error) {
+          console.error('❌ [SYSTEM_SETTINGS] خطأ في الإنشاء:', error);
+          throw error;
+        }
+
+        console.log(`✅ [SYSTEM_SETTINGS] تم إنشاء ${key}`);
+      }
+
       return true;
     } catch (error) {
-      console.error('Error updating system setting:', error);
+      console.error(`❌ [SYSTEM_SETTINGS] خطأ في حفظ ${key}:`, error);
       return false;
     }
   },

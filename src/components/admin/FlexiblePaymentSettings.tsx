@@ -32,28 +32,39 @@ export default function FlexiblePaymentSettings() {
 
   const loadSettings = async () => {
     try {
-      const allSettings = await systemSettingsService.getAllSettings();
+      const allSettingsArray = await systemSettingsService.getAllSettings();
+
+      // تحويل المصفوفة إلى كائن للوصول السهل
+      const allSettings: Record<string, string> = {};
+      allSettingsArray.forEach(setting => {
+        allSettings[setting.key] = setting.value;
+      });
+
+      console.log('📥 [SETTINGS] تحميل الإعدادات:', allSettings);
 
       const loadedSettings = {
-        flexible_payment_enabled: allSettings.flexible_payment_enabled || 'true',
-        payment_grace_period_days: allSettings.payment_grace_period_days || '7',
-        auto_cancel_after_deadline: allSettings.auto_cancel_after_deadline || 'false',
-        reminder_on_booking: allSettings.reminder_on_booking || 'true',
-        reminder_midway: allSettings.reminder_midway || 'true',
-        reminder_one_day_before: allSettings.reminder_one_day_before || 'true',
-        reminder_deadline_day: allSettings.reminder_deadline_day || 'true'
+        flexible_payment_enabled: allSettings['flexible_payment_enabled'] || 'true',
+        payment_grace_period_days: allSettings['payment_grace_period_days'] || '7',
+        auto_cancel_after_deadline: allSettings['auto_cancel_after_deadline'] || 'false',
+        reminder_on_booking: allSettings['reminder_on_booking'] || 'true',
+        reminder_midway: allSettings['reminder_midway'] || 'true',
+        reminder_one_day_before: allSettings['reminder_one_day_before'] || 'true',
+        reminder_deadline_day: allSettings['reminder_deadline_day'] || 'true'
       };
 
       const loadedTemplates = {
-        payment_reminder_initial: allSettings.payment_reminder_initial || 'شكراً لحجزك معنا! لديك {days} أيام لإتمام الدفع.',
-        payment_reminder_midway: allSettings.payment_reminder_midway || 'تذكير: لديك {days} أيام متبقية لإتمام دفع حجزك.',
-        payment_reminder_urgent: allSettings.payment_reminder_urgent || 'عاجل: يتبقى {hours} ساعة فقط لإتمام دفع حجزك!'
+        payment_reminder_initial: allSettings['payment_reminder_initial'] || 'شكراً لحجزك معنا! لديك {days} أيام لإتمام الدفع.',
+        payment_reminder_midway: allSettings['payment_reminder_midway'] || 'تذكير: لديك {days} أيام متبقية لإتمام دفع حجزك.',
+        payment_reminder_urgent: allSettings['payment_reminder_urgent'] || 'عاجل: يتبقى {hours} ساعة فقط لإتمام دفع حجزك!'
       };
+
+      console.log('✅ [SETTINGS] الإعدادات المحملة:', loadedSettings);
+      console.log('✅ [SETTINGS] القوالب المحملة:', loadedTemplates);
 
       setSettings(loadedSettings);
       setMessageTemplates(loadedTemplates);
     } catch (error) {
-      console.error('Error loading settings:', error);
+      console.error('❌ [SETTINGS] خطأ في تحميل الإعدادات:', error);
     } finally {
       setLoading(false);
     }
@@ -64,20 +75,44 @@ export default function FlexiblePaymentSettings() {
     setSuccess(false);
 
     try {
+      console.log('💾 [SETTINGS] بدء حفظ الإعدادات...');
+      console.log('💾 [SETTINGS] الإعدادات المراد حفظها:', settings);
+
       // حفظ الإعدادات
       for (const [key, value] of Object.entries(settings)) {
-        await systemSettingsService.updateSetting(key, value);
+        console.log(`💾 [SETTINGS] حفظ ${key} = ${value}`);
+        const result = await systemSettingsService.updateSetting(key, value);
+
+        if (!result) {
+          console.error(`❌ [SETTINGS] فشل حفظ ${key}`);
+          throw new Error(`فشل حفظ إعداد: ${key}`);
+        }
+
+        console.log(`✅ [SETTINGS] تم حفظ ${key}`);
       }
 
       // حفظ قوالب الرسائل
       for (const [key, value] of Object.entries(messageTemplates)) {
-        await systemSettingsService.updateSetting(key, value);
+        console.log(`💾 [SETTINGS] حفظ قالب ${key}`);
+        const result = await systemSettingsService.updateSetting(key, value);
+
+        if (!result) {
+          console.error(`❌ [SETTINGS] فشل حفظ قالب ${key}`);
+          throw new Error(`فشل حفظ قالب: ${key}`);
+        }
+
+        console.log(`✅ [SETTINGS] تم حفظ قالب ${key}`);
       }
+
+      console.log('✅ [SETTINGS] تم حفظ جميع الإعدادات بنجاح!');
+
+      // إعادة تحميل الإعدادات للتأكد من الحفظ
+      await loadSettings();
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (error) {
-      console.error('Error saving settings:', error);
+      console.error('❌ [SETTINGS] خطأ في حفظ الإعدادات:', error);
       alert('حدث خطأ أثناء حفظ الإعدادات');
     } finally {
       setSaving(false);
