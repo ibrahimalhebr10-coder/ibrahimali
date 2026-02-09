@@ -308,10 +308,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
 
       {/* Main Content */}
       <div className="xl:mr-80 pt-20 xl:pt-0 min-h-screen h-screen flex flex-col">
-        <div className="flex-1 overflow-hidden p-4 sm:p-6 lg:p-8 xl:p-10 pb-32 xl:pb-10">
-          <div className="h-full">
-            {renderContent()}
-          </div>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 xl:p-10 pb-32 xl:pb-10">
+          {renderContent()}
         </div>
       </div>
 
