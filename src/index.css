@@ -1,323 +1,68 @@
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap');
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
 
-@layer base {
-  html, body {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-  }
-
-  body {
-    font-family: 'Tajawal', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
-    direction: rtl;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background: linear-gradient(135deg, rgba(250, 252, 251, 1) 0%, rgba(248, 250, 249, 1) 100%);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-  }
-
-  #root {
-    min-height: 100vh;
-    min-height: 100dvh;
-    padding-bottom: env(safe-area-inset-bottom, 0);
-  }
-
-  #mobile-footer {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    z-index: 2147483647 !important;
-    -webkit-transform: translate3d(0, 0, 0) !important;
-    transform: translate3d(0, 0, 0) !important;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-  }
-
-  * {
-    font-feature-settings: 'ss02', 'ss01', 'ss03';
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-weight: 800;
-    letter-spacing: -0.01em;
-  }
-
-  @keyframes shimmer {
-    0% {
-      background-position: 200% 0;
-    }
-    100% {
-      background-position: -200% 0;
-    }
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes scaleIn {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.8;
-      transform: scale(1.05);
-    }
-  }
-
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-
-  @keyframes glow {
-    0%, 100% {
-      box-shadow: 0 0 20px rgba(58, 161, 126, 0.3);
-    }
-    50% {
-      box-shadow: 0 0 30px rgba(58, 161, 126, 0.6);
-    }
-  }
-
-  @keyframes slideUpFade {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  .animate-fadeIn {
-    animation: fadeIn 0.4s ease-out forwards;
-  }
-
-  .animate-slideInRight {
-    animation: slideInRight 0.5s ease-out forwards;
-  }
-
-  .animate-slideInLeft {
-    animation: slideInLeft 0.5s ease-out forwards;
-  }
-
-  .animate-scaleIn {
-    animation: scaleIn 0.3s ease-out forwards;
-  }
-
-  .animate-pulse {
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-
-  .animate-glow {
-    animation: glow 2s ease-in-out infinite;
-  }
-
-  @keyframes shimmer-slide {
-    0% {
-      transform: translateX(-100%);
-    }
-    100% {
-      transform: translateX(100%);
-    }
-  }
-
-  .animate-shimmer {
-    animation: shimmer-slide 2s ease-in-out infinite;
-    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-    background-size: 200% 100%;
-  }
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@layer utilities {
-  /* إخفاء scrollbars كاملاً */
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
   }
-
-  .scrollbar-hide {
-    -ms-overflow-style: none !important;
-    scrollbar-width: none !important;
-    scrollbar-color: transparent transparent !important;
+  a:hover {
+    color: #747bff;
   }
-
-  /* منع أي scrollbar من الظهور */
-  *::-webkit-scrollbar {
-    width: 0 !important;
-    height: 0 !important;
-    display: none !important;
-  }
-
-  * {
-    -ms-overflow-style: none !important;
-    scrollbar-width: none !important;
-  }
-
-  .safe-area-bottom {
-    padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
-  }
-
-  @supports (-webkit-touch-callout: none) {
-    .safe-area-bottom {
-      padding-bottom: max(constant(safe-area-inset-bottom), 0.5rem);
-      padding-bottom: max(env(safe-area-inset-bottom), 0.5rem);
-    }
-  }
-
-  .safe-area-top {
-    padding-top: env(safe-area-inset-top);
-  }
-
-  .safe-top {
-    padding-top: max(env(safe-area-inset-top), 2rem);
-  }
-
-  @supports (-webkit-touch-callout: none) {
-    .safe-top {
-      padding-top: max(constant(safe-area-inset-top), 2rem);
-      padding-top: max(env(safe-area-inset-top), 2rem);
-    }
-  }
-
-  @supports (-webkit-touch-callout: none) {
-    nav[style*="bottom: 0"] {
-      position: fixed !important;
-      bottom: 0 !important;
-      left: 0 !important;
-      right: 0 !important;
-      z-index: 99999 !important;
-      -webkit-transform: translate3d(0, 0, 0) !important;
-      transform: translate3d(0, 0, 0) !important;
-    }
-  }
-
-  html {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-  }
-
-  html, body, #root {
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  @media (max-width: 1024px) {
-    body {
-      padding-bottom: 0;
-    }
-  }
-
-  .scroll-smooth {
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .scroll-snap-y {
-    scroll-snap-type: y proximity;
-  }
-
-  .scroll-snap-start {
-    scroll-snap-align: start;
-  }
-
-  /* iPhone Optimization */
-  @supports (-webkit-touch-callout: none) {
-    .h-screen {
-      height: 100vh;
-      height: -webkit-fill-available;
-    }
-
-    html {
-      height: -webkit-fill-available;
-    }
-
-    body {
-      min-height: 100vh;
-      min-height: -webkit-fill-available;
-    }
-  }
-
-  /* Ensure footer is always visible */
-  .fixed.bottom-0 {
-    position: fixed !important;
-    bottom: 0 !important;
-    z-index: 9999 !important;
-  }
-
-  /* Scrolling Ticker Animation - LTR (Left to Right) */
-  @keyframes scroll-ltr {
-    0% {
-      transform: translateX(-50%);
-    }
-    100% {
-      transform: translateX(0);
-    }
-  }
-
-  .animate-scroll-ltr {
-    animation: scroll-ltr 20s linear infinite;
-  }
-
-  .animate-scroll-ltr:hover {
-    animation-play-state: paused;
+  button {
+    background-color: #f9f9f9;
   }
 }
