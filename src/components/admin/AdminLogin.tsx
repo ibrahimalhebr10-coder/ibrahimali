@@ -155,10 +155,10 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
           </div>
 
           <div className="space-y-3">
-            <div className="bg-white rounded-lg p-3 md:p-4 border border-blue-100">
-              <p className="text-xs text-gray-600 mb-1">البريد الإلكتروني</p>
-              <div className="flex items-center justify-between gap-3">
-                <code className="text-sm md:text-base font-mono text-blue-700 font-semibold">
+            <div className="bg-white rounded-lg p-4 border border-blue-100">
+              <p className="text-xs text-gray-600 mb-2 font-semibold">البريد الإلكتروني</p>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+                <code className="text-base lg:text-lg font-mono text-blue-700 font-bold bg-blue-50 px-3 py-2 rounded border border-blue-200 break-all select-all">
                   admin@dev.com
                 </code>
                 <button
@@ -167,17 +167,17 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                     navigator.clipboard.writeText('admin@dev.com');
                     setEmail('admin@dev.com');
                   }}
-                  className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                  className="text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold whitespace-nowrap shadow-sm"
                 >
                   نسخ وملء
                 </button>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-3 md:p-4 border border-blue-100">
-              <p className="text-xs text-gray-600 mb-1">كلمة المرور</p>
-              <div className="flex items-center justify-between gap-3">
-                <code className="text-sm md:text-base font-mono text-blue-700 font-semibold">
+            <div className="bg-white rounded-lg p-4 border border-blue-100">
+              <p className="text-xs text-gray-600 mb-2 font-semibold">كلمة المرور</p>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+                <code className="text-base lg:text-lg font-mono text-blue-700 font-bold bg-blue-50 px-3 py-2 rounded border border-blue-200 break-all select-all">
                   Admin@123
                 </code>
                 <button
@@ -186,7 +186,7 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onLoginSuccess }) => {
                     navigator.clipboard.writeText('Admin@123');
                     setPassword('Admin@123');
                   }}
-                  className="text-xs px-3 py-1 bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                  className="text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold whitespace-nowrap shadow-sm"
                 >
                   نسخ وملء
                 </button>
