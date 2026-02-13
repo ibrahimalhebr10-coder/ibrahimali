@@ -1,36 +1,9 @@
 import { User, Handshake, Sprout, Wheat, Apple, Grape, Leaf, HelpCircle, Sparkles, TrendingUp, CheckCircle2, Clock, Layers, ChevronLeft, ChevronRight, Settings, TreePine, Plus, X, Video, Star } from 'lucide-react';
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom';
-import NewHomePage from './components/NewHomePage';
-import HowToStart from './components/HowToStart';
-import StreamingVideoPlayer from './components/StreamingVideoPlayer';
-import AdvancedAIAssistant from './components/AdvancedAIAssistant';
-import SuccessPartnerIntro from './components/SuccessPartnerIntro';
-import SuccessPartnerIntroExperience from './components/SuccessPartnerIntroExperience';
-import SuccessPartnerOnboarding from './components/SuccessPartnerOnboarding';
-import SuccessPartnerRegistrationForm from './components/SuccessPartnerRegistrationForm';
-import SuccessPartnerWelcome from './components/SuccessPartnerWelcome';
-import HowItWorksPartner from './components/HowItWorksPartner';
-import SuccessPartnerWelcomeBanner from './components/SuccessPartnerWelcomeBanner';
-import NotificationCenter from './components/NotificationCenter';
-import AccountProfile from './components/AccountProfile';
-import SuccessPartnerAccount from './components/SuccessPartnerAccount';
-import AccountTypeSelector from './components/AccountTypeSelector';
-import StandaloneAccountRegistration from './components/StandaloneAccountRegistration';
-import WelcomeToAccountScreen from './components/WelcomeToAccountScreen';
-import MyReservations from './components/MyReservations';
-import MyTrees from './components/MyTrees';
-import QuickAccountAccess from './components/QuickAccountAccess';
-import AccountTypeIndicator from './components/AccountTypeIndicator';
 import Header from './components/Header';
 import ErrorBoundary from './components/ErrorBoundary';
 import AppModeSelector, { type AppMode } from './components/AppModeSelector';
-import InvestmentFarmPage from './components/InvestmentFarmPage';
-import AgriculturalFarmPage from './components/AgriculturalFarmPage';
-import IdentitySwitcher from './components/IdentitySwitcher';
-import AdminDashboard from './components/admin/AdminDashboard';
-import AdminLogin from './components/admin/AdminLogin';
-import FarmOfferMode from './components/FarmOfferMode';
 import { farmService, type FarmCategory, type FarmProject } from './services/farmService';
 import { farmLoadingService, type LoadingProgress } from './services/farmLoadingService';
 import { diagnostics } from './utils/diagnostics';
@@ -39,10 +12,49 @@ import { useAuth } from './contexts/AuthContext';
 import { useAdminAuth } from './contexts/AdminAuthContext';
 import { OfferModeProvider, useOfferMode } from './contexts/OfferModeContext';
 import { useDemoMode } from './contexts/DemoModeContext';
-import DemoWelcomeScreen from './components/DemoWelcomeScreen';
 import { initializeSupabase } from './lib/supabase';
 import { useLeadTracking } from './hooks/useLeadTracking';
 import { impersonationService } from './services/impersonationService';
+
+// Lazy load heavy components
+const NewHomePage = lazy(() => import('./components/NewHomePage'));
+const HowToStart = lazy(() => import('./components/HowToStart'));
+const StreamingVideoPlayer = lazy(() => import('./components/StreamingVideoPlayer'));
+const AdvancedAIAssistant = lazy(() => import('./components/AdvancedAIAssistant'));
+const SuccessPartnerIntro = lazy(() => import('./components/SuccessPartnerIntro'));
+const SuccessPartnerIntroExperience = lazy(() => import('./components/SuccessPartnerIntroExperience'));
+const SuccessPartnerOnboarding = lazy(() => import('./components/SuccessPartnerOnboarding'));
+const SuccessPartnerRegistrationForm = lazy(() => import('./components/SuccessPartnerRegistrationForm'));
+const SuccessPartnerWelcome = lazy(() => import('./components/SuccessPartnerWelcome'));
+const HowItWorksPartner = lazy(() => import('./components/HowItWorksPartner'));
+const SuccessPartnerWelcomeBanner = lazy(() => import('./components/SuccessPartnerWelcomeBanner'));
+const NotificationCenter = lazy(() => import('./components/NotificationCenter'));
+const AccountProfile = lazy(() => import('./components/AccountProfile'));
+const SuccessPartnerAccount = lazy(() => import('./components/SuccessPartnerAccount'));
+const AccountTypeSelector = lazy(() => import('./components/AccountTypeSelector'));
+const StandaloneAccountRegistration = lazy(() => import('./components/StandaloneAccountRegistration'));
+const WelcomeToAccountScreen = lazy(() => import('./components/WelcomeToAccountScreen'));
+const MyReservations = lazy(() => import('./components/MyReservations'));
+const MyTrees = lazy(() => import('./components/MyTrees'));
+const QuickAccountAccess = lazy(() => import('./components/QuickAccountAccess'));
+const AccountTypeIndicator = lazy(() => import('./components/AccountTypeIndicator'));
+const InvestmentFarmPage = lazy(() => import('./components/InvestmentFarmPage'));
+const AgriculturalFarmPage = lazy(() => import('./components/AgriculturalFarmPage'));
+const IdentitySwitcher = lazy(() => import('./components/IdentitySwitcher'));
+const AdminDashboard = lazy(() => import('./components/admin/AdminDashboard'));
+const AdminLogin = lazy(() => import('./components/admin/AdminLogin'));
+const FarmOfferMode = lazy(() => import('./components/FarmOfferMode'));
+const DemoWelcomeScreen = lazy(() => import('./components/DemoWelcomeScreen'));
+
+// Loading component
+const LoadingFallback = () => (
+  <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+    <div className="text-center">
+      <div className="w-16 h-16 border-4 border-darkgreen border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p className="text-gray-600 font-semibold">جارٍ التحميل...</p>
+    </div>
+  </div>
+);
 
 function AppContent() {
   const { user, identity, updateIdentity } = useAuth();
@@ -684,7 +696,9 @@ function AppContent() {
   if (isOfferMode) {
     return (
       <ErrorBoundary>
-        <FarmOfferMode />
+        <Suspense fallback={<LoadingFallback />}>
+          <FarmOfferMode />
+        </Suspense>
       </ErrorBoundary>
     );
   }
@@ -705,17 +719,18 @@ function AppContent() {
 
     return (
       <ErrorBoundary>
-        <NewHomePage
-          onStartInvestment={handleStartInvestment}
-          onOpenPartnerProgram={() => setShowSuccessPartnerIntroExperience(true)}
-          onOpenAccount={() => setShowQuickAccountAccess(true)}
-          onOpenAssistant={() => setShowAdvancedAssistant(true)}
-          onOfferFarm={handleOfferFarmClick}
-          hideFooter={shouldHideFooter}
-        />
+        <Suspense fallback={<LoadingFallback />}>
+          <NewHomePage
+            onStartInvestment={handleStartInvestment}
+            onOpenPartnerProgram={() => setShowSuccessPartnerIntroExperience(true)}
+            onOpenAccount={() => setShowQuickAccountAccess(true)}
+            onOpenAssistant={() => setShowAdvancedAssistant(true)}
+            onOfferFarm={handleOfferFarmClick}
+            hideFooter={shouldHideFooter}
+          />
 
-        {/* Partner Program Modals - Must be inside NewHomePage render */}
-        <SuccessPartnerIntroExperience
+          {/* Partner Program Modals - Must be inside NewHomePage render */}
+          <SuccessPartnerIntroExperience
           isOpen={showSuccessPartnerIntroExperience}
           onContinue={() => {
             console.log('✅ [App] Moving DIRECTLY to Registration - NO OLD SCREENS!');
@@ -796,6 +811,7 @@ function AppContent() {
             initialMode={standaloneRegistrationMode}
           />
         )}
+        </Suspense>
       </ErrorBoundary>
     );
   }
@@ -804,6 +820,7 @@ function AppContent() {
 
   return (
     <ErrorBoundary>
+      <Suspense fallback={<LoadingFallback />}>
       <div
         className="flex flex-col relative scrollbar-hide"
         style={{
@@ -1656,6 +1673,7 @@ function AppContent() {
       />
 
       </div>
+      </Suspense>
     </ErrorBoundary>
   );
 }
